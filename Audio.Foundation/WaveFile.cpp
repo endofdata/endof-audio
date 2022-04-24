@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "WaveFile.h"
 #include "WaveFormat.h"
+#include <SampleConversionUnmanaged.h>
 
 using namespace System;
 using namespace System::IO;
@@ -164,7 +165,7 @@ float WaveFile::ReadPCM16()
 		throw gcnew InvalidOperationException("Invalid Mode.");
 	}
 
-	return SampleConversion::Int16ToFloat(m_binaryReader->ReadInt16());
+	return Audio::Foundation::Unmanaged::SampleConversion::Int16ToFloat(m_binaryReader->ReadInt16());
 }
 
 void WaveFile::WritePCM16(float value)
@@ -173,7 +174,7 @@ void WaveFile::WritePCM16(float value)
 	{
 		throw gcnew InvalidOperationException("Invalid Mode.");
 	}
-	m_binaryWriter->Write(SampleConversion::FloatToInt16(value));
+	m_binaryWriter->Write(Audio::Foundation::Unmanaged::SampleConversion::FloatToInt16(value));
 }
 
 float WaveFile::ReadPCM32()
@@ -183,7 +184,7 @@ float WaveFile::ReadPCM32()
 		throw gcnew InvalidOperationException("Invalid Mode.");
 	}
 
-	return SampleConversion::Int32ToFloat(m_binaryReader->ReadInt32());
+	return Audio::Foundation::Unmanaged::SampleConversion::Int32ToFloat(m_binaryReader->ReadInt32());
 }
 
 void WaveFile::WritePCM32(float value)
@@ -192,7 +193,7 @@ void WaveFile::WritePCM32(float value)
 	{
 		throw gcnew InvalidOperationException("Invalid Mode.");
 	}
-	m_binaryWriter->Write(SampleConversion::FloatToInt32(value));
+	m_binaryWriter->Write(Audio::Foundation::Unmanaged::SampleConversion::FloatToInt32(value));
 }
 
 float WaveFile::ReadFloat()

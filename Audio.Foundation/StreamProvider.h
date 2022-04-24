@@ -1,8 +1,10 @@
 #pragma once
 
-#include "SampleContainer.h"
-#include "SampleSharer.h"
+#include <SampleContainer.h>
+#include <SampleSharer.h>
 #include <vcclr.h>
+
+using namespace Audio::Foundation::Unmanaged;
 
 namespace Audio
 {

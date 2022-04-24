@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "SampleConversion.h"
+#include <SampleConversionUnmanaged.h>
 
 using namespace System;
 using namespace Audio::Foundation;
@@ -46,7 +47,7 @@ int SampleConversion::Int16ToFloatConverter(array<Byte>^ buffer, int count, arra
 	float* pDst = (float*)pinnedOutput;
 
 	for (int sample = 0; sample < sampleCount; sample++)
-		*pDst++ = SampleConversion::Int16ToFloat(*pSrc++);
+		*pDst++ = Audio::Foundation::Unmanaged::SampleConversion::Int16ToFloat(*pSrc++);
 
 	return sampleCount;
 }
