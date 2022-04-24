@@ -1,0 +1,6 @@
+*.VC.db
+*.user
+*.htm
+obj/
+bin/
+Audio.Asio/TestResults/

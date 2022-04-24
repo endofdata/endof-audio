@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="UsefullStuff.cpp" />
+    <ClCompile Include="AsioCore.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AsioCoreException.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AsioDebugDriver.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AsioInteropException.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AssemblyInfo.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioInput.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioOutput.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioTrack.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="DriverDescription.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="DriverRegistry.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="TapeMachine.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioTrackCollection.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AsioDevice.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AsioRouter.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AsioCoreCallbacks.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AsioCore.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AsioCoreException.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AsioDebugDriver.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AsioDebugDriverGuid.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AsioError.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AsioInteropException.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioInput.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioInputCollection.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioOutput.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioOutputCollection.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioTrack.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioTrackCollection.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="DriverDescription.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="InputInt32Channel.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputInt32ChannelPair.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="TapeMachine.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AsioRouter.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AsioDevice.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AsioDeviceCollection.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="BufferSwitchManagedCallback.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AsioCoreCallbacks.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="InputFloat32Channel.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputFloat32ChannelPair.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="InputInt24Channel.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputInt24ChannelPair.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header">
+      <UniqueIdentifier>{ec82c371-d6f0-462c-8557-7a6df6ce36d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{62b18ed8-f30e-4a28-88a5-6183ebf4ac9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource">
+      <UniqueIdentifier>{8c98f489-5dc3-4cf7-a0db-5bba243b9710}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="app.rc">
+      <Filter>Resource</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="app.ico">
+      <Filter>Resource</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

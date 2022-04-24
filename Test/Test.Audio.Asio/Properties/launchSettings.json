@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Test.Audio.Asio": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
