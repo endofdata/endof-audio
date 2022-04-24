@@ -1,6 +1,7 @@
 *.VC.db
 *.user
 *.htm
+.vs/
 obj/
 bin/
 Audio.Asio/TestResults/

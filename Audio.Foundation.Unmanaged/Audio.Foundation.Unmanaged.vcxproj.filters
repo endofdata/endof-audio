@@ -21,55 +21,55 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Audio.Foundation\ChannelLink.h">
+    <ClInclude Include="ChannelLink.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Audio.Foundation\IChannelLink.h">
+    <ClInclude Include="IChannelLink.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Audio.Foundation\IInputChannel.h">
+    <ClInclude Include="IInputChannel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Audio.Foundation\InputOfTSampleChannel.h">
+    <ClInclude Include="InputOfTSampleChannel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Audio.Foundation\IOutputChannelPair.h">
+    <ClInclude Include="IOutputChannelPair.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Audio.Foundation\ISampleBuffer.h">
+    <ClInclude Include="ISampleBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Audio.Foundation\ISampleSharer.h">
+    <ClInclude Include="ISampleContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Audio.Foundation\ISampleReceiver.h">
+    <ClInclude Include="ISampleLinker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Audio.Foundation\ISampleLinker.h">
+    <ClInclude Include="ISampleReceiver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Audio.Foundation\ISampleContainer.h">
+    <ClInclude Include="ISampleSharer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Audio.Foundation\MeterChannel.h">
+    <ClInclude Include="MeterChannel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Audio.Foundation\OutputOfTSampleChannelPair.h">
+    <ClInclude Include="OutputOfTSampleChannelPair.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Audio.Foundation\SampleSharer.h">
+    <ClInclude Include="SampleBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Audio.Foundation\SampleJoiner.h">
+    <ClInclude Include="SampleContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Audio.Foundation\SampleContainer.h">
+    <ClInclude Include="SampleConversionUnmanaged.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Audio.Foundation\SampleBuffer.h">
+    <ClInclude Include="SampleJoiner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Audio.Foundation\SampleConversionUnmanaged.h">
+    <ClInclude Include="SampleSharer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -80,25 +80,25 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Audio.Foundation\_Interfaces.cpp">
+    <ClCompile Include="ChannelLink.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Audio.Foundation\ChannelLink.cpp">
+    <ClCompile Include="MeterChannel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Audio.Foundation\MeterChannel.cpp">
+    <ClCompile Include="SampleBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Audio.Foundation\SampleBuffer.cpp">
+    <ClCompile Include="SampleContainer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Audio.Foundation\SampleContainer.cpp">
+    <ClCompile Include="SampleJoiner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Audio.Foundation\SampleJoiner.cpp">
+    <ClCompile Include="SampleSharer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Audio.Foundation\SampleSharer.cpp">
+    <ClCompile Include="_Interfaces.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

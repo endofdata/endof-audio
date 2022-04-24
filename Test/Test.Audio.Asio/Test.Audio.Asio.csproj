@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Audio.Asio.vcxproj" />
+    <ProjectReference Include="..\..\Audio.Asio\Audio.Asio.vcxproj" />
   </ItemGroup>
 
   <ItemGroup>
