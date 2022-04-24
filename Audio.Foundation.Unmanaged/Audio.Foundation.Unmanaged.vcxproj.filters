@@ -81,6 +81,9 @@
     <ClInclude Include="UnknownBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SampleContainerBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -113,7 +116,7 @@
     <ClCompile Include="ObjectFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UnknownBase.cpp">
+    <ClCompile Include="SampleContainerBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

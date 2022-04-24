@@ -106,6 +106,7 @@
     <ClInclude Include="OutputOfTSampleChannelPair.h" />
     <ClInclude Include="SampleBuffer.h" />
     <ClInclude Include="SampleContainer.h" />
+    <ClInclude Include="SampleContainerBase.h" />
     <ClInclude Include="SampleConversionUnmanaged.h" />
     <ClInclude Include="SampleJoiner.h" />
     <ClInclude Include="SampleSharer.h" />
@@ -119,9 +120,9 @@
     <ClCompile Include="ObjectFactory.cpp" />
     <ClCompile Include="SampleBuffer.cpp" />
     <ClCompile Include="SampleContainer.cpp" />
+    <ClCompile Include="SampleContainerBase.cpp" />
     <ClCompile Include="SampleJoiner.cpp" />
     <ClCompile Include="SampleSharer.cpp" />
-    <ClCompile Include="UnknownBase.cpp" />
     <ClCompile Include="_Interfaces.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp">

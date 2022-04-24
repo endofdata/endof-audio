@@ -7,8 +7,9 @@ using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 SampleJoiner::SampleJoiner(int sampleCount) :
-	SampleContainer(sampleCount),
-	m_pOutputLink(NULL)
+	SampleContainerBase(sampleCount),
+	m_pOutputLink(NULL),
+	m_refCount(0)
 {
 }
 
@@ -16,14 +17,34 @@ SampleJoiner::~SampleJoiner()
 {
 }
 
+IMPLEMENT_IUNKNOWN(SampleJoiner)
+
+IMPLEMENT_SAMPLECONTAINER(SampleJoiner)
+
+
 bool SampleJoiner::GetInterface(REFIID iid, void** ppvResult)
 {
+	if (iid == __uuidof(IUnknown))
+	{
+		*ppvResult = dynamic_cast<IUnknown*>(dynamic_cast<ISampleJoiner*>(this));
+		return true;
+	}
 	if (iid == __uuidof(ISampleJoiner))
 	{
 		*ppvResult = dynamic_cast<ISampleJoiner*>(this);
 		return true;
 	}
-	return SampleContainer::GetInterface(iid, ppvResult);
+	if (iid == __uuidof(ISampleReceiver))
+	{
+		*ppvResult = dynamic_cast<ISampleReceiver*>(this);
+		return true;
+	}
+	if (iid == __uuidof(ISampleContainer))
+	{
+		*ppvResult = dynamic_cast<ISampleContainer*>(this);
+		return true;
+	}
+	return false;
 }
 
 

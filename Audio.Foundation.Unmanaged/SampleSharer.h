@@ -11,7 +11,7 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class SampleSharer :public UnknownBase, public Audio::Foundation::Unmanaged::Abstractions::ISampleSharer
+			class SampleSharer : public Audio::Foundation::Unmanaged::Abstractions::ISampleSharer
 			{
 			public:
 				SampleSharer();
@@ -24,6 +24,8 @@ namespace Audio
 				virtual void RemoveAllSends();
 
 				virtual void RouteToSends();
+
+				DECLARE_IUNKNOWN
 
 			protected:
 				virtual bool GetInterface(REFIID riid, void** pResult);

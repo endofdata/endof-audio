@@ -10,7 +10,7 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class SampleBuffer : public UnknownBase, public Audio::Foundation::Unmanaged::Abstractions::ISampleBuffer
+			class SampleBuffer : public Audio::Foundation::Unmanaged::Abstractions::ISampleBuffer
 			{
 			public:
 				/*! \brief Constructor
@@ -41,6 +41,8 @@ namespace Audio
 
 				//!\brief Property getter for SamplePtr
 				float* get_SamplePtr();
+
+				DECLARE_IUNKNOWN
 
 			protected:
 				virtual bool GetInterface(REFIID riid, void** pResult);

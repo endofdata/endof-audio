@@ -8,7 +8,8 @@ ChannelLink::ChannelLink() :
 	m_pInput(NULL),
 	m_pOutput(NULL),
 	m_volume(0.0f),
-	m_pan(0.0f)
+	m_pan(0.0f),
+	m_refCount(0)
 {
 }
 
@@ -16,7 +17,8 @@ ChannelLink::ChannelLink(ISampleContainer* pInput, ISampleReceiver* pOutput, flo
 	m_pInput(pInput),
 	m_pOutput(pOutput),
 	m_volume(volume),
-	m_pan(pan)
+	m_pan(pan),
+	m_refCount(0)
 {
 }
 
@@ -24,14 +26,21 @@ ChannelLink::~ChannelLink()
 {
 }
 
+IMPLEMENT_IUNKNOWN(ChannelLink)
+
 bool ChannelLink::GetInterface(REFIID iid, void** ppvResult)
 {
+	if (iid == __uuidof(IUnknown))
+	{
+		*ppvResult = dynamic_cast<IUnknown*>(this);
+		return true;
+	}
 	if (iid == __uuidof(IChannelLink))
 	{
 		*ppvResult = dynamic_cast<IChannelLink*>(this);
 		return true;
 	}
-	return UnknownBase::GetInterface(iid, ppvResult);
+	return false;
 }
 
 float ChannelLink::get_Volume()

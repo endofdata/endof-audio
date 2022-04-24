@@ -12,7 +12,7 @@ namespace Audio
 		{
 			typedef int(__stdcall* MeterChannelCallback)(class MeterChannel* pSender);
 
-			class MeterChannel : public UnknownBase, public Audio::Foundation::Unmanaged::Abstractions::ISampleReceiver
+			class MeterChannel : public Audio::Foundation::Unmanaged::Abstractions::ISampleReceiver
 			{
 			public:
 				MeterChannel(int sampleRate);
@@ -42,6 +42,8 @@ namespace Audio
 
 				MeterChannelCallback get_MeterUpdate();
 				void put_MeterUpdate(MeterChannelCallback value);
+
+				DECLARE_IUNKNOWN
 
 			protected:
 				virtual void OnMeterUpdate();

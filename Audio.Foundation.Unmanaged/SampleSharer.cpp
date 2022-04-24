@@ -10,7 +10,7 @@ using namespace std;
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
-SampleSharer::SampleSharer()
+SampleSharer::SampleSharer() : m_refCount(0)
 {
 }
 
@@ -19,14 +19,22 @@ SampleSharer::~SampleSharer()
 	RemoveAllSends();
 }
 
+IMPLEMENT_IUNKNOWN(SampleSharer)
+
 bool SampleSharer::GetInterface(REFIID iid, void** ppvResult)
 {
+	if (iid == __uuidof(IUnknown))
+	{
+		*ppvResult = dynamic_cast<IUnknown*>(this);
+		return true;
+	}
+
 	if (iid == __uuidof(ISampleSharer))
 	{
 		*ppvResult = dynamic_cast<ISampleSharer*>(this);
 		return true;
 	}
-	return UnknownBase::GetInterface(iid, ppvResult);
+	return false;
 }
 
 void SampleSharer::AddSend(ISampleContainer& fromChannel, ISampleReceiver& toChannel, float volume, float pan)

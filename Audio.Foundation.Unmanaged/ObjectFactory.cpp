@@ -72,6 +72,18 @@ ISampleJoiner* ObjectFactory::CreateSampleJoiner(int sampleCount)
 }
 
 // static
+ISampleContainer* ObjectFactory::CreateSampleContainer(int sampleCount)
+{
+	SampleContainer* instance = new SampleContainer(sampleCount);
+	ISampleContainer* result;
+	if (FAILED(instance->QueryInterface(__uuidof(ISampleContainer), (void**)&result)))
+	{
+		throw new std::runtime_error("QueryInterface failed");
+	}
+	return result;
+}
+
+// static
 ISampleSharer* ObjectFactory::CreateSampleSharer()
 {
 	SampleSharer* instance = new SampleSharer();

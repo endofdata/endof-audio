@@ -1,32 +1,45 @@
 #pragma once
 #include <comdef.h>
 
-namespace Audio
-{
-	namespace Foundation
-	{
-		namespace Unmanaged
-		{
-			class UnknownBase : public IUnknown
-			{
-			public:
-				UnknownBase();
-				virtual ~UnknownBase();
+#define DECLARE_IUNKNOWN															\
+	public:																			\
+		virtual STDMETHODIMP QueryInterface(REFIID riid, void **ppv);				\
+		virtual STDMETHODIMP_(ULONG) AddRef();										\
+		virtual STDMETHODIMP_(ULONG) Release();										\
+	private:																		\
+		ULONG m_refCount;															\
 
-				virtual HRESULT STDMETHODCALLTYPE QueryInterface(
-					/* [in] */ REFIID riid,
-					/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject);
-
-				virtual ULONG STDMETHODCALLTYPE AddRef(void);
-
-				virtual ULONG STDMETHODCALLTYPE Release(void);
-
-			protected:
-				virtual bool GetInterface(REFIID riid, void** pResult);
-
-			private:
-				ULONG m_refCount;
-			};
-		}
-	}
-}
+#define IMPLEMENT_IUNKNOWN(TYPE_NAME)												\
+	HRESULT TYPE_NAME::QueryInterface(const IID& riid, void** ppvObject)			\
+	{																				\
+		if (ppvObject == NULL)														\
+		{																			\
+			return E_INVALIDARG;													\
+		}																			\
+																					\
+		*ppvObject = NULL;															\
+																					\
+		if (GetInterface(riid, ppvObject))											\
+		{																			\
+			AddRef();																\
+			return S_OK;															\
+		}																			\
+		return E_NOINTERFACE;														\
+	}																				\
+																					\
+	ULONG STDMETHODCALLTYPE TYPE_NAME::AddRef(void)									\
+	{																				\
+		::InterlockedIncrement(&m_refCount);										\
+		return m_refCount;															\
+	}																				\
+																					\
+	ULONG STDMETHODCALLTYPE TYPE_NAME::Release(void)								\
+	{																				\
+		if (::InterlockedDecrement(&m_refCount) == 0)								\
+		{																			\
+			delete this;															\
+			return 0;																\
+		}																			\
+		return m_refCount;															\
+	}																			
+																																						

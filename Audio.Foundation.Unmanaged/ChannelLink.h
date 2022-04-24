@@ -10,7 +10,7 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class ChannelLink : public UnknownBase, public Audio::Foundation::Unmanaged::Abstractions::IChannelLink
+			class ChannelLink : public Audio::Foundation::Unmanaged::Abstractions::IChannelLink
 			{
 			public:
 				ChannelLink();
@@ -28,6 +28,8 @@ namespace Audio
 
 				Abstractions::ISampleReceiver* get_Output();
 				void put_Output(Abstractions::ISampleReceiver* Output);
+
+				DECLARE_IUNKNOWN
 
 			protected:
 				virtual bool GetInterface(REFIID riid, void** pResult);

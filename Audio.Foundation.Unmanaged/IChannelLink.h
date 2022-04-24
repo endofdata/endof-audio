@@ -2,6 +2,7 @@
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <Windows.h>
+#include <comdef.h>
 
 namespace Audio
 {
@@ -14,7 +15,7 @@ namespace Audio
 				__interface ISampleContainer;
 				__interface ISampleReceiver;
 
-				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("866238bb-6fb5-4f00-ae6d-5316f4df7cec")) IChannelLink
+				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("866238bb-6fb5-4f00-ae6d-5316f4df7cec")) IChannelLink : public IUnknown
 				{
 					_declspec(property(get = get_Volume, put = put_Volume)) float Volume;
 

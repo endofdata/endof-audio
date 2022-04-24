@@ -17,7 +17,8 @@ MeterChannel::MeterChannel(int sampleRate) :
 	m_fDbLeft(0.0f),
 	m_fDbRight(0.0f),
 	m_pInput(NULL),
-	m_meterUpdate(NULL)
+	m_meterUpdate(NULL),
+	m_refCount(0)
 {
 }
 
@@ -25,14 +26,22 @@ void MeterChannel::Flush()
 {
 }
 
+IMPLEMENT_IUNKNOWN(MeterChannel)
+
 bool MeterChannel::GetInterface(REFIID iid, void** ppvResult)
 {
+	if (iid == __uuidof(IUnknown))
+	{
+		*ppvResult = dynamic_cast<IUnknown*>(this);
+		return true;
+	}
+
 	if (iid == __uuidof(ISampleReceiver))
 	{
 		*ppvResult = dynamic_cast<ISampleReceiver*>(this);
 		return true;
 	}
-	return UnknownBase::GetInterface(iid, ppvResult);
+	return false;
 }
 
 void MeterChannel::Receive(IChannelLink& inputBuffer)

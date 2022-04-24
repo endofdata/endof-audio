@@ -30,6 +30,8 @@ namespace Audio
 
 				static ISampleJoiner* CreateSampleJoiner(int sampleCount);
 
+				static ISampleContainer* CreateSampleContainer(int sampleCount);
+
 				static ISampleSharer* CreateSampleSharer();
 
 			private:
