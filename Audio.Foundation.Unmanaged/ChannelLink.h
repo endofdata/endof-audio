@@ -1,6 +1,8 @@
 #pragma once
 
+#include "Audio.Foundation.Unmanaged.h"
 #include "IChannelLink.h"
+#include "UnknownBase.h"
 
 namespace Audio
 {
@@ -8,7 +10,7 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			_APIDEF class ChannelLink : public Audio::Foundation::Unmanaged::Abstractions::IChannelLink
+			class ChannelLink : public UnknownBase, public Audio::Foundation::Unmanaged::Abstractions::IChannelLink
 			{
 			public:
 				ChannelLink();
@@ -26,6 +28,9 @@ namespace Audio
 
 				Abstractions::ISampleReceiver* get_Output();
 				void put_Output(Abstractions::ISampleReceiver* Output);
+
+			protected:
+				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
 				Abstractions::ISampleContainer* m_pInput;

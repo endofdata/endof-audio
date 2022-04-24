@@ -19,6 +19,17 @@ SampleBuffer::~SampleBuffer()
 	delete[] m_pSamples;
 }
 
+bool SampleBuffer::GetInterface(REFIID iid, void** ppvResult)
+{
+	if (iid == __uuidof(ISampleBuffer))
+	{
+		*ppvResult = dynamic_cast<ISampleBuffer*>(this);
+		return true;
+	}
+	return UnknownBase::GetInterface(iid, ppvResult);
+
+}
+
 void SampleBuffer::Flush()
 {
 	ZeroMemory(m_pSamples, sizeof(float) * m_iSamples);

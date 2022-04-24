@@ -12,6 +12,21 @@ SampleJoiner::SampleJoiner(int sampleCount) :
 {
 }
 
+SampleJoiner::~SampleJoiner()
+{
+}
+
+bool SampleJoiner::GetInterface(REFIID iid, void** ppvResult)
+{
+	if (iid == __uuidof(ISampleJoiner))
+	{
+		*ppvResult = dynamic_cast<ISampleJoiner*>(this);
+		return true;
+	}
+	return SampleContainer::GetInterface(iid, ppvResult);
+}
+
+
 void SampleJoiner::Flush()
 {
 	LeftChannel->Flush();

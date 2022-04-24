@@ -24,6 +24,16 @@ ChannelLink::~ChannelLink()
 {
 }
 
+bool ChannelLink::GetInterface(REFIID iid, void** ppvResult)
+{
+	if (iid == __uuidof(IChannelLink))
+	{
+		*ppvResult = dynamic_cast<IChannelLink*>(this);
+		return true;
+	}
+	return UnknownBase::GetInterface(iid, ppvResult);
+}
+
 float ChannelLink::get_Volume()
 {
 	return m_volume;

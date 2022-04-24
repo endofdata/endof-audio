@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Audio.Foundation.Unmanaged.h>
 #include <math.h>
 #include <stdexcept>
 
@@ -24,7 +25,7 @@ namespace Audio
 			const float PanLeft = -1.0f;
 			const float PanRight = +1.0f;
 
-			class SampleConversion
+			class _AUDIO_FOUNDATION_UNMANAGED_API SampleConversion
 			{
 			public:
 

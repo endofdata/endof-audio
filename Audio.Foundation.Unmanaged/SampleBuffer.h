@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Audio.Foundation.Unmanaged.h"
+#include "UnknownBase.h"
 #include "ISampleBuffer.h"
 
 namespace Audio
@@ -8,7 +10,7 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			_APIDEF class SampleBuffer : public Audio::Foundation::Unmanaged::Abstractions::ISampleBuffer
+			class SampleBuffer : public UnknownBase, public Audio::Foundation::Unmanaged::Abstractions::ISampleBuffer
 			{
 			public:
 				/*! \brief Constructor
@@ -39,6 +41,9 @@ namespace Audio
 
 				//!\brief Property getter for SamplePtr
 				float* get_SamplePtr();
+
+			protected:
+				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
 				float* m_pSamples;

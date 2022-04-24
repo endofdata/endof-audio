@@ -2,6 +2,7 @@
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <Windows.h>
+#include <Audio.Foundation.Unmanaged.h>
 
 namespace Audio
 {
@@ -15,7 +16,7 @@ namespace Audio
 				__interface ISampleContainer;
 				__interface ISampleReceiver;
 
-				__interface ISampleSharer
+				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("e8ed7980-1d09-46b0-9c9c-df015a1f72fe")) ISampleSharer
 				{
 					_declspec(property(get = get_Send)) IChannelLink* Send[];
 

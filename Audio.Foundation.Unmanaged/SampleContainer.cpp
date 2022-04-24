@@ -20,6 +20,17 @@ SampleContainer::~SampleContainer()
 	FreeChannels();
 }
 
+bool SampleContainer::GetInterface(REFIID iid, void** ppvResult)
+{
+	if (iid == __uuidof(ISampleContainer))
+	{
+		*ppvResult = dynamic_cast<ISampleContainer*>(this);
+		return true;
+	}
+	return UnknownBase::GetInterface(iid, ppvResult);
+}
+
+
 void SampleContainer::AllocChannels(int sampleCount)
 {
 	m_pLeftChannel = new SampleBuffer(sampleCount);

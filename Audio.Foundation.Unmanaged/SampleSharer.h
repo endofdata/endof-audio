@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Audio.Foundation.Unmanaged.h"
+#include "UnknownBase.h"
 #include "ISampleSharer.h"
 #include <vector>
 
@@ -9,12 +11,11 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			_APIDEF class SampleSharer : public Audio::Foundation::Unmanaged::Abstractions::ISampleSharer
+			class SampleSharer :public UnknownBase, public Audio::Foundation::Unmanaged::Abstractions::ISampleSharer
 			{
 			public:
 				SampleSharer();
 				virtual ~SampleSharer();
-
 
 				virtual Abstractions::IChannelLink* get_Send(int iIdx);
 
@@ -23,6 +24,9 @@ namespace Audio
 				virtual void RemoveAllSends();
 
 				virtual void RouteToSends();
+
+			protected:
+				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
 				std::vector<Abstractions::IChannelLink*> m_vecSends;

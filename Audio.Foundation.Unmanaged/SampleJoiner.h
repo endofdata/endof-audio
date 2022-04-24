@@ -1,7 +1,9 @@
 #pragma once
 
+#include "Audio.Foundation.Unmanaged.h"
+#include "UnknownBase.h"
 #include "ISampleReceiver.h"
-#include "ISampleLinker.h"
+#include "ISampleJoiner.h"
 #include "SampleContainer.h"
 
 namespace Audio
@@ -10,10 +12,11 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			_APIDEF class SampleJoiner : public SampleContainer, public Audio::Foundation::Unmanaged::Abstractions::ISampleReceiver, public Audio::Foundation::Unmanaged::Abstractions::ISampleLinker
+			class SampleJoiner : public SampleContainer, public Audio::Foundation::Unmanaged::Abstractions::ISampleReceiver, public Audio::Foundation::Unmanaged::Abstractions::ISampleJoiner
 			{
 			public:
 				SampleJoiner(int sampleCount);
+				virtual ~SampleJoiner();
 
 				virtual void Flush();
 				virtual void Receive(Abstractions::IChannelLink& inputBuffer);
@@ -27,6 +30,7 @@ namespace Audio
 
 			protected:
 				void MixInput(ISampleContainer* pInput, float volume, float pan);
+				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
 				Abstractions::IChannelLink* m_pOutputLink;

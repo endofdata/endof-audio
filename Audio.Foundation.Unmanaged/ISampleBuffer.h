@@ -2,6 +2,7 @@
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <Windows.h>
+#include <Audio.Foundation.Unmanaged.h>
 
 namespace Audio
 {
@@ -11,7 +12,7 @@ namespace Audio
 		{
 			namespace Abstractions
 			{
-				__interface ISampleBuffer
+				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("7df79f36-35fb-4449-b72d-5952c1f4fdbc")) ISampleBuffer
 				{
 					void Flush() = 0;
 

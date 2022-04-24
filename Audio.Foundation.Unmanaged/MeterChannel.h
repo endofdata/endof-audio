@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Audio.Foundation.Unmanaged.h"
+#include "UnknownBase.h"
 #include "ISampleReceiver.h"
 
 namespace Audio
@@ -10,7 +12,7 @@ namespace Audio
 		{
 			typedef int(__stdcall* MeterChannelCallback)(class MeterChannel* pSender);
 
-			_APIDEF class MeterChannel : public Audio::Foundation::Unmanaged::Abstractions::ISampleReceiver
+			class MeterChannel : public UnknownBase, public Audio::Foundation::Unmanaged::Abstractions::ISampleReceiver
 			{
 			public:
 				MeterChannel(int sampleRate);
@@ -43,6 +45,8 @@ namespace Audio
 
 			protected:
 				virtual void OnMeterUpdate();
+
+				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
 				MeterChannelCallback m_meterUpdate;

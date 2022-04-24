@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Audio.Foundation.Unmanaged.h"
+#include "UnknownBase.h"
 #include "ISampleContainer.h"
 #include "ISampleBuffer.h"
 
@@ -9,7 +11,7 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			_APIDEF class SampleContainer abstract : public Audio::Foundation::Unmanaged::Abstractions::ISampleContainer
+			class SampleContainer abstract : public UnknownBase, public Audio::Foundation::Unmanaged::Abstractions::ISampleContainer
 			{
 			public:
 				SampleContainer(int sampleCount);
@@ -27,6 +29,9 @@ namespace Audio
 				virtual void put_SampleCount(int sampleCount);
 
 				_declspec(property(get = get_SampleCount, put = put_SampleCount)) int SampleCount;
+
+			protected:
+				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
 				void AllocChannels(int sampleCount);

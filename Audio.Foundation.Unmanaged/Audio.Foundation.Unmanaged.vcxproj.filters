@@ -42,7 +42,7 @@
     <ClInclude Include="ISampleContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ISampleLinker.h">
+    <ClInclude Include="ISampleJoiner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ISampleReceiver.h">
@@ -54,16 +54,10 @@
     <ClInclude Include="MeterChannel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OutputOfTSampleChannelPair.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SampleBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SampleContainer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SampleConversionUnmanaged.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SampleJoiner.h">
@@ -72,12 +66,30 @@
     <ClInclude Include="SampleSharer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SampleConversionUnmanaged.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputOfTSampleChannelPair.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio.Foundation.Unmanaged.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UnknownBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="_Interfaces.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ChannelLink.cpp">
@@ -98,7 +110,10 @@
     <ClCompile Include="SampleSharer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="_Interfaces.cpp">
+    <ClCompile Include="ObjectFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UnknownBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

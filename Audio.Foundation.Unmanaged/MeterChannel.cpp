@@ -25,6 +25,16 @@ void MeterChannel::Flush()
 {
 }
 
+bool MeterChannel::GetInterface(REFIID iid, void** ppvResult)
+{
+	if (iid == __uuidof(ISampleReceiver))
+	{
+		*ppvResult = dynamic_cast<ISampleReceiver*>(this);
+		return true;
+	}
+	return UnknownBase::GetInterface(iid, ppvResult);
+}
+
 void MeterChannel::Receive(IChannelLink& inputBuffer)
 {
 	ISampleContainer* pInput = inputBuffer.Input;

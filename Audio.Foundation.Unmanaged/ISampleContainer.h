@@ -2,6 +2,7 @@
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <Windows.h>
+#include <Audio.Foundation.Unmanaged.h>
 
 namespace Audio
 {
@@ -13,7 +14,7 @@ namespace Audio
 			{
 				__interface ISampleBuffer;
 
-				__interface ISampleContainer
+				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("4d5806ba-6683-48e6-93bb-2e6025e00226")) ISampleContainer
 				{
 					_declspec(property(get = get_IsActive, put = put_IsActive)) bool IsActive;
 

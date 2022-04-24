@@ -19,6 +19,16 @@ SampleSharer::~SampleSharer()
 	RemoveAllSends();
 }
 
+bool SampleSharer::GetInterface(REFIID iid, void** ppvResult)
+{
+	if (iid == __uuidof(ISampleSharer))
+	{
+		*ppvResult = dynamic_cast<ISampleSharer*>(this);
+		return true;
+	}
+	return UnknownBase::GetInterface(iid, ppvResult);
+}
+
 void SampleSharer::AddSend(ISampleContainer& fromChannel, ISampleReceiver& toChannel, float volume, float pan)
 {
 	// do not allow two sends to the same destination

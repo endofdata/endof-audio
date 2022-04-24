@@ -2,6 +2,7 @@
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <Windows.h>
+#include <Audio.Foundation.Unmanaged.h>
 
 namespace Audio
 {
@@ -13,7 +14,7 @@ namespace Audio
 			{
 				__interface ISampleReceiver;
 
-				__interface IOutputChannelPair
+				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("5d96f162-5569-40b6-9cc1-529800d1eaa2")) IOutputChannelPair
 				{
 					_declspec(property(get = get_AsSampleReceiver)) ISampleReceiver& AsSampleReceiver;
 
