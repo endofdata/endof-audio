@@ -80,6 +80,7 @@ namespace Audio
 				void OnPropertyChanged(System::String^ propertyName);
 				void CleanUp(bool isDisposing);
 
+				bool m_isDisposed;
 				int m_channelId;
 				IMeterChannel* m_pInputMeter;
 				IInputChannel* m_pInputChannel;

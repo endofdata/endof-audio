@@ -301,6 +301,7 @@ void AsioCore::CreateInputChannels()
 			if (NULL == m_pInputChannels[m_iInputChannels])
 				throw gcnew AsioCoreException("AsioCore: Not enough memory for InputChannel instance.", E_OUTOFMEMORY);
 
+			m_pInputChannels[m_iInputChannels]->AddRef();
 			m_iInputChannels++;
 		}
 	}
@@ -359,6 +360,7 @@ void AsioCore::CreateOutputChannels()
 			if (NULL == m_pOutputChannelPairs[m_iOutputChannelPairs])
 				throw gcnew AsioCoreException("AsioCore: Not enough memory for OutputChannelPair instance.", E_OUTOFMEMORY);
 
+			m_pOutputChannelPairs[m_iOutputChannelPairs]->AddRef();
 			m_iOutputChannelPairs++;
 		}
 	}
@@ -390,18 +392,19 @@ void AsioCore::DisposeInputChannels()
 		{
 			if (NULL != m_pInputChannels[i])
 			{
-				switch (m_sampleType)
-				{
-				case ASIOSTInt32LSB:
-					delete dynamic_cast<InputInt32Channel*>(m_pInputChannels[i]);
-					break;
-				case ASIOSTInt24LSB:
-					delete dynamic_cast<InputInt24Channel*>(m_pInputChannels[i]);
-					break;
-				case ASIOSTFloat32LSB:
-					delete dynamic_cast<InputFloat32Channel*>(m_pInputChannels[i]);
-					break;
-				}
+				m_pInputChannels[i]->Release();
+				//switch (m_sampleType)
+				//{
+				//case ASIOSTInt32LSB:
+				//	delete dynamic_cast<InputInt32Channel*>(m_pInputChannels[i]);
+				//	break;
+				//case ASIOSTInt24LSB:
+				//	delete dynamic_cast<InputInt24Channel*>(m_pInputChannels[i]);
+				//	break;
+				//case ASIOSTFloat32LSB:
+				//	delete dynamic_cast<InputFloat32Channel*>(m_pInputChannels[i]);
+				//	break;
+				//}
 			}
 		}
 		delete[] m_pInputChannels;
@@ -417,18 +420,19 @@ void AsioCore::DisposeOutputChannels()
 		{
 			if (NULL != m_pOutputChannelPairs[i])
 			{
-				switch (m_sampleType)
-				{
-				case ASIOSTInt32LSB:
-					delete dynamic_cast<OutputInt32ChannelPair*>(m_pOutputChannelPairs[i]);
-					break;
-				case ASIOSTInt24LSB:
-					delete dynamic_cast<OutputInt24ChannelPair*>(m_pOutputChannelPairs[i]);
-					break;
-				case ASIOSTFloat32LSB:
-					delete dynamic_cast<OutputFloat32ChannelPair*>(m_pOutputChannelPairs[i]);
-					break;
-				}
+				m_pOutputChannelPairs[i]->Release();
+				//switch (m_sampleType)
+				//{
+				//case ASIOSTInt32LSB:
+				//	delete dynamic_cast<OutputInt32ChannelPair*>(m_pOutputChannelPairs[i]);
+				//	break;
+				//case ASIOSTInt24LSB:
+				//	delete dynamic_cast<OutputInt24ChannelPair*>(m_pOutputChannelPairs[i]);
+				//	break;
+				//case ASIOSTFloat32LSB:
+				//	delete dynamic_cast<OutputFloat32ChannelPair*>(m_pOutputChannelPairs[i]);
+				//	break;
+				//}
 			}
 		}
 		delete[] m_pOutputChannelPairs;

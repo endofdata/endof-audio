@@ -46,6 +46,21 @@ int AudioTakeBase::SampleRate::get()
 	return m_sampleRate;
 }
 
+TimeSpan AudioTakeBase::Position::get()
+{
+	throw gcnew NotImplementedException();
+}
+
+void AudioTakeBase::Position::set(TimeSpan value)
+{
+	throw gcnew NotImplementedException();
+}
+
+TimeSpan AudioTakeBase::Length::get()
+{
+	throw gcnew NotImplementedException();
+}
+
 bool AudioTakeBase::TrySetPosition(TimeSpan position)
 {
 	bool result;
@@ -67,3 +82,7 @@ void AudioTakeBase::Initialize()
 {
 }
 
+int AudioTakeBase::ReadNextFrame(cli::array<float>^ audioBuffer)
+{
+	throw gcnew NotImplementedException();
+}

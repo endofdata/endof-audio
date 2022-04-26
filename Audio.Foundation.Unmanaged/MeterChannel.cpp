@@ -25,6 +25,7 @@ MeterChannel::MeterChannel(int sampleRate) :
 MeterChannel::~MeterChannel()
 {
 	put_Input(NULL);
+	put_MeterUpdate(NULL);
 }
 
 IMPLEMENT_IUNKNOWN(MeterChannel)

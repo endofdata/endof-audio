@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Audio.Asio\Audio.Asio.vcxproj" />
+    <ProjectReference Include="..\..\Audio.Foundation\Audio.Foundation.vcxproj" />
   </ItemGroup>
 
   <ItemGroup>

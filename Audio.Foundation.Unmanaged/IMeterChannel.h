@@ -12,10 +12,12 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			typedef int(__stdcall* MeterChannelCallback)(class MeterChannel* pSender);
-
 			namespace Abstractions
 			{
+				__interface IMeterChannel;
+
+				typedef int(__stdcall* MeterChannelCallback)(IMeterChannel* pSender);
+
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("fcc39f32-a0c4-4ece-a562-0a051c153a95")) IMeterChannel : public IUnknown
 				{
 					IChannelLink* get_Input() = 0;

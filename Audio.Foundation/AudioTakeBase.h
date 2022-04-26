@@ -10,7 +10,7 @@ namespace Audio
 		{
 			ref class WaveFile;
 
-			public ref class AudioTakeBase abstract : public ::Audio::Foundation::Abstractions::IAudioTake
+			public ref class AudioTakeBase : public ::Audio::Foundation::Abstractions::IAudioTake
 			{
 			public:
 				AudioTakeBase(System::TimeSpan offset, int sampleRate);
@@ -40,21 +40,20 @@ namespace Audio
 
 				virtual bool TrySetPosition(System::TimeSpan position);
 
-				// Abstract
 				property System::TimeSpan Position
 				{
-					virtual System::TimeSpan get() = 0;
-					virtual void set(System::TimeSpan value) = 0;
+					virtual System::TimeSpan get();
+					virtual void set(System::TimeSpan value);
 				}
 
 				property System::TimeSpan Length
 				{
-					virtual System::TimeSpan get() = 0;
+					virtual System::TimeSpan get();
 				}
 
 				virtual void Initialize();
 
-				virtual int ReadNextFrame(cli::array<float>^ audioBuffer) = 0;
+				virtual int ReadNextFrame(cli::array<float>^ audioBuffer);
 
 			private:
 				System::TimeSpan m_offset;

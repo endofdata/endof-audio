@@ -1,4 +1,5 @@
-﻿using Audio.Asio;
+﻿using Audio.Foundation.Abstractions;
+using Audio.Foundation.Interop;
 using Audio.Asio.Interop;
 using NUnit.Framework;
 using System;
@@ -62,7 +63,7 @@ namespace Test.Audio.Asio
 
 					offset = offset.Add(distance);
 
-					takes.Add(track: 1, take: take);
+					takes.Add(track: 1, take);
 				}
 
 				PlayTakes(tapeMachine, takes);

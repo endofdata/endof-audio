@@ -11,7 +11,7 @@ using namespace Audio::Foundation::Abstractions;
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
-AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pHwChannel, int id)
+AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pHwChannel, int id) : m_isDisposed(false)
 {
 	if(NULL == pHwChannel)
 		throw gcnew ArgumentNullException();
@@ -21,6 +21,7 @@ AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pH
 	m_pOutputMeter = ObjectFactory::CreateMeterChannel(sampleCount);
 	m_pOutputMeter->RMSTime = 100;
 
+	pHwChannel->AddRef();
 	m_pOutputChannelPair = pHwChannel;
 
 	m_pMasterMix = ObjectFactory::CreateSampleJoiner(sampleCount);
@@ -49,15 +50,25 @@ AudioOutput::!AudioOutput()
 
 void AudioOutput::CleanUp(bool isDisposing)
 {
-	if(NULL != m_pOutputMeter)
+	if (!m_isDisposed)
 	{
-		m_pOutputMeter->Release();
-		m_pOutputMeter = NULL;
-	}
-	if (NULL != m_pMasterMix)
-	{
-		m_pMasterMix->Release();
-		m_pMasterMix = NULL;
+		m_isDisposed = true;
+
+		if (NULL != m_pOutputMeter)
+		{
+			m_pOutputMeter->Release();
+			m_pOutputMeter = NULL;
+		}
+		if (NULL != m_pMasterMix)
+		{
+			m_pMasterMix->Release();
+			m_pMasterMix = NULL;
+		}
+		if (NULL != m_pOutputChannelPair)
+		{
+			m_pOutputChannelPair->Release();
+			m_pOutputChannelPair = NULL;
+		}
 	}
 }
 

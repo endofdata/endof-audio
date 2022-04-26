@@ -15,7 +15,7 @@ using namespace Audio::Foundation::Abstractions;
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
-AudioInput::AudioInput(int sampleRate, IInputChannel* pHwChannel, int id)
+AudioInput::AudioInput(int sampleRate, IInputChannel* pHwChannel, int id) : m_isDisposed(false)
 {
 	if(NULL == pHwChannel)
 		throw gcnew ArgumentNullException();
@@ -33,6 +33,7 @@ AudioInput::AudioInput(int sampleRate, IInputChannel* pHwChannel, int id)
 
 	m_pInputMeter->QueryInterface(__uuidof(ISampleReceiver), (void**)&pSampleReceiver);
 
+	pHwChannel->AddRef();
 	m_pInputChannel = pHwChannel;
 	m_pInputChannel->SampleSharer.AddSend(m_pInputChannel->SampleContainer, *pSampleReceiver, VolumeMax, PanCenter);
 
@@ -51,13 +52,24 @@ AudioInput::!AudioInput()
 
 void AudioInput::CleanUp(bool isDisposing)
 {
-	if(NULL != m_pInputMeter)
+	if (!m_isDisposed)
 	{
-		m_pInputMeter->MeterUpdate = NULL;
-		m_pInputMeter->Release();
-		m_pInputMeter = NULL;
+		m_isDisposed = true;
+
+		if (m_pInputChannel != NULL)
+		{
+			m_pInputChannel->Release();
+		}
+
+		if (m_pInputMeter != NULL)
+		{
+			m_pInputMeter->MeterUpdate = NULL;
+			m_pInputMeter->Release();
+			m_pInputMeter = NULL;
+		}
+
+		m_meterUpdateDelegateHandle.Free();
 	}
-	m_meterUpdateDelegateHandle.Free();
 }
 
 int AudioInput::ChannelId::get()

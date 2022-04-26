@@ -1,5 +1,5 @@
-﻿using Audio.Asio;
-using Audio.Asio.Interop;
+﻿using Audio.Foundation.Abstractions;
+using Audio.Foundation.Interop;
 using System;
 
 namespace Test.Audio.Asio

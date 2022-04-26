@@ -1,4 +1,4 @@
-﻿using Audio.Asio.Interop;
+﻿using Audio.Foundation.Abstractions;
 using System.Collections.Generic;
 using System.Linq;
 

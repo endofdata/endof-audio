@@ -67,6 +67,7 @@ namespace Audio
 				void CleanUp(bool isDisposing);
 				void OnPropertyChanged(System::String^ propertyName);
 
+				bool m_isDisposed;
 				int m_channelId;
 				ISampleJoiner* m_pMasterMix;
 				IMeterChannel* m_pOutputMeter;
