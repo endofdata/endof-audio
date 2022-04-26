@@ -47,6 +47,7 @@ namespace Audio
 					*/
 					virtual ~OutputOfTSampleChannelPair()
 					{
+						put_Input(NULL);
 					}
 
 					/*! \brief Sets the current write position to the indicated buffer half
@@ -117,7 +118,17 @@ namespace Audio
 
 					void put_Input(IChannelLink* value)
 					{
-						m_pInput = value;
+						if (value != NULL)
+						{
+							value->AddRef();
+						}
+
+						IChannelLink* pInput = (IChannelLink*)InterlockedExchangePointer((void**)&m_pInput, value);
+
+						if (pInput != NULL)
+						{
+							pInput->Release();
+						}						
 					}
 
 					virtual int get_SampleType()

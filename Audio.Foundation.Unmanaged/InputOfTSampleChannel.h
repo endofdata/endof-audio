@@ -41,6 +41,7 @@ namespace Audio
 					*/
 					virtual ~InputOfTSampleChannel()
 					{
+						put_Monitor(NULL);
 						m_pContainer->Release();
 						m_pSharer->Release();
 					}
@@ -87,7 +88,17 @@ namespace Audio
 
 					virtual void put_Monitor(IOutputChannelPair* value)
 					{
-						m_pMonitor = value;
+						if (value != NULL)
+						{
+							value->AddRef();
+						}
+
+						IOutputChannelPair* pMonitor = (IOutputChannelPair*)InterlockedExchangePointer((void**)&m_pMonitor, value);
+
+						if (pMonitor != NULL)
+						{
+							pMonitor->Release();
+						}						
 					}
 
 					virtual int get_SampleType()
