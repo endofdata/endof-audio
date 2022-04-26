@@ -10,7 +10,8 @@
 		ULONG m_refCount;															\
 
 #define IMPLEMENT_IUNKNOWN(TYPE_NAME)												\
-	HRESULT TYPE_NAME::QueryInterface(const IID& riid, void** ppvObject)			\
+	HRESULT STDMETHODCALLTYPE TYPE_NAME::QueryInterface(							\
+		const IID& riid, void** ppvObject)											\
 	{																				\
 		if (ppvObject == NULL)														\
 		{																			\
@@ -44,7 +45,7 @@
 	}																			
 		
 #define TEMPLATED_IUNKNOWN															\
-	HRESULT QueryInterface(const IID& riid, void** ppvObject)						\
+	HRESULT STDMETHODCALLTYPE QueryInterface(const IID& riid, void** ppvObject)		\
 	{																				\
 		if (ppvObject == NULL)														\
 		{																			\

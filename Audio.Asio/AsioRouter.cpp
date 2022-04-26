@@ -103,7 +103,7 @@ void AsioRouter::OnOutputBufferSwitch(bool isSecondHalf)
 			audioOutput->Send();
 		}
 	}
-	catch (Exception^ ex)
+	catch (Exception^)
 	{
 		IsPoweredOn = false;
 
@@ -117,7 +117,7 @@ void AsioRouter::OnInputBufferSwitch(bool isSecondHalf)
 	{
 		BufferSwitchManagedCallback^ handler = m_inputBufferSwitchHandler;
 	}
-	catch (Exception^ ex)
+	catch (Exception^)
 	{
 		IsPoweredOn = false;
 

@@ -53,7 +53,7 @@ void AudioClient::Initialize(double requestDurationMs, WAVEFORMATEX& format)
 
 void AudioClient::Initialize(double requestDurationMs, WAVEFORMATEX& format, bool isExclusive)
 {
-	WasapiCoreException::ThrowOnError(m_pUnmanaged->Initialize(isExclusive ? AUDCLNT_SHAREMODE_EXCLUSIVE : AUDCLNT_SHAREMODE_SHARED, 0, requestDurationMs * REFTIMES_PER_MILLISEC, 0, &format, NULL),
+	WasapiCoreException::ThrowOnError(m_pUnmanaged->Initialize(isExclusive ? AUDCLNT_SHAREMODE_EXCLUSIVE : AUDCLNT_SHAREMODE_SHARED, 0, (REFERENCE_TIME)(requestDurationMs * REFTIMES_PER_MILLISEC), 0, &format, NULL),
 		String::Format("Failed to initialize AudioClient with requestDuration {0:N} ms', channels: {1}, sample rate: {2}, sample bits: {3}, is exclusive: {4}",
 			requestDurationMs, format.nChannels, format.nSamplesPerSec, format.wBitsPerSample, isExclusive));
 
@@ -100,7 +100,7 @@ int AudioClient::BufferSize::get()
 void AudioClient::RecordingLoop(Action<ReadOnlySpan<byte>, int>^ callback)
 {
 	// Calculate the actual duration of the allocated buffer.
-	REFERENCE_TIME hnsActualDuration = (double)REFTIMES_PER_SEC * BufferSize / MixFormat.nSamplesPerSec;
+	REFERENCE_TIME hnsActualDuration = (REFERENCE_TIME)((double)REFTIMES_PER_SEC * BufferSize / MixFormat.nSamplesPerSec);
 	CaptureClient^ captureClient = CreateCaptureClient();
 
 	Start();
@@ -108,7 +108,7 @@ void AudioClient::RecordingLoop(Action<ReadOnlySpan<byte>, int>^ callback)
 	bool isDone = false;
 
 	// Sleep for half the buffer duration.
-	Sleep(hnsActualDuration / REFTIMES_PER_MILLISEC / 2);
+	Sleep((DWORD)(hnsActualDuration / REFTIMES_PER_MILLISEC / 2));
 
 	while (captureClient->Read(callback));
 

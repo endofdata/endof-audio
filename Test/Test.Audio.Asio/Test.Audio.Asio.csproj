@@ -20,11 +20,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Audio.Asio\Audio.Asio.vcxproj" />
-    <ProjectReference Include="..\..\Audio.Foundation\Audio.Foundation.vcxproj" />
+    <ProjectReference Include="..\..\Audio.Asio\Audio.Asio.vcxproj">
+      <CopyLocal>True</CopyLocal>
+      <CopyLocalSatelliteAssemblies>True</CopyLocalSatelliteAssemblies>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Audio.Foundation.Unmanaged.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Cow-moo-3 Mono.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

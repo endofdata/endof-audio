@@ -5,3 +5,4 @@
 obj/
 bin/
 Audio.Asio/TestResults/
+/Test/Test.Audio.Asio/Audio.Foundation.Unmanaged.dll

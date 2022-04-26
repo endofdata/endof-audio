@@ -35,6 +35,8 @@ namespace Test.Audio.Asio
 
 
 		[Test]
+		[TestCase(1)]
+		[TestCase(3)]
 		public void MultiBeep(int beeps)
 		{
 			RunTest(tapeMachine =>
@@ -52,7 +54,7 @@ namespace Test.Audio.Asio
 				for (int i = 0; i < beeps; i++)
 				{
 					// Using the same stream for multiple audio takes does not work:
-					// When the first take has played the stream is at end position. So the second
+					// When the first take has played the stream is at end position. The second
 					// take has nothing to read. So, instead reuse the sample buffer, not the stream.
 					var takeStream = new MemoryStream(memoryStream.ToArray(), writable: false);
 
@@ -72,7 +74,7 @@ namespace Test.Audio.Asio
 
 		private void RunTest(Action<TapeMachine> test)
 		{
-			foreach (var tapeMachine in TapeMachineProvider.MachinesByName(TapeMachineProvider.ASIO4AllDriver))
+			foreach (var tapeMachine in TapeMachineProvider.MachinesByName(TapeMachineProvider.SteinbergDriver))
 			{
 				test(tapeMachine);
 
