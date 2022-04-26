@@ -1,11 +1,12 @@
 #pragma once
 
-#include <MeterChannel.h>
-#include <SampleJoiner.h>
+#include <IMeterChannel.h>
+#include <ISampleJoiner.h>
 #include <IOutputChannelPair.h>
 
 using namespace Audio::Foundation;
 using namespace Audio::Foundation::Abstractions;
+using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 namespace Audio
 {
@@ -67,8 +68,8 @@ namespace Audio
 				void OnPropertyChanged(System::String^ propertyName);
 
 				int m_channelId;
-				SampleJoiner* m_pMasterMix;
-				MeterChannel* m_pOutputMeter;
+				ISampleJoiner* m_pMasterMix;
+				IMeterChannel* m_pOutputMeter;
 				IOutputChannelPair* m_pOutputChannelPair;
 
 				System::ComponentModel::PropertyChangedEventHandler^ m_propertyChangedEventHandler;

@@ -1,14 +1,18 @@
 #pragma once
 
 #include <InputOfTSampleChannel.h>
-#include <SampleConversion.h>
+#include <SampleConversionUnmanaged.h>
 #include <asio.h>
+
+using namespace Audio::Foundation::Unmanaged;
+using namespace Audio::Foundation::Unmanaged::Templates;
+
 
 namespace Audio
 {
 	namespace Asio
 	{
-		class InputInt24Channel : public Audio::Foundation::Templates::InputOfTSampleChannel<byte, ASIOSTInt24LSB>
+		class InputInt24Channel : public InputOfTSampleChannel<byte, ASIOSTInt24LSB>
 		{
 		public:
 			InputInt24Channel(int iAsioChannel, byte* pBufferA, byte* pBufferB, int sampleCount) :
@@ -27,7 +31,7 @@ namespace Audio
 					unpacked += *pSource++;
 				}
 				
-				return Audio::Foundation::SampleConversion::Int32ToFloat(unpacked);
+				return SampleConversion::Int32ToFloat(unpacked);
 			}
 		};
 	}

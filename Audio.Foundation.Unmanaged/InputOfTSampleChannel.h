@@ -4,6 +4,7 @@
 #include "SampleContainer.h"
 #include "SampleSharer.h"
 #include "IInputChannel.h"
+#include "ObjectFactory.h"
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
@@ -16,33 +17,37 @@ namespace Audio
 			namespace Templates
 			{
 				template<typename TSample, int SAMPLE_TYPE>
-				class InputOfTSampleChannel : public Audio::Foundation::SampleContainer, public Audio::Foundation::SampleSharer, public IInputChannel
+				class InputOfTSampleChannel : public IInputChannel
 				{
 				public:
 					/*! \brief Constructor
 
 					*/
 					InputOfTSampleChannel(int iAsioChannel, TSample* pBufferA, TSample* pBufferB, int sampleCount) :
-						Audio::Foundation::SampleContainer(sampleCount),
-						Audio::Foundation::SampleSharer(),
 						m_iAsioChannel(iAsioChannel),
 						m_pBufferA(pBufferA),
 						m_pBufferB(pBufferB),
-						m_pMonitor(NULL)
+						m_pMonitor(NULL),
+						m_refCount(0)
 					{
 						if (NULL == m_pBufferA || NULL == m_pBufferB)
 							throw gcnew AsioCoreException("InputChannel: Buffer pointers must not be NULL.", E_INVALIDARG);
+
+						m_pContainer = ObjectFactory::CreateSampleContainer(sampleCount);
+						m_pSharer = ObjectFactory::CreateSampleSharer();
 					}
 
 					/*! \brief Destructor
 					*/
 					virtual ~InputOfTSampleChannel()
 					{
+						m_pContainer->Release();
+						m_pSharer->Release();
 					}
 
 					virtual void Swap(bool readSecondHalf)
 					{
-						if (IsActive)
+						if (SampleContainer.IsActive)
 						{
 							TSample* pSource = readSecondHalf ? m_pBufferB : m_pBufferA;
 
@@ -51,15 +56,16 @@ namespace Audio
 							{
 								m_pMonitor->DirectOut(pSource, true, true);
 							}
-							float* pDestLeft = LeftChannel->SamplePtr;
-							float* pDestRight = RightChannel->SamplePtr;
+							float* pDestLeft = SampleContainer.LeftChannel->SamplePtr;
+							float* pDestRight = SampleContainer.RightChannel->SamplePtr;
 
 							// double the voulume to get full level on both channels
 							float volPanFactorLeft = 0.0f;
 							float volPanFactorRight = 0.0f;
-							Audio::Foundation::SampleConversion::VolumeAndPanFactor(2.0f, 0.0f, volPanFactorLeft, volPanFactorRight);
+							Audio::Foundation::Unmanaged::SampleConversion::VolumeAndPanFactor(2.0f, 0.0f, volPanFactorLeft, volPanFactorRight);
 
-							for (int i = 0; i < SampleCount; i++)
+							int sampleCount = SampleContainer.SampleCount;
+							for (int i = 0; i < sampleCount; i++)
 							{
 								float floatSample = ReadSample(pSource);
 
@@ -71,7 +77,7 @@ namespace Audio
 
 					virtual void Send()
 					{
-						RouteToSends();
+						m_pSharer->RouteToSends();
 					}
 
 					virtual IOutputChannelPair* get_Monitor()
@@ -89,14 +95,33 @@ namespace Audio
 						return SAMPLE_TYPE;
 					}
 
-					virtual ISampleContainer& get_AsSampleContainer()
+					virtual ISampleContainer& get_SampleContainer()
 					{
-						return *dynamic_cast<SampleContainer*>(this);
+						return *m_pContainer;
 					}
 
-					virtual ISampleSharer& get_AsSampleSharer()
+					virtual ISampleSharer& get_SampleSharer()
 					{
-						return *dynamic_cast<SampleSharer*>(this);
+						return *m_pSharer;
+					}
+
+					TEMPLATED_IUNKNOWN
+
+				protected:
+					virtual bool GetInterface(const IID& riid, void** pResult)
+					{
+						if (riid == _uuidof(IUnknown))
+						{
+							*pResult = dynamic_cast<IUnknown*>(this);
+							return true;
+						}
+						if (riid == _uuidof(IInputChannel))
+						{
+							*pResult = dynamic_cast<IInputChannel*>(this);
+							return true;
+						}
+						*pResult = NULL;
+						return false;
 					}
 
 				private:
@@ -107,6 +132,12 @@ namespace Audio
 					TSample* m_pBufferB;
 
 					IOutputChannelPair* m_pMonitor;
+
+					// was derived from...
+					ISampleContainer* m_pContainer;
+					ISampleSharer* m_pSharer;
+
+					unsigned long m_refCount;
 				};
 			}
 		}

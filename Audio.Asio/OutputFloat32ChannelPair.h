@@ -3,11 +3,13 @@
 #include <OutputOfTSampleChannelPair.h>
 #include <asio.h>
 
+using namespace Audio::Foundation::Unmanaged::Templates;
+
 namespace Audio
 {
 	namespace Asio
 	{
-		class OutputFloat32ChannelPair : public Audio::Foundation::Templates::OutputOfTSampleChannelPair<float, ASIOSTFloat32LSB, sizeof(float)>
+		class OutputFloat32ChannelPair : public OutputOfTSampleChannelPair<float, ASIOSTFloat32LSB, sizeof(float)>
 		{
 		public:
 			OutputFloat32ChannelPair(int iAsioChannelLeft, float* pBufferLeftA, float* pBufferLeftB,

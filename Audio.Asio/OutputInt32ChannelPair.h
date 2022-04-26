@@ -1,14 +1,17 @@
 #pragma once
 
 #include <OutputOfTSampleChannelPair.h>
-#include <SampleConversion.h>
+#include <SampleConversionUnmanaged.h>
 #include <asio.h>
+
+using namespace Audio::Foundation::Unmanaged;
+using namespace Audio::Foundation::Unmanaged::Templates;
 
 namespace Audio
 {
 	namespace Asio
 	{
-		class OutputInt32ChannelPair : public Audio::Foundation::Templates::OutputOfTSampleChannelPair<int, ASIOSTInt32LSB, sizeof(int)>
+		class OutputInt32ChannelPair : public OutputOfTSampleChannelPair<int, ASIOSTInt32LSB, sizeof(int)>
 		{
 		public:
 			OutputInt32ChannelPair(int iAsioChannelLeft, int* pBufferLeftA, int* pBufferLeftB,
@@ -21,7 +24,7 @@ namespace Audio
 		private:
 			inline void WriteSample(float value, int*& pTarget)
 			{
-				*pTarget++ = Audio::Foundation::SampleConversion::SaturatedConvert32(value, 1.0f);
+				*pTarget++ = SampleConversion::SaturatedConvert32(value, 1.0f);
 			}
 		};
 	}

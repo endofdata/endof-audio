@@ -2,8 +2,9 @@
 #include "AudioInput.h"
 #include "AudioOutput.h"
 #include <vcclr.h>
-#include <SampleConversion.h>
 #include <ISampleSharer.h>
+#include <ObjectFactory.h>
+#include <SampleConversionUnmanaged.h>
 
 using namespace System;
 using namespace System::Runtime::InteropServices;
@@ -11,6 +12,8 @@ using namespace Audio::Asio;
 using namespace Audio::Asio::Interop;
 using namespace Audio::Foundation;
 using namespace Audio::Foundation::Abstractions;
+using namespace Audio::Foundation::Unmanaged;
+using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 AudioInput::AudioInput(int sampleRate, IInputChannel* pHwChannel, int id)
 {
@@ -22,12 +25,18 @@ AudioInput::AudioInput(int sampleRate, IInputChannel* pHwChannel, int id)
 	MeterUpdateDelegate^ meterUpdateDelegate = gcnew MeterUpdateDelegate(this, &AudioInput::InputMeter_MeterUpdate);
 	m_meterUpdateDelegateHandle = GCHandle::Alloc(meterUpdateDelegate);
 
-	m_pInputMeter = new MeterChannel(sampleRate);
+	m_pInputMeter = Audio::Foundation::Unmanaged::ObjectFactory::CreateMeterChannel(sampleRate);
 	m_pInputMeter->RMSTime = 100;
 	m_pInputMeter->MeterUpdate = static_cast<MeterChannelCallback>(Marshal::GetFunctionPointerForDelegate(meterUpdateDelegate).ToPointer());
 
+	ISampleReceiver* pSampleReceiver;
+
+	m_pInputMeter->QueryInterface(__uuidof(ISampleReceiver), (void**)&pSampleReceiver);
+
 	m_pInputChannel = pHwChannel;
-	m_pInputChannel->AsSampleSharer.AddSend(m_pInputChannel->AsSampleContainer, *m_pInputMeter, Audio::Foundation::VolumeMax, Audio::Foundation::PanCenter);
+	m_pInputChannel->SampleSharer.AddSend(m_pInputChannel->SampleContainer, *pSampleReceiver, VolumeMax, PanCenter);
+
+	pSampleReceiver->Release();
 }
 
 AudioInput::~AudioInput()
@@ -45,7 +54,7 @@ void AudioInput::CleanUp(bool isDisposing)
 	if(NULL != m_pInputMeter)
 	{
 		m_pInputMeter->MeterUpdate = NULL;
-		delete m_pInputMeter;
+		m_pInputMeter->Release();
 		m_pInputMeter = NULL;
 	}
 	m_meterUpdateDelegateHandle.Free();
@@ -63,12 +72,12 @@ Level AudioInput::DbFS::get()
 
 bool AudioInput::IsActive::get()
 {
-	return m_pInputChannel->AsSampleContainer.IsActive;
+	return m_pInputChannel->SampleContainer.IsActive;
 }
 
 void AudioInput::IsActive::set(bool value)
 {
-	m_pInputChannel->AsSampleContainer.IsActive = value;
+	m_pInputChannel->SampleContainer.IsActive = value;
 
 	OnPropertyChanged(IsActiveProperty);
 }
@@ -94,7 +103,7 @@ void AudioInput::Monitor::set(IAudioOutput^ value)
 
 void AudioInput::ReadCurrentFrame(array<float>^ frameBuffer)
 {
-	System::Runtime::InteropServices::Marshal::Copy(System::IntPtr((void*)m_pInputChannel->AsSampleContainer.LeftChannel->SamplePtr), frameBuffer, 0, frameBuffer->Length);
+	System::Runtime::InteropServices::Marshal::Copy(System::IntPtr((void*)m_pInputChannel->SampleContainer.LeftChannel->SamplePtr), frameBuffer, 0, frameBuffer->Length);
 }
 
 void AudioInput::OnPropertyChanged(System::String^ propertyName)

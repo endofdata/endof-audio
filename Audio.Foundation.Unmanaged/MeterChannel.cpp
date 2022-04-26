@@ -22,7 +22,7 @@ MeterChannel::MeterChannel(int sampleRate) :
 {
 }
 
-void MeterChannel::Flush()
+MeterChannel::~MeterChannel()
 {
 }
 
@@ -32,7 +32,13 @@ bool MeterChannel::GetInterface(REFIID iid, void** ppvResult)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(this);
+		*ppvResult = dynamic_cast<IUnknown*>(dynamic_cast<IMeterChannel*>(this));
+		return true;
+	}
+
+	if (iid == __uuidof(IMeterChannel))
+	{
+		*ppvResult = dynamic_cast<IMeterChannel*>(this);
 		return true;
 	}
 
@@ -41,7 +47,13 @@ bool MeterChannel::GetInterface(REFIID iid, void** ppvResult)
 		*ppvResult = dynamic_cast<ISampleReceiver*>(this);
 		return true;
 	}
+
+	*ppvResult = NULL;
 	return false;
+}
+
+void MeterChannel::Flush()
+{
 }
 
 void MeterChannel::Receive(IChannelLink& inputBuffer)

@@ -5,6 +5,7 @@
 #include <IOutputChannelPair.h>
 
 using namespace Audio::Foundation::Abstractions;
+using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 namespace Audio
 {

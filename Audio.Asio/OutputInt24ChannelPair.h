@@ -3,11 +3,14 @@
 #include <OutputOfTSampleChannelPair.h>
 #include <asio.h>
 
+using namespace Audio::Foundation::Unmanaged;
+using namespace Audio::Foundation::Unmanaged::Templates;
+
 namespace Audio
 {
 	namespace Asio
 	{
-		class OutputInt24ChannelPair : public Audio::Foundation::Templates::OutputOfTSampleChannelPair<byte, ASIOSTInt24LSB, 3>
+		class OutputInt24ChannelPair : public OutputOfTSampleChannelPair<byte, ASIOSTInt24LSB, 3>
 		{
 		public:
 			OutputInt24ChannelPair(int iAsioChannelLeft, byte* pBufferLeftA, byte* pBufferLeftB,
@@ -20,7 +23,7 @@ namespace Audio
 		private:
 			inline void WriteSample(float value, byte*& pTarget)
 			{
-				int unpacked = Audio::Foundation::SampleConversion::SaturatedConvert32(value, 1.0f);
+				int unpacked = SampleConversion::SaturatedConvert32(value, 1.0f);
 
 				for (int i = 0; i < 3; i++)
 				{

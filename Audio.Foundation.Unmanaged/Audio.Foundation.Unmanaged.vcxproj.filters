@@ -84,6 +84,9 @@
     <ClInclude Include="SampleContainerBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IMeterChannel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

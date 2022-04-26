@@ -10,7 +10,8 @@
 
 using namespace Audio::Foundation::Unmanaged;
 
-
+// TODO: Constructors must AddRef for received interfaces
+// 
 // static
 IChannelLink* ObjectFactory::CreateChannelLink()
 {
@@ -36,11 +37,11 @@ IChannelLink* ObjectFactory::CreateChannelLink(ISampleContainer* pInput, ISample
 }
 
 // static
-ISampleReceiver* ObjectFactory::CreateMeterChannel(int sampleRate)
+IMeterChannel* ObjectFactory::CreateMeterChannel(int sampleRate)
 {
 	MeterChannel* instance = new MeterChannel(sampleRate);
-	ISampleReceiver* result;
-	if (FAILED(instance->QueryInterface(__uuidof(ISampleReceiver), (void**)&result)))
+	IMeterChannel* result;
+	if (FAILED(instance->QueryInterface(__uuidof(IMeterChannel), (void**)&result)))
 	{
 		throw new std::runtime_error("QueryInterface failed");
 	}

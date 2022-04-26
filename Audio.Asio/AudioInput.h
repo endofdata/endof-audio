@@ -1,10 +1,11 @@
 #pragma once
 
+#include <IMeterChannel.h>
 #include <IInputChannel.h>
-#include <MeterChannel.h>
 
 using namespace Audio::Foundation;
 using namespace Audio::Foundation::Abstractions;
+using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 namespace Audio
 {
@@ -80,7 +81,7 @@ namespace Audio
 				void CleanUp(bool isDisposing);
 
 				int m_channelId;
-				MeterChannel* m_pInputMeter;
+				IMeterChannel* m_pInputMeter;
 				IInputChannel* m_pInputChannel;
 				System::Runtime::InteropServices::GCHandle m_meterUpdateDelegateHandle;
 

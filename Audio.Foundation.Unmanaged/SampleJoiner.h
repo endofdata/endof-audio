@@ -32,7 +32,7 @@ namespace Audio
 
 				virtual void Send();
 
-				void MixInput(float* pSourceLeft, float* pSourceRight, float volume, float pan);
+				virtual void MixInput(float* pSourceLeft, float* pSourceRight, float volume, float pan);
 
 				DECLARE_IUNKNOWN
 

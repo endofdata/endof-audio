@@ -89,6 +89,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AudioInputBase.h" />
+    <ClInclude Include="AudioOutputBase.h" />
     <ClInclude Include="AudioRecording.h" />
     <ClInclude Include="AudioTakeBase.h" />
     <ClInclude Include="ExceptionExtensions.h" />
@@ -108,12 +110,15 @@
     <ClInclude Include="Resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AudioInputBase.cpp" />
+    <ClCompile Include="AudioOutputBase.cpp" />
     <ClCompile Include="AudioRecording.cpp" />
     <ClCompile Include="AudioTakeBase.cpp" />
     <ClCompile Include="ExceptionExtensions.cpp" />
     <ClCompile Include="FileAudioTake.cpp" />
     <ClCompile Include="FxChannel.cpp" />
     <ClCompile Include="Level.cpp" />
+    <ClCompile Include="ReadOnlyCollectionOfInt.cpp" />
     <ClCompile Include="SampleConversion.cpp" />
     <ClCompile Include="StreamAudioTake.cpp" />
     <ClCompile Include="StreamProvider.cpp" />

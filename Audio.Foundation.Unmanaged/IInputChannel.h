@@ -22,22 +22,23 @@ namespace Audio
 
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("8a41766a-92ae-4f1d-b996-f8d4b98105ad")) IInputChannel : public IUnknown
 				{
-					_declspec(property(get = get_AsSampleContainer)) ISampleContainer& AsSampleContainer;
+					ISampleContainer& get_SampleContainer() = 0;
 
-					ISampleContainer& get_AsSampleContainer() = 0;
+					_declspec(property(get = get_SampleContainer)) ISampleContainer& SampleContainer;
 
-					_declspec(property(get = get_AsSampleSharer)) ISampleSharer& AsSampleSharer;
+					ISampleSharer& get_SampleSharer() = 0;
 
-					ISampleSharer& get_AsSampleSharer() = 0;
-
-					_declspec(property(get = get_SampleType)) int SampleType;
+					_declspec(property(get = get_SampleSharer)) ISampleSharer& SampleSharer;
 
 					int get_SampleType() = 0;
 
-					_declspec(property(get = get_Monitor, put = put_Monitor)) IOutputChannelPair* Monitor;
+					_declspec(property(get = get_SampleType)) int SampleType;
+
 
 					IOutputChannelPair* get_Monitor() = 0;
 					void put_Monitor(IOutputChannelPair* value) = 0;
+
+					_declspec(property(get = get_Monitor, put = put_Monitor)) IOutputChannelPair* Monitor;
 
 					void Swap(bool readSecondHalf) = 0;
 					void Send() = 0;

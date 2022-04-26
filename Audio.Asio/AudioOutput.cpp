@@ -1,14 +1,15 @@
 #include "pch.h"
 #include "AudioOutput.h"
-#include <SampleConversion.h>
-#include <ISampleLinker.h>
-#include <ChannelLink.h>
+#include <SampleConversionUnmanaged.h>
+#include <ObjectFactory.h>
 
 using namespace System;
 using namespace Audio::Asio;
 using namespace Audio::Asio::Interop;
 using namespace Audio::Foundation;
 using namespace Audio::Foundation::Abstractions;
+using namespace Audio::Foundation::Unmanaged;
+using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pHwChannel, int id)
 {
@@ -17,13 +18,23 @@ AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pH
 
 	m_channelId = id;
 
-	m_pOutputMeter = new MeterChannel(sampleRate);
+	m_pOutputMeter = ObjectFactory::CreateMeterChannel(sampleCount);
 	m_pOutputMeter->RMSTime = 100;
 
 	m_pOutputChannelPair = pHwChannel;
 
-	m_pMasterMix = new SampleJoiner(sampleCount);
-	m_pMasterMix->OutputLink = new ChannelLink(dynamic_cast<SampleContainer*>(m_pMasterMix), &m_pOutputChannelPair->AsSampleReceiver, VolumeMax, PanCenter);
+	m_pMasterMix = ObjectFactory::CreateSampleJoiner(sampleCount);
+
+	ISampleContainer* pSampleContainer;
+	m_pMasterMix->QueryInterface(_uuidof(ISampleContainer), (void**)&pSampleContainer);
+
+	ISampleReceiver* pSampleReceiver;
+	m_pOutputChannelPair->QueryInterface(_uuidof(ISampleReceiver), (void**)&pSampleReceiver);
+
+	m_pMasterMix->OutputLink = ObjectFactory::CreateChannelLink(pSampleContainer, pSampleReceiver, VolumeMax, PanCenter);
+
+	pSampleReceiver->Release();
+	pSampleContainer->Release();
 }
 
 AudioOutput::~AudioOutput()
@@ -40,8 +51,13 @@ void AudioOutput::CleanUp(bool isDisposing)
 {
 	if(NULL != m_pOutputMeter)
 	{
-		delete m_pOutputMeter;
+		m_pOutputMeter->Release();
 		m_pOutputMeter = NULL;
+	}
+	if (NULL != m_pMasterMix)
+	{
+		m_pMasterMix->Release();
+		m_pMasterMix = NULL;
 	}
 }
 

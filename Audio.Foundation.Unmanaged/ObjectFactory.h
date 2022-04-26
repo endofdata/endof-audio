@@ -9,6 +9,7 @@
 #include <ISampleContainer.h>
 #include <ISampleJoiner.h>
 #include <ISampleSharer.h>
+#include <IMeterChannel.h>
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
@@ -24,7 +25,7 @@ namespace Audio
 				static IChannelLink* CreateChannelLink();
 				static IChannelLink* CreateChannelLink(ISampleContainer* pInput, ISampleReceiver* pOutput, float volume, float pan);
 
-				static ISampleReceiver* CreateMeterChannel(int sampleRate);
+				static IMeterChannel* CreateMeterChannel(int sampleRate);
 
 				static ISampleBuffer* CreateSampleBuffer(int sampleCount);
 

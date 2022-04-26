@@ -3,6 +3,10 @@
 #include "Audio.Foundation.Unmanaged.h"
 #include "UnknownBase.h"
 #include "ISampleReceiver.h"
+#include "IMeterChannel.h"
+
+using namespace Audio::Foundation::Unmanaged;
+using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 namespace Audio
 {
@@ -10,38 +14,28 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			typedef int(__stdcall* MeterChannelCallback)(class MeterChannel* pSender);
-
-			class MeterChannel : public Audio::Foundation::Unmanaged::Abstractions::ISampleReceiver
+			class MeterChannel : public ISampleReceiver, public IMeterChannel
 			{
 			public:
 				MeterChannel(int sampleRate);
+				virtual ~MeterChannel();
 
-				void Flush();
+				virtual void Flush();
 
-				void Receive(Audio::Foundation::Unmanaged::Abstractions::IChannelLink& inputBuffer);
+				virtual void Receive(IChannelLink& inputBuffer);
 
-				Audio::Foundation::Unmanaged::Abstractions::IChannelLink* get_Input();
-				void put_Input(Audio::Foundation::Unmanaged::Abstractions::IChannelLink* value);
+				virtual IChannelLink* get_Input();
+				virtual void put_Input(IChannelLink* value);
 
-				_declspec(property(get = get_RMSTime, put = put_RMSTime)) int RMSTime;
+				virtual int get_RMSTime();
+				virtual void put_RMSTime(int value);
 
-				int get_RMSTime();
-				void put_RMSTime(int value);
+				virtual float get_DbLeft();
 
-				_declspec(property(get = get_DbLeft)) float DbLeft;
+				virtual float get_DbRight();
 
-				float get_DbLeft();
-
-				_declspec(property(get = get_DbRight)) float DbRight;
-
-				float get_DbRight();
-
-
-				_declspec(property(get = get_MeterUpdate, put = put_MeterUpdate)) MeterChannelCallback MeterUpdate;
-
-				MeterChannelCallback get_MeterUpdate();
-				void put_MeterUpdate(MeterChannelCallback value);
+				virtual MeterChannelCallback get_MeterUpdate();
+				virtual void put_MeterUpdate(MeterChannelCallback value);
 
 				DECLARE_IUNKNOWN
 
@@ -52,7 +46,7 @@ namespace Audio
 
 			private:
 				MeterChannelCallback m_meterUpdate;
-				Audio::Foundation::Unmanaged::Abstractions::IChannelLink* m_pInput;
+				IChannelLink* m_pInput;
 				int m_sampleRate;
 				int m_iSamplesPerRMSFrame;
 				int m_iSumUpSamples;

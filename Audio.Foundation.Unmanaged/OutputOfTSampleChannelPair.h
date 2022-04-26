@@ -3,6 +3,7 @@
 #include "IOutputChannelPair.h"
 #include "ISampleReceiver.h"
 #include "IChannelLink.h"
+#include "UnknownBase.h"
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
@@ -35,7 +36,8 @@ namespace Audio
 						m_pOutputRightB(pBufferRightB),
 						m_sampleCount(sampleCount),
 						m_fillSecondHalf(true),
-						m_pInput(NULL)
+						m_pInput(NULL),
+						m_refCount(0)
 					{
 						if (NULL == pBufferLeftA || NULL == pBufferLeftB || NULL == pBufferRightA || NULL == pBufferRightB)
 							throw gcnew AsioCoreException("OutputChannelPair: Buffer pointers must not be NULL.", E_INVALIDARG);
@@ -123,9 +125,28 @@ namespace Audio
 						return SAMPLE_TYPE;
 					}
 
-					virtual ISampleReceiver& get_AsSampleReceiver()
+					TEMPLATED_IUNKNOWN
+
+				protected:
+					virtual bool GetInterface(const IID& riid, void** pResult)
 					{
-						return *dynamic_cast<ISampleReceiver*>(this);
+						if (riid == _uuidof(IUnknown))
+						{
+							*pResult = dynamic_cast<IUnknown*>(dynamic_cast<ISampleReceiver*>(this));
+							return true;
+						}
+						if (riid == _uuidof(ISampleReceiver))
+						{
+							*pResult = dynamic_cast<ISampleReceiver*>(this);
+							return true;
+						}
+						if (riid == _uuidof(IOutputChannelPair))
+						{
+							*pResult = dynamic_cast<IOutputChannelPair*>(this);
+							return true;
+						}
+						*pResult = NULL;
+						return false;
 					}
 
 				private:
@@ -155,6 +176,8 @@ namespace Audio
 					int m_sampleCount;
 					bool m_fillSecondHalf;
 					//int m_iSamples;
+
+					unsigned long m_refCount;
 				};
 			}
 		}

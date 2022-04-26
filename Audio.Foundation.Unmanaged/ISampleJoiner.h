@@ -22,7 +22,11 @@ namespace Audio
 					IChannelLink* get_OutputLink() = 0;
 					void put_OutputLink(IChannelLink* value) = 0;
 
+					void Flush() = 0;
+
 					void Send() = 0;
+
+					void MixInput(float* pSourceLeft, float* pSourceRight, float volume, float pan) = 0;
 				};
 			}
 		}

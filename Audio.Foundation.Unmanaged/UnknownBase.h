@@ -42,4 +42,37 @@
 		}																			\
 		return m_refCount;															\
 	}																			
-																																						
+		
+#define TEMPLATED_IUNKNOWN															\
+	HRESULT QueryInterface(const IID& riid, void** ppvObject)						\
+	{																				\
+		if (ppvObject == NULL)														\
+		{																			\
+			return E_INVALIDARG;													\
+		}																			\
+																					\
+		*ppvObject = NULL;															\
+																					\
+		if (GetInterface(riid, ppvObject))											\
+		{																			\
+			AddRef();																\
+			return S_OK;															\
+		}																			\
+		return E_NOINTERFACE;														\
+	}																				\
+																					\
+	ULONG STDMETHODCALLTYPE AddRef(void)											\
+	{																				\
+		::InterlockedIncrement(&m_refCount);										\
+		return m_refCount;															\
+	}																				\
+																					\
+	ULONG STDMETHODCALLTYPE Release(void)											\
+	{																				\
+		if (::InterlockedDecrement(&m_refCount) == 0)								\
+		{																			\
+			delete this;															\
+			return 0;																\
+		}																			\
+		return m_refCount;															\
+	}	

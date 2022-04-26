@@ -65,6 +65,7 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ShowIncludes>false</ShowIncludes>
       <AdditionalUsingDirectories>$(ProjectDir)..\Audio.Foundation\bin\$(Configuration)\$(Platform)</AdditionalUsingDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Audio.Foundation.Unmanaged\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ole32.lib</AdditionalDependencies>
@@ -144,6 +145,9 @@
     <Image Include="app.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Audio.Foundation.Unmanaged\Audio.Foundation.Unmanaged.vcxproj">
+      <Project>{c4d38b7d-afa0-4138-bc06-ecb238fe579b}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Audio.Foundation\Audio.Foundation.vcxproj">
       <Project>{33764059-8096-43a3-b973-866f941fd5f3}</Project>
     </ProjectReference>

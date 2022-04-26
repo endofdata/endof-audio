@@ -94,6 +94,7 @@
     <ClInclude Include="ChannelLink.h" />
     <ClInclude Include="IChannelLink.h" />
     <ClInclude Include="IInputChannel.h" />
+    <ClInclude Include="IMeterChannel.h" />
     <ClInclude Include="InputOfTSampleChannel.h" />
     <ClInclude Include="IOutputChannelPair.h" />
     <ClInclude Include="ISampleBuffer.h" />
