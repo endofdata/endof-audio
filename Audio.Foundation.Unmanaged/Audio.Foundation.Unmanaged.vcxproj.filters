@@ -95,9 +95,6 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="_Interfaces.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ChannelLink.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -15,6 +15,7 @@ SampleJoiner::SampleJoiner(int sampleCount) :
 
 SampleJoiner::~SampleJoiner()
 {
+	put_OutputLink(NULL);
 }
 
 IMPLEMENT_IUNKNOWN(SampleJoiner)
@@ -83,12 +84,25 @@ void SampleJoiner::put_OutputLink(IChannelLink* value)
 	if(NULL != value && value->Output == NULL)
 		value = NULL;
 
-	m_pOutputLink = value;
+	if (value != NULL)
+	{
+		value->AddRef();
+	}
+
+	IChannelLink* pOutputLink = (IChannelLink*)InterlockedExchangePointer((void**)&m_pOutputLink, value);
+
+	if (pOutputLink != NULL)
+	{
+		pOutputLink->Release();
+	}
 }
 
 void SampleJoiner::MixInput(ISampleContainer* pInput, float volume, float pan)
 {
-	MixInput(pInput->LeftChannel->SamplePtr, pInput->RightChannel->SamplePtr, volume, pan);
+	if (pInput != NULL)
+	{
+		MixInput(pInput->LeftChannel->SamplePtr, pInput->RightChannel->SamplePtr, volume, pan);
+	}
 }
 
 void SampleJoiner::MixInput(float* pSourceLeft, float* pSourceRight, float volume, float pan)

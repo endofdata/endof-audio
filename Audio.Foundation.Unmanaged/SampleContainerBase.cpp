@@ -22,29 +22,35 @@ SampleContainerBase::~SampleContainerBase()
 
 void SampleContainerBase::AllocChannels(int sampleCount)
 {
-	m_pLeftChannel = new SampleBuffer(sampleCount);
-	if (NULL == m_pLeftChannel)
-		throw new std::invalid_argument("SampleContainerBase: Not enough memory for SampleBuffer for left channel.");
+	ISampleBuffer* pChannel = (ISampleBuffer*)InterlockedExchangePointer((void**)&m_pLeftChannel, new SampleBuffer(sampleCount));
 
-	m_pRightChannel = new SampleBuffer(sampleCount);
-	if (NULL == m_pRightChannel)
+	if (NULL != pChannel)
 	{
-		FreeChannels();
-		throw new std::invalid_argument("SampleContainerBase: Not enough memory for SampleBuffer for right channel.");
+		pChannel->Release();
+	}
+
+	pChannel = (ISampleBuffer*)InterlockedExchangePointer((void**)&m_pRightChannel, new SampleBuffer(sampleCount));
+
+	if (NULL != pChannel)
+	{
+		pChannel->Release();
 	}
 }
 
 void SampleContainerBase::FreeChannels()
 {
-	if (NULL != m_pLeftChannel)
+	ISampleBuffer* pChannel = (ISampleBuffer*)InterlockedExchangePointer((void**)&m_pLeftChannel, NULL);
+
+	if (NULL != pChannel)
 	{
-		delete m_pLeftChannel;
-		m_pLeftChannel = NULL;
+		pChannel->Release();
 	}
-	if (NULL != m_pRightChannel)
+
+	pChannel = (ISampleBuffer*)InterlockedExchangePointer((void**)&m_pRightChannel, NULL);
+
+	if (NULL != pChannel)
 	{
-		delete m_pRightChannel;
-		m_pRightChannel = NULL;
+		pChannel->Release();
 	}
 	m_sampleCount = 0;
 }

@@ -24,6 +24,7 @@ MeterChannel::MeterChannel(int sampleRate) :
 
 MeterChannel::~MeterChannel()
 {
+	put_Input(NULL);
 }
 
 IMPLEMENT_IUNKNOWN(MeterChannel)
@@ -108,7 +109,17 @@ IChannelLink* MeterChannel::get_Input()
 
 void MeterChannel::put_Input(IChannelLink* value)
 {
-	m_pInput = value;
+	if (value != NULL)
+	{
+		value->AddRef();
+	}
+
+	IChannelLink* pInput = (IChannelLink*)InterlockedExchangePointer((void**)&m_pInput, value);
+
+	if (pInput != NULL)
+	{
+		pInput->Release();
+	}
 }
 
 MeterChannelCallback MeterChannel::get_MeterUpdate()

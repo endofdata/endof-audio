@@ -5,6 +5,7 @@
 #include <functional>
 #include <stdexcept>
 #include "ISampleReceiver.h"
+#include "ObjectFactory.h"
 
 using namespace std;
 using namespace Audio::Foundation::Unmanaged;
@@ -42,7 +43,7 @@ void SampleSharer::AddSend(ISampleContainer& fromChannel, ISampleReceiver& toCha
 	// do not allow two sends to the same destination
 	RemoveSend(toChannel);
 
-	ChannelLink* pChannelLink = new ChannelLink(&fromChannel, &toChannel, volume, pan);
+	IChannelLink* pChannelLink = ObjectFactory::CreateChannelLink(&fromChannel, &toChannel, volume, pan);
 	if(NULL == pChannelLink)
 	{
 		RemoveAllSends();
@@ -59,7 +60,7 @@ void SampleSharer::RemoveSend(ISampleReceiver& toChannel)
 	{ 
 		if(pLink->Output == &toChannel)
 		{
-			delete pLink;
+			pLink->Release();
 			return true;
 		}
 		return false;
@@ -71,7 +72,7 @@ void SampleSharer::RemoveAllSends()
 {
 	for_each(m_vecSends.begin(), m_vecSends.end(), [](IChannelLink* pLink)
 	{
-		delete pLink;
+		pLink->Release();
 	});
 	m_vecSends.clear();
 }

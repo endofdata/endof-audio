@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "ChannelLink.h"
+#include "ISampleContainer.h"
+#include "ISampleReceiver.h"
+
 
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -14,16 +17,20 @@ ChannelLink::ChannelLink() :
 }
 
 ChannelLink::ChannelLink(ISampleContainer* pInput, ISampleReceiver* pOutput, float volume, float pan) :
-	m_pInput(pInput),
-	m_pOutput(pOutput),
+	m_pInput(NULL),
+	m_pOutput(NULL),
 	m_volume(volume),
 	m_pan(pan),
 	m_refCount(0)
 {
+	put_Input(pInput);
+	put_Output(pOutput);
 }
 
 ChannelLink::~ChannelLink()
 {
+	put_Input(NULL);
+	put_Output(NULL);
 }
 
 IMPLEMENT_IUNKNOWN(ChannelLink)
@@ -70,7 +77,17 @@ ISampleContainer* ChannelLink::get_Input()
 
 void ChannelLink::put_Input(ISampleContainer* value)
 {
-	m_pInput = value;
+	if (value != NULL)
+	{
+		value->AddRef();
+	}
+
+	ISampleContainer* pInput = (ISampleContainer*)InterlockedExchangePointer((void**)&m_pInput, value);
+
+	if (pInput != NULL)
+	{
+		pInput->Release();
+	}
 }
 
 ISampleReceiver* ChannelLink::get_Output()
@@ -80,5 +97,15 @@ ISampleReceiver* ChannelLink::get_Output()
 
 void ChannelLink::put_Output(ISampleReceiver* value)
 {
-	m_pOutput = value;
+	if (value != NULL)
+	{
+		value->AddRef();
+	}
+
+	ISampleReceiver* pOutput = (ISampleReceiver*)InterlockedExchangePointer((void**)&m_pOutput, value);
+
+	if (pOutput != NULL)
+	{
+		pOutput->Release();
+	}
 }
