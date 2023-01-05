@@ -22,12 +22,18 @@ SampleContainerBase::~SampleContainerBase()
 
 void SampleContainerBase::AllocChannels(int sampleCount)
 {
-	ISampleBuffer* pChannel = (ISampleBuffer*)InterlockedExchangePointer((void**)&m_pLeftChannel, new SampleBuffer(sampleCount));
+	SampleBuffer* pBuffer = new SampleBuffer(sampleCount);
+	pBuffer->AddRef();
+
+	ISampleBuffer* pChannel = (ISampleBuffer*)InterlockedExchangePointer((void**)&m_pLeftChannel, pBuffer);
 
 	if (NULL != pChannel)
 	{
 		pChannel->Release();
 	}
+
+	pBuffer = new SampleBuffer(sampleCount);
+	pBuffer->AddRef();
 
 	pChannel = (ISampleBuffer*)InterlockedExchangePointer((void**)&m_pRightChannel, new SampleBuffer(sampleCount));
 
