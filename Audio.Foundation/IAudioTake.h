@@ -10,7 +10,7 @@ namespace Audio
 		{
 			public interface class IAudioTake
 			{
-				property System::Single Volume
+				property System::Single Level
 				{
 					System::Single get();
 					void set(System::Single value);

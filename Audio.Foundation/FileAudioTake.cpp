@@ -64,7 +64,7 @@ TimeSpan FileAudioTake::Length::get()
 int FileAudioTake::ReadNextFrame(array<Single>^ audioBuffer)
 {
 	int samples = m_waveFile->ReadSamples(audioBuffer, 0, audioBuffer->Length);
-	float vol = Volume;
+	float vol = Level;
 
 	for (int s = 0; s < samples; s++)
 		audioBuffer[s] *= vol;
@@ -74,9 +74,7 @@ int FileAudioTake::ReadNextFrame(array<Single>^ audioBuffer)
 
 WaveFile^ FileAudioTake::OpenWaveFile(String^ fileName)
 {
-	WaveFile^ result = gcnew WaveFile(fileName, WaveFile::Mode::Play);
-
-	return result;
+	return gcnew WaveFile(fileName);
 }
 
 WaveFile^ FileAudioTake::WavFile::get()

@@ -16,12 +16,12 @@ AudioTakeBase::~AudioTakeBase()
 {
 }
 
-float AudioTakeBase::Volume::get()
+float AudioTakeBase::Level::get()
 {
 	return m_volume;
 }
 
-void AudioTakeBase::Volume::set(float value)
+void AudioTakeBase::Level::set(float value)
 {
 	m_volume = max(0.0f, min(value, 1.0f));
 }

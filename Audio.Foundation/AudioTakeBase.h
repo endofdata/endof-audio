@@ -16,7 +16,7 @@ namespace Audio
 				AudioTakeBase(System::TimeSpan offset, int sampleRate);
 				virtual ~AudioTakeBase();
 
-				property float Volume
+				property float Level
 				{
 					virtual float get();
 					virtual void set(float value);

@@ -79,7 +79,7 @@ int StreamAudioTake::ReadNextFrame(array<float>^ audioBuffer)
 	}
 
 
-	float vol = Volume;
+	float vol = Level;
 	float value = 0.0;
 	int sampleSize = sizeof(float);
 	Span<byte> span = Span<byte>((void*)&value, sampleSize);

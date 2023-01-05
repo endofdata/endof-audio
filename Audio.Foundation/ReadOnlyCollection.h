@@ -20,7 +20,7 @@ namespace Audio
 					return m_itemList->GetEnumerator();
 				}
 
-					virtual System::Collections::IEnumerator^ GetNonGenericEnumerator() = System::Collections::IEnumerable::GetEnumerator
+				virtual System::Collections::IEnumerator^ GetNonGenericEnumerator() = System::Collections::IEnumerable::GetEnumerator
 				{
 					return m_itemList->GetEnumerator();
 				}
