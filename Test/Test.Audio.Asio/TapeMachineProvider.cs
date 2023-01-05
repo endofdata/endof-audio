@@ -45,9 +45,9 @@ namespace Test.Audio.Asio
 
 		public static IEnumerable<TapeMachine> MachinesByName(string driverName)
 		{
-			var driverRegistry = new DriverRegistry();
+			var driverRegistry = DriverRegistry.FromRegistry();
 
-			Assert.That(driverRegistry.Any(), Is.True, "Driver registry contains entries.");
+			Assert.That(driverRegistry.Any(), Is.True, "Driver registry from system registry contains entries.");
 
 			var firstDriverGuid = GetDriverGuidByName(driverRegistry, driverName);
 
@@ -67,6 +67,8 @@ namespace Test.Audio.Asio
 				outputDevice = AsioDevice.CreateFromGuid(outputDriver);
 				outputDevice.IsPoweredOn = true;
 
+				TestContext.WriteLine($"Output driver name: {outputDevice.DriverName}");
+
 				if (inputDriver.HasValue)
 				{
 					if (inputDriver.Value != outputDriver)
@@ -77,6 +79,7 @@ namespace Test.Audio.Asio
 					{
 						inputDevice = outputDevice;
 					}
+					TestContext.WriteLine($"Input driver name: {inputDevice.DriverName}");
 				}
 
 				var router = new AsioRouter(outputDevice, inputDevice);

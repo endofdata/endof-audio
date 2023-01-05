@@ -60,7 +60,7 @@ namespace Test.Audio.Asio
 
 					var take = new StreamAudioTake(offset, sampleRate, sampleSize: sizeof(float), takeStream, leaveOpen: false)
 					{
-						Volume = 0.25f
+						Level = 0.25f
 					};
 
 					offset = offset.Add(distance);
@@ -139,10 +139,14 @@ namespace Test.Audio.Asio
 
 			bool isIdle = false;
 			tapeMachine.Idle += (sender, e) => isIdle = true;
+			// It is crucial to set the position before starting the tape machine, as this
+			// 'prepares' the tracks, i.e., detects the current playback buffer.
+			// Failing to do so leads to a wait timeout below.
+			tapeMachine.Position = TimeSpan.Zero;
 
 			tapeMachine.IsRunning = true;
 
-			bool hasSignal = tapeMachine.WaitForIdle();
+			bool hasSignal = tapeMachine.WaitForIdle(TimeSpan.FromSeconds(10));
 
 			Assert.That(hasSignal, Is.True, "Wait successfully for idle signal.");
 			Assert.That(isIdle, Is.True, "Receive Idle event.");
@@ -187,7 +191,7 @@ namespace Test.Audio.Asio
 					}
 
 
-					using WaveFile takeData = new(takeDataPath, WaveFile.Mode.Record, format);
+					using WaveFile takeData = new(takeDataPath, format);
 
 					int done;
 					var buffer = new float[512];
@@ -238,7 +242,7 @@ namespace Test.Audio.Asio
 		{
 			var take = new FileAudioTake(TimeSpan.FromSeconds(0), tapeMachine.Router.SampleRate, "Cow-moo-3 Mono.wav")
 			{
-				Volume = 0.8f
+				Level = 0.8f
 			};
 
 			return take;
@@ -253,7 +257,7 @@ namespace Test.Audio.Asio
 
 			var take = new StreamAudioTake(TimeSpan.FromSeconds(0), sampleRate, sampleSize: sizeof(float), memoryStream, false)
 			{
-				Volume = 0.25f
+				Level = 0.25f
 			};
 
 			return take;

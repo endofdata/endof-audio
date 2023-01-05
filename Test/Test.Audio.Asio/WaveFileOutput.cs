@@ -25,7 +25,7 @@ namespace Test.Audio.Asio
 
 		public WaveFileOutput(string path, WaveFormat format)
 		{
-			WaveFile = new WaveFile(path, WaveFile.Mode.Record, format);
+			WaveFile = new WaveFile(path, format);
 		}
 
 		public void WriteCurrentFrame(float[] frameBuffer, float volume, float pan)
