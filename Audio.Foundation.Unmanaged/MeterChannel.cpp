@@ -14,8 +14,8 @@ MeterChannel::MeterChannel(int sampleRate) :
 	m_iSumUpSamples(0),
 	m_dSumUpLeft(0.0f),
 	m_dSumUpRight(0.0f),
-	m_fDbLeft(0.0f),
-	m_fDbRight(0.0f),
+	m_fDbLeft(-1000.0f),
+	m_fDbRight(-1000.0f),
 	m_pInput(NULL),
 	m_meterUpdate(NULL),
 	m_refCount(0)
@@ -67,9 +67,22 @@ void MeterChannel::Receive(IChannelLink& inputBuffer)
 		ISampleBuffer* pLeftChannel = pInput->LeftChannel;
 		ISampleBuffer* pRightChannel = pInput->RightChannel;
 
-		SampleConversion::ContinueRMSSumUp(pLeftChannel->SamplePtr, pLeftChannel->SampleCount, m_dSumUpLeft);
-		SampleConversion::ContinueRMSSumUp(pRightChannel->SamplePtr, pRightChannel->SampleCount, m_dSumUpRight);
-		m_iSumUpSamples += pLeftChannel->SampleCount;
+		int sumUp = 0;
+
+		if (pLeftChannel != NULL)
+		{
+			SampleConversion::ContinueRMSSumUp(pLeftChannel->SamplePtr, pLeftChannel->SampleCount, m_dSumUpLeft);
+			sumUp = pLeftChannel->SampleCount;
+		}
+		if (pRightChannel != NULL)
+		{
+			SampleConversion::ContinueRMSSumUp(pRightChannel->SamplePtr, pRightChannel->SampleCount, m_dSumUpRight);
+			sumUp = pRightChannel->SampleCount;
+		}
+		if (sumUp > 0)
+		{
+			m_iSumUpSamples += pLeftChannel->SampleCount;
+		}
 		if(m_iSumUpSamples >= m_iSamplesPerRMSFrame)
 		{
 			m_fDbLeft = (float)SampleConversion::DbFullScaleRMS(m_dSumUpLeft, m_iSumUpSamples);
