@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "AsioCore.h"
+#include "AsioError.h"
 #include "AsioCoreException.h"
 #include "AsioDebugDriver.h"
 #include "AsioDebugDriverGuid.h"
@@ -9,27 +10,48 @@
 #include "OutputInt32ChannelPair.h"
 #include "OutputInt24ChannelPair.h"
 #include "OutputFloat32ChannelPair.h"
+#include "ChannelNameEnumerable.h"
 
 using namespace Audio::Asio;
+using namespace Audio::Asio::Interop;
 using namespace Audio::Foundation::Abstractions;
+using namespace System::Collections::Generic;
+using namespace System;
 
 // static
-AsioCore* AsioCore::CreateInstance(REFCLSID clsid, int iSamplesPerBuffer)
+AsioCore* AsioCore::CreateInstance(REFCLSID clsid)
 {
-	AsioCore* pCore = new AsioCore(clsid);
+	AsioCore* pCore = new AsioCore();
 
 	if (NULL == pCore)
 	{
 		throw gcnew AsioCoreException("AsioCore: Not enough memory for ASIO instance.", E_OUTOFMEMORY);
 	}
 
-	pCore->CreateBuffers(iSamplesPerBuffer);
+	try
+	{
+		pCore->Initialize(clsid);
+	}
+	catch (const std::exception& unmanagedError)
+	{
+		int error = pCore->LastError != S_OK ? pCore->LastError : E_UNEXPECTED;
+		System::String^ details = gcnew System::String(unmanagedError.what());
+
+		delete pCore;
+
+		throw gcnew AsioCoreException(System::String::Format("AsioCore: Initilaization failed. {0} (0x{1:X})", details, error), error);
+	}
+	catch (AsioCoreException^)
+	{
+		delete pCore;
+		throw;
+	}
 
 	return pCore;
 }
 
 
-AsioCore::AsioCore(REFCLSID clsid) :
+AsioCore::AsioCore() :
 	m_pDriver(NULL),
 	m_iInputLatency(0),
 	m_iOutputLatency(0),
@@ -49,7 +71,6 @@ AsioCore::AsioCore(REFCLSID clsid) :
 	m_sampleType(-1)
 {
 	m_supportedBufferSize.Init();
-	Initialize(clsid);
 }
 
 // virtual
@@ -94,26 +115,18 @@ void AsioCore::Initialize(REFCLSID clsid)
 	{
 		m_pCoreCallbacks = &AsioCoreCallbacks::Create(this);
 
-		ASIOChannelInfo channelInfo = ASIOChannelInfo();
+		ThrowIfFailed(m_pDriver->getChannels((long*)&m_iHwInputCount, (long*)&m_iHwOutputCount));
+
+		m_iHwPinCount = m_iHwInputCount + m_iHwOutputCount;
+
+		ASIOChannelInfo channelInfo;
+
 		channelInfo.isInput = ASIOTrue;
 		channelInfo.channel = 0;
 
 		ThrowIfFailed(m_pDriver->getChannelInfo(&channelInfo));
-		switch(channelInfo.type)
-		{
-		case ASIOSTInt32LSB:
-		case ASIOSTInt24LSB:
-		case ASIOSTFloat32LSB:
-			break;
-		default:		
-			CleanUp();
-			throw gcnew AsioCoreException("Driver does not use supported sample formats 'Int24/LSB', 'Int32/LSB' or 'Float32/LSB'.", E_UNEXPECTED);
-		}
+
 		m_sampleType = channelInfo.type;
-
-		ThrowIfFailed(m_pDriver->getChannels((long*)&m_iHwInputCount, (long*)&m_iHwOutputCount));
-
-		m_iHwPinCount = m_iHwInputCount + m_iHwOutputCount;
 
 		ThrowIfFailed(m_pDriver->getBufferSize(
 			(long*)&m_supportedBufferSize.Minimum, (long*)&m_supportedBufferSize.Maximum,
@@ -198,28 +211,28 @@ void AsioCore::SelectSampleRate()
 	}
 }
 
-void AsioCore::CreateBuffers(int iSampleCount)
+void AsioCore::CreateBuffers(array<int>^ inputChannelIds, array<int>^ outputChannelIds, int sampleCount)
 {
 	int requestedBufferSize = 0;
 
-	if (iSampleCount == UseMaximumSize)
+	if (sampleCount == UseMaximumSize)
 		requestedBufferSize = m_supportedBufferSize.Maximum;
-	else if (iSampleCount == UsePreferredSize)
+	else if (sampleCount == UsePreferredSize)
 		requestedBufferSize = m_supportedBufferSize.Preferred;
 	else
-		requestedBufferSize = iSampleCount;
+		requestedBufferSize = sampleCount;
 
 	DisposeBuffers();
 
 	if (m_iHwPinCount > 0)
 	{
-		m_pHwBufferInfo = new ASIOBufferInfo[m_iHwPinCount];
+		m_pHwBufferInfo = new ASIOBufferInfo[inputChannelIds->Length + outputChannelIds->Length];
 		if (NULL == m_pHwBufferInfo)
 			throw gcnew AsioCoreException("AsioCore: Not enough memory for array of ASIOBufferInfo.", E_OUTOFMEMORY);
 
 		int iIdx = 0;
 
-		for (int iInput = 0; iInput < m_iHwInputCount; iInput++)
+		for each (int iInput in inputChannelIds)
 		{
 			m_pHwBufferInfo[iIdx].isInput = ASIOTrue;
 			m_pHwBufferInfo[iIdx].channelNum = iInput;
@@ -228,7 +241,7 @@ void AsioCore::CreateBuffers(int iSampleCount)
 			iIdx++;
 		}
 
-		for (int iOutput = 0; iOutput < m_iHwOutputCount; iOutput++)
+		for each (int iOutput in outputChannelIds)
 		{
 			m_pHwBufferInfo[iIdx].isInput = ASIOFalse;
 			m_pHwBufferInfo[iIdx].channelNum = iOutput;
@@ -238,15 +251,15 @@ void AsioCore::CreateBuffers(int iSampleCount)
 		}
 
 		// Alloc the driver buffers
-		ThrowIfFailed(m_pDriver->createBuffers(m_pHwBufferInfo, m_iHwPinCount, requestedBufferSize, &m_pCoreCallbacks->Callbacks));
+		ThrowIfFailed(m_pDriver->createBuffers(m_pHwBufferInfo, iIdx, requestedBufferSize, &m_pCoreCallbacks->Callbacks));
 		ThrowIfFailed(m_pDriver->getLatencies((long*)&m_iInputLatency, (long*)&m_iOutputLatency));
 		m_outputReadySupport = (m_pDriver->outputReady() == ASE_OK);
 		m_iSampleCount = requestedBufferSize;
 
 		try
 		{
-			CreateInputChannels();
-			CreateOutputChannels();
+			CreateInputChannels(0, inputChannelIds->Length);
+			CreateOutputChannels(inputChannelIds->Length, outputChannelIds->Length);
 		}
 		catch (...)
 		{
@@ -256,20 +269,20 @@ void AsioCore::CreateBuffers(int iSampleCount)
 	}
 }
 
-void AsioCore::CreateInputChannels()
+void AsioCore::CreateInputChannels(int offset, int count)
 {
-	if (m_iHwInputCount > 0)
+	if (count > 0)
 	{
 		// each input channel splits the signal to two sample buffers
-		m_pInputChannels = (IInputChannel**)new IInputChannel*[m_iHwInputCount];
+		m_pInputChannels = (IInputChannel**)new IInputChannel*[count];
 		if (NULL == m_pInputChannels)
 			throw gcnew AsioCoreException("AsioCore: Not enough memory for InputChannel array.", E_OUTOFMEMORY);
 
-		ZeroMemory(m_pInputChannels, sizeof(IInputChannel*) * m_iHwInputCount);
+		ZeroMemory(m_pInputChannels, sizeof(IInputChannel*) * count);
 
 		m_iInputChannels = 0;
 
-		for (int iIdx = 0; iIdx < m_iHwInputCount; iIdx++)
+		for (int iIdx = offset; iIdx < offset + count; iIdx++)
 		{
 			switch(m_sampleType)
 			{
@@ -307,21 +320,25 @@ void AsioCore::CreateInputChannels()
 	}
 }
 
-void AsioCore::CreateOutputChannels()
+void AsioCore::CreateOutputChannels(int offset, int count)
 {
-	if (m_iHwOutputCount > 0)
+	int pairCount = count / 2;
+
+	if (pairCount > 0)
 	{
 		// each output channel is linked to two hardware outputs
-		m_pOutputChannelPairs = (IOutputChannelPair**)new IOutputChannelPair*[m_iHwOutputCount / 2];
+		m_pOutputChannelPairs = (IOutputChannelPair**)new IOutputChannelPair*[pairCount];
 		if (NULL == m_pOutputChannelPairs)
 			throw gcnew AsioCoreException("AsioCore: Not enough memory for OutputChannelPair array.", E_OUTOFMEMORY);
 
-		ZeroMemory(m_pOutputChannelPairs, sizeof(IOutputChannelPair*) * m_iHwOutputCount / 2);
+		ZeroMemory(m_pOutputChannelPairs, sizeof(IOutputChannelPair*) * pairCount);
 
 		m_iOutputChannelPairs = 0;
 
-		for (int iIdx = m_iHwInputCount; iIdx < m_iHwPinCount - 1; iIdx += 2)
+		for (int pair = 0; pair < pairCount; pair++)
 		{
+			int iIdx = offset + pair * 2;
+
 			switch (m_sampleType)
 			{
 			case ASIOSTInt32LSB:
@@ -388,7 +405,7 @@ void AsioCore::DisposeInputChannels()
 {
 	if (NULL != m_pInputChannels)
 	{
-		for (int i = 0; i < m_iHwInputCount; i++)
+		for (int i = 0; i < m_iInputChannels; i++)
 		{
 			if (NULL != m_pInputChannels[i])
 			{
@@ -554,7 +571,11 @@ void AsioCore::ThrowIfFailed(ASIOError error)
 	if (ASE_OK != error)
 	{
 		m_lastError = error;
-		throw gcnew AsioCoreException("AsioCore: ASIO driver reported error.", (int)error);
+
+		// Cast does not fail: If error is a known Interop::AsioError enum value, we see the corresponding value, otherwise, the numeric error value.
+		Audio::Asio::Interop::AsioError errorValue = (Audio::Asio::Interop::AsioError)error;
+		
+		throw gcnew AsioCoreException(System::String::Format(L"AsioCore: ASIO driver reported error '{0}'.", errorValue), (int)error);
 	}
 }
 
@@ -573,8 +594,9 @@ IInputChannel* AsioCore::get_InputChannel(int iChannel)
 	IInputChannel* value = NULL;
 
 	if (0 <= iChannel && iChannel < m_iInputChannels)
+	{
 		value = m_pInputChannels[iChannel];
-
+	}
 	return value;
 }
 
@@ -588,8 +610,9 @@ IOutputChannelPair* AsioCore::get_OutputChannelPair(int iChannel)
 	IOutputChannelPair* value = NULL;
 
 	if (0 <= iChannel && iChannel < m_iOutputChannelPairs)
+	{
 		value = m_pOutputChannelPairs[iChannel];
-
+	}
 	return value;
 }
 
@@ -636,4 +659,14 @@ BufferSwitchEventHandler AsioCore::get_BufferSwitchEventHandler()
 void AsioCore::put_BufferSwitchEventHandler(BufferSwitchEventHandler value)
 {
 	m_bufferSwitchEventHandler = value;
+}
+
+IEnumerable<String^>^ AsioCore::GetKnownInputChannels()
+{
+	return gcnew ChannelNameEnumerable(m_pDriver, true, m_iHwInputCount);
+}
+
+IEnumerable<String^>^ AsioCore::GetKnownOutputChannels()
+{
+	return gcnew ChannelNameEnumerable(m_pDriver, false, m_iHwOutputCount);
 }

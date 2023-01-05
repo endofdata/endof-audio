@@ -24,7 +24,7 @@ namespace Audio
 			static const int UseMaximumSize = -1;
 			static const int UsePreferredSize = -2;
 
-			static AsioCore* CreateInstance(REFCLSID clsid, int iSamplesPerBuffer);
+			static AsioCore* CreateInstance(REFCLSID clsid);
 
 
 			virtual ~AsioCore();
@@ -40,6 +40,10 @@ namespace Audio
 			void GetDriverName(char* pcOut);
 
 			int GetDriverVersion();
+
+			System::Collections::Generic::IEnumerable<System::String^>^ GetKnownInputChannels();
+
+			System::Collections::Generic::IEnumerable<System::String^>^ GetKnownOutputChannels();
 
 			_declspec(property(get = get_InputChannelCount)) int InputChannelCount;
 
@@ -83,6 +87,8 @@ namespace Audio
 			BufferSwitchEventHandler get_BufferSwitchEventHandler();
 			void put_BufferSwitchEventHandler(BufferSwitchEventHandler value);
 
+			void CreateBuffers(array<int>^ inputChannelIds, array<int>^ outputChannelIds, int sampleCount);
+
 		private:
 			struct BufferSize
 			{
@@ -105,7 +111,7 @@ namespace Audio
 				}
 			};
 
-			AsioCore(REFCLSID clsid);
+			AsioCore();
 
 			void Initialize(REFCLSID clsid);
 
@@ -113,11 +119,9 @@ namespace Audio
 
 			void SelectSampleRate();
 
-			void CreateBuffers(int iSampleCount);
+			void CreateInputChannels(int offset, int count);
 
-			void CreateInputChannels();
-
-			void CreateOutputChannels();
+			void CreateOutputChannels(int offset, int count);
 
 			void DisposeBuffers();
 

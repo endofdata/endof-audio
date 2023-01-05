@@ -110,6 +110,9 @@
     <Link>
       <AdditionalDependencies>ole32.lib</AdditionalDependencies>
     </Link>
+    <Xdcmake>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </Xdcmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -124,6 +127,9 @@
     <Link>
       <AdditionalDependencies>ole32.lib</AdditionalDependencies>
     </Link>
+    <Xdcmake>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </Xdcmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -137,6 +143,9 @@
     <Link>
       <AdditionalDependencies>ole32.lib</AdditionalDependencies>
     </Link>
+    <Xdcmake>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </Xdcmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -150,6 +159,9 @@
     <Link>
       <AdditionalDependencies>ole32.lib</AdditionalDependencies>
     </Link>
+    <Xdcmake>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </Xdcmake>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AsioCore.h" />
@@ -171,7 +183,10 @@
     <ClInclude Include="AudioTrack.h" />
     <ClInclude Include="AudioTrackCollection.h" />
     <ClInclude Include="BufferSwitchManagedCallback.h" />
+    <ClInclude Include="ChannelNameEnumerable.h" />
+    <ClInclude Include="ChannelNameEnumerator.h" />
     <ClInclude Include="DriverDescription.h" />
+    <ClInclude Include="DriverRegistry.h" />
     <ClInclude Include="InputFloat32Channel.h" />
     <ClInclude Include="InputInt24Channel.h" />
     <ClInclude Include="InputInt32Channel.h" />
@@ -193,6 +208,8 @@
     <ClCompile Include="AudioOutput.cpp" />
     <ClCompile Include="AudioTrack.cpp" />
     <ClCompile Include="AudioTrackCollection.cpp" />
+    <ClCompile Include="ChannelNameEnumerable.cpp" />
+    <ClCompile Include="ChannelNameEnumerator.cpp" />
     <ClCompile Include="DriverDescription.cpp" />
     <ClCompile Include="DriverRegistry.cpp" />
     <ClCompile Include="pch.cpp">

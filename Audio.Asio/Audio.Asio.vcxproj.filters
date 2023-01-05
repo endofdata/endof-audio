@@ -50,6 +50,12 @@
     <ClCompile Include="AsioCoreCallbacks.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="ChannelNameEnumerator.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="ChannelNameEnumerable.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AsioCore.h">
@@ -131,6 +137,15 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="OutputInt24ChannelPair.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="DriverRegistry.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ChannelNameEnumerator.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ChannelNameEnumerable.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
