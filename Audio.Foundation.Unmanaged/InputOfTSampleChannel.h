@@ -66,6 +66,7 @@ namespace Audio
 							Audio::Foundation::Unmanaged::SampleConversion::VolumeAndPanFactor(2.0f, 0.0f, volPanFactorLeft, volPanFactorRight);
 
 							int sampleCount = SampleContainer.SampleCount;
+
 							for (int i = 0; i < sampleCount; i++)
 							{
 								float floatSample = ReadSample(pSource);

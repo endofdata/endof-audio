@@ -89,8 +89,9 @@ IChannelLink* SampleSharer::get_Send(int iIdx)
 {
 	IChannelLink* value = NULL;
 	
-	if(0 <= iIdx && iIdx < (int)m_vecSends.size()) 
+	if (0 <= iIdx && iIdx < (int)m_vecSends.size())
+	{
 		value = m_vecSends.at(iIdx);
-
+	}
 	return value;
 }
