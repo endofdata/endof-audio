@@ -137,7 +137,7 @@ bool TapeMachine::TrackIsSoloed(AudioTrack^ track)
 
 void TapeMachine::AudioTracks_CollectionChanged(System::Object^ sender, System::Collections::Specialized::NotifyCollectionChangedEventArgs^ e)
 {
-	for each (AudioTrack ^ track in e->NewItems)
+	for each (AudioTrack^ track in e->NewItems)
 	{
 		if (m_isRecording)
 			track->BeginRecording();
@@ -177,34 +177,36 @@ void TapeMachine::OnPropertyChanged(System::String^ propertyName)
 
 void TapeMachine::OnOutputBufferSwitch(bool isSecondHalf)
 {
-	bool hasOutput = false;
-
-	for each (AudioTrack^ track in m_audioTracks)
+	if (m_isRunning)
 	{
-		if (track->IsRecording == false && track->NextFrame())
+		bool hasOutput = false;
+
+		for each (AudioTrack^ track in m_audioTracks)
 		{
-			hasOutput = true;
-			track->Send();
+			if (track->IsRecording == false && track->NextFrame())
+			{
+				hasOutput = true;
+				track->Send();
+			}
 		}
-	}
 
-	if (!hasOutput && !IsRecording)
-	{
-		OnIdle();
+		if (!hasOutput && !IsRecording)
+		{
+			OnIdle();
+		}
 	}
 }
 
 void TapeMachine::OnInputBufferSwitch(bool isSecondHalf)
 {
-	if (IsRecording)
+	// We process data for each hot track so that input monitoring works
+	// even when tape machine is not running or recording
+	for each (AudioTrack^ track in m_audioTracks)
 	{
-		for each (AudioTrack^ track in m_audioTracks)
+		if (track->IsHot == true)
 		{
-			if (track->IsRecording == true)
-			{
-				track->NextFrame();
-				track->Send();
-			}
+			track->NextFrame();
+			track->Send();
 		}
 	}
 }
@@ -213,6 +215,8 @@ String^ TapeMachine::GetTempAudioFileName()
 {
 	long long fileTimeUtc = DateTime::Now.ToFileTimeUtc();
 	String^ fileName = String::Format("Take {0}-{1:X}.wav", m_recordings++, fileTimeUtc);
+
+	TraceSource->TraceEvent(TraceEventType::Information, 8, "Temporary audio file: {0}", fileName);
 
 	return Path::Combine(m_tempAudioPath, fileName);
 }
@@ -255,6 +259,8 @@ void TapeMachine::Position::set(TimeSpan value)
 {
 	if (m_isRunning)
 		throw gcnew InvalidOperationException("Cannot set position while TapeMachine is running.");
+
+	PrepareTracks();
 
 	if (m_position != value)
 	{
@@ -312,7 +318,6 @@ void TapeMachine::IsRunning::set(Boolean value)
 			{
 				throw gcnew InvalidOperationException("Failed to reset Idle event.");
 			}
-			PrepareTracks();
 			m_stopWatch->Start();
 		}
 		else

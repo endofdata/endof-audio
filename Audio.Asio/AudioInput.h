@@ -13,7 +13,7 @@ namespace Audio
 	{
 		namespace Interop
 		{
-			delegate void MeterUpdateDelegate(System::IntPtr pSender); 
+			delegate void MeterUpdateDelegate(System::IntPtr pSender);
 
 			public ref class AudioInput sealed : public System::ComponentModel::INotifyPropertyChanged, public IAudioInput
 			{
@@ -52,12 +52,12 @@ namespace Audio
 						m_propertyChangedEventHandler = static_cast<System::ComponentModel::PropertyChangedEventHandler^>(System::Delegate::Combine(m_propertyChangedEventHandler, value));
 					}
 
-						void remove(System::ComponentModel::PropertyChangedEventHandler^ value) sealed = INotifyPropertyChanged::PropertyChanged::remove
+					void remove(System::ComponentModel::PropertyChangedEventHandler^ value) sealed = INotifyPropertyChanged::PropertyChanged::remove
 					{
 						m_propertyChangedEventHandler = static_cast<System::ComponentModel::PropertyChangedEventHandler^>(System::Delegate::Remove(m_propertyChangedEventHandler, value));
 					}
 
-						void raise(System::Object^ sender, System::ComponentModel::PropertyChangedEventArgs^ e)
+					void raise(System::Object^ sender, System::ComponentModel::PropertyChangedEventArgs^ e)
 					{
 						System::ComponentModel::PropertyChangedEventHandler^ handler = m_propertyChangedEventHandler;
 

@@ -55,74 +55,149 @@ namespace Audio
 					}
 				}
 
+				/// <summary>
+				/// Gets or sets the track name.
+				/// </summary>
+				/// <remarks>
+				/// The default value has the format 'Track n' where 'n' is the track id.
+				/// </remarks>
 				property System::String^ Name;
+				/// <summary>
+				/// Gets or sets a value indicating whether the track audio data is sent to its monitor output
+				/// </summary>
 				property bool IsSilent;
-				property float Volume;
+				/// <summary>
+				/// Gets or sets the track output level.
+				/// </summary>
+				/// <remarks>
+				/// The default value is 0.7
+				/// </remarks>
+				property float Level;
+				/// <summary>
+				/// Gets or sets the track pan position.
+				/// </summary>
 				property float Pan;
 
+				/// <summary>
+				/// Gets the internal track identifier.
+				/// </summary>
 				property int TrackId
 				{
 					int get();
 				}
 
+				/// <summary>
+				/// Gets the tape machine to which the track belongs.
+				/// </summary>
 				property TapeMachine^ Machine
 				{
 					TapeMachine^ get();
 				}
 
+				/// <summary>
+				/// Gets a value indicating whether the track is prepared to record, e.g. <see cref="RecordIn"/> is not <see langword="null"/>.
+				/// </summary>
 				property bool IsReady
 				{
 					bool get();
 				}
 
+				/// <summary>
+				/// Gets or sets a value indicating whether the track is selected for recording.
+				/// </summary>
+				/// <remarks>
+				/// Setting this property also sets the <see cref="IAudioInput.IsActive"/> flag of the assigned
+				/// <see cref="RecordIn"/> to the same value. When setting it to <see langword="true"/> 
+				/// the next audio track matching the tape machine's playback position is prepared for playback.
+				/// Setting it to <see langword="false"/> drops any current recording take before deactivating
+				/// <see cref="RecordIn"/>.
+				/// </remarks>
 				property bool IsHot
 				{
 					bool get();
 					void set(bool value);
 				}
 
+				/// <summary>
+				/// Gets a value indicating whether the track is currently recording.
+				/// </summary>
+				/// <remarks>
+				/// Calling <see cref="BeginRecording"/> sets this property to <see langword="true"/>. A call to 
+				/// <see cref="EndRecording"/> resets it after saving the current recording take, if any.
 				property bool IsRecording
 				{
 					bool get();
 				}
 			
+				/// <summary>
+				/// Gets or sets a value indicating whether the track is currently muted.
+				/// </summary>
 				property bool IsMuted
 				{
 					bool get();
 					void set(bool value);
 				}
 
+				/// <summary>
+				/// Gets or sets a value indicating whether the track is currently soloed.
+				/// </summary>
 				property bool IsSolo
 				{
 					bool get();
 					void set(bool value);
 				}
 
-				property Level DisplayLevel
-				{
-					Level get();
-				}
+				///// <summary>
+				///// Gets the display level which is either the record input or the monitor output depending on <see cref="IsRecording"/>.
+				///// </summary>
+				//property Level DbFS
+				//{
+				//	Level get();
+				//}
 
+				/// <summary>
+				/// Gets or sets the current track status flags.
+				/// </summary>
+				/// <remarks>
+				/// The track status combines the values of <see cref="IsHot"/>, <see cref="IsRecording"/>, <see cref="IsMuted"/> 
+				/// and <see cref="IsSolo"/>. Consequently, setting this property with <see cref="TrackStatus.Recording"/> included
+				/// calls <see cref="BeginRecording"/> and setting it without <see cref="TrackStatus.Recording"/> calls <see cref="EndRecording"/>.
+				/// </remarks>
 				property TrackStatus Status
 				{
 					TrackStatus get();
 					void set(TrackStatus value);
 				}
 
+				/// <summary>
+				/// Gets or sets the audio input from which audio data can be recorded.
+				/// </summary>
 				property IAudioInput^ RecordIn
 				{
 					IAudioInput^ get();
 					void set(IAudioInput^ value);
 				}
 
+				/// <summary>
+				/// Gets or sets the audio output to which audio data can be sent.
+				/// </summary>
 				property IAudioOutput^ MonitorOut
 				{
 					IAudioOutput^ get();
 					void set(IAudioOutput^ value);
 				}
 
+				/// <summary>
+				/// Inserts an audio take to this track.
+				/// </summary>
+				/// <param name="take"></param>
 				void InsertTake(IAudioTake^ take);
 
+				/// <summary>
+				/// Gets a string representation of the audio track.
+				/// </summary>
+				/// <returns>A display string containing the track name and status codes 'H', 'M' and 'S' or '-' for
+				/// <see cref="IsHot"/>, <see cref="IsMuted"/> and <see cref="IsSolo"/>.</returns>
 				virtual System::String^ ToString() override;
 
 
@@ -131,8 +206,9 @@ namespace Audio
 				~AudioTrack();
 
 				void Prepare();
-				void Done();
-				void Abort();
+				void NewTake();
+				void CompleteTake();
+				void AbortTake();
 
 				bool NextFrame();
 				void Send();

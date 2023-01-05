@@ -22,11 +22,10 @@ AudioInput::AudioInput(int sampleRate, IInputChannel* pHwChannel, int id) : m_is
 
 	m_channelId = id;
 
-	MeterUpdateDelegate^ meterUpdateDelegate = gcnew MeterUpdateDelegate(this, &AudioInput::InputMeter_MeterUpdate);
-	m_meterUpdateDelegateHandle = GCHandle::Alloc(meterUpdateDelegate);
-
 	m_pInputMeter = Audio::Foundation::Unmanaged::ObjectFactory::CreateMeterChannel(sampleRate);
 	m_pInputMeter->RMSTime = 100;
+	MeterUpdateDelegate^ meterUpdateDelegate = gcnew MeterUpdateDelegate(this, &AudioInput::InputMeter_MeterUpdate);
+	m_meterUpdateDelegateHandle = GCHandle::Alloc(meterUpdateDelegate);
 	m_pInputMeter->MeterUpdate = static_cast<MeterChannelCallback>(Marshal::GetFunctionPointerForDelegate(meterUpdateDelegate).ToPointer());
 
 	ISampleReceiver* pSampleReceiver;
@@ -115,6 +114,7 @@ void AudioInput::Monitor::set(IAudioOutput^ value)
 
 void AudioInput::ReadCurrentFrame(array<float>^ frameBuffer)
 {
+	// TODO: Why do we always access left channel here?
 	System::Runtime::InteropServices::Marshal::Copy(System::IntPtr((void*)m_pInputChannel->SampleContainer.LeftChannel->SamplePtr), frameBuffer, 0, frameBuffer->Length);
 }
 

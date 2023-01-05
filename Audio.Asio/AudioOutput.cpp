@@ -1,9 +1,11 @@
 #include "pch.h"
+#include "AudioInput.h"
 #include "AudioOutput.h"
 #include <SampleConversionUnmanaged.h>
 #include <ObjectFactory.h>
 
 using namespace System;
+using namespace System::Runtime::InteropServices;
 using namespace Audio::Asio;
 using namespace Audio::Asio::Interop;
 using namespace Audio::Foundation;
@@ -21,6 +23,10 @@ AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pH
 	m_pOutputMeter = ObjectFactory::CreateMeterChannel(sampleCount);
 	m_pOutputMeter->RMSTime = 100;
 
+	MeterUpdateDelegate^ meterUpdateDelegate = gcnew MeterUpdateDelegate(this, &AudioOutput::OutputMeter_MeterUpdate);
+	m_meterUpdateDelegateHandle = GCHandle::Alloc(meterUpdateDelegate);
+	m_pOutputMeter->MeterUpdate = static_cast<MeterChannelCallback>(Marshal::GetFunctionPointerForDelegate(meterUpdateDelegate).ToPointer());
+
 	pHwChannel->AddRef();
 	m_pOutputChannelPair = pHwChannel;
 
@@ -33,6 +39,8 @@ AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pH
 	m_pOutputChannelPair->QueryInterface(_uuidof(ISampleReceiver), (void**)&pSampleReceiver);
 
 	m_pMasterMix->OutputLink = ObjectFactory::CreateChannelLink(pSampleContainer, pSampleReceiver, VolumeMax, PanCenter);
+
+	m_pOutputMeter->Input = m_pMasterMix->OutputLink;
 
 	pSampleReceiver->Release();
 	pSampleContainer->Release();
@@ -69,6 +77,8 @@ void AudioOutput::CleanUp(bool isDisposing)
 			m_pOutputChannelPair->Release();
 			m_pOutputChannelPair = NULL;
 		}
+
+		m_meterUpdateDelegateHandle.Free();
 	}
 }
 
@@ -107,3 +117,7 @@ void AudioOutput::OnPropertyChanged(System::String^ propertyName)
 	PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(propertyName));
 }
 
+void AudioOutput::OutputMeter_MeterUpdate(IntPtr sender)
+{
+	OnPropertyChanged(DbFSProperty);
+}

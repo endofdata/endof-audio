@@ -27,14 +27,24 @@ AsioRouter::AsioRouter(AsioDevice^ outputDevice, AsioDevice^ inputDevice)
 
 	for (int o = 0; o < outputDevice->OutputChannelPairCount; o++)
 	{
-		m_audioOutputPairs->Add(gcnew AudioOutput(outputDevice->SampleRate, outputDevice->SampleCount, outputDevice->GetOutputChannelPair(o), o + 1));
+		IOutputChannelPair* pOutputPair = outputDevice->GetOutputChannelPair(o);
+		if (pOutputPair == NULL)
+		{
+			throw gcnew InvalidOperationException("Output channel pair is not allocated.");
+		}
+		m_audioOutputPairs->Add(gcnew AudioOutput(outputDevice->SampleRate, outputDevice->SampleCount, pOutputPair, o + 1));
 	}
 
 	if (inputDevice != nullptr)
 	{
 		for (int i = 0; i < inputDevice->InputChannelCount; i++)
 		{
-			m_audioInputs->Add(gcnew AudioInput(inputDevice->SampleRate, inputDevice->GetInputChannel(i), i + 1));
+			IInputChannel* pInput = inputDevice->GetInputChannel(i);
+			if(pInput == NULL)
+			{
+				throw gcnew InvalidOperationException("Input channel is not allocated.");
+			}
+			m_audioInputs->Add(gcnew AudioInput(inputDevice->SampleRate, pInput, i + 1));
 		}
 	}
 
@@ -98,7 +108,7 @@ void AsioRouter::OnOutputBufferSwitch(bool isSecondHalf)
 			handler(isSecondHalf);
 		}
 
-		for each (AudioOutput ^ audioOutput in m_audioOutputPairs)
+		for each (AudioOutput^ audioOutput in m_audioOutputPairs)
 		{
 			audioOutput->Send();
 		}
@@ -116,6 +126,15 @@ void AsioRouter::OnInputBufferSwitch(bool isSecondHalf)
 	try
 	{
 		BufferSwitchManagedCallback^ handler = m_inputBufferSwitchHandler;
+
+		//for each (AudioInput ^ audioInput in m_audioInputs)
+		//{
+		//	audioInput->ReadCurrentFrame()
+		//}
+		if (handler != nullptr)
+		{
+			handler(isSecondHalf);
+		}
 	}
 	catch (Exception^)
 	{
@@ -173,6 +192,9 @@ void AsioRouter::IsPoweredOn::set(Boolean value)
 			m_inputDevice->IsPoweredOn = value;
 		}
 		m_outputDevice->IsPoweredOn = value;
+		m_isPoweredOn = value;
+
+		OnPropertyChanged(IsPoweredOnProperty);
 	}
 }
 
@@ -208,4 +230,9 @@ int AsioRouter::SampleRate::get()
 	// c'tor checks that input and output are using the same sample rate
 	// so we can always return output buffer size here.
 	return m_outputDevice->SampleRate;
+}
+
+void AsioRouter::OnPropertyChanged(System::String^ propertyName)
+{
+	PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(propertyName));
 }

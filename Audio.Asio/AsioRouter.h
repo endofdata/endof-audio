@@ -91,6 +91,7 @@ namespace Audio
 				void OnInputBufferSwitch(bool isSecondHalf);
 				void OnOutputBufferSwitch(bool isSecondHalf);
 				void OnDuplexBufferSwitch(bool isSecondHalf);
+				void OnPropertyChanged(System::String^ propertyName);
 
 				AsioDevice^ m_inputDevice;
 				AsioDevice^ m_outputDevice;

@@ -31,12 +31,12 @@ namespace Audio
 						m_propertyChangedEventHandler = static_cast<System::ComponentModel::PropertyChangedEventHandler^>(System::Delegate::Combine(m_propertyChangedEventHandler, value));
 					}
 
-						void remove(System::ComponentModel::PropertyChangedEventHandler^ value) sealed = INotifyPropertyChanged::PropertyChanged::remove
+					void remove(System::ComponentModel::PropertyChangedEventHandler^ value) sealed = INotifyPropertyChanged::PropertyChanged::remove
 					{
 						m_propertyChangedEventHandler = static_cast<System::ComponentModel::PropertyChangedEventHandler^>(System::Delegate::Remove(m_propertyChangedEventHandler, value));
 					}
 
-						void raise(System::Object^ sender, System::ComponentModel::PropertyChangedEventArgs^ e)
+					void raise(System::Object^ sender, System::ComponentModel::PropertyChangedEventArgs^ e)
 					{
 						System::ComponentModel::PropertyChangedEventHandler^ handler = m_propertyChangedEventHandler;
 
@@ -53,44 +53,113 @@ namespace Audio
 				~TapeMachine();
 				!TapeMachine();
 
+				/// <summary>
+				/// Adds a new audio track.
+				/// </summary>
+				/// <returns>New audio track.</returns>
+				/// <remarks>
+				/// The track is added to the <see cref="Tracks"/> collection and its <see cref="AudioTrack.MonitorOut"/>
+				/// is routed to the first output pair of <see cref="Router"/>
+				/// </remarks>
 				AudioTrack^ AddTrack();
 
+				/// <summary>
+				/// Removes the audio track with the specified <paramref name="trackId"/> from the <see cref="Tracks"/> collection.
+				/// </summary>
+				/// <param name="trackId">Id of the track to remove.</param>
 				void RemoveTrack(int trackId);
+				/// <summary>
+				/// Removes the specified audio <paramref name="track"/> from the <see cref="Tracks"/> collection.
+				/// </summary>
 				void RemoveTrack(AudioTrack^ track);
 
+				/// <summary>
+				/// Waits for the tape machine to go idle.
+				/// </summary>
+				/// <returns><see langword="true"/> if idle event was received, otherwise <see langword="false"/>.</returns>
+				/// <remarks>
+				/// Setting <see cref="IsRunning"/> to <see langword="false"/> raises an idle event. Also, when the tape machine 
+				/// is not recording and no more audio data to output is available, an idle event is raised.
+				/// </remarks>
 				bool WaitForIdle();
+				/// <summary>
+				/// Waits up to the specified <paramref name="timeout"/> for the tape machine to go idle.
+				/// </summary>
+				/// <param name="timeout">Return if no idle event was received during this time span.</param>
+				/// <returns><see langword="true"/> if idle event was received, otherwise <see langword="false"/>.</returns>
 				bool WaitForIdle(System::TimeSpan timeout);
+				/// <summary>
+				/// Waits up to the specified <paramref name="timeout"/> for the tape machine to go idle.
+				/// </summary>
+				/// <param name="timeout">Return if no idle event was received during this time span.</param>
+				/// <param name="exitContext">Controls synchronisation context handling.</param>
+				/// <returns><see langword="true"/> if idle event was received, otherwise <see langword="false"/>.</returns>
+				/// <seealso cref="System.Threading.ManualResetEvent.WaitOne"/>
 				bool WaitForIdle(System::TimeSpan timeout, bool exitContext);
 
+				/// <summary>
+				/// Gets or sets the directory in which temporary audio files are stored.
+				/// </summary>
+				/// <remarks>
+				/// The default value is obtained by calling <see cref="System.IO.Path.GetTempPath"/>. 
+				/// </remarks>
+				/// <exception cref="System.ArgumentException">Thrown if an attempt was made to set this property to a non-existing path.</exception>
 				property System::String^ TempAudioPath
 				{
 					System::String^ get();
 					void set(System::String^ value);
 				}
 
+				/// <summary>
+				/// Gets the collection of audio tracks.
+				/// </summary>
+				/// <seealso cref="AddTrack"/>
+				/// <seealso cref="RemoveTrack(int)"/>
+				/// <seealso cref="RemoveTrack(AudioTrack)"/>
 				property AudioTrackCollection^ Tracks
 				{
 					AudioTrackCollection^ get();
 				}
 
+				/// <summary>
+				/// Gets or sets the current playback position.
+				/// </summary>
+				/// <exception cref="InvalidOperationException">Thrown if an attempt was made to set the position while the tape machine is running.</exception>
 				property System::TimeSpan Position
 				{
 					System::TimeSpan get();
 					void set(System::TimeSpan value);
 				}
 
+				/// <summary>
+				/// Gets or sets a value indicating whether the tape machine's virtual transport is running.
+				/// </summary>
+				/// <remarks>
+				/// Setting this property to <see langword="true"/> resets the idle event, prepares the tracks and starts the virtual transport.
+				/// Setting this property to <see langword="false"/> stops the virtual transport and raises the idle event.
+				/// </remarks>
 				property System::Boolean IsRunning
 				{
 					System::Boolean get();
 					void set(System::Boolean value);
 				}
 
+				/// <summary>
+				/// Gets or sets a value indicating whether the tape machine is in recording mode.
+				/// </summary>
+				/// <remarks>
+				/// Setting this property to <see langword="true"/> invokes <see cref="AudioTrack.BeginRecording"/> for all tracks.
+				/// Setting this property to <see langword="false"/> invokes <see cref="AudioTrack.EndRecording"/> for all tracks.
+				/// </remarks>
 				property System::Boolean IsRecording
 				{
 					System::Boolean get();
 					void set(System::Boolean value);
 				}
 
+				/// <summary>
+				/// Gets the audio router instance which was passed to the constructor of this tape machine instance.
+				/// </summary>
 				property AsioRouter^ Router
 				{
 					AsioRouter^ get();

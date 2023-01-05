@@ -11,7 +11,7 @@ using namespace System::Diagnostics;
 using namespace System::Linq;
 using namespace System::Collections::Generic;
 using namespace Audio::Asio::Interop;
-using namespace Audio::Foundation::Interop; 
+using namespace Audio::Foundation::Interop;
 using namespace Audio::Foundation::Abstractions;
 
 AudioTrack::AudioTrack(TapeMachine^ machine, int trackId) :
@@ -21,7 +21,7 @@ AudioTrack::AudioTrack(TapeMachine^ machine, int trackId) :
 {
 	Name = String::Format("Track {0}", trackId);
 	IsSilent = false;
-	Volume = 0.7f;
+	Level = 0.7f;
 	Pan = 0.0f;
 	IsHot = false;
 	IsMuted = false;
@@ -46,7 +46,7 @@ void AudioTrack::CleanUp()
 {
 	IsHot = false;
 
-	for each (IAudioTake^ take in m_takes->Values)
+	for each (IAudioTake ^ take in m_takes->Values)
 		delete take;
 
 	m_takes->Clear();
@@ -71,18 +71,24 @@ void AudioTrack::RecordIn::set(IAudioInput^ value)
 {
 	if (value != m_recordIn)
 	{
-		m_recordIn = value;
+		if (nullptr == value)
+		{
+			IsHot = false;
+		}
 
-		if (nullptr == value && IsRecording)
-			EndRecording();
+		m_recordIn = value;
 
 		OnPropertyChanged(RecordInProperty);
 		OnPropertyChanged(IsReadyProperty);
 
 		if (nullptr == value)
+		{
 			TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 101, "Trk {0}: RecordIn = null", m_trackId);
+		}
 		else
+		{
 			TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 101, "Trk {0}: RecordIn = channel {1}", m_trackId, value->ChannelId);
+		}
 	}
 }
 
@@ -106,19 +112,19 @@ void AudioTrack::MonitorOut::set(IAudioOutput^ value)
 	}
 }
 
-Level AudioTrack::DisplayLevel::get()
-{
-	Level result;
-
-	if (IsRecording)
-		result = m_recordIn->DbFS;
-	else if (nullptr != m_monitorOut)
-		result = m_monitorOut->DbFS;
-	else
-		result = Level();
-
-	return result;
-}
+//Level AudioTrack::DbFS::get()
+//{
+//	Level result;
+//
+//	if (IsHot)
+//		result = m_recordIn->DbFS;
+//	else if (nullptr != m_monitorOut)
+//		result = m_monitorOut->DbFS;
+//	else
+//		result = Level(System::Double::NegativeInfinity, System::Double::NegativeInfinity);
+//
+//	return result;
+//}
 
 TrackStatus AudioTrack::Status::get()
 {
@@ -166,7 +172,9 @@ void AudioTrack::IsHot::set(bool value)
 		if (true == value)
 		{
 			if (!IsReady)
+			{
 				throw gcnew InvalidOperationException("Before setting the track hot, the RecordIn property must be initialized.");
+			}
 
 			m_isHot = value;
 			m_recordIn->IsActive = true;
@@ -175,12 +183,17 @@ void AudioTrack::IsHot::set(bool value)
 		}
 		else
 		{
-			Abort();
+			AbortTake();
 
-			m_recordIn->IsActive = false;
+			if (IsReady)
+			{
+				m_recordIn->IsActive = false;
+			}
 			m_isHot = value;
 
 			EndRecording();
+
+			Array::Clear(m_pCurrentFrame);
 		}
 		OnPropertyChanged(IsHotProperty);
 
@@ -209,10 +222,12 @@ void AudioTrack::EndRecording()
 {
 	if (IsRecording)
 	{
-		Done();
+		CompleteTake();
 		m_isRecording = false;
 
 		TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 104, "Trk {0}: IsRecording = {1}", m_trackId, m_isRecording);
+
+		NewTake();
 
 		OnPropertyChanged(IsRecordingProperty);
 	}
@@ -296,26 +311,29 @@ void AudioTrack::Prepare()
 		bool canSetPos = m_playbackTake->TrySetPosition(m_machine->Position);
 	}
 
+	NewTake();
+}
+
+void AudioTrack::NewTake()
+{
 	if (IsHot)
 	{
 		m_recordingTake = gcnew AudioRecording(m_machine->Position, m_machine->Router->SampleRate, m_machine->GetTempAudioFileName());
 	}
 }
 
-void AudioTrack::Done()
+void AudioTrack::CompleteTake()
 {
-	if (IsRecording)
+	if (nullptr != m_recordingTake)
 	{
-		if (nullptr == m_recordingTake)
-			throw gcnew InvalidOperationException("Expected recording take to be not-null.");
-
 		m_recordingTake->Finish();
+		// TODO: Handle existing take at the same offset
 		m_takes->Add(m_recordingTake->Offset, m_recordingTake);
 		m_recordingTake = nullptr;
 	}
 }
 
-void AudioTrack::Abort()
+void AudioTrack::AbortTake()
 {
 	if (nullptr != m_recordingTake)
 	{
@@ -330,11 +348,13 @@ bool AudioTrack::NextFrame()
 	{
 		if (IsHot)
 		{
+			// TODO: Implement 'CopyCurrentFrame' w/o marshalling?
 			RecordIn->ReadCurrentFrame(m_pCurrentFrame);
 
 			if (IsRecording)
+			{
 				m_recordingTake->WriteNextFrame(m_pCurrentFrame);
-
+			}
 			return true;
 		}
 		else
@@ -373,11 +393,8 @@ bool AudioTrack::NextFrame()
 
 			if (samplesToClear > 0)
 			{
-				pin_ptr<float> pPinnedFrame = &m_pCurrentFrame[samplesTotal];
-
-				ZeroMemory(pPinnedFrame, sizeof(float) * samplesToClear);
+				Array::Clear(m_pCurrentFrame, samplesTotal, samplesToClear);
 			}
-			
 
 			return !m_isAtEndOfStream;
 		}
@@ -393,8 +410,8 @@ bool AudioTrack::NextFrame()
 
 void AudioTrack::Send()
 {
-	if (nullptr != m_pCurrentFrame && nullptr != MonitorOut && !IsSilent)
-		MonitorOut->WriteCurrentFrame(m_pCurrentFrame, Volume, Pan);
+	if (nullptr != MonitorOut && !IsSilent)
+		MonitorOut->WriteCurrentFrame(m_pCurrentFrame, Level, Pan);
 }
 
 String^ AudioTrack::ToString()

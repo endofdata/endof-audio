@@ -17,6 +17,8 @@ namespace Audio
 			public ref class AudioOutput sealed : public System::ComponentModel::INotifyPropertyChanged, public IAudioOutput
 			{
 			public:
+				static initonly System::String^ DbFSProperty = gcnew System::String("DbFS");
+
 				property Level DbFS
 				{
 					virtual Level get();
@@ -64,14 +66,16 @@ namespace Audio
 					IOutputChannelPair& get();
 				}
 			private:
-				void CleanUp(bool isDisposing);
+				void OutputMeter_MeterUpdate(System::IntPtr sender);
 				void OnPropertyChanged(System::String^ propertyName);
+				void CleanUp(bool isDisposing);
 
 				bool m_isDisposed;
 				int m_channelId;
 				ISampleJoiner* m_pMasterMix;
 				IMeterChannel* m_pOutputMeter;
 				IOutputChannelPair* m_pOutputChannelPair;
+				System::Runtime::InteropServices::GCHandle m_meterUpdateDelegateHandle;
 
 				System::ComponentModel::PropertyChangedEventHandler^ m_propertyChangedEventHandler;
 			};
