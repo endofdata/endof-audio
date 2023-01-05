@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Lupus": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

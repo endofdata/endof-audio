@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="Lupus.Controls.LoopTrack"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ctrl="clr-namespace:Lupus.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="64">
+    <GroupBox Header="{Binding RelativeSource={RelativeSource AncestorType={x:Type ctrl:LoopTrack}},Path=TrackName}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="Input"/>
+            <ComboBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                ItemsSource="{Binding RelativeSource={RelativeSource AncestorType={x:Type ctrl:LoopTrack}},Path=Inputs,Mode=OneWay}"
+                SelectedItem="{Binding RelativeSource={RelativeSource AncestorType={x:Type ctrl:LoopTrack}},Path=SelectedInput}"
+                DisplayMemberPath="ChannelId"/>
+            <Slider Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" VerticalAlignment="Center" TickPlacement="BottomRight" Ticks="5" IsSnapToTickEnabled="False"
+                Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type ctrl:LoopTrack}},Path=Pan}"
+                Minimum="-1.0" Maximum="1.0"/>
+            <Slider Grid.Row="3" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" TickPlacement="TopLeft" TickFrequency="0.2" IsSnapToTickEnabled="False"
+                Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type ctrl:LoopTrack}},Path=Level}"
+                Minimum="0" Maximum="1.2"/>
+            <DockPanel Grid.Row="3" Grid.Column="1">
+                <ToggleButton DockPanel.Dock="Bottom" Content="R" IsChecked="{Binding RelativeSource={RelativeSource AncestorType={x:Type ctrl:LoopTrack}},Path=IsHot,Mode=TwoWay}" Foreground="Red"/>
+                <ToggleButton DockPanel.Dock="Bottom" Content="M" IsChecked="{Binding RelativeSource={RelativeSource AncestorType={x:Type ctrl:LoopTrack}},Path=IsMuted,Mode=TwoWay}" Foreground="Blue"/>
+                <ToggleButton DockPanel.Dock="Bottom" Content="S" IsChecked="{Binding RelativeSource={RelativeSource AncestorType={x:Type ctrl:LoopTrack}},Path=IsSolo,Mode=TwoWay}" Foreground="Green"/>
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <ctrl:LevelMeter Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type ctrl:LoopTrack}},Path=DbFS.Left,UpdateSourceTrigger=Explicit}" MinWidth="6"/>
+                    <ctrl:LevelMeter Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type ctrl:LoopTrack}},Path=DbFS.Right,UpdateSourceTrigger=Explicit}" MinWidth="6"/>
+                </StackPanel>
+            </DockPanel>
+        </Grid>
+    </GroupBox>
+</UserControl>
