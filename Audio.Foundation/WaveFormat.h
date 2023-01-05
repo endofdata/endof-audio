@@ -782,6 +782,11 @@ namespace Audio
 				property int SampleSize;
 
 				/// <summary>
+				/// Gets or sets the sample rate in samples per second
+				/// </summary>
+				property int SampleRate;
+
+				/// <summary>
 				/// Gets the binary sample format.
 				/// </summary>
 				/// <seealso cref="Audio.Asio.SampleFormat"/>

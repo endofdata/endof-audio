@@ -69,6 +69,7 @@ void WaveFormat::WriteHeaderChunks(Stream^ wavStream)
 	header.formatChunkExt2.wWaveFormat = (unsigned short)SampleFormat;
 	header.formatChunkExt2.SetBitsPerSample(SampleSize * 8);
 	header.formatChunkExt2.SetChannels(Channels);
+	header.formatChunkExt2.SetSamplesPerSec(SampleRate);
 	header.riffChunk.uChunkSize = uFileSize - sizeof(ChunkHeader); 
 	array<Byte,1>^ buffer = gcnew array<Byte,1>(uWavHeaderSize);
 
@@ -112,6 +113,9 @@ void WaveFormat::ReadToData(Stream^ wavStream)
 
 		if(0 == SampleSize)
 			throw gcnew FormatException("Unexpected sample format");
+
+		SampleRate = pFormatChunk->GetSamplesPerSec();
+		Channels = pFormatChunk->GetChannels();
 
 		while(iRead = ReadNextChunk(wavStream, pChunkBuffer, iMaximumChunkSize))
 		{

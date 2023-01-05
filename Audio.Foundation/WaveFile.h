@@ -45,22 +45,21 @@ namespace Audio
 				/// Constructor.
 				/// </summary>
 				/// <param name="fileName">Path to the file.</param>
-				/// <param name="mode">One of the <see cref="Mode"/> values.</param>
 				/// <remarks>
-				/// Creates a new WaveFile and opens the file in the specified <paramref name="mode"/>.
+				/// Creates a new WaveFile instance and opens the specified file in <see cref="Mode.Play"/>.
 				/// </remarks>
-				WaveFile(System::String^ fileName, Mode mode);
+				WaveFile(System::String^ fileName);
 
 				/// <summary>
 				/// Constructor.
 				/// </summary>
 				/// <param name="fileName">Path to the file.</param>
-				/// <param name="mode">One of the <see cref="Mode"/> values.</param>
-				/// <param name="format">For recording mode only: the output format.</param>
+				/// <param name="format">Defines the wave format.</param>
 				/// <remarks>
-				/// Creates a new WaveFile and opens the file in the specified <paramref name="mode"/>.
+				/// Creates a new WaveFile and opens the specified file in <see cref="Mode.Record"/>. A file header is written based 
+				/// on the <paramref name="format"/>
 				/// </remarks>
-				WaveFile(System::String^ fileName, Mode mode, WaveFormat^ format);
+				WaveFile(System::String^ fileName, WaveFormat^ format);
 
 				/// <summary>
 				/// Closes the WaveFile, if <see cref="Close"/> has not been called yet.
@@ -91,12 +90,17 @@ namespace Audio
 				void SetPosition(double sampleRate, System::TimeSpan value);
 
 				/// <summary>
-				/// Opens the file under the provided <paramref name="fileName"/> in the specified <paramref name="mode"/>
+				/// Creates a file with the provided <paramref name="fileName"/> and <paramref name="format"/> in <see cref="Mode.Record"/>
 				/// </summary>
-				/// <param name="fileName">Path of the file to create or read.</param>
-				/// <param name="mode">File mode</param>
-				/// <seealso cref="Mode"/>
-				void Open(System::String^ fileName, Mode mode);
+				/// <param name="fileName">Path of the file to create.</param>
+				/// <param name="format">Wave data format</param>
+				void Create(System::String^ fileName, WaveFormat^ format);
+
+				/// <summary>
+				/// Opens the file under the provided <paramref name="fileName"/> in <see cref="Mode.Play"/>
+				/// </summary>
+				/// <param name="fileName">Path of the file to read.</param>
+				void Open(System::String^ fileName);
 
 				/// <summary>
 				/// Reads <paramref name="count"/> samples from the WaveFile into <paramref name="data"/> buffer at the given <paramref name="offset"/>. 
@@ -170,7 +174,7 @@ namespace Audio
 				static System::TimeSpan SamplesToTimeSpan(double sampleRate, long long samples);
 
 			private:
-				void WriteWavHeader(int sampleCount);
+				void WriteWavHeader(WaveFormat^ format);
 				void ReadWavHeader();
 				int GetTotalSampleCount();
 				int GetSampleCountAtCurrentPosition();
@@ -186,6 +190,8 @@ namespace Audio
 
 				Audio::Foundation::SampleReader^ m_sampleReader;
 				Audio::Foundation::SampleWriter^ m_sampleWriter;
+
+				System::Threading::Mutex^ m_lock;
 
 				long long m_dataOffset;
 

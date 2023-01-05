@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "AudioRecording.h"
 #include "WaveFile.h"
+#include "WaveFormat.h"
 
 using namespace System;
 using namespace System::IO;
@@ -13,7 +14,16 @@ AudioRecording::AudioRecording(TimeSpan offset, int sampleRate, String^ wavStrea
 
 WaveFile^ AudioRecording::OpenWaveFile(String^ wavStreamFileName)
 {
-	return gcnew WaveFile(wavStreamFileName, WaveFile::Mode::Record);
+	WaveFormat^ format = gcnew WaveFormat();
+
+	format->Channels = 1;
+	format->SampleSize = sizeof(float);
+	format->SampleRate = SampleRate;
+	format->SampleFormat = SampleFormat::IEEEFloat;
+
+	WaveFile^ recording = gcnew WaveFile(wavStreamFileName, format);
+
+	return recording;
 }
 
 void AudioRecording::WriteNextFrame(array<float>^ audioData)
@@ -25,5 +35,6 @@ void AudioRecording::Finish()
 {
 	WavFile->Close();
 
-	WavFile = gcnew WaveFile(Filename, WaveFile::Mode::Play);
+	// Reopen in play-mode
+	WavFile = gcnew WaveFile(Filename);
 }

@@ -5,25 +5,46 @@
 
 using namespace System;
 using namespace System::IO;
+using namespace System::Threading;
 using namespace Audio::Foundation::Interop;
 
 WaveFile::WaveFile() : m_mode(Mode::Closed)
 {
+	m_lock = gcnew Mutex();
 }
 
-WaveFile::WaveFile(String^ fileName, Mode mode)	: m_mode(Mode::Closed)
+WaveFile::WaveFile(String^ fileName, WaveFormat^ format) : m_mode(Mode::Closed)
 {
-	Open(fileName, mode);
+	if (String::IsNullOrEmpty(fileName))
+	{
+		throw gcnew ArgumentException("'fileName' cannot be null or empty.");
+	}
+	if (format == nullptr)
+	{
+		throw gcnew ArgumentNullException("format");
+	}
+
+	m_lock = gcnew Mutex();
+
+	Create(fileName, format);
 }
 
-WaveFile::WaveFile(String^ fileName, Mode mode, WaveFormat^ format) : WaveFile(fileName, mode)
+WaveFile::WaveFile(String^ fileName) : m_mode(Mode::Closed)
 {
-	Format = format;
+	if (String::IsNullOrEmpty(fileName))
+	{
+		throw gcnew ArgumentException("'fileName' cannot be null or empty.");
+	}
+
+	m_lock = gcnew Mutex();
+
+	Open(fileName);
 }
 
 WaveFile::~WaveFile()
 {
 	Close();
+	delete m_lock;
 }
 
 WaveFile::Mode WaveFile::CurrentMode::get()
@@ -49,29 +70,70 @@ Boolean WaveFile::IsEOF::get()
 	return m_bufferedStream->Length == m_bufferedStream->Position;
 }
 
-void WaveFile::Open(String^ fileName, Mode mode)
+void WaveFile::Create(String^ fileName, WaveFormat^ format)
 {
 	Close();
 
-	if (mode == Mode::Play)
-		m_wavStream = gcnew FileStream(fileName, FileMode::Open, FileAccess::Read);
-	else
+	m_lock->WaitOne();
+
+	try
 	{
+		m_wavFormat = format;
+		m_samplesRecorded = 0;
+		m_mode = Mode::Record;
 		m_wavStream = gcnew FileStream(fileName, FileMode::CreateNew, FileAccess::ReadWrite);
 
-		WriteWavHeader(0);
+		WriteWavHeader(format);
 
-		m_wavStream->Position = 0;
+		m_bufferedStream = gcnew System::IO::BufferedStream(m_wavStream);
+		m_binaryWriter = gcnew BinaryWriter(m_bufferedStream, System::Text::Encoding::Default, true);
+
+		switch (m_wavFormat->SampleFormat)
+		{
+		case SampleFormat::IEEEFloat:
+			m_sampleWriter = gcnew SampleWriter(this, &WaveFile::WriteFloat);
+			break;
+		case SampleFormat::PCM:
+			// VSCode 2022 cannot auto-format nested switch/case obviously
+			switch (m_wavFormat->SampleSize)
+			{
+				case sizeof(short) :
+					m_sampleWriter = gcnew SampleWriter(this, &WaveFile::WritePCM16);
+					break;
+					case sizeof(int) :
+						m_sampleWriter = gcnew SampleWriter(this, &WaveFile::WritePCM32);
+						break;
+					default:
+						throw gcnew NotSupportedException();
+			}
+			break;
+
+		default:
+			throw gcnew NotSupportedException();
+		}
 	}
-	m_mode = mode;
-
-	ReadWavHeader();
-	m_samplesRecorded = GetTotalSampleCount();
-
-	m_bufferedStream = gcnew System::IO::BufferedStream(m_wavStream);
-
-	if (mode == Mode::Play)
+	finally
 	{
+		m_lock->ReleaseMutex();
+	}
+}
+
+
+void WaveFile::Open(String^ fileName)
+{
+	Close();
+
+	m_lock->WaitOne();
+
+	try
+	{
+		m_wavStream = gcnew FileStream(fileName, FileMode::Open, FileAccess::Read);
+		m_mode = Mode::Play;
+
+		ReadWavHeader();
+		m_samplesRecorded = GetTotalSampleCount();
+
+		m_bufferedStream = gcnew System::IO::BufferedStream(m_wavStream);
 		m_binaryReader = gcnew BinaryReader(m_bufferedStream, System::Text::Encoding::Default, true);
 
 		switch (m_wavFormat->SampleFormat)
@@ -82,47 +144,63 @@ void WaveFile::Open(String^ fileName, Mode mode)
 		case SampleFormat::PCM:
 			switch (m_wavFormat->SampleSize)
 			{
-			case sizeof(short):
-				m_sampleReader = gcnew SampleReader(this, &WaveFile::ReadPCM16);
-				break;
-			case sizeof(int):
-				m_sampleReader = gcnew SampleReader(this, &WaveFile::ReadPCM32);
-				break;
-			default:
-				throw gcnew NotSupportedException();
+				case sizeof(short) :
+					m_sampleReader = gcnew SampleReader(this, &WaveFile::ReadPCM16);
+					break;
+					case sizeof(int) :
+						m_sampleReader = gcnew SampleReader(this, &WaveFile::ReadPCM32);
+						break;
+					default:
+						throw gcnew NotSupportedException();
 			}
 			break;
 		default:
 			throw gcnew NotSupportedException();
 		}
 	}
-	else
+	finally
 	{
-		m_binaryWriter = gcnew BinaryWriter(m_bufferedStream, System::Text::Encoding::Default, true);
+		m_lock->ReleaseMutex();
+	}
+}
 
-		switch (m_wavFormat->SampleFormat)
+void WaveFile::Close()
+{
+	m_lock->WaitOne();
+
+	try
+	{
+		if (m_mode != Mode::Closed)
 		{
-		case SampleFormat::IEEEFloat:
-			m_sampleWriter = gcnew SampleWriter(this, &WaveFile::WriteFloat);
-			break;
-		case SampleFormat::PCM:
-			switch (m_wavFormat->SampleSize)
+			m_bufferedStream->Flush();
+
+			if (m_mode == Mode::Record)
 			{
-			case sizeof(short):
-				m_sampleWriter = gcnew SampleWriter(this, &WaveFile::WritePCM16);
-				break;
-			case sizeof(int):
-				m_sampleWriter = gcnew SampleWriter(this, &WaveFile::WritePCM32);
-				break;
-			default:
-				throw gcnew NotSupportedException();
+				m_wavFormat->SampleCount = GetTotalSampleCount();
+				WriteWavHeader(m_wavFormat);
+
+				delete m_binaryWriter;
+				m_binaryWriter = nullptr;
 			}
-			break;
-		default:
-			throw gcnew NotSupportedException();
+			else
+			{
+				delete m_binaryReader;
+				m_binaryReader = nullptr;
+			}
+
+			delete m_bufferedStream;
+			m_bufferedStream = nullptr;
+
+			delete m_wavStream;
+			m_wavStream = nullptr;
+
+			m_mode = Mode::Closed;
 		}
 	}
-
+	finally
+	{
+		m_lock->ReleaseMutex();
+	}
 }
 
 int WaveFile::ReadSamples(array<float>^ data, int offset, int count)
@@ -137,9 +215,13 @@ int WaveFile::ReadSamples(array<float>^ data, int offset, int count)
 	for (sample = 0; sample < count; sample++)
 	{
 		if (m_binaryReader->BaseStream->Length > m_binaryReader->BaseStream->Position)
+		{
 			data[offset + sample] = m_sampleReader();
+		}
 		else
+		{
 			break;
+		}
 	}
 
 	return sample;
@@ -147,101 +229,57 @@ int WaveFile::ReadSamples(array<float>^ data, int offset, int count)
 
 void WaveFile::WriteSamples(array<float>^ data, int offset, int count)
 {
-	if (m_mode != Mode::Record)
+	m_lock->WaitOne();
+
+	try
 	{
-		throw gcnew InvalidOperationException("Invalid Mode.");
+		if (m_mode == Mode::Record)
+		{
+			for (int sample = 0; sample < count; sample++)
+			{
+				m_sampleWriter(data[offset + sample]);
+			}
+		}
 	}
-
-	for (int sample = 0; sample < count; sample++)
-		m_binaryWriter->Write(data[offset + sample]);
-
+	finally
+	{
+		m_lock->ReleaseMutex();
+	}
 	m_samplesRecorded = Nullable<int>();
+
 }
 
 float WaveFile::ReadPCM16()
 {
-	if (m_mode != Mode::Play)
-	{
-		throw gcnew InvalidOperationException("Invalid Mode.");
-	}
-
 	return Audio::Foundation::Unmanaged::SampleConversion::Int16ToFloat(m_binaryReader->ReadInt16());
 }
 
 void WaveFile::WritePCM16(float value)
 {
-	if (m_mode != Mode::Record)
-	{
-		throw gcnew InvalidOperationException("Invalid Mode.");
-	}
 	m_binaryWriter->Write(Audio::Foundation::Unmanaged::SampleConversion::FloatToInt16(value));
 }
 
 float WaveFile::ReadPCM32()
 {
-	if (m_mode != Mode::Play)
-	{
-		throw gcnew InvalidOperationException("Invalid Mode.");
-	}
-
 	return Audio::Foundation::Unmanaged::SampleConversion::Int32ToFloat(m_binaryReader->ReadInt32());
 }
 
 void WaveFile::WritePCM32(float value)
 {
-	if (m_mode != Mode::Record)
-	{
-		throw gcnew InvalidOperationException("Invalid Mode.");
-	}
 	m_binaryWriter->Write(Audio::Foundation::Unmanaged::SampleConversion::FloatToInt32(value));
 }
 
 float WaveFile::ReadFloat()
 {
-	if (m_mode != Mode::Play)
-	{
-		throw gcnew InvalidOperationException("Invalid Mode.");
-	}
 	return m_binaryReader->ReadSingle();
 }
 
 void WaveFile::WriteFloat(float value)
 {
-	if (m_mode != Mode::Play)
-	{
-		throw gcnew InvalidOperationException("Invalid Mode.");
-	}
 	m_binaryWriter->Write(value);
 }
 
-void WaveFile::Close()
-{
-	if (m_mode != Mode::Closed)
-	{
-		m_bufferedStream->Flush();
 
-		if (m_mode == Mode::Record)
-		{
-			WriteWavHeader(GetTotalSampleCount());
-
-			delete m_binaryWriter;
-			m_binaryWriter = nullptr;
-		}
-		else
-		{
-			delete m_binaryReader;
-			m_binaryReader = nullptr;
-		}
-
-		delete m_bufferedStream;
-		m_bufferedStream = nullptr;
-
-		delete m_wavStream;
-		m_wavStream = nullptr;
-
-		m_mode = Mode::Closed;
-	}
-}
 
 void WaveFile::ReadWavHeader()
 {
@@ -254,21 +292,24 @@ void WaveFile::ReadWavHeader()
 	m_dataOffset = m_wavStream->Position;
 }
 
-void WaveFile::WriteWavHeader(int sampleCount)
+void WaveFile::WriteWavHeader(WaveFormat^ format)
 {
-	long long position = m_wavStream->Position;
+	m_lock->WaitOne();
 
-	m_wavStream->Position = 0;
+	try
+	{
+		long long position = m_wavStream->Position;
 
-	WaveFormat^ waveFormat = gcnew WaveFormat();
+		m_wavStream->Position = 0;
 
-	waveFormat->SampleCount = sampleCount;
-	waveFormat->SampleSize = sizeof(float);
-	waveFormat->SampleFormat = SampleFormat::IEEEFloat;
-	waveFormat->Channels = 1;
-	waveFormat->WriteHeaderChunks(m_wavStream);
+		format->WriteHeaderChunks(m_wavStream);
 
-	m_wavStream->Position = position;
+		m_wavStream->Position = position;
+	}
+	finally
+	{
+		m_lock->ReleaseMutex();
+	}
 }
 
 int WaveFile::GetTotalSampleCount()
