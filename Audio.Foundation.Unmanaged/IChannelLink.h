@@ -19,7 +19,7 @@ namespace Audio
 					float get_Volume() = 0;
 					void put_Volume(float value) = 0;
 
-					_declspec(property(get = get_Volume, put = put_Volume)) float Volume;
+					_declspec(property(get = get_Volume, put = put_Volume)) float Level;
 
 					float get_Pan() = 0;
 					void put_Pan(float value) = 0;
@@ -35,6 +35,14 @@ namespace Audio
 					void put_Output(ISampleReceiver* Output) = 0;
 
 					_declspec(property(get = get_Output, put = put_Output)) ISampleReceiver* Output;
+
+					bool get_HasOutput() = 0;
+
+					_declspec(property(get = get_HasOutput)) bool HasOutput;
+
+					bool get_HasInput() = 0;
+
+					_declspec(property(get = get_HasInput)) bool HasInput;
 				};
 			}
 		}

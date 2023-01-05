@@ -33,6 +33,9 @@ namespace Audio
 				virtual ISampleReceiver* get_Output();
 				virtual void put_Output(ISampleReceiver* Output);
 
+				virtual bool get_HasInput();
+				virtual bool get_HasOutput();
+
 				DECLARE_IUNKNOWN
 
 			protected:

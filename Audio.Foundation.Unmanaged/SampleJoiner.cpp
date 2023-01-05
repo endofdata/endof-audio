@@ -63,7 +63,7 @@ void SampleJoiner::Receive(IChannelLink& receiveLink)
 	ISampleContainer* pInput = receiveLink.Input;
 
 	if(NULL != pInput)
-		MixInput(pInput, receiveLink.Volume, receiveLink.Pan);
+		MixInput(pInput, receiveLink.Level, receiveLink.Pan);
 
 	Send();
 }
@@ -81,7 +81,7 @@ IChannelLink* SampleJoiner::get_OutputLink()
 
 void SampleJoiner::put_OutputLink(IChannelLink* value)
 {
-	if(NULL != value && value->Output == NULL)
+	if(NULL != value && value->HasOutput == false)
 		value = NULL;
 
 	if (value != NULL)

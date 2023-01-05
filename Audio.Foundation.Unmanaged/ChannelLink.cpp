@@ -109,3 +109,13 @@ void ChannelLink::put_Output(ISampleReceiver* value)
 		pOutput->Release();
 	}
 }
+
+bool ChannelLink::get_HasInput()
+{
+	return m_pInput != NULL;
+}
+
+bool ChannelLink::get_HasOutput()
+{
+	return m_pOutput != NULL;
+}
