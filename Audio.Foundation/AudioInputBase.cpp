@@ -6,6 +6,7 @@ using namespace Audio::Foundation::Interop;
 AudioInputBase::AudioInputBase(int channelId)
 {
 	m_channelId = channelId;
+	m_dbFS = Level(System::Double::NegativeInfinity, System::Double::NegativeInfinity);
 }
 
 // virtual 
