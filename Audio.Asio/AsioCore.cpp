@@ -82,17 +82,18 @@ AsioCore::~AsioCore()
 void AsioCore::Initialize(REFCLSID clsid)
 {
 	HRESULT hr;
+	IASIO* pDriver = NULL;
 
 	if (clsid == CLSID_AsioDebugDriver)
 	{
 		Debug::AsioDebugDriver* pDriver = new Debug::AsioDebugDriver();
 
-		hr = pDriver->QueryInterface(clsid, (void**)&m_pDriver);
+		hr = pDriver->QueryInterface(clsid, (void**)&pDriver);
 	}
 	else
 	{
 		// clsid is used twice by intention
-		hr = CoCreateInstance(clsid, NULL, CLSCTX_INPROC_SERVER, clsid, (void**)&m_pDriver);
+		hr = CoCreateInstance(clsid, NULL, CLSCTX_INPROC_SERVER, clsid, (void**)&pDriver);
 	}
 
 	// If the error is E_NOINTERFACE (0x80004002), this may be caused by invalid COM initialization
@@ -106,13 +107,27 @@ void AsioCore::Initialize(REFCLSID clsid)
 	driverInfo.asioVersion = 2;
 	driverInfo.sysRef = NULL;
 
-	if (ASIOTrue != m_pDriver->init(&driverInfo))
+	if (ASIOTrue != pDriver->init(&driverInfo))
 	{
-		CleanUp();
-		throw gcnew AsioCoreException("Driver did not initialise properly.");
+		char msgBuffer[512];
+		ZeroMemory(msgBuffer, _countof(msgBuffer));
+
+		try
+		{
+			pDriver->getErrorMessage(msgBuffer);
+			msgBuffer[_countof(msgBuffer) - 1] = 0;
+			pDriver->Release();
+		}
+		catch(...)
+		{
+		}
+
+		String^ message = msgBuffer[0] != 0 ? gcnew String(msgBuffer) : "Driver did not initialise properly";
+		throw gcnew AsioCoreException(message);
 	}
 	else
 	{
+		m_pDriver = pDriver;
 		m_pCoreCallbacks = &AsioCoreCallbacks::Create(this);
 
 		ThrowIfFailed(m_pDriver->getChannels((long*)&m_iHwInputCount, (long*)&m_iHwOutputCount));
@@ -142,8 +157,12 @@ void AsioCore::CleanUp()
 	{
 		Stop();
 		DisposeBuffers();
+
 		m_pDriver->Release();
 		m_pDriver = NULL;
+
+		System::GC::Collect();
+		System::GC::WaitForPendingFinalizers();
 	}
 	if (NULL != m_pCoreCallbacks)
 	{
