@@ -16,7 +16,7 @@ namespace Audio
 	namespace Asio
 	{
 
-		typedef void (*BufferSwitchEventHandler)(bool);
+		typedef void (*BufferSwitchEventHandler)(bool writeSecondHalf);
 
 		class AsioCore
 		{

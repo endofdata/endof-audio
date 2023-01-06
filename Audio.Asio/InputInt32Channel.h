@@ -19,7 +19,7 @@ namespace Audio
 				InputOfTSampleChannel(iAsioChannel, pBufferA, pBufferB, sampleCount)
 			{
 			}
-
+			
 		private:
 			inline float ReadSample(int*& pSource)
 			{

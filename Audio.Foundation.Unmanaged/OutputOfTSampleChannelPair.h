@@ -35,7 +35,7 @@ namespace Audio
 						m_pOutputRightA(pBufferRightA),
 						m_pOutputRightB(pBufferRightB),
 						m_sampleCount(sampleCount),
-						m_fillSecondHalf(true),
+						m_writeSecondHalf(true),
 						m_pInput(NULL),
 						m_refCount(0)
 					{
@@ -57,11 +57,11 @@ namespace Audio
 						a buffer switch, this method is used to update the current write
 						position to either the first or the second buffer half.
 
-						\param[in] fillSecondHalf	If true, the second buffer half gets activated.
+						\param[in] writeSecondHalf	If true, the second buffer half gets activated.
 					*/
-					virtual void Swap(bool fillSecondHalf)
+					virtual void Swap(bool writeSecondHalf)
 					{
-						m_fillSecondHalf = fillSecondHalf;
+						m_writeSecondHalf = writeSecondHalf;
 					}
 
 					virtual void Flush()
@@ -163,7 +163,7 @@ namespace Audio
 				private:
 					void SelectBufferPointer(TSample*& pLeft, TSample*& pRight)
 					{
-						if (m_fillSecondHalf)
+						if (m_writeSecondHalf)
 						{
 							pLeft = m_pOutputLeftB;
 							pRight = m_pOutputRightB;
@@ -185,7 +185,7 @@ namespace Audio
 					TSample* m_pOutputRightA;
 					TSample* m_pOutputRightB;
 					int m_sampleCount;
-					bool m_fillSecondHalf;
+					bool m_writeSecondHalf;
 					//int m_iSamples;
 
 					unsigned long m_refCount;

@@ -21,7 +21,7 @@ namespace Audio
 
 					int get_SampleType() = 0;
 
-					void Swap(bool readSecondHalf) = 0;
+					void Swap(bool writeSecondHalf) = 0;
 					void DirectOut(void* pBuffer, bool fLeft, bool fRight) = 0;
 				};
 			}

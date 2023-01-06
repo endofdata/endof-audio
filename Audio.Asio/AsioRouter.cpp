@@ -97,7 +97,7 @@ void AsioRouter::CleanUp(bool isDisposing)
 	}
 }
 
-void AsioRouter::OnOutputBufferSwitch(bool isSecondHalf)
+void AsioRouter::OnOutputBufferSwitch(bool writeSecondHalf)
 {
 	try
 	{
@@ -105,7 +105,7 @@ void AsioRouter::OnOutputBufferSwitch(bool isSecondHalf)
 
 		if (handler != nullptr)
 		{
-			handler(isSecondHalf);
+			handler(writeSecondHalf);
 		}
 
 		for each (AudioOutput^ audioOutput in m_audioOutputPairs)
@@ -121,7 +121,7 @@ void AsioRouter::OnOutputBufferSwitch(bool isSecondHalf)
 	}
 }
 
-void AsioRouter::OnInputBufferSwitch(bool isSecondHalf)
+void AsioRouter::OnInputBufferSwitch(bool writeSecondHalf)
 {
 	try
 	{
@@ -133,7 +133,7 @@ void AsioRouter::OnInputBufferSwitch(bool isSecondHalf)
 		//}
 		if (handler != nullptr)
 		{
-			handler(isSecondHalf);
+			handler(!writeSecondHalf);
 		}
 	}
 	catch (Exception^)
@@ -144,10 +144,10 @@ void AsioRouter::OnInputBufferSwitch(bool isSecondHalf)
 	}
 }
 
-void AsioRouter::OnDuplexBufferSwitch(bool isSecondHalf)
+void AsioRouter::OnDuplexBufferSwitch(bool writeSecondHalf)
 {
-	OnInputBufferSwitch(isSecondHalf);
-	OnOutputBufferSwitch(isSecondHalf);
+	OnInputBufferSwitch(writeSecondHalf);
+	OnOutputBufferSwitch(writeSecondHalf);
 }
 
 void AsioRouter::AttachBufferSwitchHandler(BufferSwitchManagedCallback^ bufferSwitchHandler, bool isInput)

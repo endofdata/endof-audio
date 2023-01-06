@@ -6,7 +6,7 @@ namespace Audio
 	{
 		namespace Interop
 		{
-			delegate void BufferSwitchManagedCallback(System::Boolean);
+			delegate void BufferSwitchManagedCallback(System::Boolean writeSecondHalf);
 		}
 	}
 }
