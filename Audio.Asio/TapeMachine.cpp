@@ -264,12 +264,11 @@ void TapeMachine::Position::set(TimeSpan value)
 	{
 		m_position = value;
 
-		PrepareTracks();
-
 		OnPropertyChanged(PositionProperty);
 
 		TraceSource->TraceEvent(TraceEventType::Information, 5, "Position = {0}", value);
 	}
+	PrepareTracks();
 }
 
 bool TapeMachine::IsRecording::get()
