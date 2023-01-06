@@ -26,7 +26,7 @@ namespace Test.Audio.Asio
 		{
 			get
 			{
-				var driverRegistry = new DriverRegistry();
+				var driverRegistry = DriverRegistry.FromRegistry();
 
 				Assert.That(driverRegistry.Any(), Is.True, "Driver registry contains entries.");
 
@@ -51,6 +51,8 @@ namespace Test.Audio.Asio
 
 			var firstDriverGuid = GetDriverGuidByName(driverRegistry, driverName);
 
+			TestContext.WriteLine($"Driver name: '{driverName}'");
+
 			yield return CreateTapeMachine(firstDriverGuid, inputDriver: null);
 
 			yield return CreateTapeMachine(firstDriverGuid, firstDriverGuid);
@@ -64,8 +66,9 @@ namespace Test.Audio.Asio
 
 			try
 			{
+				TestContext.WriteLine($"Creating output device for '{outputDriver}' on thread {System.Threading.Thread.CurrentThread.ManagedThreadId}");
+
 				outputDevice = AsioDevice.CreateFromGuid(outputDriver);
-				outputDevice.IsPoweredOn = true;
 
 				TestContext.WriteLine($"Output driver name: {outputDevice.DriverName}");
 
@@ -73,13 +76,39 @@ namespace Test.Audio.Asio
 				{
 					if (inputDriver.Value != outputDriver)
 					{
+						TestContext.WriteLine($"Creating input device for '{inputDriver.Value}'");
+
 						inputDevice = AsioDevice.CreateFromGuid(inputDriver.Value);
 					}
 					else
 					{
+						TestContext.WriteLine($"Using output device as input device");
+
 						inputDevice = outputDevice;
 					}
+
 					TestContext.WriteLine($"Input driver name: {inputDevice.DriverName}");
+
+					var inputChannel = inputDevice.AvailableInputChannels.First();
+
+					Assert.That(inputChannel, Is.Not.Null, "Required input channel available.");
+
+					inputDevice.SelectInputChannel(inputChannel.Key, isSelected: true);
+				}
+
+				Assert.That(outputDevice.AvailableOutputChannels.Count, Is.GreaterThanOrEqualTo(2), "Required two output channels are available.");
+
+				var outputChannels = outputDevice.AvailableOutputChannels.Take(2).ToArray();
+
+				outputDevice.SelectOutputChannel(outputChannels[0].Key, isSelected: true);
+				outputDevice.SelectOutputChannel(outputChannels[1].Key, isSelected: true);
+				outputDevice.ActivateChannels();
+				outputDevice.IsPoweredOn = true;
+
+				if (inputDevice != null && inputDevice != outputDevice)
+				{
+					inputDevice.ActivateChannels();
+					inputDevice.IsPoweredOn = true;
 				}
 
 				var router = new AsioRouter(outputDevice, inputDevice);

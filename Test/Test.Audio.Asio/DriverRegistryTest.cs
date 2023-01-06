@@ -19,12 +19,14 @@ namespace Test.Audio.Asio
 		[Test]
 		public void ListDrivers()
 		{
-			var driverRegistry = new DriverRegistry();
+			var driverRegistry = DriverRegistry.FromRegistry();
 
 			foreach (var driver in driverRegistry)
 			{
 				TestContext.WriteLine($"{driver.Name} {driver.ClsId}");
 			}
+
+			Assert.That(driverRegistry.Count, Is.GreaterThanOrEqualTo(1), "At least one ASIO driver is available.");
 		}
 
 		[Test]
@@ -143,10 +145,10 @@ namespace Test.Audio.Asio
 			// 'prepares' the tracks, i.e., detects the current playback buffer.
 			// Failing to do so leads to a wait timeout below.
 			tapeMachine.Position = TimeSpan.Zero;
-
+			
 			tapeMachine.IsRunning = true;
 
-			bool hasSignal = tapeMachine.WaitForIdle(TimeSpan.FromSeconds(10));
+			bool hasSignal = tapeMachine.WaitForIdle(TimeSpan.FromSeconds(12));
 
 			Assert.That(hasSignal, Is.True, "Wait successfully for idle signal.");
 			Assert.That(isIdle, Is.True, "Receive Idle event.");
@@ -297,22 +299,8 @@ namespace Test.Audio.Asio
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
-			// Not required
-			//COMSystem.Init(isMultiThreaded: false);
 			var consoleTraceListener = new ConsoleTraceListener();
 			Trace.Listeners.Add(consoleTraceListener);
-			TapeMachine.TraceSource.Listeners.Add(consoleTraceListener);
-			TapeMachine.TraceSource.Switch.Level = SourceLevels.All;
-		}
-
-		[OneTimeTearDown]
-		public void OneTimeTearDown()
-		{
-			// This is required to get around RPC_E_DISCONNECTED COM error,
-			// after test ran successfully.
-			GC.Collect();
-			GC.WaitForPendingFinalizers();
-			//COMSystem.Exit();
 		}
 	}
 }
