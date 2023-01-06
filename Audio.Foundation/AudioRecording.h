@@ -12,13 +12,17 @@ namespace Audio
 			{
 			public:
 				AudioRecording(System::TimeSpan offset, int sampleRate, System::String^ wavStreamFileName);
+				virtual ~AudioRecording();
 
 				void WriteNextFrame(cli::array<System::Single>^ audioData);
 
-				void Finish();
+				bool Finish();
 
 			protected:
 				virtual Audio::Foundation::Interop::WaveFile^ OpenWaveFile(System::String^ fileName) override;
+
+			private:
+				System::IO::MemoryStream^ m_stream;
 			};
 		}
 	}

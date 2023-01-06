@@ -120,7 +120,14 @@ namespace Audio
 				/// <param name="count">Number of samples to copy.</param>
 				/// <returns>Number of samples written to the file.</returns>
 				/// <remarks>The WaveFile must be opened in <see cref="Mode.Record"/> mode.</remarks>
-				void WriteSamples(cli::array<System::Single>^ data, int offset, int count);
+				int WriteSamples(cli::array<System::Single>^ data, int offset, int count);
+
+				/// <summary>
+				/// Writes the contents of <paramref name="input"/> to the WaveFile.
+				/// </summary>
+				/// <param name="input">Stream from which the samples can be read</param>
+				/// <param name="count">Number of samples to copy.</param>
+				int WriteSamples(System::IO::Stream^ input, int count);
 
 				/// <summary>
 				/// Moves the file pointer to start position of sample data.

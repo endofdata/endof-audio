@@ -10,10 +10,42 @@ using namespace Audio::Foundation::Interop;
 AudioRecording::AudioRecording(TimeSpan offset, int sampleRate, String^ wavStreamFileName)
 	: FileAudioTake(offset, sampleRate, wavStreamFileName)
 {
+	// Initial capacity of 10s recording
+	m_stream = gcnew MemoryStream(sampleRate * sizeof(float) * 10);
+}
+
+AudioRecording::~AudioRecording()
+{
+	if (m_stream != nullptr)
+	{
+		delete m_stream;
+	}
 }
 
 WaveFile^ AudioRecording::OpenWaveFile(String^ wavStreamFileName)
 {
+	// Do not create the file yet
+	return gcnew WaveFile();
+}
+
+void AudioRecording::WriteNextFrame(array<float>^ audioData)
+{
+	pin_ptr<float> pinnedData = &audioData[0];
+
+	m_stream->Write(ReadOnlySpan<unsigned char>(pinnedData, audioData->Length * sizeof(float)));
+}
+
+bool AudioRecording::Finish()
+{
+	m_stream->Flush();
+
+	int recorded = m_stream->Position / sizeof(float);
+
+	if (recorded <= 0)
+	{
+		return false;
+	}
+
 	WaveFormat^ format = gcnew WaveFormat();
 
 	format->Channels = 1;
@@ -21,20 +53,26 @@ WaveFile^ AudioRecording::OpenWaveFile(String^ wavStreamFileName)
 	format->SampleRate = SampleRate;
 	format->SampleFormat = SampleFormat::IEEEFloat;
 
-	WaveFile^ recording = gcnew WaveFile(wavStreamFileName, format);
+	try
+	{
+		WavFile->Create(Filename, format);
 
-	return recording;
-}
+		m_stream->Position = 0;
+		WavFile->WriteSamples(m_stream, recorded);
 
-void AudioRecording::WriteNextFrame(array<float>^ audioData)
-{
-	WavFile->WriteSamples(audioData, 0, audioData->Length);
-}
+		// Reopen in play-mode
+		WavFile->Open(Filename);
+	}
+	catch (const std::exception&)
+	{
+		WavFile->Close();
+		throw;
+	}
+	finally
+	{
+		m_stream->Position = 0;
+		m_stream->SetLength(0);
+	}
 
-void AudioRecording::Finish()
-{
-	WavFile->Close();
-
-	// Reopen in play-mode
-	WavFile = gcnew WaveFile(Filename);
+	return true;
 }

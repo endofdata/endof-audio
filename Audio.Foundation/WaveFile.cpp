@@ -175,7 +175,14 @@ void WaveFile::MoveToSamples()
 
 	m_lock->WaitOne();
 
-	m_bufferedStream->Seek(m_dataOffset, SeekOrigin::Begin);
+	try
+	{
+		m_bufferedStream->Seek(m_dataOffset, SeekOrigin::Begin);
+	}
+	finally
+	{
+		m_lock->ReleaseMutex();
+	}
 }
 
 void WaveFile::Close()
@@ -241,9 +248,10 @@ int WaveFile::ReadSamples(array<float>^ data, int offset, int count)
 	return sample;
 }
 
-void WaveFile::WriteSamples(array<float>^ data, int offset, int count)
+int WaveFile::WriteSamples(array<float>^ data, int offset, int count)
 {
 	m_lock->WaitOne();
+	int done = 0;
 
 	try
 	{
@@ -256,6 +264,7 @@ void WaveFile::WriteSamples(array<float>^ data, int offset, int count)
 			{
 				m_sampleWriter(*pDataPos++);
 			}
+			done = count;
 		}
 	}
 	finally
@@ -264,6 +273,39 @@ void WaveFile::WriteSamples(array<float>^ data, int offset, int count)
 	}
 	m_samplesRecorded = Nullable<int>();
 
+	return done;
+}
+
+int WaveFile::WriteSamples(Stream^ input, int count)
+{
+	m_lock->WaitOne();
+	int done = 0;
+
+	try
+	{
+		BinaryReader^ reader = gcnew BinaryReader(input, System::Text::Encoding::Default, true);
+
+		try
+		{
+			for (int sample = 0; sample < count; sample++)
+			{
+				float value = reader->ReadSingle();
+				m_sampleWriter(value);
+				done++;
+			}
+		}
+		finally
+		{
+			delete reader;
+		}
+	}
+	finally
+	{
+		m_lock->ReleaseMutex();
+	}
+	m_samplesRecorded = Nullable<int>();
+
+	return done;
 }
 
 float WaveFile::ReadPCM16()
