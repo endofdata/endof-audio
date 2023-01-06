@@ -8,9 +8,10 @@ namespace Lupus.Model
 	/// <summary>
 	/// Main model for Lupus
 	/// </summary>
-	internal class MainModel : NotifyPropertyChangedBase
+	internal class MainModel : NotifyPropertyChangedBase, IDisposable
 	{
 		private IAudioOutput? _selectedOutput;
+		private bool _isDisposed;
 
 		/// <summary>
 		/// Gets the <see cref="TapeMachine"/> instance
@@ -89,6 +90,25 @@ namespace Lupus.Model
 				audioTrack.Name = string.Format(nameFormat, i + 1);
 			}
 			SelectedOutput = tapeMachine.Router.Outputs.FirstOrDefault();
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!_isDisposed)
+			{
+				if (disposing)
+				{
+					TapeMachine?.Dispose();
+				}
+				_isDisposed = true;
+			}
+		}
+
+		public void Dispose()
+		{
+			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+			Dispose(disposing: true);
+			GC.SuppressFinalize(this);
 		}
 	}
 }

@@ -1,16 +1,9 @@
 ﻿using Audio.Asio.Interop;
-using Lupus.Controls;
 using Lupus.Model;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
 using System.Windows.Input;
 
 namespace Lupus
@@ -50,16 +43,6 @@ namespace Lupus
 			}
 		}
 
-		private void Run_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = Model?.TapeMachine != null;
-
-		// NFO: CanExecute checks that Model.TapeMachine is not null
-		private void Run_Executed(object sender, ExecutedRoutedEventArgs e) => Model!.TapeMachine.IsRunning = ((ToggleButton)e.Source).IsChecked == true;
-
-		private void Record_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = Model?.TapeMachine?.Tracks.Any(t => t.IsHot) == true;
-
-		private void Record_Executed(object sender, ExecutedRoutedEventArgs e) => Model!.TapeMachine.IsRecording = ((ToggleButton) e.Source).IsChecked == true;
-
-
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
 			string driverPattern = "Steinberg";
@@ -98,8 +81,8 @@ namespace Lupus
 
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
-
+			Model?.Dispose();
+			Model = null;
 		}
-
 	}
 }
