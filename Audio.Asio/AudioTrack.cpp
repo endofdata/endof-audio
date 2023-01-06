@@ -327,8 +327,15 @@ void AudioTrack::CompleteTake()
 	if (nullptr != m_recordingTake)
 	{
 		m_recordingTake->Finish();
-		// TODO: Handle existing take at the same offset
+		IAudioTake^ oldTake = nullptr;
+
+		if (m_takes->TryGetValue(m_recordingTake->Offset, oldTake))
+		{
+			// TODO: Handle concurrent takes in same position
+			m_takes->Remove(oldTake->Offset);			
+		}
 		m_takes->Add(m_recordingTake->Offset, m_recordingTake);
+
 		m_recordingTake = nullptr;
 	}
 }
