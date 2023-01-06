@@ -83,7 +83,9 @@ void WaveFile::Create(String^ fileName, WaveFormat^ format)
 		m_mode = Mode::Record;
 		m_wavStream = gcnew FileStream(fileName, FileMode::CreateNew, FileAccess::ReadWrite);
 
-		WriteWavHeader(format);
+		int headerSize = WriteWavHeader(format);
+
+		m_wavStream->Position = headerSize;
 
 		m_bufferedStream = gcnew System::IO::BufferedStream(m_wavStream);
 		m_binaryWriter = gcnew BinaryWriter(m_bufferedStream, System::Text::Encoding::Default, true);
@@ -164,6 +166,18 @@ void WaveFile::Open(String^ fileName)
 	}
 }
 
+void WaveFile::MoveToSamples()
+{
+	if (!m_bufferedStream->CanSeek)
+	{
+		throw gcnew NotSupportedException();
+	}
+
+	m_lock->WaitOne();
+
+	m_bufferedStream->Seek(m_dataOffset, SeekOrigin::Begin);
+}
+
 void WaveFile::Close()
 {
 	m_lock->WaitOne();
@@ -235,9 +249,12 @@ void WaveFile::WriteSamples(array<float>^ data, int offset, int count)
 	{
 		if (m_mode == Mode::Record)
 		{
+			pin_ptr<float> pinned_data = &data[0];
+			float* pDataPos = pinned_data;
+
 			for (int sample = 0; sample < count; sample++)
 			{
-				m_sampleWriter(data[offset + sample]);
+				m_sampleWriter(*pDataPos++);
 			}
 		}
 	}
@@ -281,20 +298,24 @@ void WaveFile::WriteFloat(float value)
 
 
 
-void WaveFile::ReadWavHeader()
+int WaveFile::ReadWavHeader()
 {
 	m_wavStream->Position = 0;
 
 	m_wavFormat = gcnew WaveFormat();
 
-	m_wavFormat->ReadToData(m_wavStream);
+	int headerSize = m_wavFormat->ReadToData(m_wavStream);
 
 	m_dataOffset = m_wavStream->Position;
+
+	return headerSize;
 }
 
-void WaveFile::WriteWavHeader(WaveFormat^ format)
+int WaveFile::WriteWavHeader(WaveFormat^ format)
 {
 	m_lock->WaitOne();
+
+	int headerSize = 0;
 
 	try
 	{
@@ -302,7 +323,9 @@ void WaveFile::WriteWavHeader(WaveFormat^ format)
 
 		m_wavStream->Position = 0;
 
-		format->WriteHeaderChunks(m_wavStream);
+		headerSize = format->WriteHeaderChunks(m_wavStream);
+
+		m_dataOffset = m_wavStream->Position;
 
 		m_wavStream->Position = position;
 	}
@@ -310,6 +333,7 @@ void WaveFile::WriteWavHeader(WaveFormat^ format)
 	{
 		m_lock->ReleaseMutex();
 	}
+	return headerSize;
 }
 
 int WaveFile::GetTotalSampleCount()

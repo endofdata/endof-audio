@@ -123,6 +123,11 @@ namespace Audio
 				void WriteSamples(cli::array<System::Single>^ data, int offset, int count);
 
 				/// <summary>
+				/// Moves the file pointer to start position of sample data.
+				/// </summary>
+				void MoveToSamples();
+
+				/// <summary>
 				/// Closes the WaveFile
 				/// </summary>
 				/// <remarks>
@@ -174,8 +179,8 @@ namespace Audio
 				static System::TimeSpan SamplesToTimeSpan(double sampleRate, long long samples);
 
 			private:
-				void WriteWavHeader(WaveFormat^ format);
-				void ReadWavHeader();
+				int WriteWavHeader(WaveFormat^ format);
+				int ReadWavHeader();
 				int GetTotalSampleCount();
 				int GetSampleCountAtCurrentPosition();
 

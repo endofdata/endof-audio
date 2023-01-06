@@ -29,7 +29,7 @@ WaveFormat::WaveFormat()
 {
 }
 
-void WaveFormat::WriteHeaderChunks(Stream^ wavStream)
+int WaveFormat::WriteHeaderChunks(Stream^ wavStream)
 {
 	unsigned int uRiffAndFormatChunkSize = 0;
 	bool hasFactChunk = false;
@@ -81,11 +81,14 @@ void WaveFormat::WriteHeaderChunks(Stream^ wavStream)
 	Marshal::Copy(IntPtr((void*)&dataChunk), buffer, uDataChunkOffset, sizeof(DataChunk));
 
 	wavStream->Write(buffer, 0, uWavHeaderSize);
+
+	return (int)uWavHeaderSize;
 }
 
-void WaveFormat::ReadToData(Stream^ wavStream)
+int WaveFormat::ReadToData(Stream^ wavStream)
 {
 	unsigned char* pChunkBuffer = NULL;
+	int totalSize = 0;
 
 	try
 	{
@@ -93,15 +96,19 @@ void WaveFormat::ReadToData(Stream^ wavStream)
 		pChunkBuffer = new unsigned char[iMaximumChunkSize];
 		ZeroMemory(pChunkBuffer, iMaximumChunkSize);
 		ChunkHeader* pChunkHeader = (ChunkHeader*)pChunkBuffer;
-		int iRead = 0;
+		int readSize = 0;
 
-		iRead = ReadNextChunk(wavStream, pChunkBuffer, iMaximumChunkSize);
+		readSize = ReadNextChunk(wavStream, pChunkBuffer, iMaximumChunkSize);
 		if(!pChunkHeader->IsTypeOf(FCC_RIFF))
 			throw gcnew FormatException("RIFF chunk not found");
 
-		iRead = ReadNextChunk(wavStream, pChunkBuffer, iMaximumChunkSize);
+		totalSize += readSize;
+
+		readSize = ReadNextChunk(wavStream, pChunkBuffer, iMaximumChunkSize);
 		if(!pChunkHeader->IsTypeOf(FCC_FMT))
 			throw gcnew FormatException("Format chunk not found");
+
+		totalSize += readSize;
 
 		FormatChunk* pFormatChunk = (FormatChunk*)pChunkBuffer;
 
@@ -117,8 +124,10 @@ void WaveFormat::ReadToData(Stream^ wavStream)
 		SampleRate = pFormatChunk->GetSamplesPerSec();
 		Channels = pFormatChunk->GetChannels();
 
-		while(iRead = ReadNextChunk(wavStream, pChunkBuffer, iMaximumChunkSize))
+		while(readSize = ReadNextChunk(wavStream, pChunkBuffer, iMaximumChunkSize))
 		{
+			totalSize += readSize;
+
 			if(pChunkHeader->IsTypeOf(FCC_FACT))
 			{
 				FactChunk* pFactChunk = (FactChunk*)pChunkBuffer;
@@ -130,8 +139,10 @@ void WaveFormat::ReadToData(Stream^ wavStream)
 				SampleCount = pDataChunk->uChunkSize / SampleSize;
 				break;
 			}
-			else 
-				SkipChunkContent(wavStream, pChunkHeader, iRead); 
+			else
+			{
+				totalSize += SkipChunkContent(wavStream, pChunkHeader, readSize);
+			}
 		}
 	}
 	catch(IOException^ iox)
@@ -143,6 +154,7 @@ void WaveFormat::ReadToData(Stream^ wavStream)
 		if(NULL != pChunkBuffer)
 			delete[] pChunkBuffer;
 	}
+	return totalSize;
 }
 
 int WaveFormat::GetMaximumChunkSize()

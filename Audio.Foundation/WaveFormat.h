@@ -755,13 +755,13 @@ namespace Audio
 				/// When a <see cref="WaveFile"/> was opened in Record mode, <see cref="WaveFile.Close()"/> calls this
 				/// after calculating the sample count according to the recorded data size.
 				/// </remarks>
-				void WriteHeaderChunks(System::IO::Stream^ wavStream);
+				int WriteHeaderChunks(System::IO::Stream^ wavStream);
 
 				/// <summary>
 				/// Reads the header chunks of the given <paramref name="wavStream"/>
 				/// </summary>
 				/// <param name="wavStream">Stream to read from</param>
-				void ReadToData(System::IO::Stream^ wavStream);
+				int ReadToData(System::IO::Stream^ wavStream);
 
 				/// <summary>
 				/// Gets or sets the number of audio channels.
