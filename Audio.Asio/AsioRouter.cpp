@@ -79,12 +79,10 @@ void AsioRouter::CleanUp(bool isDisposing)
 {
 	if (m_inputDevice != nullptr && m_inputDevice != m_outputDevice)
 	{
-		m_inputDevice->DetachBufferSwitchHandler();
 		delete m_inputDevice;
 	}
 	if (m_outputDevice != nullptr)
 	{
-		m_outputDevice->DetachBufferSwitchHandler();
 		delete m_outputDevice;
 	}
 	if (m_audioOutputPairs != nullptr)
