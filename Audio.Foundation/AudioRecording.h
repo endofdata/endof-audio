@@ -22,7 +22,8 @@ namespace Audio
 				virtual Audio::Foundation::Interop::WaveFile^ OpenWaveFile(System::String^ fileName) override;
 
 			private:
-				System::IO::MemoryStream^ m_stream;
+				System::IO::Stream^ m_stream;
+				System::Threading::Mutex^ m_lock;
 			};
 		}
 	}
