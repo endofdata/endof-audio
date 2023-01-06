@@ -52,7 +52,7 @@ namespace Audio
 					}
 				}
 
-				virtual void WriteCurrentFrame(cli::array<System::Single>^ frameBuffer, float volume, float pan);
+				virtual void WriteCurrentFrame(cli::array<System::Single>^ frameBuffer, float level, float pan);
 
 			internal:
 				AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pChannel, int id);

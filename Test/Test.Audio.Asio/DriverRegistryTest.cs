@@ -274,7 +274,7 @@ namespace Test.Audio.Asio
 				float samplesPerPeriod = rate / frequency;
 				float stepPerSample = (float)(Math.PI * 2.0f / samplesPerPeriod);
 				float sample = 0.0f;
-				float vol = 1.0f;
+				float lvl = 1.0f;
 				int startFade = sampleCount - (int)(rate / 10);
 				float fadeStep = 1.0f / (sampleCount - startFade);
 
@@ -282,9 +282,9 @@ namespace Test.Audio.Asio
 				{
 					if (pos >= startFade)
 					{
-						vol -= fadeStep;
+						lvl -= fadeStep;
 					}
-					writer.Write((float)Math.Sin(sample) * vol);
+					writer.Write((float)Math.Sin(sample) * lvl);
 
 					sample += stepPerSample;
 				}

@@ -61,9 +61,9 @@ namespace Audio
 							float* pDestRight = SampleContainer.RightChannel->SamplePtr;
 
 							// double the voulume to get full level on both channels
-							float volPanFactorLeft = 0.0f;
-							float volPanFactorRight = 0.0f;
-							Audio::Foundation::Unmanaged::SampleConversion::VolumeAndPanFactor(2.0f, 0.0f, volPanFactorLeft, volPanFactorRight);
+							float lvlPanFactorLeft = 0.0f;
+							float lvlPanFactorRight = 0.0f;
+							Audio::Foundation::Unmanaged::SampleConversion::LevelAndPanFactor(2.0f, 0.0f, lvlPanFactorLeft, lvlPanFactorRight);
 
 							int sampleCount = SampleContainer.SampleCount;
 
@@ -71,8 +71,8 @@ namespace Audio
 							{
 								float floatSample = ReadSample(pSource);
 
-								*pDestLeft++ = floatSample * volPanFactorLeft;
-								*pDestRight++ = floatSample * volPanFactorRight;
+								*pDestLeft++ = floatSample * lvlPanFactorLeft;
+								*pDestRight++ = floatSample * lvlPanFactorRight;
 							}
 						}
 					}

@@ -10,6 +10,7 @@ AudioTakeBase::AudioTakeBase(TimeSpan offset, int sampleRate)
 {
 	m_offset = offset;
 	m_sampleRate = sampleRate;
+	m_level = 1.0f;
 }
 
 AudioTakeBase::~AudioTakeBase()
@@ -18,12 +19,12 @@ AudioTakeBase::~AudioTakeBase()
 
 float AudioTakeBase::Level::get()
 {
-	return m_volume;
+	return m_level;
 }
 
 void AudioTakeBase::Level::set(float value)
 {
-	m_volume = max(0.0f, min(value, 1.0f));
+	m_level = max(0.0f, min(value, 1.0f));
 }
 
 TimeSpan AudioTakeBase::Offset::get()

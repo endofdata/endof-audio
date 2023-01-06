@@ -29,7 +29,7 @@ namespace Audio
 					virtual void set(Level value);
 				}
 
-				virtual void WriteCurrentFrame(cli::array<System::Single>^ frameBuffer, float volume, float pan) = 0;
+				virtual void WriteCurrentFrame(cli::array<System::Single>^ frameBuffer, float level, float pan) = 0;
 
 			private:
 				int m_channelId;

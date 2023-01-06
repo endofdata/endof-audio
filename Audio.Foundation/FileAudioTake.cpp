@@ -64,10 +64,10 @@ TimeSpan FileAudioTake::Length::get()
 int FileAudioTake::ReadNextFrame(array<Single>^ audioBuffer)
 {
 	int samples = m_waveFile->ReadSamples(audioBuffer, 0, audioBuffer->Length);
-	float vol = Level;
+	float lvl = Level;
 
 	for (int s = 0; s < samples; s++)
-		audioBuffer[s] *= vol;
+		audioBuffer[s] *= lvl;
 
 	return samples;
 }

@@ -28,7 +28,7 @@ namespace Test.Audio.Asio
 			WaveFile = new WaveFile(path, format);
 		}
 
-		public void WriteCurrentFrame(float[] frameBuffer, float volume, float pan)
+		public void WriteCurrentFrame(float[] frameBuffer, float level, float pan)
 		{
 			WaveFile.WriteSamples(frameBuffer, 0, frameBuffer.Length);
 		}

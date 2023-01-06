@@ -26,7 +26,7 @@ namespace Audio
 
 					void Send() = 0;
 
-					void MixInput(float* pSourceLeft, float* pSourceRight, float volume, float pan) = 0;
+					void MixInput(float* pSourceLeft, float* pSourceRight, float level, float pan) = 0;
 				};
 			}
 		}

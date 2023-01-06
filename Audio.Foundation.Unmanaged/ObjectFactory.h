@@ -23,7 +23,7 @@ namespace Audio
 			{
 			public:
 				static IChannelLink* CreateChannelLink();
-				static IChannelLink* CreateChannelLink(ISampleContainer* pInput, ISampleReceiver* pOutput, float volume, float pan);
+				static IChannelLink* CreateChannelLink(ISampleContainer* pInput, ISampleReceiver* pOutput, float level, float pan);
 
 				static IMeterChannel* CreateMeterChannel(int sampleRate);
 

@@ -34,7 +34,7 @@ AudioInput::AudioInput(int sampleRate, IInputChannel* pHwChannel, int id) : m_is
 
 	pHwChannel->AddRef();
 	m_pInputChannel = pHwChannel;
-	m_pInputChannel->SampleSharer.AddSend(m_pInputChannel->SampleContainer, *pSampleReceiver, VolumeMax, PanCenter);
+	m_pInputChannel->SampleSharer.AddSend(m_pInputChannel->SampleContainer, *pSampleReceiver, LevelMax, PanCenter);
 
 	pSampleReceiver->Release();
 }

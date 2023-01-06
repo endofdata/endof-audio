@@ -25,9 +25,9 @@ IChannelLink* ObjectFactory::CreateChannelLink()
 }
 
 // static
-IChannelLink* ObjectFactory::CreateChannelLink(ISampleContainer* pInput, ISampleReceiver* pOutput, float volume, float pan)
+IChannelLink* ObjectFactory::CreateChannelLink(ISampleContainer* pInput, ISampleReceiver* pOutput, float level, float pan)
 {
-	ChannelLink* instance = new ChannelLink(pInput, pOutput, volume, pan);
+	ChannelLink* instance = new ChannelLink(pInput, pOutput, level, pan);
 	IChannelLink* result;
 	if (FAILED(instance->QueryInterface(__uuidof(IChannelLink), (void**)&result)))
 	{

@@ -97,26 +97,26 @@ void SampleJoiner::put_OutputLink(IChannelLink* value)
 	}
 }
 
-void SampleJoiner::MixInput(ISampleContainer* pInput, float volume, float pan)
+void SampleJoiner::MixInput(ISampleContainer* pInput, float level, float pan)
 {
 	if (pInput != NULL)
 	{
-		MixInput(pInput->LeftChannel->SamplePtr, pInput->RightChannel->SamplePtr, volume, pan);
+		MixInput(pInput->LeftChannel->SamplePtr, pInput->RightChannel->SamplePtr, level, pan);
 	}
 }
 
-void SampleJoiner::MixInput(float* pSourceLeft, float* pSourceRight, float volume, float pan)
+void SampleJoiner::MixInput(float* pSourceLeft, float* pSourceRight, float level, float pan)
 {
 	float* pDestLeft = this->LeftChannel->SamplePtr;
 	float* pDestRight = this->RightChannel->SamplePtr;
 
-	float volPanFactorLeft; 
-	float volPanFactorRight; 
-	SampleConversion::VolumeAndPanFactor(volume, pan, volPanFactorLeft, volPanFactorRight);
+	float lvlPanFactorLeft; 
+	float lvlPanFactorRight; 
+	SampleConversion::LevelAndPanFactor(level, pan, lvlPanFactorLeft, lvlPanFactorRight);
 
 	for(int i = 0; i < SampleCount; i++)
 	{
-		*pDestLeft++ = SampleConversion::AddSignals(*pDestLeft, *pSourceLeft++ * volPanFactorLeft);
-		*pDestRight++ = SampleConversion::AddSignals(*pDestRight, *pSourceRight++ * volPanFactorRight);
+		*pDestLeft++ = SampleConversion::AddSignals(*pDestLeft, *pSourceLeft++ * lvlPanFactorLeft);
+		*pDestRight++ = SampleConversion::AddSignals(*pDestRight, *pSourceRight++ * lvlPanFactorRight);
 	}
 }

@@ -23,7 +23,7 @@ namespace Audio
 
 					IChannelLink* get_Send(int iIdx) = 0;
 
-					void AddSend(ISampleContainer& fromChannel, ISampleReceiver& toChannel, float volume, float pan) = 0;
+					void AddSend(ISampleContainer& fromChannel, ISampleReceiver& toChannel, float level, float pan) = 0;
 					void RemoveSend(ISampleReceiver& toChannel) = 0;
 					void RemoveAllSends() = 0;
 

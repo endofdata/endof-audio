@@ -20,9 +20,6 @@ namespace Lupus
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		//private CancellationTokenSource _cancellationTokenSource = new();
-		//private Task? _meterTask;
-
 		internal MainModel? Model
 		{
 			get => (MainModel?)DataContext;
@@ -97,60 +94,11 @@ namespace Lupus
 			// Configure trace source to write to console
 			TapeMachine.TraceSource.Listeners.Add(new System.Diagnostics.ConsoleTraceListener());
 			TapeMachine.TraceSource.Switch.Level = System.Diagnostics.SourceLevels.All;
-
-			// To continuously update the meter displays, collect the binding expressions of all
-			// LoopTrack controls and run a background task that updates the meter values
-			// TODO: Doesn't that conflict with PropertyChanged events of the lower levels?
-			// At least it eats CPU tooooo much
-//			var bindingExpressions = new List<BindingExpression>();
-
-//			for (int i = 0; i < Model.Tracks.Count; i++)
-//			{
-//				var elementName = $"Track{i}";
-
-
-//#if DEBUG
-//				var loopTrack = LogicalTreeHelper.FindLogicalNode(this, elementName) as LoopTrack;
-
-//				if (loopTrack == null)
-//				{
-//					break;
-//				}
-//#else
-//				var loopTrack = LogicalTreeHelper.FindLogicalNode(this, elementName) as LoopTrack ??
-//					throw new InvalidOperationException($"Unable to find '{elementName}' LoopTrack element");
-//#endif
-
-//				bindingExpressions.Add(loopTrack.GetBindingExpression(LoopTrack.DbFSProperty));
-//			}
-
-//			// Use a cancellation token to terminate on event (see Window_Closing)
-//			var cancellationToken = _cancellationTokenSource.Token;
-
-			//_meterTask = Task.Run(() =>
-			//{
-			//	while (!cancellationToken.IsCancellationRequested)
-			//	{
-			//		Task.Delay(50);
-
-			//		Dispatcher.Invoke(() =>
-			//		{
-			//			foreach (var binding in bindingExpressions)
-			//			{
-			//				binding.UpdateTarget();
-			//			}
-			//		});
-			//	}
-			//}, cancellationToken);
 		}
 
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
-			//if (_meterTask != null)
-			//{
-			//	_cancellationTokenSource.Cancel();
-			//	await _meterTask;
-			//}
+
 		}
 
 	}

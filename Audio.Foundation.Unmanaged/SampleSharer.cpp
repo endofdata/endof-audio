@@ -38,12 +38,12 @@ bool SampleSharer::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-void SampleSharer::AddSend(ISampleContainer& fromChannel, ISampleReceiver& toChannel, float volume, float pan)
+void SampleSharer::AddSend(ISampleContainer& fromChannel, ISampleReceiver& toChannel, float level, float pan)
 {
 	// do not allow two sends to the same destination
 	RemoveSend(toChannel);
 
-	IChannelLink* pChannelLink = ObjectFactory::CreateChannelLink(&fromChannel, &toChannel, volume, pan);
+	IChannelLink* pChannelLink = ObjectFactory::CreateChannelLink(&fromChannel, &toChannel, level, pan);
 	if(NULL == pChannelLink)
 	{
 		RemoveAllSends();

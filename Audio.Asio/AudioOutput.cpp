@@ -38,7 +38,7 @@ AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pH
 	ISampleReceiver* pSampleReceiver;
 	m_pOutputChannelPair->QueryInterface(_uuidof(ISampleReceiver), (void**)&pSampleReceiver);
 
-	m_pMasterMix->OutputLink = ObjectFactory::CreateChannelLink(pSampleContainer, pSampleReceiver, VolumeMax, PanCenter);
+	m_pMasterMix->OutputLink = ObjectFactory::CreateChannelLink(pSampleContainer, pSampleReceiver, LevelMax, PanCenter);
 
 	m_pOutputMeter->Input = m_pMasterMix->OutputLink;
 
@@ -97,12 +97,12 @@ IOutputChannelPair& AudioOutput::OutputChannelPair::get()
 	return *m_pOutputChannelPair;
 }
 
-void AudioOutput::WriteCurrentFrame(array<float>^ frameBuffer, float volume, float pan)
+void AudioOutput::WriteCurrentFrame(array<float>^ frameBuffer, float level, float pan)
 {
 	if(nullptr != frameBuffer)
 	{
 		pin_ptr<float> pBuffer = &frameBuffer[0];
-		m_pMasterMix->MixInput(pBuffer, pBuffer, volume, pan);
+		m_pMasterMix->MixInput(pBuffer, pBuffer, level, pan);
 	}
 }
 

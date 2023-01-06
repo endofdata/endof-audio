@@ -10,16 +10,16 @@ using namespace Audio::Foundation::Unmanaged::Abstractions;
 ChannelLink::ChannelLink() :
 	m_pInput(NULL),
 	m_pOutput(NULL),
-	m_volume(0.0f),
+	m_level(0.0f),
 	m_pan(0.0f),
 	m_refCount(0)
 {
 }
 
-ChannelLink::ChannelLink(ISampleContainer* pInput, ISampleReceiver* pOutput, float volume, float pan) :
+ChannelLink::ChannelLink(ISampleContainer* pInput, ISampleReceiver* pOutput, float level, float pan) :
 	m_pInput(NULL),
 	m_pOutput(NULL),
-	m_volume(volume),
+	m_level(level),
 	m_pan(pan),
 	m_refCount(0)
 {
@@ -50,14 +50,14 @@ bool ChannelLink::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-float ChannelLink::get_Volume()
+float ChannelLink::get_Level()
 {
-	return m_volume;
+	return m_level;
 }
 
-void ChannelLink::put_Volume(float value)
+void ChannelLink::put_Level(float value)
 {
-	m_volume = value;
+	m_level = value;
 }
 
 float ChannelLink::get_Pan()

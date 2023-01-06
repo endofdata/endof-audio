@@ -58,7 +58,7 @@ namespace Audio
 			private:
 				System::TimeSpan m_offset;
 				int m_sampleRate;
-				float m_volume;
+				float m_level;
 			};
 		}
 	}

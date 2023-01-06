@@ -16,10 +16,10 @@ namespace Audio
 			{
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("866238bb-6fb5-4f00-ae6d-5316f4df7cec")) IChannelLink : public IUnknown
 				{
-					float get_Volume() = 0;
-					void put_Volume(float value) = 0;
+					float get_Level() = 0;
+					void put_Level(float value) = 0;
 
-					_declspec(property(get = get_Volume, put = put_Volume)) float Level;
+					_declspec(property(get = get_Level, put = put_Level)) float Level;
 
 					float get_Pan() = 0;
 					void put_Pan(float value) = 0;

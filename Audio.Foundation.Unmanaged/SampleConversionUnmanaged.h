@@ -20,7 +20,7 @@ namespace Audio
 			const float Int16ToFloatFactor = (1.f / FloatMaxRange16);
 			const float FloatToInt16Factor = FloatMaxRange16;
 
-			const float VolumeMax = 1.0f;
+			const float LevelMax = 1.0f;
 			const float PanCenter = 0.0f;
 			const float PanLeft = -1.0f;
 			const float PanRight = +1.0f;
@@ -31,16 +31,16 @@ namespace Audio
 
 				/// <summary>
 				/// Calculates the factor by which samples for the left and right channel can be multiplied 
-				/// to achieve the given <paramref name="volume"/> and <paramref name="pand"/>.
+				/// to achieve the given <paramref name="level"/> and <paramref name="pan"/>.
 				/// </summary>
-				/// <param name="volume">Volume factor</param>
+				/// <param name="level">Level factor</param>
 				/// <param name="pan">Pan position</param>
 				/// <param name="factorLeft">Receives the factor for the left channel</param>
 				/// <param name="factorRight">Receives the factor for the right channel</param>
-				static inline void VolumeAndPanFactor(float volume, float pan, float& factorLeft, float& factorRight)
+				static inline void LevelAndPanFactor(float level, float pan, float& factorLeft, float& factorRight)
 				{
-					factorLeft = (pan + PanLeft) * -0.5f * volume;
-					factorRight = (pan + PanRight) * 0.5f * volume;
+					factorLeft = (pan + PanLeft) * -0.5f * level;
+					factorRight = (pan + PanRight) * 0.5f * level;
 				}
 
 				/// <summary>

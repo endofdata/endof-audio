@@ -79,7 +79,7 @@ int StreamAudioTake::ReadNextFrame(array<float>^ audioBuffer)
 	}
 
 
-	float vol = Level;
+	float lvl = Level;
 	float value = 0.0;
 	int sampleSize = sizeof(float);
 	Span<byte> span = Span<byte>((void*)&value, sampleSize);
@@ -91,7 +91,7 @@ int StreamAudioTake::ReadNextFrame(array<float>^ audioBuffer)
 		if (sampleSize > m_sampleStream->Read(span))
 			break;
 
-		*pTarget++= value * vol;
+		*pTarget++= value * lvl;
 	}
 
 	//int ignored = audioBuffer->Length - count;

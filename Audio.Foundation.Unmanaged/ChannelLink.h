@@ -18,11 +18,11 @@ namespace Audio
 			{
 			public:
 				ChannelLink();
-				ChannelLink(ISampleContainer* pInput, ISampleReceiver* pOutput, float volume, float pan);
+				ChannelLink(ISampleContainer* pInput, ISampleReceiver* pOutput, float level, float pan);
 				virtual ~ChannelLink();
 
-				virtual float get_Volume();
-				virtual void put_Volume(float value);
+				virtual float get_Level();
+				virtual void put_Level(float value);
 
 				virtual float get_Pan();
 				virtual void put_Pan(float value);
@@ -44,7 +44,7 @@ namespace Audio
 			private:
 				ISampleContainer* m_pInput;
 				ISampleReceiver* m_pOutput;
-				float m_volume;
+				float m_level;
 				float m_pan;
 			};
 		}

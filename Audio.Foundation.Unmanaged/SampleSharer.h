@@ -19,7 +19,7 @@ namespace Audio
 
 				virtual Abstractions::IChannelLink* get_Send(int iIdx);
 
-				virtual void AddSend(Abstractions::ISampleContainer& fromChannel, Abstractions::ISampleReceiver& channel, float volume, float pan);
+				virtual void AddSend(Abstractions::ISampleContainer& fromChannel, Abstractions::ISampleReceiver& channel, float level, float pan);
 				virtual void RemoveSend(Abstractions::ISampleReceiver& channel);
 				virtual void RemoveAllSends();
 

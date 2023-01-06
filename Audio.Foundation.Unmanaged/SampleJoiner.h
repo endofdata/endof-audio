@@ -32,14 +32,14 @@ namespace Audio
 
 				virtual void Send();
 
-				virtual void MixInput(float* pSourceLeft, float* pSourceRight, float volume, float pan);
+				virtual void MixInput(float* pSourceLeft, float* pSourceRight, float level, float pan);
 
 				DECLARE_IUNKNOWN
 
 				DECLARE_SAMPLECONTAINER
 
 			protected:
-				void MixInput(ISampleContainer* pInput, float volume, float pan);
+				void MixInput(ISampleContainer* pInput, float level, float pan);
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
