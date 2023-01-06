@@ -225,7 +225,7 @@ namespace Audio
 				void CleanUp();
 				void OnPropertyChanged(System::String^ propertyName);
 
-				IAudioTake^ GetNextTake();
+				bool AdvancePlaybackTake();
 
 				AudioRecording^ m_recordingTake;
 				IAudioTake^ m_playbackTake;

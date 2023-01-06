@@ -287,24 +287,31 @@ void AudioTrack::InsertTake(IAudioTake^ take)
 	m_takes->Add(take->Offset, take);
 }
 
-IAudioTake^ AudioTrack::GetNextTake()
+bool AudioTrack::AdvancePlaybackTake()
 {
-	IAudioTake^ result = nullptr;
+	m_playbackTake = m_playbackIndex < m_takes->Count ? m_playbackTake = Enumerable::ElementAtOrDefault(m_takes->Values, m_playbackIndex++) : nullptr;
+	m_isAtEndOfStream = nullptr == m_playbackTake && m_playbackIndex >= m_takes->Count;
 
-	if (m_playbackIndex < m_takes->Count)
-		result = Enumerable::ElementAtOrDefault(m_takes->Values, m_playbackIndex++);
-
-	return result;
+	if (m_isAtEndOfStream)
+	{
+		TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 107, "Trk {0}: End of stream", m_trackId);
+	}
+	else if(m_playbackTake != nullptr)
+	{
+		TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 108, "Trk {0}: Take from {1} to {2}", m_trackId, m_playbackTake->Offset, m_playbackTake->End);
+	}
+	else
+	{
+		TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 109, "Trk {0}: Waiting for first take", m_trackId);
+	}
+	return !m_isAtEndOfStream;
 }
 
 void AudioTrack::Prepare()
 {
 	m_playbackIndex = 0;
 
-	do
-	{
-		m_playbackTake = GetNextTake();
-	} while (m_playbackTake != nullptr && m_playbackTake->End <= m_machine->Position);
+	while (AdvancePlaybackTake() && m_playbackTake->End <= m_machine->Position);
 
 	if (m_playbackTake != nullptr)
 	{
@@ -377,8 +384,7 @@ bool AudioTrack::NextFrame()
 
 					if (0 >= samplesRead)
 					{
-						m_playbackTake = GetNextTake();
-						m_isAtEndOfStream = nullptr == m_playbackTake && m_playbackIndex >= m_takes->Count;
+						AdvancePlaybackTake();						
 					}
 					else
 					{

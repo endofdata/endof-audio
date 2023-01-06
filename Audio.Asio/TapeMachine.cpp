@@ -260,14 +260,11 @@ void TapeMachine::Position::set(TimeSpan value)
 	if (m_isRunning)
 		throw gcnew InvalidOperationException("Cannot set position while TapeMachine is running.");
 
-	PrepareTracks();
-
 	if (m_position != value)
 	{
 		m_position = value;
 
-		//for each(AudioTrack^ track in m_audioTracks)
-		//	track->Position = m_position;
+		PrepareTracks();
 
 		OnPropertyChanged(PositionProperty);
 
@@ -275,49 +272,62 @@ void TapeMachine::Position::set(TimeSpan value)
 	}
 }
 
-Boolean TapeMachine::IsRecording::get()
+bool TapeMachine::IsRecording::get()
 {
 	return m_isRecording;
 }
 
-void TapeMachine::IsRecording::set(Boolean value)
+void TapeMachine::IsRecording::set(bool value)
 {
 	if (m_isRecording != value)
 	{
+		// Here, we propagate the recording mode to the tracks only, when transport is currently running.
+		// Otherwise, changing the transport state will start/stop track recordings.
+		if (m_isRunning)
+		{
+			if (value)
+			{
+				for each (AudioTrack ^ track in m_audioTracks)
+					track->BeginRecording();
+			}
+			else
+			{
+				for each (AudioTrack ^ track in m_audioTracks)
+					track->EndRecording();
+			}
+		}
 		m_isRecording = value;
-
-		if (m_isRecording)
-		{
-			for each (AudioTrack ^ track in m_audioTracks)
-				track->BeginRecording();
-		}
-		else
-		{
-			for each (AudioTrack ^ track in m_audioTracks)
-				track->EndRecording();
-		}
 		TraceSource->TraceEvent(TraceEventType::Information, 6, "IsRecording = {0}", value);
 
 		OnPropertyChanged(IsRecordingProperty);
 	}
 }
 
-Boolean TapeMachine::IsRunning::get()
+bool TapeMachine::IsRunning::get()
 {
 	return m_isRunning;
 }
 
-void TapeMachine::IsRunning::set(Boolean value)
+void TapeMachine::IsRunning::set(bool value)
 {
 	if (value != m_isRunning)
 	{
-		if (value == true)
+		if (value)
 		{
 			m_isIdleSignaled = false;
+
 			if (!m_idleEvent->Reset())
 			{
 				throw gcnew InvalidOperationException("Failed to reset Idle event.");
 			}
+
+			// If record mode was activated before transport is started, propagate recording mode now
+			if (m_isRecording)
+			{
+				for each (AudioTrack ^ track in m_audioTracks)
+					track->BeginRecording();
+			}
+
 			m_stopWatch->Start();
 		}
 		else
@@ -325,6 +335,9 @@ void TapeMachine::IsRunning::set(Boolean value)
 			m_stopWatch->Stop();
 			m_position = TimeSpan::operator+(m_position, m_stopWatch->Elapsed);
 			m_stopWatch->Reset();
+
+			// If record mode has not already been deactivated while transport was running, stop track recordings now
+			IsRecording = false;
 			OnIdle();
 		}
 
@@ -334,4 +347,3 @@ void TapeMachine::IsRunning::set(Boolean value)
 		OnPropertyChanged(IsRunningProperty);
 	}
 }
-

@@ -138,10 +138,10 @@ namespace Audio
 				/// Setting this property to <see langword="true"/> resets the idle event, prepares the tracks and starts the virtual transport.
 				/// Setting this property to <see langword="false"/> stops the virtual transport and raises the idle event.
 				/// </remarks>
-				property System::Boolean IsRunning
+				property bool IsRunning
 				{
-					System::Boolean get();
-					void set(System::Boolean value);
+					bool get();
+					void set(bool value);
 				}
 
 				/// <summary>
@@ -151,10 +151,10 @@ namespace Audio
 				/// Setting this property to <see langword="true"/> invokes <see cref="AudioTrack.BeginRecording"/> for all tracks.
 				/// Setting this property to <see langword="false"/> invokes <see cref="AudioTrack.EndRecording"/> for all tracks.
 				/// </remarks>
-				property System::Boolean IsRecording
+				property bool IsRecording
 				{
-					System::Boolean get();
-					void set(System::Boolean value);
+					bool get();
+					void set(bool value);
 				}
 
 				/// <summary>
@@ -185,8 +185,8 @@ namespace Audio
 				AsioRouter^ m_router;
 				AudioTrackCollection^ m_audioTracks;
 				System::TimeSpan m_position;
-				System::Boolean m_isRunning;
-				System::Boolean m_isRecording;
+				bool m_isRunning;
+				bool m_isRecording;
 				void AudioTracks_CollectionChanged(System::Object^ sender, System::Collections::Specialized::NotifyCollectionChangedEventArgs^ e);
 				System::UInt32 m_recordings;
 				System::Diagnostics::Stopwatch^ m_stopWatch;
