@@ -27,12 +27,13 @@ namespace Audio
 				/// </remarks>
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("8a41766a-92ae-4f1d-b996-f8d4b98105ad")) IInputChannel : public IUnknown
 				{
-					ISampleContainer& get_SampleContainer() = 0;
-
 					/// <summary>
-					/// Gets or sets the two-channel input sample container.
+					/// Gets or sets a value indicating whether the input channel is activated
 					/// </summary>
-					_declspec(property(get = get_SampleContainer)) ISampleContainer& SampleContainer;
+					_declspec(property(get = get_IsActive, put = put_IsActive)) bool IsActive;
+
+					bool get_IsActive() = 0;
+					void put_IsActive(bool value) = 0;
 
 					ISampleSharer& get_SampleSharer() = 0;
 

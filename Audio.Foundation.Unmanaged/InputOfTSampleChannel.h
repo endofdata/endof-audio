@@ -35,6 +35,7 @@ namespace Audio
 
 						m_pContainer = ObjectFactory::CreateSampleContainer(sampleCount);
 						m_pSharer = ObjectFactory::CreateSampleSharer();
+						m_pSharer->Source = m_pContainer;
 					}
 
 					/*! \brief Destructor
@@ -48,7 +49,7 @@ namespace Audio
 
 					virtual void Swap(bool readSecondHalf)
 					{
-						if (SampleContainer.IsActive)
+						if (m_pContainer->IsActive)
 						{
 							TSample* pSource = readSecondHalf ? m_pBufferB : m_pBufferA;
 
@@ -57,15 +58,15 @@ namespace Audio
 							{
 								m_pMonitor->DirectOut(pSource, true, true);
 							}
-							float* pDestLeft = SampleContainer.LeftChannel->SamplePtr;
-							float* pDestRight = SampleContainer.RightChannel->SamplePtr;
+							float* pDestLeft = m_pContainer->LeftChannel->SamplePtr;
+							float* pDestRight = m_pContainer->RightChannel->SamplePtr;
 
 							// double the level to get full level on both channels
 							float lvlPanFactorLeft = 0.0f;
 							float lvlPanFactorRight = 0.0f;
 							Audio::Foundation::Unmanaged::SampleConversion::LevelAndPanFactor(2.0f, 0.0f, lvlPanFactorLeft, lvlPanFactorRight);
 
-							int sampleCount = SampleContainer.SampleCount;
+							int sampleCount = m_pContainer->SampleCount;
 
 							for (int i = 0; i < sampleCount; i++)
 							{
@@ -79,7 +80,17 @@ namespace Audio
 
 					virtual void Send()
 					{
-						m_pSharer->RouteToSends();
+						m_pSharer->RouteToTargets();
+					}
+
+					virtual bool get_IsActive()
+					{
+						return m_pContainer->IsActive;
+					}
+
+					virtual void put_IsActive(bool value)
+					{
+						m_pContainer->IsActive = value;
 					}
 
 					virtual IOutputChannelPair* get_Monitor()
@@ -105,11 +116,6 @@ namespace Audio
 					virtual int get_SampleType()
 					{
 						return SAMPLE_TYPE;
-					}
-
-					virtual ISampleContainer& get_SampleContainer()
-					{
-						return *m_pContainer;
 					}
 
 					virtual ISampleSharer& get_SampleSharer()

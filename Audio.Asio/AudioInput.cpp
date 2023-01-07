@@ -34,7 +34,8 @@ AudioInput::AudioInput(int sampleRate, IInputChannel* pHwChannel, int id) : m_is
 
 	pHwChannel->AddRef();
 	m_pInputChannel = pHwChannel;
-	m_pInputChannel->SampleSharer.AddSend(m_pInputChannel->SampleContainer, *pSampleReceiver, LevelMax, PanCenter);
+
+	m_pInputChannel->SampleSharer.AddTarget(*pSampleReceiver);
 
 	pSampleReceiver->Release();
 }
@@ -83,12 +84,12 @@ Level AudioInput::DbFS::get()
 
 bool AudioInput::IsActive::get()
 {
-	return m_pInputChannel->SampleContainer.IsActive;
+	return m_pInputChannel->IsActive;
 }
 
 void AudioInput::IsActive::set(bool value)
 {
-	m_pInputChannel->SampleContainer.IsActive = value;
+	m_pInputChannel->IsActive = value;
 
 	OnPropertyChanged(IsActiveProperty);
 }
@@ -121,9 +122,9 @@ void AudioInput::Monitor::set(IAudioOutput^ value)
 }
 
 void AudioInput::ReadCurrentFrame(array<float>^ frameBuffer)
-{
+{	
 	// TODO: Why do we always access left channel here?
-	System::Runtime::InteropServices::Marshal::Copy(System::IntPtr((void*)m_pInputChannel->SampleContainer.LeftChannel->SamplePtr), frameBuffer, 0, frameBuffer->Length);
+	System::Runtime::InteropServices::Marshal::Copy(System::IntPtr((void*)m_pInputChannel->SampleSharer.Source->LeftChannel->SamplePtr), frameBuffer, 0, frameBuffer->Length);
 }
 
 void AudioInput::OnPropertyChanged(System::String^ propertyName)
