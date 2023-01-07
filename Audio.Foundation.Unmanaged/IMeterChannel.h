@@ -14,6 +14,7 @@ namespace Audio
 			namespace Abstractions
 			{
 				__interface IMeterChannel;
+				__interface ISampleReceiver;
 
 				typedef int(__stdcall* MeterChannelCallback)(IMeterChannel* pSender);
 
@@ -36,6 +37,11 @@ namespace Audio
 					void put_MeterUpdate(MeterChannelCallback value) = 0;
 
 					_declspec(property(get = get_MeterUpdate, put = put_MeterUpdate)) MeterChannelCallback MeterUpdate;
+
+					ISampleReceiver* get_WriteThrough() = 0;
+					void put_WriteThrough(ISampleReceiver* value) = 0;
+
+					_declspec(property(get = get_WriteThrough, put = put_WriteThrough)) ISampleReceiver* WriteThrough;
 				};
 			}
 		}

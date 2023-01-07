@@ -127,14 +127,16 @@ Combines ```Audio.Asio.Interop.AsioDevice``` instances for input and output. Pro
 
 Mixes the internal sample buffers and forwards them to an unmanaged ```IOutputChannelPair```. Continuous level metering not implemented yet.
 
-- creates a ```Audio.Foundation.Unmanaged.SampleJoiner``` to mix down all frames written during a single buffer switch
-- sets the ```ISampleJoiner.Target``` to the ```IOutputChannelPair```'s ```ISampleReceiver``` implementation
+- creates ```Audio.Foundation.Unmanaged.SampleJoiner``` to mix down all frames written during a single buffer switch
+- creates ```Audio.Foundation.Unmanaged.IMeterChannel``` for continuous update of ```IAudioOutput.DbFS``` property
+- sets the ```IMeterChannel.WriteThrough``` to the ```IOutputChannelPair```'s ```ISampleReceiver``` implementation
+- sets the ```ISampleJoiner.Target``` to the ```IMeterChannel```'s ```ISampleReceiver``` implementation
 
 ### AudioOutput.WriteNextFrame() invokes...
 - ```ISampleJoine.MixInput()``` to add the frame to the combined output mix
 
 ### AudioOutput.Send() invokes...
-- ```ISampleJoiner.Send()``` to write the mix to the output channel
+- ```ISampleJoiner.Send()``` to send the mix to the meter channel target
 - ```ISampleJoiner.Flush()``` to reset the mix
 
 ## Audio.Foundation.Unmanaged.Abstractions.ISampleJoiner
@@ -146,6 +148,12 @@ Mix down multiple two-channel sample buffers and send them to a native ```IOutpu
 
 ### SampleJoiner.Receive() invokes...
 - ```SampleJoiner.MixInput()```
+- ```SampleJoiner.Send()```
+
+## Audio.Foundation.Unmanaged.Abstractions.IMeterChannel
+
+Calculates *ContinueRMS* over the input samples and invokes ```MeterChannelCallback``` when RMS frame is completed.
+Supports ```WriteThrough```: invokes the ```ISampleReceiver.Receive()``` method of a linked receiver.
 
 ## Audio.Foundation.Unmanaged.Abstractions.IOutputChannelPair
 
@@ -166,12 +174,10 @@ Also exposes a ```int SampleType``` property.
 
 # Questions and remarks
 
-In some places where ```IChannelLink``` is used, the callee takes either the ```Input``` or the ```Output``` but not both. For a clean separation, use only ```ISampleContainer``` as input or ```ISampleReceiver``` as output.
-
 We have an active pushing of samples with ```InputChannel.Send``` but also a passive pulling of samples with ```IAudioInput.ReadCurrentFrame()```. The active path is used for the monitoring only. Can we use a *pulling* monitor implementation instead?
 
 Rename ```IAudioTake.ReadNextFrame()``` to ```ReadCurrentFrame()``` as in ```IAudioInput```
 
 Why is the ```ISampleSharer``` handled by native ```IInputChannel``` but the ```ISampleJoiner``` is handled by managed ```IAudioOutput```?
 
-Why does the ```SampleJoiner``` provide two (or three) methods to add samples to the mixdown (Receive and 2x MixInput)?
+Is ```SampleJoiner.Receive()``` used anywhere or is the joiner only fed via ```MixInput()```?

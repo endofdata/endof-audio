@@ -18,8 +18,12 @@ AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pH
 	if(NULL == pHwChannel)
 		throw gcnew ArgumentNullException();
 
+	pHwChannel->AddRef();
+	m_pOutputChannelPair = pHwChannel;
+
 	m_channelId = id;
 
+	// Create output meter including meter update event handler
 	m_pOutputMeter = ObjectFactory::CreateMeterChannel(sampleCount);
 	m_pOutputMeter->RMSTime = 100;
 
@@ -27,17 +31,20 @@ AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pH
 	m_meterUpdateDelegateHandle = GCHandle::Alloc(meterUpdateDelegate);
 	m_pOutputMeter->MeterUpdate = static_cast<MeterChannelCallback>(Marshal::GetFunctionPointerForDelegate(meterUpdateDelegate).ToPointer());
 
-	pHwChannel->AddRef();
-	m_pOutputChannelPair = pHwChannel;
+	// Chain the output-channel receiver to the write-through of the meter channel
+	ISampleReceiver* pOutputSampleReceiver;
+	m_pOutputChannelPair->QueryInterface(_uuidof(ISampleReceiver), (void**)&pOutputSampleReceiver);
+	m_pOutputMeter->WriteThrough = pOutputSampleReceiver;
+	pOutputSampleReceiver->Release();
 
+	// Create master mix sample joiner
 	m_pMasterMix = ObjectFactory::CreateSampleJoiner(sampleCount);
 
-	ISampleReceiver* pSampleReceiver;
-	m_pOutputChannelPair->QueryInterface(_uuidof(ISampleReceiver), (void**)&pSampleReceiver);
-
-	m_pMasterMix->Target = pSampleReceiver;
-
-	pSampleReceiver->Release();
+	// Chain the meter-channel receiver to the master mix
+	ISampleReceiver* pMeterSampleReceiver;
+	m_pOutputMeter->QueryInterface(__uuidof(ISampleReceiver), (void**)&pMeterSampleReceiver);
+	m_pMasterMix->Target = pMeterSampleReceiver;
+	pMeterSampleReceiver->Release();
 }
 
 AudioOutput::~AudioOutput()

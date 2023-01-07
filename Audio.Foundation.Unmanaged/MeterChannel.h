@@ -34,6 +34,9 @@ namespace Audio
 				virtual MeterChannelCallback get_MeterUpdate();
 				virtual void put_MeterUpdate(MeterChannelCallback value);
 
+				virtual ISampleReceiver* get_WriteThrough();
+				virtual void put_WriteThrough(ISampleReceiver* value);
+
 				DECLARE_IUNKNOWN
 
 			protected:
@@ -43,6 +46,8 @@ namespace Audio
 
 			private:
 				MeterChannelCallback m_meterUpdate;
+				ISampleReceiver* m_pWriteThrough;
+
 				int m_sampleRate;
 				int m_iSamplesPerRMSFrame;
 				int m_iSumUpSamples;
