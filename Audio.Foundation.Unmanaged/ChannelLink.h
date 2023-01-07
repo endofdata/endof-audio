@@ -14,11 +14,29 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
+			/// <summary>
+			/// Implementation of <see cref="IChannelLink"/> to combine an input <see cref="ISampleContainer"/> with an output <see cref="ISampleReciver"/>
+			/// </summary>
 			class ChannelLink : public IChannelLink
 			{
 			public:
+				/// <summary>
+				/// Constructor
+				/// </summary>
 				ChannelLink();
+
+				/// <summary>
+				/// Constructor
+				/// </summary>
+				/// <param name="pInput">Provides the input signal</param>
+				/// <param name="pOutput">Receives the processed input signal</param>
+				/// <param name="level">Level applied to the input signal</param>
+				/// <param name="pan">Panorama position applied to the input signal</param>
 				ChannelLink(ISampleContainer* pInput, ISampleReceiver* pOutput, float level, float pan);
+
+				/// <summary>
+				/// Destructor
+				/// </summary>
 				virtual ~ChannelLink();
 
 				virtual float get_Level();

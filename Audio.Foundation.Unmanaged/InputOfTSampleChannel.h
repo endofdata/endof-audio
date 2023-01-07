@@ -60,7 +60,7 @@ namespace Audio
 							float* pDestLeft = SampleContainer.LeftChannel->SamplePtr;
 							float* pDestRight = SampleContainer.RightChannel->SamplePtr;
 
-							// double the voulume to get full level on both channels
+							// double the level to get full level on both channels
 							float lvlPanFactorLeft = 0.0f;
 							float lvlPanFactorRight = 0.0f;
 							Audio::Foundation::Unmanaged::SampleConversion::LevelAndPanFactor(2.0f, 0.0f, lvlPanFactorLeft, lvlPanFactorRight);

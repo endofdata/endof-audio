@@ -128,7 +128,7 @@ namespace Audio
 				{
 					bool get();
 				}
-			
+
 				/// <summary>
 				/// Gets or sets a value indicating whether the track is currently muted.
 				/// </summary>

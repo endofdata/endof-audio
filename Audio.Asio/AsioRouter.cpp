@@ -48,7 +48,7 @@ AsioRouter::AsioRouter(AsioDevice^ outputDevice, AsioDevice^ inputDevice)
 		}
 	}
 
-	// Do not attach buffer switch handler before initialization is complete: the device may be already running
+	// Do not attach buffer switch handler before initialization is complete: the device may already be running
 	if (outputDevice != inputDevice)
 	{
 		if (inputDevice != nullptr)
