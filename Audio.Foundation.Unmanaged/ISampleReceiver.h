@@ -16,7 +16,7 @@ namespace Audio
 				__interface ISampleContainer;
 
 				/// <summary>
-				/// Exposes methods to receive two channels of samples from a <see cref="IChannelLink"/> for further processing
+				/// Exposes methods to receive two channels of samples from a <see cref="ISampleContainer"/> for further processing
 				/// </summary>
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("3a7970a7-fdb6-4dc6-ba80-540ab339c988")) ISampleReceiver : public IUnknown
 				{

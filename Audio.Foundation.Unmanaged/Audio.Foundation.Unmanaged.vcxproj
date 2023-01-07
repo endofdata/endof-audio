@@ -164,8 +164,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Audio.Foundation.Unmanaged.h" />
-    <ClInclude Include="ChannelLink.h" />
-    <ClInclude Include="IChannelLink.h" />
     <ClInclude Include="IInputChannel.h" />
     <ClInclude Include="IMeterChannel.h" />
     <ClInclude Include="InputOfTSampleChannel.h" />
@@ -189,7 +187,6 @@
     <ClInclude Include="UnknownBase.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ChannelLink.cpp" />
     <ClCompile Include="MeterChannel.cpp" />
     <ClCompile Include="ObjectFactory.cpp" />
     <ClCompile Include="SampleBuffer.cpp" />

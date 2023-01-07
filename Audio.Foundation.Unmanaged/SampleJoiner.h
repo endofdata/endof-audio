@@ -27,8 +27,8 @@ namespace Audio
 				virtual void Flush();
 				virtual void Receive(ISampleContainer& input);
 
-				virtual IChannelLink* get_OutputLink();
-				virtual void put_OutputLink(IChannelLink* value);
+				virtual ISampleReceiver* get_Target();
+				virtual void put_Target(ISampleReceiver* value);
 
 				virtual void Send();
 
@@ -42,7 +42,7 @@ namespace Audio
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
-				IChannelLink* m_pOutputLink;
+				ISampleReceiver* m_pTarget;
 			};
 		}
 	}

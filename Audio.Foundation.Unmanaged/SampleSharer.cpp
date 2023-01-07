@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "SampleSharer.h"
-#include "ChannelLink.h"
 #include <algorithm>
 #include <functional>
 #include <stdexcept>

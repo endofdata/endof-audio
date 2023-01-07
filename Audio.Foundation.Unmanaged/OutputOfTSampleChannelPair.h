@@ -2,7 +2,6 @@
 
 #include "IOutputChannelPair.h"
 #include "ISampleReceiver.h"
-#include "IChannelLink.h"
 #include "UnknownBase.h"
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -36,7 +35,6 @@ namespace Audio
 						m_pOutputRightB(pBufferRightB),
 						m_sampleCount(sampleCount),
 						m_writeSecondHalf(true),
-						m_pInput(NULL),
 						m_refCount(0)
 					{
 						if (NULL == pBufferLeftA || NULL == pBufferLeftB || NULL == pBufferRightA || NULL == pBufferRightB)
@@ -47,7 +45,6 @@ namespace Audio
 					*/
 					virtual ~OutputOfTSampleChannelPair()
 					{
-						put_Input(NULL);
 					}
 
 					/*! \brief Sets the current write position to the indicated buffer half
@@ -105,27 +102,6 @@ namespace Audio
 						}
 					}
 
-					// TODO: Do we need the Input property? The Receive() method works on an IChannelLink anyway
-					virtual IChannelLink* get_Input()
-					{
-						return m_pInput;
-					}
-
-					void put_Input(IChannelLink* value)
-					{
-						if (value != NULL)
-						{
-							value->AddRef();
-						}
-
-						IChannelLink* pInput = (IChannelLink*)InterlockedExchangePointer((void**)&m_pInput, value);
-
-						if (pInput != NULL)
-						{
-							pInput->Release();
-						}						
-					}
-
 					virtual int get_SampleType()
 					{
 						return SAMPLE_TYPE;
@@ -172,7 +148,6 @@ namespace Audio
 
 					virtual void WriteSample(float value, TSample*& pTarget) = 0;
 
-					IChannelLink* m_pInput;
 					int m_iAsioChannelLeft;
 					TSample* m_pOutputLeftA;
 					TSample* m_pOutputLeftB;

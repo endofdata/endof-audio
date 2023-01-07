@@ -32,18 +32,12 @@ AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pH
 
 	m_pMasterMix = ObjectFactory::CreateSampleJoiner(sampleCount);
 
-	ISampleContainer* pSampleContainer;
-	m_pMasterMix->QueryInterface(_uuidof(ISampleContainer), (void**)&pSampleContainer);
-
 	ISampleReceiver* pSampleReceiver;
 	m_pOutputChannelPair->QueryInterface(_uuidof(ISampleReceiver), (void**)&pSampleReceiver);
 
-	m_pMasterMix->OutputLink = ObjectFactory::CreateChannelLink(pSampleContainer, pSampleReceiver, LevelMax, PanCenter);
-
-	m_pOutputMeter->Input = m_pMasterMix->OutputLink;
+	m_pMasterMix->Target = pSampleReceiver;
 
 	pSampleReceiver->Release();
-	pSampleContainer->Release();
 }
 
 AudioOutput::~AudioOutput()

@@ -3,7 +3,6 @@
 #pragma once
 
 #include <Audio.Foundation.Unmanaged.h>
-#include <IChannelLink.h>
 #include <ISampleReceiver.h>
 #include <ISampleBuffer.h>
 #include <ISampleContainer.h>
@@ -22,9 +21,6 @@ namespace Audio
 			class _AUDIO_FOUNDATION_UNMANAGED_API ObjectFactory
 			{
 			public:
-				static IChannelLink* CreateChannelLink();
-				static IChannelLink* CreateChannelLink(ISampleContainer* pInput, ISampleReceiver* pOutput, float level, float pan);
-
 				static IMeterChannel* CreateMeterChannel(int sampleRate);
 
 				static ISampleBuffer* CreateSampleBuffer(int sampleCount);

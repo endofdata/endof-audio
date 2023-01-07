@@ -3,7 +3,6 @@
 #include "SampleConversionUnmanaged.h"
 #include "ISampleContainer.h"
 #include "ISampleBuffer.h"
-#include "IChannelLink.h"
 
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -11,7 +10,6 @@ using namespace Audio::Foundation::Unmanaged::Abstractions;
 MeterChannel::MeterChannel(int sampleRate) :
 	m_sampleRate(sampleRate),
 	m_iSamplesPerRMSFrame(880), // ~20 ms @ 44.1 kHz
-	m_pInput(NULL),
 	m_meterUpdate(NULL),
 	m_refCount(0)
 {
@@ -20,7 +18,6 @@ MeterChannel::MeterChannel(int sampleRate) :
 
 MeterChannel::~MeterChannel()
 {
-	put_Input(NULL);
 	put_MeterUpdate(NULL);
 }
 
@@ -110,26 +107,6 @@ int MeterChannel::get_RMSTime()
 void MeterChannel::put_RMSTime(int value)
 {
 	m_iSamplesPerRMSFrame = static_cast<int>(SampleConversion::MilliSecondsToSamples(value, m_sampleRate));
-}
-
-IChannelLink* MeterChannel::get_Input()
-{
-	return m_pInput;
-}
-
-void MeterChannel::put_Input(IChannelLink* value)
-{
-	if (value != NULL)
-	{
-		value->AddRef();
-	}
-
-	IChannelLink* pInput = (IChannelLink*)InterlockedExchangePointer((void**)&m_pInput, value);
-
-	if (pInput != NULL)
-	{
-		pInput->Release();
-	}
 }
 
 MeterChannelCallback MeterChannel::get_MeterUpdate()

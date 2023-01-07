@@ -13,14 +13,12 @@ namespace Audio
 		{
 			namespace Abstractions
 			{
-				__interface IChannelLink;
-
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("519e9d40-db0b-42c4-b435-90d7ec67206a")) ISampleJoiner : public IUnknown
 				{
-					_declspec(property(get = get_OutputLink, put = put_OutputLink)) IChannelLink* OutputLink;
+					_declspec(property(get = get_Target, put = put_Target)) ISampleReceiver* Target;
 
-					IChannelLink* get_OutputLink() = 0;
-					void put_OutputLink(IChannelLink* value) = 0;
+					ISampleReceiver* get_Target() = 0;
+					void put_Target(ISampleReceiver* value) = 0;
 
 					void Flush() = 0;
 

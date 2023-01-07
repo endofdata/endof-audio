@@ -4,7 +4,6 @@
 #include <Windows.h>
 #include <Audio.Foundation.Unmanaged.h>
 #include <comdef.h>
-#include <IChannelLink.h>
 
 namespace Audio
 {
@@ -20,11 +19,6 @@ namespace Audio
 
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("fcc39f32-a0c4-4ece-a562-0a051c153a95")) IMeterChannel : public IUnknown
 				{
-					IChannelLink* get_Input() = 0;
-					void put_Input(IChannelLink* value) = 0;
-
-					_declspec(property(get = get_Input, put = put_Input)) IChannelLink* Input;
-
 					int get_RMSTime() = 0;
 					void put_RMSTime(int value) = 0;
 

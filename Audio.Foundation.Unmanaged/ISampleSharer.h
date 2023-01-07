@@ -13,12 +13,11 @@ namespace Audio
 		{
 			namespace Abstractions
 			{
-				__interface IChannelLink;
 				__interface ISampleContainer;
 				__interface ISampleReceiver;
 
 				/// <summary>
-				/// Handles a collection of <see cref="IChannelLink"/> instances and routes the samples from the containers to the receivers
+				/// Handles a collection of <see cref="ISampleContainer"/> instances and routes the samples from the containers to the receivers
 				/// </summary>
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("e8ed7980-1d09-46b0-9c9c-df015a1f72fe")) ISampleSharer : public IUnknown
 				{

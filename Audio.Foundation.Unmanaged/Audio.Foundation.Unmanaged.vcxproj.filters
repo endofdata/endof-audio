@@ -21,12 +21,6 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ChannelLink.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IChannelLink.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="IInputChannel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -93,9 +87,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ChannelLink.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MeterChannel.cpp">

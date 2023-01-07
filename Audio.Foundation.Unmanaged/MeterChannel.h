@@ -24,9 +24,6 @@ namespace Audio
 
 				virtual void Receive(ISampleContainer& inputBuffer);
 
-				virtual IChannelLink* get_Input();
-				virtual void put_Input(IChannelLink* value);
-
 				virtual int get_RMSTime();
 				virtual void put_RMSTime(int value);
 
@@ -46,7 +43,6 @@ namespace Audio
 
 			private:
 				MeterChannelCallback m_meterUpdate;
-				IChannelLink* m_pInput;
 				int m_sampleRate;
 				int m_iSamplesPerRMSFrame;
 				int m_iSumUpSamples;

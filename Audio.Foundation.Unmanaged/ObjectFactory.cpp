@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "ObjectFactory.h"
-#include "ChannelLink.h"
 #include "MeterChannel.h"
 #include "SampleBuffer.h"
 #include "SampleContainer.h"
@@ -11,30 +10,6 @@
 using namespace Audio::Foundation::Unmanaged;
 
 // TODO: Constructors must AddRef for received interfaces
-// 
-// static
-IChannelLink* ObjectFactory::CreateChannelLink()
-{
-	ChannelLink* instance = new ChannelLink();
-	IChannelLink* result;
-	if (FAILED(instance->QueryInterface(__uuidof(IChannelLink), (void**)&result)))
-	{
-		throw new std::runtime_error("QueryInterface failed");
-	}
-	return result;
-}
-
-// static
-IChannelLink* ObjectFactory::CreateChannelLink(ISampleContainer* pInput, ISampleReceiver* pOutput, float level, float pan)
-{
-	ChannelLink* instance = new ChannelLink(pInput, pOutput, level, pan);
-	IChannelLink* result;
-	if (FAILED(instance->QueryInterface(__uuidof(IChannelLink), (void**)&result)))
-	{
-		throw new std::runtime_error("QueryInterface failed");
-	}
-	return result;
-}
 
 // static
 IMeterChannel* ObjectFactory::CreateMeterChannel(int sampleRate)

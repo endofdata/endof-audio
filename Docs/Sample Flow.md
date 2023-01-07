@@ -19,23 +19,19 @@ Converts single-channel hardware sample buffers to unmanaged two-channel buffers
 Supports direct-out monitoring of native samples via [IOutputChannelPair](#audiofoundationunmanagedabstractionsioutputchannelpair).
 
 Creates a [Audio.Foundation.Unmanaged.Abstractions.ISampleContainer](#audiofoundationunmanagedabstractionsisamplecontainer) and a
-[Audio.Foundation.Unmanaged.Abstractions.ISampleSharer](#audiofoundationunmanagedabstractionsisamplesharer)
+[Audio.Foundation.Unmanaged.Abstractions.ISampleSharer](#audiofoundationunmanagedabstractionsisamplesharer). The ```ISampleSharer.Source```
+is set tot the ```ISampleContainer```.
 
 - template in ```Audio.Foundation.Unmanaged\InputOfTSampleChannel.h``` implements ```IInputChannel```
 - hardware-sample specific implementation e.g. in ```Audio.Asio\InputInt32Channel.h```
 
 ### InputOfTSampleChannel.Swap() invokes...
-  - ```IOutputChannelPair.DirectOut()``` is called on ```Monitor```, if available to write input samples to hardware output buffers
+  - [IOutputChannelPair](#audiofoundationunmanagedabstractionsioutputchannelpair).DirectOut() is called on ```Monitor```, if available to write input samples to hardware output buffers
   - ```InputOfTSampleChannel.ReadSample()``` to convert hardware input buffers to float
-  - ```float``` samples are distributed to both channels of a [ISampleContainer](#audiofoundationunmanagedabstractionsisamplecontainer)
+  - ```float``` samples are written to both channels of an [ISampleContainer](#audiofoundationunmanagedabstractionsisamplecontainer)
 
 ### InputOfTSampleChannel.Send() invokes...
-  - [ISampleSharer](#audiofoundationunmanagedabstractionsisamplesharer).RouteToSends()``` to forward converted samples to any attached 
-    send channel (initially none, see [IAudioInput](#audiofoundationabstractionsiaudioinput)
-
-## Audio.Foundation.Unmanaged.Abstractions.ISampleReceiver
-
-Exposes the ```Receive(IChannelLink)``` method to receive sample data
+  - [ISampleSharer](#audiofoundationunmanagedabstractionsisamplesharer).RouteToTargets() to forward converted samples to any attached target
 
 ## Audio.Foundation.Unmanaged.Abstractions.ISampleContainer
 
@@ -49,15 +45,15 @@ Also exposes the buffer size as ```SampleCount```
 
 ## Audio.Foundation.Unmanaged.Abstractions.ISampleSharer
 
-Manages a collection of [Audio.Foundation.Unmanaged.Abstractions.IChannelLink](#audiofoundationunmanagedabstractionsichannellink) instances.
+Manages the connection between an [ISampleContainer](#audiofoundationunmanagedabstractionsisamplecontainer) *Source* and a collection of 
+[Audio.Foundation.Unmanaged.Abstractions.ISampleReceiver](#audiofoundationunmanagedabstractionsisamplereceiver) *Targets*.
 
 ### ISampleSharer.RouteToSends() invokes...
-- ```ISampleReceiver.Receive()``` for each ```IChannelLink.Output```, passing the same ```IChannelLink``` as input link
+- ```ISampleReceiver.Receive()``` for each ```ISampleReceiver```, passing the same ```ISampleContainer``` as input source
 
-## Audio.Foundation.Unmanaged.Abstractions.IChannelLink
+## Audio.Foundation.Unmanaged.Abstractions.ISampleReceiver
 
-An interface of questionable use that combines an [ISampleContainer](#audiofoundationunmanagedabstractionsisamplecontainer) and 
-an [ISampleReceiver](#audiofoundationunmanagedabstractionsisamplereceiver)
+Exposes the ```Receive(ISampleContainer)``` method to receive sample data
 
 
 ## Audio.Foundation.Abstractions.IAudioInput
@@ -129,11 +125,10 @@ Combines ```Audio.Asio.Interop.AsioDevice``` instances for input and output. Pro
 
 ## Audio.Asio.Interop.AudioOutput
 
-Mixes the internal sample buffers and forwards them to an unmanaged ```IOutputChannelPair```. Provides continuous level metering.
+Mixes the internal sample buffers and forwards them to an unmanaged ```IOutputChannelPair```. Continuous level metering not implemented yet.
 
 - creates a ```Audio.Foundation.Unmanaged.SampleJoiner``` to mix down all frames written during a single buffer switch
-- creates a ```IChannelLink``` between the ```ISampleJoiner```'s ```ISampleContainer``` and the ```IOutputChannelPair```'s ```ISampleReceiver``` implementations
-- creates a ```IMeterChannel``` and attaches the ```ISampleJoiner.OutputLink``` to its ```IMeterChannel.Input```
+- sets the ```ISampleJoiner.Target``` to the ```IOutputChannelPair```'s ```ISampleReceiver``` implementation
 
 ### AudioOutput.WriteNextFrame() invokes...
 - ```ISampleJoine.MixInput()``` to add the frame to the combined output mix

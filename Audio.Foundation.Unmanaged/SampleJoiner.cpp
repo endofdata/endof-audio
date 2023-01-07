@@ -1,21 +1,20 @@
 #include "pch.h"
 #include "SampleJoiner.h"
 #include "SampleConversionUnmanaged.h"
-#include "IChannelLink.h"
 
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 SampleJoiner::SampleJoiner(int sampleCount) :
 	SampleContainerBase(sampleCount),
-	m_pOutputLink(NULL),
+	m_pTarget(NULL),
 	m_refCount(0)
 {
 }
 
 SampleJoiner::~SampleJoiner()
 {
-	put_OutputLink(NULL);
+	put_Target(NULL);
 }
 
 IMPLEMENT_IUNKNOWN(SampleJoiner)
@@ -54,8 +53,8 @@ void SampleJoiner::Flush()
 	LeftChannel->Flush();
 	RightChannel->Flush();
 
-	if(NULL != OutputLink)
-		OutputLink->Output->Flush();
+	if(NULL != Target)
+		Target->Flush();
 }
 
 void SampleJoiner::Receive(ISampleContainer& input)
@@ -67,30 +66,27 @@ void SampleJoiner::Receive(ISampleContainer& input)
 
 void SampleJoiner::Send()
 {
-	if(NULL != m_pOutputLink && m_pOutputLink->HasInput)
-		m_pOutputLink->Output->Receive(*m_pOutputLink->Input);
+	if(NULL != m_pTarget)
+		m_pTarget->Receive(*this);
 }
 
-IChannelLink* SampleJoiner::get_OutputLink()
+ISampleReceiver* SampleJoiner::get_Target()
 {
-	return m_pOutputLink;
+	return m_pTarget;
 }
 
-void SampleJoiner::put_OutputLink(IChannelLink* value)
+void SampleJoiner::put_Target(ISampleReceiver* value)
 {
-	if(NULL != value && value->HasOutput == false)
-		value = NULL;
-
 	if (value != NULL)
 	{
 		value->AddRef();
 	}
 
-	IChannelLink* pOutputLink = (IChannelLink*)InterlockedExchangePointer((void**)&m_pOutputLink, value);
+	ISampleReceiver* pTarget = (ISampleReceiver*)InterlockedExchangePointer((void**)&m_pTarget, value);
 
-	if (pOutputLink != NULL)
+	if (pTarget != NULL)
 	{
-		pOutputLink->Release();
+		pTarget->Release();
 	}
 }
 
