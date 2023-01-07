@@ -11,15 +11,11 @@ using namespace Audio::Foundation::Unmanaged::Abstractions;
 MeterChannel::MeterChannel(int sampleRate) :
 	m_sampleRate(sampleRate),
 	m_iSamplesPerRMSFrame(880), // ~20 ms @ 44.1 kHz
-	m_iSumUpSamples(0),
-	m_dSumUpLeft(0.0f),
-	m_dSumUpRight(0.0f),
-	m_fDbLeft(-1000.0f),
-	m_fDbRight(-1000.0f),
 	m_pInput(NULL),
 	m_meterUpdate(NULL),
 	m_refCount(0)
 {
+	Flush();
 }
 
 MeterChannel::~MeterChannel()
@@ -56,43 +52,43 @@ bool MeterChannel::GetInterface(REFIID iid, void** ppvResult)
 
 void MeterChannel::Flush()
 {
+	m_iSumUpSamples = 0;
+	m_dSumUpLeft = 0.0f;
+	m_dSumUpRight = 0.0f;
+	m_fDbLeft = -1000.0f;
+	m_fDbRight = -1000.0f;
 }
 
-void MeterChannel::Receive(IChannelLink& inputBuffer)
+void MeterChannel::Receive(ISampleContainer& input)
 {
-	ISampleContainer* pInput = inputBuffer.Input;
+	ISampleBuffer* pLeftChannel = input.LeftChannel;
+	ISampleBuffer* pRightChannel = input.RightChannel;
 
-	if(NULL != pInput)
+	int sumUp = 0;
+
+	if (pLeftChannel != NULL)
 	{
-		ISampleBuffer* pLeftChannel = pInput->LeftChannel;
-		ISampleBuffer* pRightChannel = pInput->RightChannel;
+		SampleConversion::ContinueRMSSumUp(pLeftChannel->SamplePtr, pLeftChannel->SampleCount, m_dSumUpLeft);
+		sumUp = pLeftChannel->SampleCount;
+	}
+	if (pRightChannel != NULL)
+	{
+		SampleConversion::ContinueRMSSumUp(pRightChannel->SamplePtr, pRightChannel->SampleCount, m_dSumUpRight);
+		sumUp = pRightChannel->SampleCount;
+	}
+	if (sumUp > 0)
+	{
+		m_iSumUpSamples += pLeftChannel->SampleCount;
+	}
+	if (m_iSumUpSamples >= m_iSamplesPerRMSFrame)
+	{
+		m_fDbLeft = (float)SampleConversion::DbFullScaleRMS(m_dSumUpLeft, m_iSumUpSamples);
+		m_fDbRight = (float)SampleConversion::DbFullScaleRMS(m_dSumUpRight, m_iSumUpSamples);
+		m_dSumUpLeft = 0.0f;
+		m_dSumUpRight = 0.0f;
+		m_iSumUpSamples = 0;
 
-		int sumUp = 0;
-
-		if (pLeftChannel != NULL)
-		{
-			SampleConversion::ContinueRMSSumUp(pLeftChannel->SamplePtr, pLeftChannel->SampleCount, m_dSumUpLeft);
-			sumUp = pLeftChannel->SampleCount;
-		}
-		if (pRightChannel != NULL)
-		{
-			SampleConversion::ContinueRMSSumUp(pRightChannel->SamplePtr, pRightChannel->SampleCount, m_dSumUpRight);
-			sumUp = pRightChannel->SampleCount;
-		}
-		if (sumUp > 0)
-		{
-			m_iSumUpSamples += pLeftChannel->SampleCount;
-		}
-		if(m_iSumUpSamples >= m_iSamplesPerRMSFrame)
-		{
-			m_fDbLeft = (float)SampleConversion::DbFullScaleRMS(m_dSumUpLeft, m_iSumUpSamples);
-			m_fDbRight = (float)SampleConversion::DbFullScaleRMS(m_dSumUpRight, m_iSumUpSamples);
-			m_dSumUpLeft = 0.0f;
-			m_dSumUpRight = 0.0f;
-			m_iSumUpSamples = 0;
-
-			OnMeterUpdate();
-		}
+		OnMeterUpdate();
 	}
 }
 
@@ -150,6 +146,6 @@ void MeterChannel::OnMeterUpdate()
 {
 	MeterChannelCallback handler = m_meterUpdate;
 
-	if(NULL != handler)
+	if (NULL != handler)
 		handler(this);
 }

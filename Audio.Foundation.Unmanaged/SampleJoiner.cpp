@@ -58,20 +58,17 @@ void SampleJoiner::Flush()
 		OutputLink->Output->Flush();
 }
 
-void SampleJoiner::Receive(IChannelLink& receiveLink)
+void SampleJoiner::Receive(ISampleContainer& input)
 {
-	ISampleContainer* pInput = receiveLink.Input;
-
-	if(NULL != pInput)
-		MixInput(pInput, receiveLink.Level, receiveLink.Pan);
+	MixInput(input.LeftChannel->SamplePtr, input.RightChannel->SamplePtr, 1.0f, 0.0f);
 
 	Send();
 }
 
 void SampleJoiner::Send()
 {
-	if(NULL != m_pOutputLink)
-		m_pOutputLink->Output->Receive(*m_pOutputLink);
+	if(NULL != m_pOutputLink && m_pOutputLink->HasInput)
+		m_pOutputLink->Output->Receive(*m_pOutputLink->Input);
 }
 
 IChannelLink* SampleJoiner::get_OutputLink()
@@ -94,14 +91,6 @@ void SampleJoiner::put_OutputLink(IChannelLink* value)
 	if (pOutputLink != NULL)
 	{
 		pOutputLink->Release();
-	}
-}
-
-void SampleJoiner::MixInput(ISampleContainer* pInput, float level, float pan)
-{
-	if (pInput != NULL)
-	{
-		MixInput(pInput->LeftChannel->SamplePtr, pInput->RightChannel->SamplePtr, level, pan);
 	}
 }
 

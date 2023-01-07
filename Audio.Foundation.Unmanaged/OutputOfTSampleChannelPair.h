@@ -68,25 +68,20 @@ namespace Audio
 					{
 					}
 
-					virtual void Receive(IChannelLink& receiveLink)
+					virtual void Receive(ISampleContainer& input)
 					{
-						ISampleContainer* pInput = receiveLink.Input;
+						float* pSourceLeft = input.LeftChannel->SamplePtr;
+						float* pSourceRight = input.RightChannel->SamplePtr;
 
-						if (NULL != pInput)
+						TSample* pTargetLeft;
+						TSample* pTargetRight;
+
+						SelectBufferPointer(pTargetLeft, pTargetRight);
+
+						for (int i = 0; i < m_sampleCount; i++)
 						{
-							float* pSourceLeft = pInput->LeftChannel->SamplePtr;
-							float* pSourceRight = pInput->RightChannel->SamplePtr;
-
-							TSample* pTargetLeft;
-							TSample* pTargetRight;
-
-							SelectBufferPointer(pTargetLeft, pTargetRight);
-
-							for (int i = 0; i < m_sampleCount; i++)
-							{
-								WriteSample(*pSourceLeft++, pTargetLeft);
-								WriteSample(*pSourceRight++, pTargetRight);
-							}
+							WriteSample(*pSourceLeft++, pTargetLeft);
+							WriteSample(*pSourceRight++, pTargetRight);
 						}
 					}
 
@@ -110,7 +105,7 @@ namespace Audio
 						}
 					}
 
-
+					// TODO: Do we need the Input property? The Receive() method works on an IChannelLink anyway
 					virtual IChannelLink* get_Input()
 					{
 						return m_pInput;

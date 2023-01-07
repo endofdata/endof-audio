@@ -22,7 +22,7 @@ namespace Audio
 
 				virtual void Flush();
 
-				virtual void Receive(IChannelLink& inputBuffer);
+				virtual void Receive(ISampleContainer& inputBuffer);
 
 				virtual IChannelLink* get_Input();
 				virtual void put_Input(IChannelLink* value);

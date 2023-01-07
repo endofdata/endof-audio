@@ -81,17 +81,20 @@ void SampleSharer::RouteToSends()
 {
 	for_each(m_vecSends.begin(), m_vecSends.end(), [](IChannelLink* pLink) 
 	{ 
-		pLink->Output->Receive(*pLink); 
+		if (pLink->HasInput)
+		{
+			pLink->Output->Receive(*pLink->Input);
+		}
 	});
 }
 
-IChannelLink* SampleSharer::get_Send(int iIdx)
+IChannelLink* SampleSharer::get_Send(int index)
 {
 	IChannelLink* value = NULL;
 	
-	if (0 <= iIdx && iIdx < (int)m_vecSends.size())
+	if (0 <= index && index < (int)m_vecSends.size())
 	{
-		value = m_vecSends.at(iIdx);
+		value = m_vecSends.at(index);
 	}
 	return value;
 }

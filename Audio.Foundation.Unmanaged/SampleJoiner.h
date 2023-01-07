@@ -25,7 +25,7 @@ namespace Audio
 				virtual ~SampleJoiner();
 
 				virtual void Flush();
-				virtual void Receive(IChannelLink& inputBuffer);
+				virtual void Receive(ISampleContainer& input);
 
 				virtual IChannelLink* get_OutputLink();
 				virtual void put_OutputLink(IChannelLink* value);
@@ -39,7 +39,6 @@ namespace Audio
 				DECLARE_SAMPLECONTAINER
 
 			protected:
-				void MixInput(ISampleContainer* pInput, float level, float pan);
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
