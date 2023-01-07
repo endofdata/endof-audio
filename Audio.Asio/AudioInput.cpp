@@ -103,7 +103,15 @@ void AudioInput::Monitor::set(IAudioOutput^ value)
 	if (nullptr != value)
 	{
 		AudioOutput^ output = safe_cast<AudioOutput^>(value);
-		m_pInputChannel->Monitor = &output->OutputChannelPair;
+
+		if (output == nullptr)
+		{
+			m_pInputChannel->Monitor = NULL;
+		}
+		else
+		{
+			m_pInputChannel->Monitor = &output->OutputChannelPair;
+		}
 	}
 	else
 		m_pInputChannel->Monitor = NULL;
