@@ -17,13 +17,16 @@ namespace Audio
 				SampleSharer();
 				virtual ~SampleSharer();
 
-				virtual Abstractions::IChannelLink* get_Send(int iIdx);
+				virtual void put_Source(Abstractions::ISampleContainer* value);
+				virtual Abstractions::ISampleContainer* get_Source();
 
-				virtual void AddSend(Abstractions::ISampleContainer& fromChannel, Abstractions::ISampleReceiver& channel, float level, float pan);
-				virtual void RemoveSend(Abstractions::ISampleReceiver& channel);
-				virtual void RemoveAllSends();
+				virtual Abstractions::ISampleReceiver* get_Target(int iIdx);
 
-				virtual void RouteToSends();
+				virtual void AddTarget(Abstractions::ISampleReceiver& channel);
+				virtual void RemoveTarget(Abstractions::ISampleReceiver& channel);
+				virtual void RemoveAllTargets();
+
+				virtual void RouteToTargets();
 
 				DECLARE_IUNKNOWN
 
@@ -31,7 +34,8 @@ namespace Audio
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
-				std::vector<Abstractions::IChannelLink*> m_vecSends;
+				Abstractions::ISampleContainer* m_pSource;
+				std::vector<Abstractions::ISampleReceiver*> m_vecTargets;
 			};
 		}
 	}

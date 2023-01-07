@@ -22,42 +22,49 @@ namespace Audio
 				/// </summary>
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("e8ed7980-1d09-46b0-9c9c-df015a1f72fe")) ISampleSharer : public IUnknown
 				{
-					/// <summary>
-					/// Gets channel links as created by previous calls to <see cref="AddSend"/>
-					/// </summary>
-					_declspec(property(get = get_Send)) IChannelLink* Sends[];
+					void put_Source(ISampleContainer* value) = 0;
+					ISampleContainer* get_Source() = 0;
 
 					/// <summary>
-					/// Gets one item from the <see cref="Sends"/> collection at the given <paramref name="index"/>
+					/// Gets or sets the sample container for the input samples
+					/// </summary>
+					_declspec(property(get = get_Source, put = put_Source)) ISampleContainer* Source;
+
+					/// <summary>
+					/// Gets targets as defined by previous calls to <see cref="AddTarget"/>
+					/// </summary>
+					_declspec(property(get = get_Target)) ISampleReceiver* Targets[];
+
+					/// <summary>
+					/// Gets one item from the <see cref="Targets"/> collection at the given <paramref name="index"/>
 					/// </summary>
 					/// <param name="index">Index of the requested item</param>
-					/// <returns>The <see cref="IChannelLink"/> or <see langword="null"/> if <paramref name="index"/> is out of range.</returns>
-					IChannelLink* get_Send(int index) = 0;
+					/// <returns>The <see cref="ISampleReceiver"/> or <see langword="null"/> if <paramref name="index"/> is out of range.</returns>
+					ISampleReceiver* get_Target(int index) = 0;
 
 					/// <summary>
-					/// Adds a new channel link to the <see cref="Sends"/> collection
+					/// Adds a new item to the <see cref="Targets"/> collection
 					/// </summary>
-					/// <param name="fromChannel">Container for input samples</param>
-					/// <param name="toChannel">Target for output samples</param>
-					/// <param name="level">Level applied to the input signal</param>
-					/// <param name="pan">Panorama position applied to the input signal</param>
-					void AddSend(ISampleContainer& fromChannel, ISampleReceiver& toChannel, float level, float pan) = 0;
+					/// <param name="target">Target for output samples</param>
+					/// <param name="level">Level applied to the input signal before sending to target</param>
+					/// <param name="pan">Panorama position applied to the input signal before sending to target</param>
+					void AddTarget(ISampleReceiver& target) = 0;
 
 					/// <summary>
-					/// Removes a channel link from the <see cref="Sends"/> collection
+					/// Removes an item from the <see cref="Targets"/> collection
 					/// </summary>
-					/// <param name="toChannel">Target of the channel link to remove</param>
-					void RemoveSend(ISampleReceiver& toChannel) = 0;
+					/// <param name="target">Target to remove</param>
+					void RemoveTarget(ISampleReceiver& target) = 0;
 
 					/// <summary>
-					/// Clears the <see cref="Sends"/> collection
+					/// Clears the <see cref="Targets"/> collection
 					/// </summary>
-					void RemoveAllSends() = 0;
+					void RemoveAllTargets() = 0;
 
 					/// <summary>
-					/// Routes the input samples of each channel link in the <see cref="Sends"/> collection
+					/// Routes the input samples of <see cref="Source"/> to all items in the <see cref="Targets"/> collection
 					/// </summary>
-					void RouteToSends() = 0;
+					void RouteToTargets() = 0;
 				};
 
 			}

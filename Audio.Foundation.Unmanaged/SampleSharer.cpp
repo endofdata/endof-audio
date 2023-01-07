@@ -11,13 +11,15 @@ using namespace std;
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
-SampleSharer::SampleSharer() : m_refCount(0)
+SampleSharer::SampleSharer() : 
+	m_refCount(0), 
+	m_pSource(NULL)
 {
 }
 
 SampleSharer::~SampleSharer()
 {
-	RemoveAllSends();
+	RemoveAllTargets();
 }
 
 IMPLEMENT_IUNKNOWN(SampleSharer)
@@ -38,63 +40,78 @@ bool SampleSharer::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-void SampleSharer::AddSend(ISampleContainer& fromChannel, ISampleReceiver& toChannel, float level, float pan)
+void SampleSharer::AddTarget(ISampleReceiver& target)
 {
+	target.AddRef();
+
 	// do not allow two sends to the same destination
-	RemoveSend(toChannel);
+	RemoveTarget(target);
 
-	IChannelLink* pChannelLink = ObjectFactory::CreateChannelLink(&fromChannel, &toChannel, level, pan);
-	if(NULL == pChannelLink)
-	{
-		RemoveAllSends();
-		throw new std::invalid_argument("SampleSharer: Not enough memory for ChannelLink instance.");
-	}
-
-	m_vecSends.push_back(pChannelLink);
+	m_vecTargets.push_back(&target);
 }
 
-void SampleSharer::RemoveSend(ISampleReceiver& toChannel)
+void SampleSharer::RemoveTarget(ISampleReceiver& target)
 {
-	vector<IChannelLink*>::iterator newEnd =
-	remove_if(m_vecSends.begin(), m_vecSends.end(), [&toChannel](IChannelLink* pLink) 
+	vector<ISampleReceiver*>::iterator newEnd =
+	remove_if(m_vecTargets.begin(), m_vecTargets.end(), [&target](ISampleReceiver* item) 
 	{ 
-		if(pLink->Output == &toChannel)
+		if(item == &target)
 		{
-			pLink->Release();
+			item->Release();
 			return true;
 		}
 		return false;
 	});
-	m_vecSends.erase(newEnd, m_vecSends.end());
+	m_vecTargets.erase(newEnd, m_vecTargets.end());
 }
 
-void SampleSharer::RemoveAllSends()
+void SampleSharer::RemoveAllTargets()
 {
-	for_each(m_vecSends.begin(), m_vecSends.end(), [](IChannelLink* pLink)
+	for_each(m_vecTargets.begin(), m_vecTargets.end(), [](ISampleReceiver* item)
 	{
-		pLink->Release();
+		item->Release();
 	});
-	m_vecSends.clear();
+	m_vecTargets.clear();
 }
 
-void SampleSharer::RouteToSends()
+void SampleSharer::RouteToTargets()
 {
-	for_each(m_vecSends.begin(), m_vecSends.end(), [](IChannelLink* pLink) 
-	{ 
-		if (pLink->HasInput)
+	if (m_pSource != NULL)
+	{
+		for_each(m_vecTargets.begin(), m_vecTargets.end(), [this](ISampleReceiver* item)
 		{
-			pLink->Output->Receive(*pLink->Input);
-		}
-	});
+			item->Receive(*m_pSource);
+		});
+	}
 }
 
-IChannelLink* SampleSharer::get_Send(int index)
+void SampleSharer::put_Source(ISampleContainer* value)
 {
-	IChannelLink* value = NULL;
-	
-	if (0 <= index && index < (int)m_vecSends.size())
+	if (value != NULL)
 	{
-		value = m_vecSends.at(index);
+		value->AddRef();
+	}
+
+	ISampleContainer* pSource = (ISampleContainer*)InterlockedExchangePointer((void**)&m_pSource, value);
+
+	if (pSource != NULL)
+	{
+		pSource->Release();
+	}
+}
+
+ISampleContainer* SampleSharer::get_Source()
+{
+	return m_pSource;
+}
+
+ISampleReceiver* SampleSharer::get_Target(int index)
+{
+	ISampleReceiver* value = NULL;
+	
+	if (0 <= index && index < (int)m_vecTargets.size())
+	{
+		value = m_vecTargets.at(index);
 	}
 	return value;
 }
