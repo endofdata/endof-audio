@@ -34,11 +34,6 @@ bool SampleJoiner::GetInterface(REFIID iid, void** ppvResult)
 		*ppvResult = dynamic_cast<ISampleJoiner*>(this);
 		return true;
 	}
-	if (iid == __uuidof(ISampleReceiver))
-	{
-		*ppvResult = dynamic_cast<ISampleReceiver*>(this);
-		return true;
-	}
 	if (iid == __uuidof(ISampleContainer))
 	{
 		*ppvResult = dynamic_cast<ISampleContainer*>(this);
@@ -55,13 +50,6 @@ void SampleJoiner::Flush()
 
 	if(NULL != Target)
 		Target->Flush();
-}
-
-void SampleJoiner::Receive(ISampleContainer& input)
-{
-	MixInput(input.LeftChannel->SamplePtr, input.RightChannel->SamplePtr, 1.0f, 0.0f);
-
-	Send();
 }
 
 void SampleJoiner::Send()

@@ -16,7 +16,6 @@ namespace Audio
 		namespace Unmanaged
 		{
 			class SampleJoiner : public SampleContainerBase, 
-				public Audio::Foundation::Unmanaged::Abstractions::ISampleReceiver, 
 				public Audio::Foundation::Unmanaged::Abstractions::ISampleJoiner,
 				public Audio::Foundation::Unmanaged::Abstractions::ISampleContainer
 			{
@@ -25,8 +24,6 @@ namespace Audio
 				virtual ~SampleJoiner();
 
 				virtual void Flush();
-				virtual void Receive(ISampleContainer& input);
-
 				virtual ISampleReceiver* get_Target();
 				virtual void put_Target(ISampleReceiver* value);
 
