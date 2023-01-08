@@ -39,6 +39,11 @@ namespace Audio
 					{
 						if (NULL == pBufferLeftA || NULL == pBufferLeftB || NULL == pBufferRightA || NULL == pBufferRightB)
 							throw gcnew AsioCoreException("OutputChannelPair: Buffer pointers must not be NULL.", E_INVALIDARG);
+
+						ZeroMemory(m_pOutputLeftA, sampleCount * sizeof(TSample));
+						ZeroMemory(m_pOutputRightA, sampleCount * sizeof(TSample));
+						ZeroMemory(m_pOutputLeftB, sampleCount * sizeof(TSample));
+						ZeroMemory(m_pOutputRightB, sampleCount * sizeof(TSample));
 					}
 
 					/*! \brief Destructor

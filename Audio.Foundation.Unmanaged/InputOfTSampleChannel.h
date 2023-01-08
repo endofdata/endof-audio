@@ -33,6 +33,9 @@ namespace Audio
 						if (NULL == m_pBufferA || NULL == m_pBufferB)
 							throw gcnew AsioCoreException("InputChannel: Buffer pointers must not be NULL.", E_INVALIDARG);
 
+						ZeroMemory(m_pBufferA, sampleCount * sizeof(TSample));
+						ZeroMemory(m_pBufferB, sampleCount * sizeof(TSample));
+
 						m_pContainer = ObjectFactory::CreateSampleContainer(sampleCount);
 						m_pSharer = ObjectFactory::CreateSampleSharer();
 						m_pSharer->Source = m_pContainer;
