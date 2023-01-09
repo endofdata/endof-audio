@@ -27,7 +27,10 @@ namespace Audio
 						m_iAsioChannel(iAsioChannel),
 						m_pBufferA(pBufferA),
 						m_pBufferB(pBufferB),
-						m_pMonitor(NULL),
+						m_pDirectMonitor(NULL),
+						m_pContainer(NULL),
+						m_pSharer(NULL),
+						m_readSecondHalf(false),
 						m_refCount(0)
 					{
 						if (NULL == m_pBufferA || NULL == m_pBufferB)
@@ -36,7 +39,7 @@ namespace Audio
 						ZeroMemory(m_pBufferA, sampleCount * sizeof(TSample));
 						ZeroMemory(m_pBufferB, sampleCount * sizeof(TSample));
 
-						m_pContainer = ObjectFactory::CreateSampleContainer(sampleCount);
+						m_pContainer = ObjectFactory::CreateSampleContainer(sampleCount, 1);
 						m_pSharer = ObjectFactory::CreateSampleSharer();
 						m_pSharer->Source = m_pContainer;
 					}
@@ -45,38 +48,32 @@ namespace Audio
 					*/
 					virtual ~InputOfTSampleChannel()
 					{
-						put_Monitor(NULL);
+						put_DirectMonitor(NULL);
 						m_pContainer->Release();
 						m_pSharer->Release();
 					}
 
 					virtual void Swap(bool readSecondHalf)
 					{
+						m_readSecondHalf = readSecondHalf;
+
 						if (m_pContainer->IsActive)
 						{
-							TSample* pSource = readSecondHalf ? m_pBufferB : m_pBufferA;
+							TSample* pSource;
+							SelectBufferPointer(pSource);
 
 							// if monitor is attached, send to both monitor channels
-							if (NULL != m_pMonitor)
+							if (NULL != m_pDirectMonitor)
 							{
-								m_pMonitor->DirectOut(pSource, true, true);
+								m_pDirectMonitor->DirectOut(pSource, true, true);
 							}
-							float* pDestLeft = m_pContainer->LeftChannel->SamplePtr;
-							float* pDestRight = m_pContainer->RightChannel->SamplePtr;
-
-							// double the level to get full level on both channels
-							float lvlPanFactorLeft = 0.0f;
-							float lvlPanFactorRight = 0.0f;
-							Audio::Foundation::Unmanaged::SampleConversion::LevelAndPanFactor(2.0f, 0.0f, lvlPanFactorLeft, lvlPanFactorRight);
 
 							int sampleCount = m_pContainer->SampleCount;
+							float* pDest = m_pContainer->Channels[0]->SamplePtr;
 
 							for (int i = 0; i < sampleCount; i++)
 							{
-								float floatSample = ReadSample(pSource);
-
-								*pDestLeft++ = floatSample * lvlPanFactorLeft;
-								*pDestRight++ = floatSample * lvlPanFactorRight;
+								*pDest = ReadSample(pSource);
 							}
 						}
 					}
@@ -96,19 +93,19 @@ namespace Audio
 						m_pContainer->IsActive = value;
 					}
 
-					virtual IOutputChannelPair* get_Monitor()
+					virtual IOutputChannelPair* get_DirectMonitor()
 					{
-						return m_pMonitor;
+						return m_pDirectMonitor;
 					}
 
-					virtual void put_Monitor(IOutputChannelPair* value)
+					virtual void put_DirectMonitor(IOutputChannelPair* value)
 					{
 						if (value != NULL)
 						{
 							value->AddRef();
 						}
 
-						IOutputChannelPair* pMonitor = (IOutputChannelPair*)InterlockedExchangePointer((void**)&m_pMonitor, value);
+						IOutputChannelPair* pMonitor = (IOutputChannelPair*)InterlockedExchangePointer((void**)&m_pDirectMonitor, value);
 
 						if (pMonitor != NULL)
 						{
@@ -146,13 +143,19 @@ namespace Audio
 					}
 
 				private:
+					void SelectBufferPointer(TSample*& pSource)
+					{
+						pSource = m_readSecondHalf ? m_pBufferB : m_pBufferA;
+					}
+
 					virtual float ReadSample(TSample*& pSource) = 0;
 
 					int m_iAsioChannel;
 					TSample* m_pBufferA;
 					TSample* m_pBufferB;
+					bool m_readSecondHalf;
 
-					IOutputChannelPair* m_pMonitor;
+					IOutputChannelPair* m_pDirectMonitor;
 
 					// was derived from...
 					ISampleContainer* m_pContainer;

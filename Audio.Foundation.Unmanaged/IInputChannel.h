@@ -27,18 +27,18 @@ namespace Audio
 				/// </remarks>
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("8a41766a-92ae-4f1d-b996-f8d4b98105ad")) IInputChannel : public IUnknown
 				{
+					bool get_IsActive() = 0;
+					void put_IsActive(bool value) = 0;
+
 					/// <summary>
 					/// Gets or sets a value indicating whether the input channel is activated
 					/// </summary>
 					_declspec(property(get = get_IsActive, put = put_IsActive)) bool IsActive;
 
-					bool get_IsActive() = 0;
-					void put_IsActive(bool value) = 0;
-
 					ISampleSharer& get_SampleSharer() = 0;
 
 					/// <summary>
-					/// Gets or sets the target sample sharer that distributes the input samples to a collection of <see cref="ISampleReceiver"/> instances.
+					/// Gets the target sample sharer that distributes the input samples to a collection of <see cref="ISampleReceiver"/> instances.
 					/// </summary>
 					_declspec(property(get = get_SampleSharer)) ISampleSharer& SampleSharer;
 
@@ -50,13 +50,16 @@ namespace Audio
 					_declspec(property(get = get_SampleType)) int SampleType;
 
 
-					IOutputChannelPair* get_Monitor() = 0;
-					void put_Monitor(IOutputChannelPair* value) = 0;
+					IOutputChannelPair* get_DirectMonitor() = 0;
+					void put_DirectMonitor(IOutputChannelPair* value) = 0;
 
 					/// <summary>
-					/// Gets or sets the optional <see cref="IOutputChannelPair"/> that is used as monitoring device.
+					/// Gets or sets the optional <see cref="IOutputChannelPair"/> that is used as direct-input monitoring device.
 					/// </summary>
-					_declspec(property(get = get_Monitor, put = put_Monitor)) IOutputChannelPair* Monitor;
+					/// <remarks>
+					/// Direct-input monitoring copies the input samples to the output buffers w/o sample conversion
+					/// </remarks>
+					_declspec(property(get = get_DirectMonitor, put = put_DirectMonitor)) IOutputChannelPair* DirectMonitor;
 
 					/// <summary>
 					/// Invoked for each ASIO buffer switch
