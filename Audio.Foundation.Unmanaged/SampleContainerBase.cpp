@@ -2,17 +2,16 @@
 #include "SampleContainerBase.h"
 #include "SampleBuffer.h"
 #include <stdexcept>
+#include <algorithm>
 
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
-SampleContainerBase::SampleContainerBase(int sampleCount) :
-	m_pLeftChannel(NULL),
-	m_pRightChannel(NULL),
+SampleContainerBase::SampleContainerBase(int sampleCount, int channelCount) :
 	m_isActive(false),
 	m_sampleCount(0)
 {
-	put_SampleCount(sampleCount);
+	CreateChannels(sampleCount, channelCount);
 }
 
 SampleContainerBase::~SampleContainerBase()
@@ -20,57 +19,57 @@ SampleContainerBase::~SampleContainerBase()
 	FreeChannels();
 }
 
-void SampleContainerBase::AllocChannels(int sampleCount)
+void SampleContainerBase::CreateChannels(int sampleCount, int channelCount)
 {
-	SampleBuffer* pBuffer = new SampleBuffer(sampleCount);
-	pBuffer->AddRef();
-
-	ISampleBuffer* pChannel = (ISampleBuffer*)InterlockedExchangePointer((void**)&m_pLeftChannel, pBuffer);
-
-	if (NULL != pChannel)
+	if (sampleCount != get_SampleCount() || channelCount != get_ChannelCount())
 	{
-		pChannel->Release();
-	}
+		if (sampleCount != get_SampleCount())
+		{
+			FreeChannels();
+		}
 
-	pBuffer = new SampleBuffer(sampleCount);
-	pBuffer->AddRef();
-
-	pChannel = (ISampleBuffer*)InterlockedExchangePointer((void**)&m_pRightChannel, new SampleBuffer(sampleCount));
-
-	if (NULL != pChannel)
-	{
-		pChannel->Release();
+		if (channelCount < get_ChannelCount())
+		{
+			for (int c = channelCount; c < get_ChannelCount(); c++)
+			{
+				ISampleBuffer* pBuffer = m_vecChannels.back();
+				pBuffer->Release();
+				m_vecChannels.pop_back();
+			}
+		}
+		else
+		{
+			for (int c = get_ChannelCount(); c < channelCount; c++)
+			{
+				SampleBuffer* pBuffer = new SampleBuffer(sampleCount);
+				pBuffer->AddRef();
+				m_vecChannels.push_back(pBuffer);
+			}
+		}
+		m_sampleCount = sampleCount;
 	}
 }
 
 void SampleContainerBase::FreeChannels()
 {
-	ISampleBuffer* pChannel = (ISampleBuffer*)InterlockedExchangePointer((void**)&m_pLeftChannel, NULL);
-
-	if (NULL != pChannel)
+	for_each(m_vecChannels.begin(), m_vecChannels.end(), [](ISampleBuffer* item)
 	{
-		pChannel->Release();
-	}
+		item->Release();
+	});
 
-	pChannel = (ISampleBuffer*)InterlockedExchangePointer((void**)&m_pRightChannel, NULL);
-
-	if (NULL != pChannel)
-	{
-		pChannel->Release();
-	}
-	m_sampleCount = 0;
+	m_vecChannels.clear();
 }
 
 // virtual
-ISampleBuffer* SampleContainerBase::get_LeftChannel()
+int SampleContainerBase::get_SampleCount()
 {
-	return m_pLeftChannel;
+	return m_sampleCount;
 }
 
 // virtual
-ISampleBuffer* SampleContainerBase::get_RightChannel()
+void SampleContainerBase::put_SampleCount(int sampleCount)
 {
-	return m_pRightChannel;
+	CreateChannels(sampleCount, get_ChannelCount());
 }
 
 // virtual
@@ -85,17 +84,24 @@ void SampleContainerBase::put_IsActive(bool value)
 	m_isActive = value;
 }
 
-int SampleContainerBase::get_SampleCount()
+// virtual
+int SampleContainerBase::get_ChannelCount()
 {
-	return m_sampleCount;
+	return m_vecChannels.size();
 }
 
-void SampleContainerBase::put_SampleCount(int sampleCount)
+// virtual
+void SampleContainerBase::put_ChannelCount(int channelCount)
 {
-	if (sampleCount != m_sampleCount)
+	CreateChannels(m_sampleCount, channelCount);
+}
+
+// virtual
+ISampleBuffer* SampleContainerBase::get_Channel(int index)
+{
+	if (index < 0 || index >= get_ChannelCount())
 	{
-		FreeChannels();
-		AllocChannels(sampleCount);
-		m_sampleCount = sampleCount;
+		throw std::out_of_range("Invalid channel index");
 	}
+	return m_vecChannels.at(index);
 }

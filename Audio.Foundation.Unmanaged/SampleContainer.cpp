@@ -6,8 +6,8 @@
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
-SampleContainer::SampleContainer(int sampleCount) : 
-	SampleContainerBase(sampleCount),
+SampleContainer::SampleContainer(int sampleCount, int channelCount) : 
+	SampleContainerBase(sampleCount, channelCount),
 	m_refCount(0)
 {
 }

@@ -28,6 +28,22 @@ namespace Audio
 					/// </summary>
 					_declspec(property(get = get_SampleCount, put = put_SampleCount)) int SampleCount;
 
+					virtual int get_ChannelCount() = 0;
+					virtual void put_ChannelCount(int channelCount) = 0;
+
+					/// <summary>
+					/// Gets or sets the number of channels
+					/// </summary>
+					_declspec(property(get = get_ChannelCount, put = put_ChannelCount)) int ChannelCount;
+
+					
+					virtual ISampleBuffer* get_Channel(int index) = 0;
+
+					/// <summary>
+					/// Gets the sample buffers for the allocated channels
+					/// </summary>
+					_declspec(property(get = get_Channel)) ISampleBuffer* Channels[];
+
 					/// <summary>
 					/// Gets or sets a value indicating whether the sample container is active
 					/// </summary>
@@ -38,20 +54,6 @@ namespace Audio
 
 					bool get_IsActive() = 0;
 					void put_IsActive(bool value) = 0;
-
-					/// <summary>
-					/// Gets the sample buffer for the left channel
-					/// </summary>
-					_declspec(property(get = get_LeftChannel)) ISampleBuffer* LeftChannel;
-
-					ISampleBuffer* get_LeftChannel() = 0;
-
-					/// <summary>
-					/// Gets the sample buffer for the right channel
-					/// </summary>
-					_declspec(property(get = get_RightChannel)) ISampleBuffer* RightChannel;
-
-					ISampleBuffer* get_RightChannel() = 0;
 				};
 			}
 		}

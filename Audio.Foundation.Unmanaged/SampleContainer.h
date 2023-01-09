@@ -14,7 +14,7 @@ namespace Audio
 			class SampleContainer : public SampleContainerBase, public Audio::Foundation::Unmanaged::Abstractions::ISampleContainer
 			{
 			public:
-				SampleContainer(int sampleCount);
+				SampleContainer(int sampleCount, int channelCount);
 				virtual ~SampleContainer();
 
 				DECLARE_IUNKNOWN
