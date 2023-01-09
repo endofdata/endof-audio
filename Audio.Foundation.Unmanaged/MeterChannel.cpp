@@ -3,6 +3,7 @@
 #include "SampleConversionUnmanaged.h"
 #include "ISampleContainer.h"
 #include "ISampleBuffer.h"
+#include <algorithm>
 
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -52,10 +53,15 @@ bool MeterChannel::GetInterface(REFIID iid, void** ppvResult)
 void MeterChannel::Flush()
 {
 	m_iSumUpSamples = 0;
-	m_dSumUpLeft = 0.0f;
-	m_dSumUpRight = 0.0f;
-	m_fDbLeft = -1000.0f;
-	m_fDbRight = -1000.0f;
+	std::for_each(m_vecSumUp.begin(), m_vecSumUp.end(), [](double& value)
+	{
+		value = 0.0;
+	});
+
+	std::for_each(m_vecDbFS.begin(), m_vecDbFS.end(), [](float& value)
+	{
+		value = 0.0f;
+	});
 }
 
 void MeterChannel::Receive(ISampleContainer& input)
@@ -65,45 +71,39 @@ void MeterChannel::Receive(ISampleContainer& input)
 		m_pWriteThrough->Receive(input);
 	}
 
-	ISampleBuffer* pLeftChannel = input.LeftChannel;
-	ISampleBuffer* pRightChannel = input.RightChannel;
+	if (input.ChannelCount > 0)
+	{
+		m_vecSumUp.resize(input.ChannelCount, 0.0);
+		m_vecDbFS.resize(input.ChannelCount, 0.0f);
 
-	int sumUp = 0;
+		for (int c = 0; c < input.ChannelCount; c++)
+		{
+			ISampleBuffer* pChannel = input.Channels[c];
+			SampleConversion::ContinueRMSSumUp(pChannel->SamplePtr, pChannel->SampleCount, m_vecSumUp.at(c));
+		}
 
-	if (pLeftChannel != NULL)
-	{
-		SampleConversion::ContinueRMSSumUp(pLeftChannel->SamplePtr, pLeftChannel->SampleCount, m_dSumUpLeft);
-		sumUp = pLeftChannel->SampleCount;
-	}
-	if (pRightChannel != NULL)
-	{
-		SampleConversion::ContinueRMSSumUp(pRightChannel->SamplePtr, pRightChannel->SampleCount, m_dSumUpRight);
-		sumUp = pRightChannel->SampleCount;
-	}
-	if (sumUp > 0)
-	{
-		m_iSumUpSamples += pLeftChannel->SampleCount;
-	}
-	if (m_iSumUpSamples >= m_iSamplesPerRMSFrame)
-	{
-		m_fDbLeft = (float)SampleConversion::DbFullScaleRMS(m_dSumUpLeft, m_iSumUpSamples);
-		m_fDbRight = (float)SampleConversion::DbFullScaleRMS(m_dSumUpRight, m_iSumUpSamples);
-		m_dSumUpLeft = 0.0f;
-		m_dSumUpRight = 0.0f;
-		m_iSumUpSamples = 0;
+		m_iSumUpSamples += input.SampleCount;
 
-		OnMeterUpdate();
+		if (m_iSumUpSamples >= m_iSamplesPerRMSFrame)
+		{
+			int sumUpSamples = m_iSumUpSamples;
+			auto dbFSIterator = m_vecDbFS.begin();
+
+			std::for_each(m_vecSumUp.begin(), m_vecSumUp.end(), [dbFSIterator, sumUpSamples](const double& sumUp)
+			{
+				*dbFSIterator = (float)SampleConversion::DbFullScaleRMS(sumUp, sumUpSamples);
+			});
+
+			Flush();
+
+			OnMeterUpdate();
+		}
 	}
 }
 
-float MeterChannel::get_DbLeft()
+float MeterChannel::get_DbFS(int index)
 {
-	return m_fDbLeft;
-}
-
-float MeterChannel::get_DbRight()
-{
-	return m_fDbRight;
+	return m_vecDbFS[index];
 }
 
 int MeterChannel::get_RMSTime()

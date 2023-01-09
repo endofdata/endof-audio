@@ -25,13 +25,9 @@ namespace Audio
 
 					_declspec(property(get = get_RMSTime, put = put_RMSTime)) int RMSTime;
 
-					float get_DbLeft() = 0;
+					float get_DbFS(int index) = 0;
 
-					_declspec(property(get = get_DbLeft)) float DbLeft;
-
-					float get_DbRight() = 0;
-
-					_declspec(property(get = get_DbRight)) float DbRight;
+					_declspec(property(get = get_DbFS)) float DbFS[];
 
 					MeterChannelCallback get_MeterUpdate() = 0;
 					void put_MeterUpdate(MeterChannelCallback value) = 0;

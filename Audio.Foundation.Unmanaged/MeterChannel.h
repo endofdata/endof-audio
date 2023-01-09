@@ -4,6 +4,7 @@
 #include "UnknownBase.h"
 #include "ISampleReceiver.h"
 #include "IMeterChannel.h"
+#include <vector>
 
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -27,9 +28,7 @@ namespace Audio
 				virtual int get_RMSTime();
 				virtual void put_RMSTime(int value);
 
-				virtual float get_DbLeft();
-
-				virtual float get_DbRight();
+				virtual float get_DbFS(int index);
 
 				virtual MeterChannelCallback get_MeterUpdate();
 				virtual void put_MeterUpdate(MeterChannelCallback value);
@@ -51,10 +50,8 @@ namespace Audio
 				int m_sampleRate;
 				int m_iSamplesPerRMSFrame;
 				int m_iSumUpSamples;
-				double m_dSumUpLeft;
-				double m_dSumUpRight;
-				float m_fDbLeft;
-				float m_fDbRight;
+				std::vector<double> m_vecSumUp;
+				std::vector<float> m_vecDbFS;
 			};
 		}
 	}
