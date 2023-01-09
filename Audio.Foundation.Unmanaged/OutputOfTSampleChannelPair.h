@@ -15,7 +15,7 @@ namespace Audio
 			namespace Templates
 			{
 				template <typename TSample, int SAMPLE_TYPE, size_t SAMPLE_SIZE>
-				class OutputOfTSampleChannelPair : public ISampleReceiver, public IOutputChannelPair
+				class OutputOfTSampleChannelPair : public IOutputChannelPair, public ISampleReceiver
 				{
 				public:
 					/*! \brief Constructor
@@ -33,6 +33,7 @@ namespace Audio
 						m_iAsioChannelRight(iAsioChannelRight),
 						m_pOutputRightA(pBufferRightA),
 						m_pOutputRightB(pBufferRightB),
+						m_pJoiner(NULL),
 						m_sampleCount(sampleCount),
 						m_writeSecondHalf(true),
 						m_refCount(0)
@@ -44,12 +45,20 @@ namespace Audio
 						ZeroMemory(m_pOutputRightA, sampleCount * sizeof(TSample));
 						ZeroMemory(m_pOutputLeftB, sampleCount * sizeof(TSample));
 						ZeroMemory(m_pOutputRightB, sampleCount * sizeof(TSample));
+
+						m_pJoiner = ObjectFactory::CreateSampleJoiner(sampleCount, 2);
+						ISampleReceiver* pSampleReceiver = NULL;
+
+						QueryInterface(__uuidof(ISampleReceiver), (void**)&pSampleReceiver);
+						m_pJoiner->Target = pSampleReceiver;
+						pSampleReceiver->Release();
 					}
 
 					/*! \brief Destructor
 					*/
 					virtual ~OutputOfTSampleChannelPair()
 					{
+						m_pJoiner->Release();
 					}
 
 					/*! \brief Sets the current write position to the indicated buffer half
@@ -72,18 +81,24 @@ namespace Audio
 
 					virtual void Receive(ISampleContainer& input)
 					{
-						float* pSourceLeft = input.LeftChannel->SamplePtr;
-						float* pSourceRight = input.RightChannel->SamplePtr;
+						int inputChannels = input.ChannelCount;
 
-						TSample* pTargetLeft;
-						TSample* pTargetRight;
-
-						SelectBufferPointer(pTargetLeft, pTargetRight);
-
-						for (int i = 0; i < m_sampleCount; i++)
+						if (inputChannels > 0)
 						{
-							WriteSample(*pSourceLeft++, pTargetLeft);
-							WriteSample(*pSourceRight++, pTargetRight);
+							int rightChannel = inputChannels == 1 ? 0 : 1;
+							const float* pSourceLeft = input.Channels[0]->SamplePtr;
+							const float* pSourceRight = input.Channels[rightChannel]->SamplePtr;
+
+							TSample* pTargetLeft;
+							TSample* pTargetRight;
+
+							SelectBufferPointer(pTargetLeft, pTargetRight);
+
+							for (int i = 0; i < m_sampleCount; i++)
+							{
+								WriteSample(*pSourceLeft++, pTargetLeft);
+								WriteSample(*pSourceRight++, pTargetRight);
+							}
 						}
 					}
 
@@ -112,6 +127,11 @@ namespace Audio
 						return SAMPLE_TYPE;
 					}
 
+					virtual ISampleJoiner& get_SampleJoiner()
+					{
+						return *m_pJoiner;
+					}
+
 					TEMPLATED_IUNKNOWN
 
 				protected:
@@ -122,14 +142,14 @@ namespace Audio
 							*pResult = dynamic_cast<IUnknown*>(dynamic_cast<ISampleReceiver*>(this));
 							return true;
 						}
-						if (riid == _uuidof(ISampleReceiver))
-						{
-							*pResult = dynamic_cast<ISampleReceiver*>(this);
-							return true;
-						}
 						if (riid == _uuidof(IOutputChannelPair))
 						{
 							*pResult = dynamic_cast<IOutputChannelPair*>(this);
+							return true;
+						}
+						if (riid == _uuidof(ISampleReceiver))
+						{
+							*pResult = dynamic_cast<ISampleReceiver*>(this);
 							return true;
 						}
 						*pResult = NULL;
@@ -161,7 +181,7 @@ namespace Audio
 					TSample* m_pOutputRightB;
 					int m_sampleCount;
 					bool m_writeSecondHalf;
-					//int m_iSamples;
+					ISampleJoiner* m_pJoiner;
 
 					unsigned long m_refCount;
 				};
