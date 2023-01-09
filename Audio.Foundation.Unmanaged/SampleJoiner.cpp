@@ -1,12 +1,13 @@
 #include "pch.h"
 #include "SampleJoiner.h"
 #include "SampleConversionUnmanaged.h"
+#include <algorithm>
 
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
-SampleJoiner::SampleJoiner(int sampleCount) :
-	SampleContainerBase(sampleCount),
+SampleJoiner::SampleJoiner(int sampleCount, int channelCount) :
+	SampleContainerBase(sampleCount, channelCount),
 	m_pTarget(NULL),
 	m_refCount(0)
 {
@@ -34,6 +35,11 @@ bool SampleJoiner::GetInterface(REFIID iid, void** ppvResult)
 		*ppvResult = dynamic_cast<ISampleJoiner*>(this);
 		return true;
 	}
+	if (iid == __uuidof(ISampleReceiver))
+	{
+		*ppvResult = dynamic_cast<ISampleReceiver*>(this);
+		return true;
+	}
 	if (iid == __uuidof(ISampleContainer))
 	{
 		*ppvResult = dynamic_cast<ISampleContainer*>(this);
@@ -45,17 +51,16 @@ bool SampleJoiner::GetInterface(REFIID iid, void** ppvResult)
 
 void SampleJoiner::Flush()
 {
-	LeftChannel->Flush();
-	RightChannel->Flush();
-
-	if(NULL != Target)
-		Target->Flush();
-}
-
-void SampleJoiner::Send()
-{
-	if(NULL != m_pTarget)
+	if (NULL != m_pTarget)
+	{
 		m_pTarget->Receive(*this);
+		m_pTarget->Flush();
+	}
+
+	for (int c = 0; c < ChannelCount; c++)
+	{
+		Channels[c]->Flush();
+	}
 }
 
 ISampleReceiver* SampleJoiner::get_Target()
@@ -78,18 +83,19 @@ void SampleJoiner::put_Target(ISampleReceiver* value)
 	}
 }
 
-void SampleJoiner::MixInput(float* pSourceLeft, float* pSourceRight, float level, float pan)
+void SampleJoiner::Receive(ISampleContainer& container)
 {
-	float* pDestLeft = this->LeftChannel->SamplePtr;
-	float* pDestRight = this->RightChannel->SamplePtr;
+	int maxChannels = min(container.ChannelCount, ChannelCount);
+	float chnLvl = ChannelCount / container.ChannelCount;
 
-	float lvlPanFactorLeft; 
-	float lvlPanFactorRight; 
-	SampleConversion::LevelAndPanFactor(level, pan, lvlPanFactorLeft, lvlPanFactorRight);
-
-	for(int i = 0; i < SampleCount; i++)
+	for (int c = 0; c < maxChannels; c++)
 	{
-		*pDestLeft++ = SampleConversion::AddSignals(*pDestLeft, *pSourceLeft++ * lvlPanFactorLeft);
-		*pDestRight++ = SampleConversion::AddSignals(*pDestRight, *pSourceRight++ * lvlPanFactorRight);
+		const float* pSource = container.Channels[c]->SamplePtr;
+		float* pDest = Channels[c]->SamplePtr;
+
+		for (int i = 0; i < SampleCount; i++)
+		{
+			*pDest++ = SampleConversion::AddSignals(*pDest, *pSource++ * chnLvl);
+		}
 	}
 }

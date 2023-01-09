@@ -16,20 +16,20 @@ namespace Audio
 		namespace Unmanaged
 		{
 			class SampleJoiner : public SampleContainerBase, 
-				public Audio::Foundation::Unmanaged::Abstractions::ISampleJoiner,
-				public Audio::Foundation::Unmanaged::Abstractions::ISampleContainer
+				public Abstractions::ISampleJoiner,
+				public Abstractions::ISampleReceiver,
+				public Abstractions::ISampleContainer
 			{
 			public:
-				SampleJoiner(int sampleCount);
+				SampleJoiner(int sampleCount, int channelCount);
 				virtual ~SampleJoiner();
 
-				virtual void Flush();
 				virtual ISampleReceiver* get_Target();
 				virtual void put_Target(ISampleReceiver* value);
 
-				virtual void Send();
+				virtual void Receive(Abstractions::ISampleContainer& container);
 
-				virtual void MixInput(float* pSourceLeft, float* pSourceRight, float level, float pan);
+				virtual void Flush();
 
 				DECLARE_IUNKNOWN
 
