@@ -45,12 +45,27 @@ namespace Lupus
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			string driverPattern = "Steinberg";
+			//string driverPattern = "Steinberg";
 			int maxTracks = 1;
+			RegisteredDriver? selectedDriver = null;
 
 			try
 			{
-				Model = MainModel.Create(driverPattern, maxTracks);
+				var dialog = new DriverSelectionDialog();
+
+				if (dialog.ShowDialog() == true)
+				{
+					selectedDriver = dialog.Model.SelectedDriver ?? throw new InvalidOperationException();
+					// NFO: If dialog returns true, SelecteDriver must not be null
+					Model = MainModel.Create(selectedDriver, maxTracks);
+				}
+				else
+				{
+					Close();
+					e.Handled = true;
+					return;
+				}
+				//Model = MainModel.Create(driverPattern, maxTracks);
 			}
 			catch (Exception? ex)
 			{
@@ -61,17 +76,12 @@ namespace Lupus
 					ex = ex.InnerException;
 				}
 				
-				MessageBox.Show($"Initialization of ASIO driver '{driverPattern}' (max. tracks: {maxTracks}) failed. {builder}", 
+				MessageBox.Show($"Initialization of ASIO driver '{selectedDriver}' (max. tracks: {maxTracks}) failed. {builder}", 
 					Title, MessageBoxButton.OK, MessageBoxImage.Error);
 
 				Close();
 				e.Handled = true;
 				return;
-			}
-
-			if (Model == null)
-			{
-				throw new InvalidOperationException("A model must be initialized first.");
 			}
 
 			// Configure trace source to write to console

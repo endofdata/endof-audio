@@ -1,0 +1,29 @@
+﻿<Window x:Class="Lupus.DriverSelectionDialog" x:ClassModifier="internal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Lupus"
+        mc:Ignorable="d"
+        Title="Select ASIO Driver" Height="320" Width="500">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="MinWidth" Value="90"/>
+            <Setter Property="Margin" Value="2"/>
+        </Style>
+    </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding x:Name="SelectDriver" Command="{x:Static ApplicationCommands.Save}" CanExecute="SelectDriver_CanExecute" Executed="SelectDriver_Executed"/>
+    </Window.CommandBindings>
+    <Grid Background="{x:Static SystemColors.ControlBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <ListView Grid.Row="0" ItemsSource="{Binding RegisteredDrivers, Mode=OneWay}" SelectedItem="{Binding SelectedDriver}" MouseDoubleClick="ListView_MouseDoubleClick" />
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content="Cancel" IsCancel="True"/>
+            <Button Content="OK" IsDefault="True" Command="{x:Static ApplicationCommands.Save}"/>
+        </StackPanel>
+    </Grid>
+</Window>

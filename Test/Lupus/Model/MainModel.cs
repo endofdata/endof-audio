@@ -48,20 +48,46 @@ namespace Lupus.Model
 			{
 				throw new ArgumentException($"'{nameof(driverPattern)}' cannot be null or empty.", nameof(driverPattern));
 			}
+			
+			return Create(AsioDevice.CreateFromNameLike(driverPattern), maxTracks, nameFormat);
+		}
+
+		public static MainModel Create(RegisteredDriver driver, int maxTracks, string? nameFormat = null)
+		{
+			if (driver is null)
+			{
+				throw new ArgumentNullException(nameof(driver));
+			}
+
+			return Create(AsioDevice.CreateFromGuid(driver.ClsId), maxTracks, nameFormat);
+		}
+
+		public static MainModel Create(AsioDevice device, int maxTracks, string? nameFormat = null)
+		{
+			if (device is null)
+			{
+				throw new ArgumentNullException(nameof(device));
+			}
 
 			if (maxTracks <= 0)
 			{
 				throw new ArgumentException($"'{nameof(maxTracks)}' must be greater than zero.");
 			}
 
-			var device = AsioDevice.CreateFromNameLike(driverPattern);
+			var inputChannels = device.AvailableInputChannels.Take(2).ToArray();
 
-			var inputChannel = device.AvailableInputChannels.First();
+			foreach (var key in inputChannels.Select(input => input.Key))
+			{
+				device.SelectInputChannel(key, isSelected: true);
+			}
+
 			var outputChannels = device.AvailableOutputChannels.Take(2).ToArray();
 
-			device.SelectInputChannel(inputChannel.Key, isSelected: true);
-			device.SelectOutputChannel(outputChannels[0].Key, isSelected: true);
-			device.SelectOutputChannel(outputChannels[1].Key, isSelected: true);
+			foreach (var key in outputChannels.Select(output => output.Key))
+			{
+				device.SelectOutputChannel(key, isSelected: true);
+			}
+
 			device.ActivateChannels();
 
 			var tapeMachine = new TapeMachine(new AsioRouter(device, device));
@@ -98,7 +124,12 @@ namespace Lupus.Model
 			{
 				if (disposing)
 				{
-					TapeMachine?.Dispose();
+					if (TapeMachine != null)
+					{
+						var router = TapeMachine.Router;
+						TapeMachine.Dispose();
+						router?.Dispose();
+					}
 				}
 				_isDisposed = true;
 			}
