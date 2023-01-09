@@ -86,9 +86,9 @@ void AsioCore::Initialize(REFCLSID clsid)
 
 	if (clsid == CLSID_AsioDebugDriver)
 	{
-		Debug::AsioDebugDriver* pDriver = new Debug::AsioDebugDriver();
+		Debug::AsioDebugDriver* pInstance = new Debug::AsioDebugDriver();
 
-		hr = pDriver->QueryInterface(clsid, (void**)&pDriver);
+		hr = pInstance->QueryInterface(clsid, (void**)&pDriver);
 	}
 	else
 	{
@@ -480,14 +480,14 @@ void AsioCore::SetInputMonitoring(int iInputChannel, int iOutputPair)
 {
 	if (m_iCurrentMonitorInput >= 0)
 	{
-		m_pInputChannels[m_iCurrentMonitorInput]->Monitor = NULL;
+		m_pInputChannels[m_iCurrentMonitorInput]->DirectMonitor = NULL;
 		m_iCurrentMonitorInput = -1;
 	}
 	if (0 <= iInputChannel && iInputChannel < m_iInputChannels)
 	{
 		if (0 <= iOutputPair && iOutputPair < m_iOutputChannelPairs)
 		{
-			m_pInputChannels[iInputChannel]->Monitor = m_pOutputChannelPairs[iOutputPair];
+			m_pInputChannels[iInputChannel]->DirectMonitor = m_pOutputChannelPairs[iOutputPair];
 			m_iCurrentMonitorInput = iInputChannel;
 		}
 	}
