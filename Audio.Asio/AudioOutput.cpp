@@ -13,7 +13,11 @@ using namespace Audio::Foundation::Abstractions;
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
-AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pHwChannel, int id) : m_isDisposed(false)
+AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pHwChannel, int id) : 
+	m_isDisposed(false),
+	m_pOutputChannelPair(NULL),
+	m_pOutputJoinerReceiver(NULL),
+	m_pOutputMeter(NULL)
 {
 	if(NULL == pHwChannel)
 		throw gcnew ArgumentNullException();
@@ -24,27 +28,28 @@ AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pH
 	m_channelId = id;
 
 	// Create output meter including meter update event handler
-	m_pOutputMeter = ObjectFactory::CreateMeterChannel(sampleCount);
+	m_pOutputMeter = ObjectFactory::CreateMeterChannel(sampleCount, 2);
 	m_pOutputMeter->RMSTime = 100;
-
 	MeterUpdateDelegate^ meterUpdateDelegate = gcnew MeterUpdateDelegate(this, &AudioOutput::OutputMeter_MeterUpdate);
 	m_meterUpdateDelegateHandle = GCHandle::Alloc(meterUpdateDelegate);
 	m_pOutputMeter->MeterUpdate = static_cast<MeterChannelCallback>(Marshal::GetFunctionPointerForDelegate(meterUpdateDelegate).ToPointer());
 
 	// Chain the output-channel receiver to the write-through of the meter channel
-	ISampleReceiver* pOutputSampleReceiver;
+	ISampleReceiver* pOutputSampleReceiver = NULL;
 	m_pOutputChannelPair->QueryInterface(_uuidof(ISampleReceiver), (void**)&pOutputSampleReceiver);
 	m_pOutputMeter->WriteThrough = pOutputSampleReceiver;
 	pOutputSampleReceiver->Release();
 
-	// Create master mix sample joiner
-	m_pMasterMix = ObjectFactory::CreateSampleJoiner(sampleCount);
-
 	// Chain the meter-channel receiver to the master mix
-	ISampleReceiver* pMeterSampleReceiver;
+	ISampleReceiver* pMeterSampleReceiver = NULL;
 	m_pOutputMeter->QueryInterface(__uuidof(ISampleReceiver), (void**)&pMeterSampleReceiver);
-	m_pMasterMix->Target = pMeterSampleReceiver;
+	m_pOutputChannelPair->SampleJoiner.Target = pMeterSampleReceiver;
 	pMeterSampleReceiver->Release();
+
+	// Store the ISampleReceiver iface of the output's sample joiner
+	ISampleReceiver* pOutputJoinerReceiver = NULL;
+	m_pOutputChannelPair->SampleJoiner.QueryInterface(__uuidof(ISampleReceiver), (void**)&pOutputJoinerReceiver);
+	m_pOutputJoinerReceiver = pOutputJoinerReceiver;
 }
 
 AudioOutput::~AudioOutput()
@@ -63,15 +68,15 @@ void AudioOutput::CleanUp(bool isDisposing)
 	{
 		m_isDisposed = true;
 
+		if (NULL != m_pOutputJoinerReceiver)
+		{
+			m_pOutputJoinerReceiver->Release();
+			m_pOutputJoinerReceiver = NULL;
+		}
 		if (NULL != m_pOutputMeter)
 		{
 			m_pOutputMeter->Release();
 			m_pOutputMeter = NULL;
-		}
-		if (NULL != m_pMasterMix)
-		{
-			m_pMasterMix->Release();
-			m_pMasterMix = NULL;
 		}
 		if (NULL != m_pOutputChannelPair)
 		{
@@ -90,7 +95,7 @@ int AudioOutput::ChannelId::get()
 
 Level AudioOutput::DbFS::get()
 {
-	return Level(m_pOutputMeter->DbLeft, m_pOutputMeter->DbRight);
+	return Level(m_pOutputMeter->DbFS[0], m_pOutputMeter->DbFS[1]);
 }
 
 IOutputChannelPair& AudioOutput::OutputChannelPair::get()
@@ -98,19 +103,9 @@ IOutputChannelPair& AudioOutput::OutputChannelPair::get()
 	return *m_pOutputChannelPair;
 }
 
-void AudioOutput::WriteCurrentFrame(array<float>^ frameBuffer, float level, float pan)
-{
-	if(nullptr != frameBuffer)
-	{
-		pin_ptr<float> pBuffer = &frameBuffer[0];
-		m_pMasterMix->MixInput(pBuffer, pBuffer, level, pan);
-	}
-}
-
 void AudioOutput::Send()
 {
-	m_pMasterMix->Send();
-	m_pMasterMix->Flush();
+	m_pOutputJoinerReceiver->Flush();
 }
 
 void AudioOutput::OnPropertyChanged(System::String^ propertyName)

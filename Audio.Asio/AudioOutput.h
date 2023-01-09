@@ -52,8 +52,6 @@ namespace Audio
 					}
 				}
 
-				virtual void WriteCurrentFrame(cli::array<System::Single>^ frameBuffer, float level, float pan);
-
 			internal:
 				AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pChannel, int id);
 				~AudioOutput();
@@ -72,9 +70,10 @@ namespace Audio
 
 				bool m_isDisposed;
 				int m_channelId;
-				ISampleJoiner* m_pMasterMix;
 				IMeterChannel* m_pOutputMeter;
 				IOutputChannelPair* m_pOutputChannelPair;
+				ISampleReceiver* m_pOutputJoinerReceiver;
+
 				System::Runtime::InteropServices::GCHandle m_meterUpdateDelegateHandle;
 
 				System::ComponentModel::PropertyChangedEventHandler^ m_propertyChangedEventHandler;
