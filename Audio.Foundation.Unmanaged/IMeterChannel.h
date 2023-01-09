@@ -20,6 +20,10 @@ namespace Audio
 
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("fcc39f32-a0c4-4ece-a562-0a051c153a95")) IMeterChannel : public IUnknown
 				{
+					int get_ChannelCount() = 0;
+
+					_declspec(property(get = get_ChannelCount)) int ChannelCount;
+
 					int get_RMSTime() = 0;
 					void put_RMSTime(int value) = 0;
 

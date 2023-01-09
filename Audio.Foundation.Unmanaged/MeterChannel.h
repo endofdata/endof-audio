@@ -18,12 +18,14 @@ namespace Audio
 			class MeterChannel : public ISampleReceiver, public IMeterChannel
 			{
 			public:
-				MeterChannel(int sampleRate);
+				MeterChannel(int sampleRate, int channelCount);
 				virtual ~MeterChannel();
 
 				virtual void Flush();
 
 				virtual void Receive(ISampleContainer& inputBuffer);
+
+				virtual int get_ChannelCount();
 
 				virtual int get_RMSTime();
 				virtual void put_RMSTime(int value);

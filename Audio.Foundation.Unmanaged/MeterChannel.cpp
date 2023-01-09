@@ -8,13 +8,15 @@
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
-MeterChannel::MeterChannel(int sampleRate) :
+MeterChannel::MeterChannel(int sampleRate, int channelCount) :
 	m_sampleRate(sampleRate),
 	m_iSamplesPerRMSFrame(880), // ~20 ms @ 44.1 kHz
 	m_meterUpdate(NULL),
 	m_pWriteThrough(NULL),
 	m_refCount(0)
 {
+	m_vecSumUp.resize(channelCount, 0.0);
+	m_vecDbFS.resize(channelCount, 0.0f);
 	Flush();
 }
 
@@ -71,12 +73,11 @@ void MeterChannel::Receive(ISampleContainer& input)
 		m_pWriteThrough->Receive(input);
 	}
 
-	if (input.ChannelCount > 0)
-	{
-		m_vecSumUp.resize(input.ChannelCount, 0.0);
-		m_vecDbFS.resize(input.ChannelCount, 0.0f);
+	int maxChannels = min(input.ChannelCount, m_vecSumUp.size());
 
-		for (int c = 0; c < input.ChannelCount; c++)
+	if (maxChannels > 0)
+	{
+		for (int c = 0; c < maxChannels; c++)
 		{
 			ISampleBuffer* pChannel = input.Channels[c];
 			SampleConversion::ContinueRMSSumUp(pChannel->SamplePtr, pChannel->SampleCount, m_vecSumUp.at(c));
@@ -99,6 +100,11 @@ void MeterChannel::Receive(ISampleContainer& input)
 			OnMeterUpdate();
 		}
 	}
+}
+
+int MeterChannel::get_ChannelCount()
+{
+	return m_vecDbFS.size();
 }
 
 float MeterChannel::get_DbFS(int index)
