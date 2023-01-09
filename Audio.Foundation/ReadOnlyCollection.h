@@ -93,12 +93,7 @@ namespace Audio
 
 				virtual void Clear()
 				{
-					int idx = 0;
-
-					for each (TItem item in m_itemList)
-					{
-						OnCollectionChanged(NotifyCollectionChangedAction::Remove, item, idx++);
-					}
+					OnCollectionChanged(NotifyCollectionChangedAction::Reset, TItem(), -1);
 					m_itemList->Clear();
 				}
 
