@@ -22,7 +22,6 @@ namespace Audio
 					Level get();
 				}
 
-				void WriteCurrentFrame(cli::array<System::Single>^ frameBuffer, float level, float pan);
 			};
 		}
 	}
