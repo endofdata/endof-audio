@@ -8,6 +8,7 @@
 
 using namespace System;
 using namespace System::Runtime::InteropServices;
+using namespace System::Collections::Generic;
 using namespace Audio::Asio;
 using namespace Audio::Asio::Interop;
 using namespace Audio::Foundation;
@@ -20,24 +21,24 @@ AudioInput::AudioInput(int sampleRate, IInputChannel* pHwChannel, int id) : m_is
 	if(NULL == pHwChannel)
 		throw gcnew ArgumentNullException();
 
+	pHwChannel->AddRef();
+	m_pInputChannel = pHwChannel;
 	m_channelId = id;
 
-	m_pInputMeter = Audio::Foundation::Unmanaged::ObjectFactory::CreateMeterChannel(sampleRate);
+	m_targets = gcnew List<IAudioOutput^>();
+
+	int inputChannels = m_pInputChannel->SampleSharer.Source->ChannelCount;
+
+	m_pInputMeter = Audio::Foundation::Unmanaged::ObjectFactory::CreateMeterChannel(sampleRate, inputChannels);
 	m_pInputMeter->RMSTime = 100;
 	MeterUpdateDelegate^ meterUpdateDelegate = gcnew MeterUpdateDelegate(this, &AudioInput::InputMeter_MeterUpdate);
 	m_meterUpdateDelegateHandle = GCHandle::Alloc(meterUpdateDelegate);
 	m_pInputMeter->MeterUpdate = static_cast<MeterChannelCallback>(Marshal::GetFunctionPointerForDelegate(meterUpdateDelegate).ToPointer());
 
-	ISampleReceiver* pSampleReceiver;
-
-	m_pInputMeter->QueryInterface(__uuidof(ISampleReceiver), (void**)&pSampleReceiver);
-
-	pHwChannel->AddRef();
-	m_pInputChannel = pHwChannel;
-
-	m_pInputChannel->SampleSharer.AddTarget(*pSampleReceiver);
-
-	pSampleReceiver->Release();
+	ISampleReceiver* pMeteringReceiver;
+	m_pInputMeter->QueryInterface(__uuidof(ISampleReceiver), (void**)&pMeteringReceiver);
+	m_pInputChannel->SampleSharer.AddTarget(*pMeteringReceiver);
+	pMeteringReceiver->Release();
 }
 
 AudioInput::~AudioInput()
@@ -70,6 +71,7 @@ void AudioInput::CleanUp(bool isDisposing)
 
 		m_meterUpdateDelegateHandle.Free();
 	}
+		RemoveAllTargets();
 }
 
 int AudioInput::ChannelId::get()
@@ -79,7 +81,8 @@ int AudioInput::ChannelId::get()
 
 Level AudioInput::DbFS::get()
 {
-	return Level(m_pInputMeter->DbLeft, m_pInputMeter->DbRight);
+	// We have only a single channel, so use index 0 twice
+	return Level(m_pInputMeter->DbFS[0], m_pInputMeter->DbFS[0]);
 }
 
 bool AudioInput::IsActive::get()
@@ -107,24 +110,76 @@ void AudioInput::Monitor::set(IAudioOutput^ value)
 
 		if (output == nullptr)
 		{
-			m_pInputChannel->Monitor = NULL;
+			m_pInputChannel->DirectMonitor = NULL;
 		}
 		else
 		{
-			m_pInputChannel->Monitor = &output->OutputChannelPair;
+			m_pInputChannel->DirectMonitor = &output->OutputChannelPair;
 		}
 	}
 	else
-		m_pInputChannel->Monitor = NULL;
+	{
+		m_pInputChannel->DirectMonitor = NULL;
+	}
 	m_monitor = value;
 
 	OnPropertyChanged(MonitorProperty);
 }
 
-void AudioInput::ReadCurrentFrame(array<float>^ frameBuffer)
-{	
-	// TODO: Why do we always access left channel here?
-	System::Runtime::InteropServices::Marshal::Copy(System::IntPtr((void*)m_pInputChannel->SampleSharer.Source->LeftChannel->SamplePtr), frameBuffer, 0, frameBuffer->Length);
+// virtual 
+bool AudioInput::AddTarget(IAudioOutput^ target)
+{
+	if (!m_targets->Contains(target))
+	{
+		AudioOutput^ output = safe_cast<AudioOutput^>(target);
+
+		if (output != nullptr)
+		{
+			ISampleReceiver* pJoinerAsReceiver = NULL;
+
+			if (SUCCEEDED(output->OutputChannelPair.SampleJoiner.QueryInterface(__uuidof(ISampleReceiver), (void**)&pJoinerAsReceiver)))
+			{
+				m_pInputChannel->SampleSharer.AddTarget(*pJoinerAsReceiver);
+				m_targets->Add(target);
+				pJoinerAsReceiver->Release();
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+// virtual 
+bool AudioInput::RemoveTarget(IAudioOutput^ target)
+{
+	if (m_targets->Remove(target))
+	{
+		UnlinkTarget(target);
+		return true;
+	}
+	return false;
+}
+
+// virtual
+void AudioInput::RemoveAllTargets()
+{
+	for each (IAudioOutput ^ target in m_targets)
+	{
+		UnlinkTarget(target);
+	}
+}
+
+void AudioInput::UnlinkTarget(IAudioOutput^ target)
+{
+	AudioOutput^ output = safe_cast<AudioOutput^>(target);
+
+	ISampleReceiver* pJoinerAsReceiver = NULL;
+
+	if (SUCCEEDED(output->OutputChannelPair.SampleJoiner.QueryInterface(__uuidof(ISampleReceiver), (void**)&pJoinerAsReceiver)))
+	{
+		m_pInputChannel->SampleSharer.RemoveTarget(*pJoinerAsReceiver);
+		pJoinerAsReceiver->Release();
+	}
 }
 
 void AudioInput::OnPropertyChanged(System::String^ propertyName)

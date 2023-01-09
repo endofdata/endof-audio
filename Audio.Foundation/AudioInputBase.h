@@ -41,7 +41,9 @@ namespace Audio
 					virtual void set(IAudioOutput^ value);
 				}
 
-				virtual void ReadCurrentFrame(cli::array<System::Single>^ frameBuffer) = 0;
+				virtual bool AddTarget(IAudioOutput^ target) = 0;
+				virtual bool RemoveTarget(IAudioOutput^ target) = 0;
+				virtual void RemoveAllTargets() = 0;
 
 			private:
 				int m_channelId;

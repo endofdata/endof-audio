@@ -15,7 +15,7 @@ namespace Audio
 		{
 			delegate void MeterUpdateDelegate(System::IntPtr pSender);
 
-			public ref class AudioInput sealed : public System::ComponentModel::INotifyPropertyChanged, public IAudioInput
+			public ref class AudioInput sealed : public System::ComponentModel::INotifyPropertyChanged, public Audio::Foundation::Abstractions::IAudioInput
 			{
 			public:
 				static initonly System::String^ DbFSProperty = gcnew System::String("DbFS");
@@ -68,7 +68,11 @@ namespace Audio
 					}
 				}
 
-				virtual void ReadCurrentFrame(cli::array<System::Single>^ frameBuffer);
+				virtual bool AddTarget(IAudioOutput^ target);
+
+				virtual bool RemoveTarget(IAudioOutput^ target);
+
+				virtual void RemoveAllTargets();
 
 			internal:
 				AudioInput(int sampleRate, IInputChannel* pChannel, int id);
@@ -79,11 +83,13 @@ namespace Audio
 				void InputMeter_MeterUpdate(System::IntPtr sender);
 				void OnPropertyChanged(System::String^ propertyName);
 				void CleanUp(bool isDisposing);
+				void UnlinkTarget(IAudioOutput^ target);
 
 				bool m_isDisposed;
 				int m_channelId;
 				IMeterChannel* m_pInputMeter;
 				IInputChannel* m_pInputChannel;
+				System::Collections::Generic::List<IAudioOutput^>^ m_targets;
 				System::Runtime::InteropServices::GCHandle m_meterUpdateDelegateHandle;
 
 				IAudioOutput^ m_monitor;
