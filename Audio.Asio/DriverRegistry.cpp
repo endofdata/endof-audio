@@ -69,6 +69,12 @@ DriverRegistry^ DriverRegistry::FromRegistry()
 		result->Add(gcnew RegisteredDriver(clsidString, name));
 	}
 
+#if _DEBUG
+	ReadOnlySpan<byte> span((unsigned char*)&CLSID_AsioDebugDriver, sizeof(GUID));
+
+	result->Add(gcnew RegisteredDriver(Guid::Guid(span).ToString(), "ASIO Debug Driver"));
+#endif
+
 	asioRoot->Close();
 
 	return result;
