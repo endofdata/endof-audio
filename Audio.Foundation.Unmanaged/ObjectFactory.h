@@ -21,13 +21,13 @@ namespace Audio
 			class _AUDIO_FOUNDATION_UNMANAGED_API ObjectFactory
 			{
 			public:
-				static IMeterChannel* CreateMeterChannel(int sampleRate);
+				static IMeterChannel* CreateMeterChannel(int sampleRate, int channelCount);
 
 				static ISampleBuffer* CreateSampleBuffer(int sampleCount);
 
-				static ISampleJoiner* CreateSampleJoiner(int sampleCount);
+				static ISampleJoiner* CreateSampleJoiner(int sampleCount, int channelCount);
 
-				static ISampleContainer* CreateSampleContainer(int sampleCount);
+				static ISampleContainer* CreateSampleContainer(int sampleCount, int channelCount);
 
 				static ISampleSharer* CreateSampleSharer();
 

@@ -12,9 +12,9 @@ using namespace Audio::Foundation::Unmanaged;
 // TODO: Constructors must AddRef for received interfaces
 
 // static
-IMeterChannel* ObjectFactory::CreateMeterChannel(int sampleRate)
+IMeterChannel* ObjectFactory::CreateMeterChannel(int sampleRate, int channelCount)
 {
-	MeterChannel* instance = new MeterChannel(sampleRate);
+	MeterChannel* instance = new MeterChannel(sampleRate, channelCount);
 	IMeterChannel* result;
 	if (FAILED(instance->QueryInterface(__uuidof(IMeterChannel), (void**)&result)))
 	{
@@ -36,9 +36,9 @@ ISampleBuffer* ObjectFactory::CreateSampleBuffer(int sampleCount)
 }
 
 // static
-ISampleJoiner* ObjectFactory::CreateSampleJoiner(int sampleCount)
+ISampleJoiner* ObjectFactory::CreateSampleJoiner(int sampleCount, int channelCount)
 {
-	SampleJoiner* instance = new SampleJoiner(sampleCount);
+	SampleJoiner* instance = new SampleJoiner(sampleCount, channelCount);
 	ISampleJoiner* result;
 	if (FAILED(instance->QueryInterface(__uuidof(ISampleJoiner), (void**)&result)))
 	{
@@ -48,9 +48,9 @@ ISampleJoiner* ObjectFactory::CreateSampleJoiner(int sampleCount)
 }
 
 // static
-ISampleContainer* ObjectFactory::CreateSampleContainer(int sampleCount)
+ISampleContainer* ObjectFactory::CreateSampleContainer(int sampleCount, int channelCount)
 {
-	SampleContainer* instance = new SampleContainer(sampleCount);
+	SampleContainer* instance = new SampleContainer(sampleCount, channelCount);
 	ISampleContainer* result;
 	if (FAILED(instance->QueryInterface(__uuidof(ISampleContainer), (void**)&result)))
 	{
