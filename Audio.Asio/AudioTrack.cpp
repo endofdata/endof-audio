@@ -101,14 +101,29 @@ void AudioTrack::MonitorOut::set(IAudioOutput^ value)
 {
 	if (value != m_monitorOut)
 	{
+		bool wasMonitoring = false;
+
+		if (m_monitorOut != nullptr)
+		{
+			wasMonitoring = m_recordIn->RemoveTarget(m_monitorOut);
+		}
 		m_monitorOut = value;
 
 		OnPropertyChanged(MonitorOutProperty);
 
 		if (nullptr == value)
+		{
 			TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 102, "Trk {0}: MonitorOut = null", m_trackId);
+		}
 		else
+		{
 			TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 102, "Trk {0}: MonitorOut = channel pair {1}", m_trackId, value->ChannelId);
+
+			if (wasMonitoring)
+			{
+				m_recordIn->AddTarget(m_monitorOut);
+			}
+		}
 	}
 }
 
@@ -178,7 +193,11 @@ void AudioTrack::IsHot::set(bool value)
 
 			m_isHot = value;
 			m_recordIn->IsActive = true;
-
+			
+			if (m_monitorOut != nullptr)
+			{
+				m_recordIn->AddTarget(m_monitorOut);
+			}
 			Prepare();
 		}
 		else
@@ -188,6 +207,10 @@ void AudioTrack::IsHot::set(bool value)
 			if (IsReady)
 			{
 				m_recordIn->IsActive = false;
+				if (m_monitorOut != nullptr)
+				{
+					m_recordIn->RemoveTarget(m_monitorOut);
+				}
 			}
 			m_isHot = value;
 
@@ -363,7 +386,7 @@ bool AudioTrack::NextFrame()
 		if (IsHot)
 		{
 			// TODO: Implement 'CopyCurrentFrame' w/o marshalling?
-			RecordIn->ReadCurrentFrame(m_pCurrentFrame);
+			//RecordIn->ReadCurrentFrame(m_pCurrentFrame);
 
 			if (IsRecording)
 			{
@@ -423,8 +446,8 @@ bool AudioTrack::NextFrame()
 
 void AudioTrack::Send()
 {
-	if (nullptr != MonitorOut && !IsSilent)
-		MonitorOut->WriteCurrentFrame(m_pCurrentFrame, Level, Pan);
+	//if (nullptr != MonitorOut && !IsSilent)
+	//	MonitorOut->WriteCurrentFrame(m_pCurrentFrame, Level, Pan);
 }
 
 String^ AudioTrack::ToString()
