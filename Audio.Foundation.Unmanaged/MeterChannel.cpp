@@ -8,6 +8,8 @@
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
+const float MeterChannel::DbFSMin = -1000.0f;
+
 MeterChannel::MeterChannel(int sampleRate, int channelCount) :
 	m_sampleRate(sampleRate),
 	m_iSamplesPerRMSFrame(880), // ~20 ms @ 44.1 kHz
@@ -16,7 +18,7 @@ MeterChannel::MeterChannel(int sampleRate, int channelCount) :
 	m_refCount(0)
 {
 	m_vecSumUp.resize(channelCount, 0.0);
-	m_vecDbFS.resize(channelCount, 0.0f);
+	m_vecDbFS.resize(channelCount, DbFSMin);
 	Flush();
 }
 
@@ -60,7 +62,7 @@ void MeterChannel::Flush()
 
 	std::for_each(m_vecDbFS.begin(), m_vecDbFS.end(), [](float& value)
 	{
-		value = 0.0f;
+		value = DbFSMin;
 	});
 }
 

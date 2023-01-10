@@ -46,6 +46,8 @@ namespace Audio
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
+				static const float DbFSMin;
+
 				MeterChannelCallback m_meterUpdate;
 				ISampleReceiverPtr m_pWriteThrough;
 
