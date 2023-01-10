@@ -57,6 +57,8 @@ void AudioInput::CleanUp(bool isDisposing)
 	{
 		m_isDisposed = true;
 
+		RemoveAllTargets();
+
 		if (m_pInputChannel != NULL)
 		{
 			m_pInputChannel->Release();
@@ -71,7 +73,6 @@ void AudioInput::CleanUp(bool isDisposing)
 
 		m_meterUpdateDelegateHandle.Free();
 	}
-		RemoveAllTargets();
 }
 
 Level AudioInput::DbFS::get()
@@ -101,8 +102,6 @@ bool AudioInput::OnSetMonitor(IAudioOutput^ value)
 		m_pInputChannel->DirectMonitor = NULL;
 	}
 	AudioInputBase::Monitor = value;
-
-	OnPropertyChanged(MonitorProperty);
 
 	return true;
 }
@@ -136,11 +135,6 @@ void AudioInput::OnRemoveTarget(IAudioOutput^ target)
 		m_pInputChannel->SampleSharer.RemoveTarget(*pJoinerAsReceiver);
 		pJoinerAsReceiver->Release();
 	}
-}
-
-void AudioInput::OnPropertyChanged(System::String^ propertyName)
-{
-	PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(propertyName));
 }
 
 void AudioInput::InputMeter_MeterUpdate(IntPtr sender)

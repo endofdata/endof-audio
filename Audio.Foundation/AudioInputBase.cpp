@@ -22,6 +22,8 @@ int AudioInputBase::ChannelId::get()
 void AudioInputBase::ChannelId::set(int value)
 {
 	m_channelId = value;
+
+	OnPropertyChanged(ChannelIdProperty);
 }
 
 System::Boolean AudioInputBase::IsActive::get()
@@ -32,6 +34,7 @@ System::Boolean AudioInputBase::IsActive::get()
 void AudioInputBase::IsActive::set(System::Boolean value)
 {
 	m_isActive = value;
+	OnPropertyChanged(IsActiveProperty);
 }
 
 
@@ -45,6 +48,7 @@ void AudioInputBase::Monitor::set(IAudioOutput^ value)
 	if (OnSetMonitor(value))
 	{
 		m_monitor = value;
+		OnPropertyChanged(MonitorProperty);
 	}
 }
 
@@ -61,6 +65,7 @@ bool AudioInputBase::AddTarget(IAudioOutput^ target)
 		if (OnAddTarget(target))
 		{
 			m_targets->Add(target);
+			OnPropertyChanged(TargetsProperty);
 
 			return true;
 		}
@@ -73,6 +78,8 @@ bool AudioInputBase::RemoveTarget(IAudioOutput^ target)
 	if (m_targets->Remove(target))
 	{
 		OnRemoveTarget(target);
+		OnPropertyChanged(TargetsProperty);
+
 		return true;
 	}
 	return false;
@@ -84,4 +91,10 @@ void AudioInputBase::RemoveAllTargets()
 	{
 		OnRemoveTarget(target);
 	}
+	OnPropertyChanged(TargetsProperty);
+}
+
+void AudioInputBase::OnPropertyChanged(System::String^ propertyName)
+{
+	PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(propertyName));
 }
