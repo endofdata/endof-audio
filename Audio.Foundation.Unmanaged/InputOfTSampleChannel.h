@@ -48,9 +48,6 @@ namespace Audio
 					*/
 					virtual ~InputOfTSampleChannel()
 					{
-						put_DirectMonitor(NULL);
-						m_pContainer->Release();
-						m_pSharer->Release();
 					}
 
 					virtual void Swap(bool readSecondHalf)
@@ -93,24 +90,14 @@ namespace Audio
 						m_pContainer->IsActive = value;
 					}
 
-					virtual IOutputChannelPair* get_DirectMonitor()
+					virtual IOutputChannelPairPtr get_DirectMonitor()
 					{
 						return m_pDirectMonitor;
 					}
 
-					virtual void put_DirectMonitor(IOutputChannelPair* value)
+					virtual void put_DirectMonitor(IOutputChannelPairPtr value)
 					{
-						if (value != NULL)
-						{
-							value->AddRef();
-						}
-
-						IOutputChannelPair* pMonitor = (IOutputChannelPair*)InterlockedExchangePointer((void**)&m_pDirectMonitor, value);
-
-						if (pMonitor != NULL)
-						{
-							pMonitor->Release();
-						}						
+						m_pDirectMonitor = value;
 					}
 
 					virtual int get_SampleType()
@@ -118,9 +105,9 @@ namespace Audio
 						return SAMPLE_TYPE;
 					}
 
-					virtual ISampleSharer& get_SampleSharer()
+					virtual ISampleSharerPtr get_SampleSharer()
 					{
-						return *m_pSharer;
+						return m_pSharer;
 					}
 
 					TEMPLATED_IUNKNOWN
@@ -155,11 +142,11 @@ namespace Audio
 					TSample* m_pBufferB;
 					bool m_readSecondHalf;
 
-					IOutputChannelPair* m_pDirectMonitor;
+					IOutputChannelPairPtr m_pDirectMonitor;
 
 					// was derived from...
-					ISampleContainer* m_pContainer;
-					ISampleSharer* m_pSharer;
+					ISampleContainerPtr m_pContainer;
+					ISampleSharerPtr m_pSharer;
 
 					unsigned long m_refCount;
 				};

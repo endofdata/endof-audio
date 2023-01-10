@@ -4,6 +4,8 @@
 #include <Windows.h>
 #include <Audio.Foundation.Unmanaged.h>
 #include <comdef.h>
+#include <ISampleReceiver.h>
+
 namespace Audio
 {
 	namespace Foundation

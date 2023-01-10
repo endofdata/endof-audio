@@ -58,7 +58,6 @@ namespace Audio
 					*/
 					virtual ~OutputOfTSampleChannelPair()
 					{
-						m_pJoiner->Release();
 					}
 
 					/*! \brief Sets the current write position to the indicated buffer half
@@ -79,15 +78,15 @@ namespace Audio
 					{
 					}
 
-					virtual void Receive(ISampleContainer& input)
+					virtual void Receive(ISampleContainerPtr input)
 					{
-						int inputChannels = input.ChannelCount;
+						int inputChannels = input->ChannelCount;
 
 						if (inputChannels > 0)
 						{
 							int rightChannel = inputChannels == 1 ? 0 : 1;
-							const float* pSourceLeft = input.Channels[0]->SamplePtr;
-							const float* pSourceRight = input.Channels[rightChannel]->SamplePtr;
+							const float* pSourceLeft = input->Channels[0]->SamplePtr;
+							const float* pSourceRight = input->Channels[rightChannel]->SamplePtr;
 
 							TSample* pTargetLeft;
 							TSample* pTargetRight;
@@ -127,9 +126,9 @@ namespace Audio
 						return SAMPLE_TYPE;
 					}
 
-					virtual ISampleJoiner& get_SampleJoiner()
+					virtual ISampleJoinerPtr get_SampleJoiner()
 					{
-						return *m_pJoiner;
+						return m_pJoiner;
 					}
 
 					TEMPLATED_IUNKNOWN
@@ -181,7 +180,7 @@ namespace Audio
 					TSample* m_pOutputRightB;
 					int m_sampleCount;
 					bool m_writeSecondHalf;
-					ISampleJoiner* m_pJoiner;
+					ISampleJoinerPtr m_pJoiner;
 
 					unsigned long m_refCount;
 				};

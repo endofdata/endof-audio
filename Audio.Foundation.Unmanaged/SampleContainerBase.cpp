@@ -76,7 +76,7 @@ void SampleContainerBase::put_IsActive(bool value)
 // virtual
 int SampleContainerBase::get_ChannelCount()
 {
-	return m_vecChannels.size();
+	return (int)m_vecChannels.size();
 }
 
 // virtual

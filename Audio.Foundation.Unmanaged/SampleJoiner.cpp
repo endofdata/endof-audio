@@ -75,7 +75,7 @@ void SampleJoiner::put_Target(ISampleReceiverPtr value)
 void SampleJoiner::Receive(ISampleContainerPtr container)
 {
 	int maxChannels = min(container->ChannelCount, ChannelCount);
-	float chnLvl = ChannelCount / container->ChannelCount;
+	float chnLvl = (float)(ChannelCount / container->ChannelCount);
 
 	for (int c = 0; c < maxChannels; c++)
 	{

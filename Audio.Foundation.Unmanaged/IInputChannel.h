@@ -4,7 +4,8 @@
 #include <Windows.h>
 #include <Audio.Foundation.Unmanaged.h>
 #include <comdef.h>
-
+#include <ISampleSharer.h>
+#include <IOutputChannelPair.h>
 
 namespace Audio
 {
@@ -14,10 +15,6 @@ namespace Audio
 		{
 			namespace Abstractions
 			{
-				__interface ISampleContainer;
-				__interface ISampleSharer;
-				__interface ISampleReceiver;
-				__interface IOutputChannelPair;
 
 				/// <summary>
 				/// Connects an input <see cref="ISampleContainer"/> to a target <see cref="ISampleSharer"/> with optional monitoring.
@@ -35,12 +32,12 @@ namespace Audio
 					/// </summary>
 					_declspec(property(get = get_IsActive, put = put_IsActive)) bool IsActive;
 
-					ISampleSharer& get_SampleSharer() = 0;
+					ISampleSharerPtr get_SampleSharer() = 0;
 
 					/// <summary>
 					/// Gets the target sample sharer that distributes the input samples to a collection of <see cref="ISampleReceiver"/> instances.
 					/// </summary>
-					_declspec(property(get = get_SampleSharer)) ISampleSharer& SampleSharer;
+					_declspec(property(get = get_SampleSharer)) ISampleSharerPtr SampleSharer;
 
 					int get_SampleType() = 0;
 
@@ -50,8 +47,8 @@ namespace Audio
 					_declspec(property(get = get_SampleType)) int SampleType;
 
 
-					IOutputChannelPair* get_DirectMonitor() = 0;
-					void put_DirectMonitor(IOutputChannelPair* value) = 0;
+					IOutputChannelPairPtr get_DirectMonitor() = 0;
+					void put_DirectMonitor(IOutputChannelPairPtr value) = 0;
 
 					/// <summary>
 					/// Gets or sets the optional <see cref="IOutputChannelPair"/> that is used as direct-input monitoring device.
@@ -59,7 +56,7 @@ namespace Audio
 					/// <remarks>
 					/// Direct-input monitoring copies the input samples to the output buffers w/o sample conversion
 					/// </remarks>
-					_declspec(property(get = get_DirectMonitor, put = put_DirectMonitor)) IOutputChannelPair* DirectMonitor;
+					_declspec(property(get = get_DirectMonitor, put = put_DirectMonitor)) IOutputChannelPairPtr DirectMonitor;
 
 					/// <summary>
 					/// Invoked for each ASIO buffer switch
@@ -76,6 +73,8 @@ namespace Audio
 					/// </summary>
 					void Send() = 0;
 				};
+
+				_COM_SMARTPTR_TYPEDEF(IInputChannel, __uuidof(IInputChannel));
 			}
 		}
 	}
