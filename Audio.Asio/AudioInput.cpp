@@ -27,7 +27,7 @@ AudioInput::AudioInput(int sampleRate, IInputChannel* pHwChannel, int id) :
 	pHwChannel->AddRef();
 	m_pInputChannel = pHwChannel;
 
-	int inputChannels = m_pInputChannel->SampleSharer.Source->ChannelCount;
+	int inputChannels = m_pInputChannel->SampleSharer->Source->ChannelCount;
 
 	m_pInputMeter = Audio::Foundation::Unmanaged::ObjectFactory::CreateMeterChannel(sampleRate, inputChannels);
 	m_pInputMeter->RMSTime = 100;
@@ -37,7 +37,7 @@ AudioInput::AudioInput(int sampleRate, IInputChannel* pHwChannel, int id) :
 
 	ISampleReceiver* pMeteringReceiver;
 	m_pInputMeter->QueryInterface(__uuidof(ISampleReceiver), (void**)&pMeteringReceiver);
-	m_pInputChannel->SampleSharer.AddTarget(*pMeteringReceiver);
+	m_pInputChannel->SampleSharer->AddTarget(pMeteringReceiver);
 	pMeteringReceiver->Release();
 }
 
@@ -116,7 +116,7 @@ bool AudioInput::OnAddTarget(IAudioOutput^ target)
 
 		if (SUCCEEDED(output->OutputChannelPair.SampleJoiner.QueryInterface(__uuidof(ISampleReceiver), (void**)&pJoinerAsReceiver)))
 		{
-			m_pInputChannel->SampleSharer.AddTarget(*pJoinerAsReceiver);
+			m_pInputChannel->SampleSharer->AddTarget(pJoinerAsReceiver);
 			pJoinerAsReceiver->Release();
 			return true;
 		}
@@ -132,7 +132,7 @@ void AudioInput::OnRemoveTarget(IAudioOutput^ target)
 
 	if (SUCCEEDED(output->OutputChannelPair.SampleJoiner.QueryInterface(__uuidof(ISampleReceiver), (void**)&pJoinerAsReceiver)))
 	{
-		m_pInputChannel->SampleSharer.RemoveTarget(*pJoinerAsReceiver);
+		m_pInputChannel->SampleSharer->RemoveTarget(pJoinerAsReceiver);
 		pJoinerAsReceiver->Release();
 	}
 }
