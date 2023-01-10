@@ -11,7 +11,7 @@ namespace Audio
 	{
 		namespace Interop
 		{
-			public ref class AudioInputBase abstract : public ::Audio::Foundation::Abstractions::IAudioInput
+			public ref class AudioInputBase abstract //: public ::Audio::Foundation::Abstractions::IAudioInput
 			{
 			public:
 				AudioInputBase(int channelId);
@@ -25,8 +25,7 @@ namespace Audio
 
 				property Level DbFS
 				{
-					virtual Level get();
-					virtual void set(Level value);
+					virtual Level get() = 0;
 				}
 
 				property System::Boolean IsActive
@@ -41,15 +40,25 @@ namespace Audio
 					virtual void set(IAudioOutput^ value);
 				}
 
-				virtual bool AddTarget(IAudioOutput^ target) = 0;
-				virtual bool RemoveTarget(IAudioOutput^ target) = 0;
-				virtual void RemoveAllTargets() = 0;
+				property System::Collections::Generic::IEnumerable<IAudioOutput^>^ Targets
+				{
+					virtual System::Collections::Generic::IEnumerable<IAudioOutput^>^ get();
+				}
+
+				virtual bool AddTarget(IAudioOutput^ target);
+				virtual bool RemoveTarget(IAudioOutput^ target);
+				virtual void RemoveAllTargets();
+
+			protected:
+				virtual bool OnSetMonitor(IAudioOutput^ monitor) = 0;
+				virtual bool OnAddTarget(IAudioOutput^ target) = 0;
+				virtual void OnRemoveTarget(IAudioOutput^ target) = 0;
 
 			private:
 				int m_channelId;
-				Level m_dbFS;
 				bool m_isActive;
 				IAudioOutput^ m_monitor;
+				System::Collections::Generic::List<IAudioOutput^>^ m_targets;
 			};
 		}
 	}

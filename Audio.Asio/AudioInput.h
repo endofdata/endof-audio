@@ -15,7 +15,7 @@ namespace Audio
 		{
 			delegate void MeterUpdateDelegate(System::IntPtr pSender);
 
-			public ref class AudioInput sealed : public System::ComponentModel::INotifyPropertyChanged, public Audio::Foundation::Abstractions::IAudioInput
+			public ref class AudioInput sealed : public Audio::Foundation::Interop::AudioInputBase, public ::Audio::Foundation::Abstractions::IAudioInput, public System::ComponentModel::INotifyPropertyChanged
 			{
 			public:
 				static initonly System::String^ DbFSProperty = gcnew System::String("DbFS");
@@ -23,26 +23,9 @@ namespace Audio
 				static initonly System::String^ MonitorProperty = gcnew System::String("Monitor");
 
 
-				property int ChannelId
-				{
-					virtual int get();
-				}
-
 				property Level DbFS
 				{
-					virtual Level get();
-				}
-
-				property bool IsActive
-				{
-					virtual bool get();
-					virtual void set(bool value);
-				}
-
-				property IAudioOutput^ Monitor
-				{
-					virtual IAudioOutput^ get();
-					virtual void set(IAudioOutput^ value);
+					virtual Level get() override;
 				}
 
 				virtual event System::ComponentModel::PropertyChangedEventHandler^ PropertyChanged
@@ -68,31 +51,25 @@ namespace Audio
 					}
 				}
 
-				virtual bool AddTarget(IAudioOutput^ target);
-
-				virtual bool RemoveTarget(IAudioOutput^ target);
-
-				virtual void RemoveAllTargets();
-
 			internal:
 				AudioInput(int sampleRate, IInputChannel* pChannel, int id);
-				~AudioInput();
+				virtual ~AudioInput() override;
 				!AudioInput();
+
+			protected:
+				virtual bool OnSetMonitor(IAudioOutput^ value) override;
+				virtual bool OnAddTarget(IAudioOutput^ target) override;
+				virtual void OnRemoveTarget(IAudioOutput^ target) override;
 
 			private:
 				void InputMeter_MeterUpdate(System::IntPtr sender);
 				void OnPropertyChanged(System::String^ propertyName);
 				void CleanUp(bool isDisposing);
-				void UnlinkTarget(IAudioOutput^ target);
 
 				bool m_isDisposed;
-				int m_channelId;
 				IMeterChannel* m_pInputMeter;
 				IInputChannel* m_pInputChannel;
-				System::Collections::Generic::List<IAudioOutput^>^ m_targets;
 				System::Runtime::InteropServices::GCHandle m_meterUpdateDelegateHandle;
-
-				IAudioOutput^ m_monitor;
 
 				System::ComponentModel::PropertyChangedEventHandler^ m_propertyChangedEventHandler;
 			};

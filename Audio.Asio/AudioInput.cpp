@@ -12,20 +12,20 @@ using namespace System::Collections::Generic;
 using namespace Audio::Asio;
 using namespace Audio::Asio::Interop;
 using namespace Audio::Foundation;
+using namespace Audio::Foundation::Interop;
 using namespace Audio::Foundation::Abstractions;
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
-AudioInput::AudioInput(int sampleRate, IInputChannel* pHwChannel, int id) : m_isDisposed(false)
+AudioInput::AudioInput(int sampleRate, IInputChannel* pHwChannel, int id) : 
+	AudioInputBase(id),
+	m_isDisposed(false)
 {
 	if(NULL == pHwChannel)
 		throw gcnew ArgumentNullException();
 
 	pHwChannel->AddRef();
 	m_pInputChannel = pHwChannel;
-	m_channelId = id;
-
-	m_targets = gcnew List<IAudioOutput^>();
 
 	int inputChannels = m_pInputChannel->SampleSharer.Source->ChannelCount;
 
@@ -74,35 +74,13 @@ void AudioInput::CleanUp(bool isDisposing)
 		RemoveAllTargets();
 }
 
-int AudioInput::ChannelId::get()
-{
-	return m_channelId;
-}
-
 Level AudioInput::DbFS::get()
 {
 	// We have only a single channel, so use index 0 twice
 	return Level(m_pInputMeter->DbFS[0], m_pInputMeter->DbFS[0]);
 }
 
-bool AudioInput::IsActive::get()
-{
-	return m_pInputChannel->IsActive;
-}
-
-void AudioInput::IsActive::set(bool value)
-{
-	m_pInputChannel->IsActive = value;
-
-	OnPropertyChanged(IsActiveProperty);
-}
-
-IAudioOutput^ AudioInput::Monitor::get()
-{
-	return m_monitor;
-}
-
-void AudioInput::Monitor::set(IAudioOutput^ value)
+bool AudioInput::OnSetMonitor(IAudioOutput^ value)
 {
 	if (nullptr != value)
 	{
@@ -111,6 +89,7 @@ void AudioInput::Monitor::set(IAudioOutput^ value)
 		if (output == nullptr)
 		{
 			m_pInputChannel->DirectMonitor = NULL;
+			return false;
 		}
 		else
 		{
@@ -121,55 +100,32 @@ void AudioInput::Monitor::set(IAudioOutput^ value)
 	{
 		m_pInputChannel->DirectMonitor = NULL;
 	}
-	m_monitor = value;
+	AudioInputBase::Monitor = value;
 
 	OnPropertyChanged(MonitorProperty);
+
+	return true;
 }
 
-// virtual 
-bool AudioInput::AddTarget(IAudioOutput^ target)
+bool AudioInput::OnAddTarget(IAudioOutput^ target)
 {
-	if (!m_targets->Contains(target))
+	AudioOutput^ output = safe_cast<AudioOutput^>(target);
+
+	if (output != nullptr)
 	{
-		AudioOutput^ output = safe_cast<AudioOutput^>(target);
+		ISampleReceiver* pJoinerAsReceiver = NULL;
 
-		if (output != nullptr)
+		if (SUCCEEDED(output->OutputChannelPair.SampleJoiner.QueryInterface(__uuidof(ISampleReceiver), (void**)&pJoinerAsReceiver)))
 		{
-			ISampleReceiver* pJoinerAsReceiver = NULL;
-
-			if (SUCCEEDED(output->OutputChannelPair.SampleJoiner.QueryInterface(__uuidof(ISampleReceiver), (void**)&pJoinerAsReceiver)))
-			{
-				m_pInputChannel->SampleSharer.AddTarget(*pJoinerAsReceiver);
-				m_targets->Add(target);
-				pJoinerAsReceiver->Release();
-				return true;
-			}
+			m_pInputChannel->SampleSharer.AddTarget(*pJoinerAsReceiver);
+			pJoinerAsReceiver->Release();
+			return true;
 		}
 	}
 	return false;
 }
 
-// virtual 
-bool AudioInput::RemoveTarget(IAudioOutput^ target)
-{
-	if (m_targets->Remove(target))
-	{
-		UnlinkTarget(target);
-		return true;
-	}
-	return false;
-}
-
-// virtual
-void AudioInput::RemoveAllTargets()
-{
-	for each (IAudioOutput ^ target in m_targets)
-	{
-		UnlinkTarget(target);
-	}
-}
-
-void AudioInput::UnlinkTarget(IAudioOutput^ target)
+void AudioInput::OnRemoveTarget(IAudioOutput^ target)
 {
 	AudioOutput^ output = safe_cast<AudioOutput^>(target);
 

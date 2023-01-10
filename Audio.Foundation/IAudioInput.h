@@ -48,6 +48,14 @@ namespace Audio
 				}
 
 				/// <summary>
+				/// Gets the output target collection
+				/// </summary>
+				property System::Collections::Generic::IEnumerable<IAudioOutput^>^ Targets
+				{
+					System::Collections::Generic::IEnumerable<IAudioOutput^>^ get();
+				}
+
+				/// <summary>
 				/// Adds an audio output to which incoming audio is sent.
 				/// </summary>
 				/// <param name="target">Target to add</param>
