@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Level.h"
-#include "IAudioOutput.h"
+#include "IAudioSource.h"
 #include "IAudioTarget.h"
 
 using namespace Audio::Foundation::Abstractions;
@@ -13,14 +12,13 @@ namespace Audio
 	{
 		namespace Interop
 		{
-			public ref class AudioOutputBase abstract : 
-				public IAudioTarget,
-				public IAudioOutput,
+			public ref class AudioSourceBase abstract : 
+				public IAudioSource,
 				public INotifyPropertyChanged
 			{
 			public:
-				static initonly System::String^ ChannelIdProperty = gcnew System::String("ChannelId");
-				static initonly System::String^ DbFSProperty = gcnew System::String("DbFS");
+				static initonly System::String^ IsActiveProperty = gcnew System::String("IsActive");
+				static initonly System::String^ TargetsProperty = gcnew System::String("Targets");
 
 				virtual event System::ComponentModel::PropertyChangedEventHandler^ PropertyChanged
 				{
@@ -45,24 +43,32 @@ namespace Audio
 					}
 				}
 
-				AudioOutputBase(int channelId);
-				virtual ~AudioOutputBase();
+				AudioSourceBase();
+				virtual ~AudioSourceBase();
 
-				property int ChannelId
+				property System::Boolean IsActive
 				{
-					virtual int get();
+					virtual System::Boolean get();
+					virtual void set(System::Boolean value);
 				}
 
-				property Level DbFS
+				property System::Collections::Generic::IEnumerable<IAudioTarget^>^ Targets
 				{
-					virtual Level get() abstract;
+					virtual System::Collections::Generic::IEnumerable<IAudioTarget^>^ get();
 				}
+
+				virtual bool AddTarget(IAudioTarget^ target);
+				virtual bool RemoveTarget(IAudioTarget^ target);
+				virtual void RemoveAllTargets();
 
 			protected:
+				virtual bool OnAddTarget(IAudioTarget^ target) = 0;
+				virtual void OnRemoveTarget(IAudioTarget^ target) = 0;
 				virtual void OnPropertyChanged(System::String^ propertyName);
 
 			private:
-				int m_channelId;
+				bool m_isActive;
+				System::Collections::Generic::List<IAudioTarget^>^ m_targets;
 
 				System::ComponentModel::PropertyChangedEventHandler^ m_propertyChangedEventHandler;
 			};

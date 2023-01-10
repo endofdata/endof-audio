@@ -154,12 +154,16 @@
     <ClInclude Include="AudioInputBase.h" />
     <ClInclude Include="AudioOutputBase.h" />
     <ClInclude Include="AudioRecording.h" />
+    <ClInclude Include="AudioSourceBase.h" />
     <ClInclude Include="AudioTakeBase.h" />
+    <ClInclude Include="AudioTargetBase.h" />
     <ClInclude Include="ExceptionExtensions.h" />
     <ClInclude Include="FileAudioTake.h" />
     <ClInclude Include="IAudioInput.h" />
     <ClInclude Include="IAudioOutput.h" />
+    <ClInclude Include="IAudioSource.h" />
     <ClInclude Include="IAudioTake.h" />
+    <ClInclude Include="IAudioTarget.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="ReadOnlyCollection.h" />
     <ClInclude Include="SampleConversion.h" />
@@ -175,7 +179,9 @@
     <ClCompile Include="AudioInputBase.cpp" />
     <ClCompile Include="AudioOutputBase.cpp" />
     <ClCompile Include="AudioRecording.cpp" />
+    <ClCompile Include="AudioSourceBase.cpp" />
     <ClCompile Include="AudioTakeBase.cpp" />
+    <ClCompile Include="AudioTargetBase.cpp" />
     <ClCompile Include="ExceptionExtensions.cpp" />
     <ClCompile Include="FileAudioTake.cpp" />
     <ClCompile Include="FxChannel.cpp" />
