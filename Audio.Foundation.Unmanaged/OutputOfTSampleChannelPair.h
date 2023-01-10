@@ -47,11 +47,8 @@ namespace Audio
 						ZeroMemory(m_pOutputRightB, sampleCount * sizeof(TSample));
 
 						m_pJoiner = ObjectFactory::CreateSampleJoiner(sampleCount, 2);
-						ISampleReceiver* pSampleReceiver = NULL;
 
-						QueryInterface(__uuidof(ISampleReceiver), (void**)&pSampleReceiver);
-						m_pJoiner->Target = pSampleReceiver;
-						pSampleReceiver->Release();
+						m_pJoiner->Target = this;
 					}
 
 					/*! \brief Destructor
