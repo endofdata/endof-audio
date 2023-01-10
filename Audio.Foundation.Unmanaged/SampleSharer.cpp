@@ -18,7 +18,6 @@ SampleSharer::SampleSharer() :
 
 SampleSharer::~SampleSharer()
 {
-	RemoveAllTargets();
 }
 
 IMPLEMENT_IUNKNOWN(SampleSharer)
@@ -39,24 +38,23 @@ bool SampleSharer::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-void SampleSharer::AddTarget(ISampleReceiver& target)
+void SampleSharer::AddTarget(ISampleReceiverPtr target)
 {
 	target.AddRef();
 
 	// do not allow two sends to the same destination
 	RemoveTarget(target);
 
-	m_vecTargets.push_back(&target);
+	m_vecTargets.push_back(target);
 }
 
-void SampleSharer::RemoveTarget(ISampleReceiver& target)
+void SampleSharer::RemoveTarget(ISampleReceiverPtr target)
 {
-	vector<ISampleReceiver*>::iterator newEnd =
-	remove_if(m_vecTargets.begin(), m_vecTargets.end(), [&target](ISampleReceiver* item) 
+	vector<ISampleReceiverPtr>::iterator newEnd =
+	remove_if(m_vecTargets.begin(), m_vecTargets.end(), [&target](ISampleReceiverPtr item) 
 	{ 
-		if(item == &target)
+		if(item == target)
 		{
-			item->Release();
 			return true;
 		}
 		return false;
@@ -66,10 +64,6 @@ void SampleSharer::RemoveTarget(ISampleReceiver& target)
 
 void SampleSharer::RemoveAllTargets()
 {
-	for_each(m_vecTargets.begin(), m_vecTargets.end(), [](ISampleReceiver* item)
-	{
-		item->Release();
-	});
 	m_vecTargets.clear();
 }
 
@@ -77,40 +71,24 @@ void SampleSharer::RouteToTargets()
 {
 	if (m_pSource != NULL)
 	{
-		for_each(m_vecTargets.begin(), m_vecTargets.end(), [this](ISampleReceiver* item)
+		for_each(m_vecTargets.begin(), m_vecTargets.end(), [this](ISampleReceiverPtr item)
 		{
-			item->Receive(*m_pSource);
+			item->Receive(m_pSource);
 		});
 	}
 }
 
-void SampleSharer::put_Source(ISampleContainer* value)
+void SampleSharer::put_Source(ISampleContainerPtr value)
 {
-	if (value != NULL)
-	{
-		value->AddRef();
-	}
-
-	ISampleContainer* pSource = (ISampleContainer*)InterlockedExchangePointer((void**)&m_pSource, value);
-
-	if (pSource != NULL)
-	{
-		pSource->Release();
-	}
+	m_pSource = value;
 }
 
-ISampleContainer* SampleSharer::get_Source()
+ISampleContainerPtr SampleSharer::get_Source()
 {
 	return m_pSource;
 }
 
-ISampleReceiver* SampleSharer::get_Target(int index)
+ISampleReceiverPtr SampleSharer::get_Target(int index)
 {
-	ISampleReceiver* value = NULL;
-	
-	if (0 <= index && index < (int)m_vecTargets.size())
-	{
-		value = m_vecTargets.at(index);
-	}
-	return value;
+	return m_vecTargets.at(index);
 }

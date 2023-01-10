@@ -23,7 +23,7 @@ namespace Audio
 
 				virtual void Flush();
 
-				virtual void Receive(ISampleContainer& inputBuffer);
+				virtual void Receive(ISampleContainerPtr inputBuffer);
 
 				virtual int get_ChannelCount();
 
@@ -35,8 +35,8 @@ namespace Audio
 				virtual MeterChannelCallback get_MeterUpdate();
 				virtual void put_MeterUpdate(MeterChannelCallback value);
 
-				virtual ISampleReceiver* get_WriteThrough();
-				virtual void put_WriteThrough(ISampleReceiver* value);
+				virtual ISampleReceiverPtr get_WriteThrough();
+				virtual void put_WriteThrough(ISampleReceiverPtr value);
 
 				DECLARE_IUNKNOWN
 
@@ -47,7 +47,7 @@ namespace Audio
 
 			private:
 				MeterChannelCallback m_meterUpdate;
-				ISampleReceiver* m_pWriteThrough;
+				ISampleReceiverPtr m_pWriteThrough;
 
 				int m_sampleRate;
 				int m_iSamplesPerRMSFrame;

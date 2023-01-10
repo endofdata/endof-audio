@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <Audio.Foundation.Unmanaged.h>
 #include <comdef.h>
+#include <ISampleContainer.h>
 
 namespace Audio
 {
@@ -13,8 +14,6 @@ namespace Audio
 		{
 			namespace Abstractions
 			{
-				__interface ISampleContainer;
-
 				/// <summary>
 				/// Exposes methods to receive two channels of samples from a <see cref="ISampleContainer"/> for further processing
 				/// </summary>
@@ -29,8 +28,10 @@ namespace Audio
 					/// Processes the current sample buffers of the <paramref name="input"/> container
 					/// </summary>
 					/// <param name="input">Input sample container</param>
-					void Receive(ISampleContainer& input) = 0;
+					void Receive(ISampleContainerPtr input) = 0;
 				};
+
+				_COM_SMARTPTR_TYPEDEF(ISampleReceiver, __uuidof(ISampleReceiver));
 			}
 		}
 	}

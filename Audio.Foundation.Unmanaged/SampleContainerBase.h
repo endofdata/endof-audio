@@ -10,7 +10,7 @@
 	virtual void put_SampleCount(int sampleCount);							\
 	virtual int get_ChannelCount();											\
 	virtual void put_ChannelCount(int channelCount);						\
-	virtual Abstractions::ISampleBuffer* get_Channel(int index);
+	virtual Abstractions::ISampleBufferPtr get_Channel(int index);
 
 #define IMPLEMENT_SAMPLECONTAINER(TYPE_NAME)								\
 																			\
@@ -44,7 +44,7 @@
 		return SampleContainerBase::put_ChannelCount(channelCount);			\
 	}																		\
 																			\
-	Abstractions::ISampleBuffer* TYPE_NAME::get_Channel(int index)			\
+	Abstractions::ISampleBufferPtr TYPE_NAME::get_Channel(int index)		\
 	{																		\
 		return SampleContainerBase::get_Channel(index);						\
 	}
@@ -70,13 +70,12 @@ namespace Audio
 				virtual int get_ChannelCount();
 				virtual void put_ChannelCount(int channelCount);
 
-				virtual Abstractions::ISampleBuffer* get_Channel(int index);
+				virtual Abstractions::ISampleBufferPtr get_Channel(int index);
 
 			private:
 				void CreateChannels(int sampleCount, int channelCount);
-				void FreeChannels();
 
-				std::vector<Abstractions::ISampleBuffer*> m_vecChannels;
+				std::vector<Abstractions::ISampleBufferPtr> m_vecChannels;
 				int m_sampleCount;
 				bool m_isActive;
 			};

@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <Audio.Foundation.Unmanaged.h>
 #include <comdef.h>
+#include <comip.h>
 
 namespace Audio
 {
@@ -47,6 +48,8 @@ namespace Audio
 
 					int get_SampleCount() = 0;
 				};
+
+				_COM_SMARTPTR_TYPEDEF(ISampleBuffer, __uuidof(ISampleBuffer));
 			}
 		}
 	}

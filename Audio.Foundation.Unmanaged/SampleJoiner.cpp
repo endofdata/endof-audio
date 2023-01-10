@@ -15,7 +15,6 @@ SampleJoiner::SampleJoiner(int sampleCount, int channelCount) :
 
 SampleJoiner::~SampleJoiner()
 {
-	put_Target(NULL);
 }
 
 IMPLEMENT_IUNKNOWN(SampleJoiner)
@@ -53,7 +52,7 @@ void SampleJoiner::Flush()
 {
 	if (NULL != m_pTarget)
 	{
-		m_pTarget->Receive(*this);
+		m_pTarget->Receive(this);
 		m_pTarget->Flush();
 	}
 
@@ -63,34 +62,24 @@ void SampleJoiner::Flush()
 	}
 }
 
-ISampleReceiver* SampleJoiner::get_Target()
+ISampleReceiverPtr SampleJoiner::get_Target()
 {
 	return m_pTarget;
 }
 
-void SampleJoiner::put_Target(ISampleReceiver* value)
+void SampleJoiner::put_Target(ISampleReceiverPtr value)
 {
-	if (value != NULL)
-	{
-		value->AddRef();
-	}
-
-	ISampleReceiver* pTarget = (ISampleReceiver*)InterlockedExchangePointer((void**)&m_pTarget, value);
-
-	if (pTarget != NULL)
-	{
-		pTarget->Release();
-	}
+	m_pTarget = value;
 }
 
-void SampleJoiner::Receive(ISampleContainer& container)
+void SampleJoiner::Receive(ISampleContainerPtr container)
 {
-	int maxChannels = min(container.ChannelCount, ChannelCount);
-	float chnLvl = ChannelCount / container.ChannelCount;
+	int maxChannels = min(container->ChannelCount, ChannelCount);
+	float chnLvl = ChannelCount / container->ChannelCount;
 
 	for (int c = 0; c < maxChannels; c++)
 	{
-		const float* pSource = container.Channels[c]->SamplePtr;
+		const float* pSource = container->Channels[c]->SamplePtr;
 		float* pDest = Channels[c]->SamplePtr;
 
 		for (int i = 0; i < SampleCount; i++)

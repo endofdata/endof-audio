@@ -16,48 +16,37 @@ SampleContainerBase::SampleContainerBase(int sampleCount, int channelCount) :
 
 SampleContainerBase::~SampleContainerBase()
 {
-	FreeChannels();
 }
 
 void SampleContainerBase::CreateChannels(int sampleCount, int channelCount)
 {
-	if (sampleCount != get_SampleCount() || channelCount != get_ChannelCount())
+	int currentSamples = get_SampleCount();
+	int currentChannels = get_ChannelCount();
+
+	if (sampleCount != currentSamples || channelCount != currentChannels)
 	{
-		if (sampleCount != get_SampleCount())
+		if (sampleCount != currentSamples)
 		{
-			FreeChannels();
+			m_vecChannels.clear();
+			currentChannels = 0;
 		}
 
-		if (channelCount < get_ChannelCount())
+		if (channelCount < currentChannels)
 		{
-			for (int c = channelCount; c < get_ChannelCount(); c++)
+			for (int c = channelCount; c < currentChannels; c++)
 			{
-				ISampleBuffer* pBuffer = m_vecChannels.back();
-				pBuffer->Release();
 				m_vecChannels.pop_back();
 			}
 		}
 		else
 		{
-			for (int c = get_ChannelCount(); c < channelCount; c++)
+			for (int c = currentChannels; c < channelCount; c++)
 			{
-				SampleBuffer* pBuffer = new SampleBuffer(sampleCount);
-				pBuffer->AddRef();
-				m_vecChannels.push_back(pBuffer);
+				m_vecChannels.push_back(new SampleBuffer(sampleCount));
 			}
 		}
 		m_sampleCount = sampleCount;
 	}
-}
-
-void SampleContainerBase::FreeChannels()
-{
-	for_each(m_vecChannels.begin(), m_vecChannels.end(), [](ISampleBuffer* item)
-	{
-		item->Release();
-	});
-
-	m_vecChannels.clear();
 }
 
 // virtual
@@ -97,7 +86,7 @@ void SampleContainerBase::put_ChannelCount(int channelCount)
 }
 
 // virtual
-ISampleBuffer* SampleContainerBase::get_Channel(int index)
+ISampleBufferPtr SampleContainerBase::get_Channel(int index)
 {
 	if (index < 0 || index >= get_ChannelCount())
 	{

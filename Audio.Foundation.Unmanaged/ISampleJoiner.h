@@ -16,11 +16,13 @@ namespace Audio
 			{				
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("519e9d40-db0b-42c4-b435-90d7ec67206a")) ISampleJoiner : public IUnknown
 				{
-					_declspec(property(get = get_Target, put = put_Target)) ISampleReceiver* Target;
+					_declspec(property(get = get_Target, put = put_Target)) ISampleReceiverPtr Target;
 
-					ISampleReceiver* get_Target() = 0;
-					void put_Target(ISampleReceiver* value) = 0;
+					ISampleReceiverPtr get_Target() = 0;
+					void put_Target(ISampleReceiverPtr value) = 0;
 				};
+
+				_COM_SMARTPTR_TYPEDEF(ISampleJoiner, __uuidof(ISampleJoiner));
 			}
 		}
 	}

@@ -22,8 +22,6 @@ MeterChannel::MeterChannel(int sampleRate, int channelCount) :
 
 MeterChannel::~MeterChannel()
 {
-	put_MeterUpdate(NULL);
-	put_WriteThrough(NULL);
 }
 
 IMPLEMENT_IUNKNOWN(MeterChannel)
@@ -66,24 +64,24 @@ void MeterChannel::Flush()
 	});
 }
 
-void MeterChannel::Receive(ISampleContainer& input)
+void MeterChannel::Receive(ISampleContainerPtr input)
 {
 	if (m_pWriteThrough != NULL)
 	{
 		m_pWriteThrough->Receive(input);
 	}
 
-	int maxChannels = min(input.ChannelCount, m_vecSumUp.size());
+	int maxChannels = min(input->ChannelCount, (int)m_vecSumUp.size());
 
 	if (maxChannels > 0)
 	{
 		for (int c = 0; c < maxChannels; c++)
 		{
-			ISampleBuffer* pChannel = input.Channels[c];
+			ISampleBuffer* pChannel = input->Channels[c];
 			SampleConversion::ContinueRMSSumUp(pChannel->SamplePtr, pChannel->SampleCount, m_vecSumUp.at(c));
 		}
 
-		m_iSumUpSamples += input.SampleCount;
+		m_iSumUpSamples += input->SampleCount;
 
 		if (m_iSumUpSamples >= m_iSamplesPerRMSFrame)
 		{
@@ -104,7 +102,7 @@ void MeterChannel::Receive(ISampleContainer& input)
 
 int MeterChannel::get_ChannelCount()
 {
-	return m_vecDbFS.size();
+	return (int)m_vecDbFS.size();
 }
 
 float MeterChannel::get_DbFS(int index)
@@ -122,24 +120,14 @@ void MeterChannel::put_RMSTime(int value)
 	m_iSamplesPerRMSFrame = static_cast<int>(SampleConversion::MilliSecondsToSamples(value, m_sampleRate));
 }
 
-ISampleReceiver* MeterChannel::get_WriteThrough()
+ISampleReceiverPtr MeterChannel::get_WriteThrough()
 {
 	return m_pWriteThrough;
 }
 
-void MeterChannel::put_WriteThrough(ISampleReceiver* value)
+void MeterChannel::put_WriteThrough(ISampleReceiverPtr value)
 {
-	if (value != NULL)
-	{
-		value->AddRef();
-	}
-
-	ISampleReceiver* pWriteThrough = (ISampleReceiver*)InterlockedExchangePointer((void**)&m_pWriteThrough, value);
-
-	if (pWriteThrough != NULL)
-	{
-		pWriteThrough->Release();
-	}
+	m_pWriteThrough = value;
 }
 
 MeterChannelCallback MeterChannel::get_MeterUpdate()

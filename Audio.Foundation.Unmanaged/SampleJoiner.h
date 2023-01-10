@@ -24,10 +24,10 @@ namespace Audio
 				SampleJoiner(int sampleCount, int channelCount);
 				virtual ~SampleJoiner();
 
-				virtual ISampleReceiver* get_Target();
-				virtual void put_Target(ISampleReceiver* value);
+				virtual ISampleReceiverPtr get_Target();
+				virtual void put_Target(ISampleReceiverPtr value);
 
-				virtual void Receive(Abstractions::ISampleContainer& container);
+				virtual void Receive(Abstractions::ISampleContainerPtr container);
 
 				virtual void Flush();
 
@@ -39,7 +39,7 @@ namespace Audio
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
-				ISampleReceiver* m_pTarget;
+				ISampleReceiverPtr m_pTarget;
 			};
 		}
 	}

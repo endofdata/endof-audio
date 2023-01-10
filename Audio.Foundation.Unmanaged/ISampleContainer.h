@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <Audio.Foundation.Unmanaged.h>
 #include <comdef.h>
+#include <ISampleBuffer.h>
 
 namespace Audio
 {
@@ -13,8 +14,6 @@ namespace Audio
 		{
 			namespace Abstractions
 			{
-				__interface ISampleBuffer;
-
 				/// <summary>
 				/// Exposes two channels of samples as unmanaged <see cref="ISampleBuffer"/> instances
 				/// </summary>
@@ -37,12 +36,12 @@ namespace Audio
 					_declspec(property(get = get_ChannelCount, put = put_ChannelCount)) int ChannelCount;
 
 					
-					virtual ISampleBuffer* get_Channel(int index) = 0;
+					virtual ISampleBufferPtr get_Channel(int index) = 0;
 
 					/// <summary>
 					/// Gets the sample buffers for the allocated channels
 					/// </summary>
-					_declspec(property(get = get_Channel)) ISampleBuffer* Channels[];
+					_declspec(property(get = get_Channel)) ISampleBufferPtr Channels[];
 
 					/// <summary>
 					/// Gets or sets a value indicating whether the sample container is active
@@ -55,6 +54,8 @@ namespace Audio
 					bool get_IsActive() = 0;
 					void put_IsActive(bool value) = 0;
 				};
+
+				_COM_SMARTPTR_TYPEDEF(ISampleContainer, __uuidof(ISampleContainer));
 			}
 		}
 	}

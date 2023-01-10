@@ -17,13 +17,13 @@ namespace Audio
 				SampleSharer();
 				virtual ~SampleSharer();
 
-				virtual void put_Source(Abstractions::ISampleContainer* value);
-				virtual Abstractions::ISampleContainer* get_Source();
+				virtual void put_Source(Abstractions::ISampleContainerPtr value);
+				virtual Abstractions::ISampleContainerPtr get_Source();
 
-				virtual Abstractions::ISampleReceiver* get_Target(int iIdx);
+				virtual Abstractions::ISampleReceiverPtr get_Target(int iIdx);
 
-				virtual void AddTarget(Abstractions::ISampleReceiver& channel);
-				virtual void RemoveTarget(Abstractions::ISampleReceiver& channel);
+				virtual void AddTarget(Abstractions::ISampleReceiverPtr channel);
+				virtual void RemoveTarget(Abstractions::ISampleReceiverPtr channel);
 				virtual void RemoveAllTargets();
 
 				virtual void RouteToTargets();
@@ -34,8 +34,8 @@ namespace Audio
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
-				Abstractions::ISampleContainer* m_pSource;
-				std::vector<Abstractions::ISampleReceiver*> m_vecTargets;
+				Abstractions::ISampleContainerPtr m_pSource;
+				std::vector<Abstractions::ISampleReceiverPtr> m_vecTargets;
 			};
 		}
 	}
