@@ -4,6 +4,7 @@
 #include "IAudioOutput.h"
 
 using namespace Audio::Foundation::Abstractions;
+using namespace System::ComponentModel;
 
 namespace Audio
 {
@@ -11,29 +12,55 @@ namespace Audio
 	{
 		namespace Interop
 		{
-			public ref class AudioOutputBase abstract : public ::Audio::Foundation::Abstractions::IAudioOutput
+			public ref class AudioOutputBase abstract : public System::ComponentModel::INotifyPropertyChanged, public IAudioOutput
 			{
 			public:
+				static initonly System::String^ ChannelIdProperty = gcnew System::String("ChannelId");
+				static initonly System::String^ DbFSProperty = gcnew System::String("DbFS");
+
+				virtual event System::ComponentModel::PropertyChangedEventHandler^ PropertyChanged
+				{
+					void add(System::ComponentModel::PropertyChangedEventHandler^ value) sealed = INotifyPropertyChanged::PropertyChanged::add
+					{
+						m_propertyChangedEventHandler = static_cast<System::ComponentModel::PropertyChangedEventHandler^>(System::Delegate::Combine(m_propertyChangedEventHandler, value));
+					}
+
+						void remove(System::ComponentModel::PropertyChangedEventHandler^ value) sealed = INotifyPropertyChanged::PropertyChanged::remove
+					{
+						m_propertyChangedEventHandler = static_cast<System::ComponentModel::PropertyChangedEventHandler^>(System::Delegate::Remove(m_propertyChangedEventHandler, value));
+					}
+
+						void raise(System::Object^ sender, System::ComponentModel::PropertyChangedEventArgs^ e)
+					{
+						System::ComponentModel::PropertyChangedEventHandler^ handler = m_propertyChangedEventHandler;
+
+						if (handler != nullptr)
+						{
+							handler->Invoke(sender, e);
+						}
+					}
+				}
+
 				AudioOutputBase(int channelId);
 				virtual ~AudioOutputBase();
 
 				property int ChannelId
 				{
 					virtual int get();
-					virtual void set(int value);
 				}
 
 				property Level DbFS
 				{
-					virtual Level get();
-					virtual void set(Level value);
+					virtual Level get() abstract;
 				}
 
-				virtual void WriteCurrentFrame(cli::array<System::Single>^ frameBuffer, float level, float pan) = 0;
+			protected:
+				virtual void OnPropertyChanged(System::String^ propertyName);
 
 			private:
 				int m_channelId;
-				Level m_dbFS;
+
+				System::ComponentModel::PropertyChangedEventHandler^ m_propertyChangedEventHandler;
 			};
 		}
 	}

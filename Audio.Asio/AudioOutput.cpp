@@ -14,6 +14,7 @@ using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pHwChannel, int id) : 
+	AudioOutputBase(id),
 	m_isDisposed(false),
 	m_pOutputChannelPair(NULL),
 	m_pOutputJoinerReceiver(NULL),
@@ -24,8 +25,6 @@ AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pH
 
 	pHwChannel->AddRef();
 	m_pOutputChannelPair = pHwChannel;
-
-	m_channelId = id;
 
 	// Create output meter including meter update event handler
 	m_pOutputMeter = ObjectFactory::CreateMeterChannel(sampleCount, 2);
@@ -88,11 +87,6 @@ void AudioOutput::CleanUp(bool isDisposing)
 	}
 }
 
-int AudioOutput::ChannelId::get()
-{
-	return m_channelId;
-}
-
 Level AudioOutput::DbFS::get()
 {
 	return Level(m_pOutputMeter->DbFS[0], m_pOutputMeter->DbFS[1]);
@@ -106,11 +100,6 @@ IOutputChannelPair& AudioOutput::OutputChannelPair::get()
 void AudioOutput::Send()
 {
 	m_pOutputJoinerReceiver->Flush();
-}
-
-void AudioOutput::OnPropertyChanged(System::String^ propertyName)
-{
-	PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(propertyName));
 }
 
 void AudioOutput::OutputMeter_MeterUpdate(IntPtr sender)

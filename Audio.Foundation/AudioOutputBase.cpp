@@ -6,7 +6,6 @@ using namespace Audio::Foundation::Interop;
 AudioOutputBase::AudioOutputBase(int channelId)
 {
 	m_channelId = channelId;
-	m_dbFS = Level(System::Double::NegativeInfinity, System::Double::NegativeInfinity);
 }
 
 // virtual 
@@ -20,21 +19,8 @@ int AudioOutputBase::ChannelId::get()
 	return m_channelId;
 }
 
-// virtual 
-void AudioOutputBase::ChannelId::set(int value)
+void AudioOutputBase::OnPropertyChanged(System::String^ propertyName)
 {
-	m_channelId = value;
+	PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(propertyName));
 }
 
-
-// virtual 
-Level AudioOutputBase::DbFS::get()
-{
-	return m_dbFS;
-}
-
-// virtual 
-void AudioOutputBase::DbFS::set(Level value)
-{
-	m_dbFS = value;
-}

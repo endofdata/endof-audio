@@ -26,7 +26,7 @@ namespace Audio
 
 			internal:
 				AudioInput(int sampleRate, IInputChannel* pChannel, int id);
-				virtual ~AudioInput() override;
+				virtual ~AudioInput();
 				!AudioInput();
 
 			protected:
