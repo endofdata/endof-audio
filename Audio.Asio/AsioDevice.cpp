@@ -98,12 +98,12 @@ void AsioDevice::ShowControlPanel()
 	m_pCore->ShowControlPanel();
 }
 
-IInputChannel* AsioDevice::GetInputChannel(int index)
+IInputChannelPtr AsioDevice::GetInputChannel(int index)
 {
 	return m_pCore->InputChannel[index];	
 }
 
-IOutputChannelPair* AsioDevice::GetOutputChannelPair(int index)
+IOutputChannelPairPtr AsioDevice::GetOutputChannelPair(int index)
 {
 	return m_pCore->OutputChannelPair[index];
 }

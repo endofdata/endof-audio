@@ -17,28 +17,24 @@ using namespace Audio::Foundation::Abstractions;
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
-AudioInput::AudioInput(int sampleRate, IInputChannel* pHwChannel, int id) : 
+AudioInput::AudioInput(int sampleRate, IInputChannelPtr pHwChannel, int id) : 
 	AudioInputBase(id),
 	m_isDisposed(false)
 {
 	if(NULL == pHwChannel)
 		throw gcnew ArgumentNullException();
 
-	pHwChannel->AddRef();
-	m_pInputChannel = pHwChannel;
+	m_pInputChannel = pHwChannel.Detach();
 
 	int inputChannels = m_pInputChannel->SampleSharer->Source->ChannelCount;
 
-	m_pInputMeter = Audio::Foundation::Unmanaged::ObjectFactory::CreateMeterChannel(sampleRate, inputChannels);
+	m_pInputMeter = Audio::Foundation::Unmanaged::ObjectFactory::CreateMeterChannel(sampleRate, inputChannels).Detach();
 	m_pInputMeter->RMSTime = 100;
 	MeterUpdateDelegate^ meterUpdateDelegate = gcnew MeterUpdateDelegate(this, &AudioInput::InputMeter_MeterUpdate);
 	m_meterUpdateDelegateHandle = GCHandle::Alloc(meterUpdateDelegate);
 	m_pInputMeter->MeterUpdate = static_cast<MeterChannelCallback>(Marshal::GetFunctionPointerForDelegate(meterUpdateDelegate).ToPointer());
 
-	ISampleReceiver* pMeteringReceiver;
-	m_pInputMeter->QueryInterface(__uuidof(ISampleReceiver), (void**)&pMeteringReceiver);
-	m_pInputChannel->SampleSharer->AddTarget(pMeteringReceiver);
-	pMeteringReceiver->Release();
+	m_pInputChannel->SampleSharer->AddTarget(m_pInputMeter);
 }
 
 AudioInput::~AudioInput()
@@ -62,6 +58,7 @@ void AudioInput::CleanUp(bool isDisposing)
 		if (m_pInputChannel != NULL)
 		{
 			m_pInputChannel->Release();
+			m_pInputChannel = NULL;
 		}
 
 		if (m_pInputMeter != NULL)
@@ -94,7 +91,7 @@ bool AudioInput::OnSetMonitor(IAudioOutput^ value)
 		}
 		else
 		{
-			m_pInputChannel->DirectMonitor = &output->OutputChannelPair;
+			m_pInputChannel->DirectMonitor = output->OutputChannelPair;
 		}
 	}
 	else
@@ -112,14 +109,8 @@ bool AudioInput::OnAddTarget(IAudioOutput^ target)
 
 	if (output != nullptr)
 	{
-		ISampleReceiver* pJoinerAsReceiver = NULL;
-
-		if (SUCCEEDED(output->OutputChannelPair.SampleJoiner.QueryInterface(__uuidof(ISampleReceiver), (void**)&pJoinerAsReceiver)))
-		{
-			m_pInputChannel->SampleSharer->AddTarget(pJoinerAsReceiver);
-			pJoinerAsReceiver->Release();
-			return true;
-		}
+		m_pInputChannel->SampleSharer->AddTarget(output->OutputChannelPair->SampleJoiner);
+		return true;
 	}
 	return false;
 }
@@ -128,13 +119,7 @@ void AudioInput::OnRemoveTarget(IAudioOutput^ target)
 {
 	AudioOutput^ output = safe_cast<AudioOutput^>(target);
 
-	ISampleReceiver* pJoinerAsReceiver = NULL;
-
-	if (SUCCEEDED(output->OutputChannelPair.SampleJoiner.QueryInterface(__uuidof(ISampleReceiver), (void**)&pJoinerAsReceiver)))
-	{
-		m_pInputChannel->SampleSharer->RemoveTarget(pJoinerAsReceiver);
-		pJoinerAsReceiver->Release();
-	}
+	m_pInputChannel->SampleSharer->RemoveTarget(output->OutputChannelPair->SampleJoiner);
 }
 
 void AudioInput::InputMeter_MeterUpdate(IntPtr sender)

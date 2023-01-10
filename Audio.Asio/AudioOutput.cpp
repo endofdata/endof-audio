@@ -13,42 +13,29 @@ using namespace Audio::Foundation::Abstractions;
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
-AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pHwChannel, int id) : 
+AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPairPtr pHwChannel, int id) : 
 	AudioOutputBase(id),
 	m_isDisposed(false),
 	m_pOutputChannelPair(NULL),
-	m_pOutputJoinerReceiver(NULL),
 	m_pOutputMeter(NULL)
 {
 	if(NULL == pHwChannel)
 		throw gcnew ArgumentNullException();
 
-	pHwChannel->AddRef();
-	m_pOutputChannelPair = pHwChannel;
+	m_pOutputChannelPair = pHwChannel.Detach();
 
 	// Create output meter including meter update event handler
-	m_pOutputMeter = ObjectFactory::CreateMeterChannel(sampleRate, 2);
+	m_pOutputMeter = ObjectFactory::CreateMeterChannel(sampleRate, 2).Detach();
 	m_pOutputMeter->RMSTime = 100;
 	MeterUpdateDelegate^ meterUpdateDelegate = gcnew MeterUpdateDelegate(this, &AudioOutput::OutputMeter_MeterUpdate);
 	m_meterUpdateDelegateHandle = GCHandle::Alloc(meterUpdateDelegate);
 	m_pOutputMeter->MeterUpdate = static_cast<MeterChannelCallback>(Marshal::GetFunctionPointerForDelegate(meterUpdateDelegate).ToPointer());
 
 	// Chain the output-channel receiver to the write-through of the meter channel
-	ISampleReceiver* pOutputSampleReceiver = NULL;
-	m_pOutputChannelPair->QueryInterface(_uuidof(ISampleReceiver), (void**)&pOutputSampleReceiver);
-	m_pOutputMeter->WriteThrough = pOutputSampleReceiver;
-	pOutputSampleReceiver->Release();
+	m_pOutputMeter->WriteThrough = m_pOutputChannelPair;
 
 	// Chain the meter-channel receiver to the master mix
-	ISampleReceiver* pMeterSampleReceiver = NULL;
-	m_pOutputMeter->QueryInterface(__uuidof(ISampleReceiver), (void**)&pMeterSampleReceiver);
-	m_pOutputChannelPair->SampleJoiner->Target = pMeterSampleReceiver;
-	pMeterSampleReceiver->Release();
-
-	// Store the ISampleReceiver iface of the output's sample joiner
-	ISampleReceiver* pOutputJoinerReceiver = NULL;
-	m_pOutputChannelPair->SampleJoiner.QueryInterface(__uuidof(ISampleReceiver), (void**)&pOutputJoinerReceiver);
-	m_pOutputJoinerReceiver = pOutputJoinerReceiver;
+	m_pOutputChannelPair->SampleJoiner->Target = m_pOutputMeter;
 }
 
 AudioOutput::~AudioOutput()
@@ -67,11 +54,6 @@ void AudioOutput::CleanUp(bool isDisposing)
 	{
 		m_isDisposed = true;
 
-		if (NULL != m_pOutputJoinerReceiver)
-		{
-			m_pOutputJoinerReceiver->Release();
-			m_pOutputJoinerReceiver = NULL;
-		}
 		if (NULL != m_pOutputMeter)
 		{
 			m_pOutputMeter->Release();
@@ -92,14 +74,15 @@ Level AudioOutput::DbFS::get()
 	return Level(m_pOutputMeter->DbFS[0], m_pOutputMeter->DbFS[1]);
 }
 
-IOutputChannelPair& AudioOutput::OutputChannelPair::get()
+IOutputChannelPairPtr AudioOutput::OutputChannelPair::get()
 {
-	return *m_pOutputChannelPair;
+	return m_pOutputChannelPair;
 }
 
 void AudioOutput::Send()
 {
-	m_pOutputJoinerReceiver->Flush();
+	ISampleReceiverPtr pReceiver = m_pOutputChannelPair->SampleJoiner;
+	pReceiver->Flush();
 }
 
 void AudioOutput::OutputMeter_MeterUpdate(IntPtr sender)

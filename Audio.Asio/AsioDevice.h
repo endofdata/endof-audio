@@ -164,8 +164,8 @@ namespace Audio
 				void AttachBufferSwitchHandler(BufferSwitchManagedCallback^ bufferSwitchHandler);
 				void DetachBufferSwitchHandler();
 
-				IInputChannel* GetInputChannel(int index);
-				IOutputChannelPair* GetOutputChannelPair(int index);
+				IInputChannelPtr GetInputChannel(int index);
+				IOutputChannelPairPtr GetOutputChannelPair(int index);
 
 			private:
 				void CleanUp(bool fIsDisposing);

@@ -24,15 +24,15 @@ namespace Audio
 				}
 
 			internal:
-				AudioOutput(int sampleRate, int sampleCount, IOutputChannelPair* pChannel, int id);
+				AudioOutput(int sampleRate, int sampleCount, IOutputChannelPairPtr pChannel, int id);
 				virtual ~AudioOutput();
 				!AudioOutput();
 
 				void Send();
 
-				property IOutputChannelPair& OutputChannelPair
+				property IOutputChannelPairPtr OutputChannelPair
 				{
-					IOutputChannelPair& get();
+					IOutputChannelPairPtr get();
 				}
 			private:
 				void OutputMeter_MeterUpdate(System::IntPtr sender);
@@ -41,7 +41,6 @@ namespace Audio
 				bool m_isDisposed;
 				IMeterChannel* m_pOutputMeter;
 				IOutputChannelPair* m_pOutputChannelPair;
-				ISampleReceiver* m_pOutputJoinerReceiver;
 
 				System::Runtime::InteropServices::GCHandle m_meterUpdateDelegateHandle;
 			};
