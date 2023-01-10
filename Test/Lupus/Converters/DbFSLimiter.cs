@@ -8,7 +8,7 @@ namespace Lupus.Converters
 	{
 		public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 		{
-			if (targetType == typeof(double) || targetType == typeof(double?))
+			if (targetType == typeof(double) || targetType == typeof(double?) || targetType == typeof(object))
 			{
 				// TODO: Floor and Peek are dependency properties of LevelMeter. How can we get their actual value here?
 				double minValue = Lupus.Controls.LevelMeter.DefaultFloor;
