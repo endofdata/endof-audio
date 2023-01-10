@@ -72,7 +72,7 @@ namespace Test
 						{
 							for (int s = 0; s < Constants::SampleCount; s++)
 							{
-								pTestBuffers->Channels[c]->Samples[s] = 1.0f - 2.0 / s;
+								pTestBuffers->Channels[c]->Samples[s] = (float)(1.0f - 2.0 / s);
 							}
 						}
 

@@ -78,26 +78,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>..\..\Audio.Foundation.Unmanaged;$(IncludePath)</IncludePath>
-    <OutDir>bin\$(Configuration)\$(PlatformTarget)</OutDir>
-    <IntDir>obj\$(Configuration)\$(PlatformTarget)</IntDir>
+    <OutDir>bin\$(Configuration)\$(PlatformTarget)\</OutDir>
+    <IntDir>obj\$(Configuration)\$(PlatformTarget)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>..\..\Audio.Foundation.Unmanaged;$(IncludePath)</IncludePath>
-    <OutDir>bin\$(Configuration)\$(PlatformTarget)</OutDir>
-    <IntDir>obj\$(Configuration)\$(PlatformTarget)</IntDir>
+    <OutDir>bin\$(Configuration)\$(PlatformTarget)\</OutDir>
+    <IntDir>obj\$(Configuration)\$(PlatformTarget)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>..\..\Audio.Foundation.Unmanaged;$(IncludePath)</IncludePath>
-    <OutDir>bin\$(Configuration)\$(PlatformTarget)</OutDir>
-    <IntDir>obj\$(Configuration)\$(PlatformTarget)</IntDir>
+    <OutDir>bin\$(Configuration)\$(PlatformTarget)\</OutDir>
+    <IntDir>obj\$(Configuration)\$(PlatformTarget)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>..\..\Audio.Foundation.Unmanaged;$(IncludePath)</IncludePath>
-    <OutDir>bin\$(Configuration)\$(PlatformTarget)</OutDir>
-    <IntDir>obj\$(Configuration)\$(PlatformTarget)</IntDir>
+    <OutDir>bin\$(Configuration)\$(PlatformTarget)\</OutDir>
+    <IntDir>obj\$(Configuration)\$(PlatformTarget)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -186,8 +186,8 @@
   <Target Name="CopyDependencies" AfterTargets="Build" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Message Text="Copy dependencies to $(OutDir)" Importance="high" />
     <ItemGroup>
-		<Dependencies Include="..\..\Audio.Foundation.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Foundation.Unmanaged.dll" />
-		<Dependencies Include="..\..\Audio.Foundation.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Foundation.Unmanaged.pdb" />
+      <Dependencies Include="..\..\Audio.Foundation.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Foundation.Unmanaged.dll" />
+      <Dependencies Include="..\..\Audio.Foundation.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Foundation.Unmanaged.pdb" />
     </ItemGroup>
     <Copy SourceFiles="@(Dependencies)" DestinationFolder="$(OutDir)" />
   </Target>
