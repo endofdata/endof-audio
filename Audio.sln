@@ -22,7 +22,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Audio.Foundation.Unmanaged"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Audio.Asio", "Audio.Asio\Audio.Asio.vcxproj", "{9E4F5AA3-C267-40B0-AECB-5357C04AC230}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lupus", "Test\Lupus\Lupus.csproj", "{55BB491B-9563-458A-80C3-A3684965120D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lupus", "Test\Lupus\Lupus.csproj", "{55BB491B-9563-458A-80C3-A3684965120D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test.Audio.Foundation.Unmanaged", "Test\Test.Audio.Foundation.Unmanaged\Test.Audio.Foundation.Unmanaged.vcxproj", "{679523DE-A065-4974-9DBB-4070245C5336}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C4D38B7D-AFA0-4138-BC06-ECB238FE579B} = {C4D38B7D-AFA0-4138-BC06-ECB238FE579B}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -118,6 +123,18 @@ Global
 		{55BB491B-9563-458A-80C3-A3684965120D}.Release|Win32.Build.0 = Release|Any CPU
 		{55BB491B-9563-458A-80C3-A3684965120D}.Release|x64.ActiveCfg = Release|Any CPU
 		{55BB491B-9563-458A-80C3-A3684965120D}.Release|x64.Build.0 = Release|Any CPU
+		{679523DE-A065-4974-9DBB-4070245C5336}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{679523DE-A065-4974-9DBB-4070245C5336}.Debug|Any CPU.Build.0 = Debug|x64
+		{679523DE-A065-4974-9DBB-4070245C5336}.Debug|Win32.ActiveCfg = Debug|Win32
+		{679523DE-A065-4974-9DBB-4070245C5336}.Debug|Win32.Build.0 = Debug|Win32
+		{679523DE-A065-4974-9DBB-4070245C5336}.Debug|x64.ActiveCfg = Debug|x64
+		{679523DE-A065-4974-9DBB-4070245C5336}.Debug|x64.Build.0 = Debug|x64
+		{679523DE-A065-4974-9DBB-4070245C5336}.Release|Any CPU.ActiveCfg = Release|x64
+		{679523DE-A065-4974-9DBB-4070245C5336}.Release|Any CPU.Build.0 = Release|x64
+		{679523DE-A065-4974-9DBB-4070245C5336}.Release|Win32.ActiveCfg = Release|Win32
+		{679523DE-A065-4974-9DBB-4070245C5336}.Release|Win32.Build.0 = Release|Win32
+		{679523DE-A065-4974-9DBB-4070245C5336}.Release|x64.ActiveCfg = Release|x64
+		{679523DE-A065-4974-9DBB-4070245C5336}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,6 +143,7 @@ Global
 		{D735B24C-070B-4F66-B483-8B00DAB52FA0} = {EC809D6F-537C-4250-93D7-1CB420C2725C}
 		{819E29CA-4A44-4E7F-A8EE-06421091BADE} = {EC809D6F-537C-4250-93D7-1CB420C2725C}
 		{55BB491B-9563-458A-80C3-A3684965120D} = {EC809D6F-537C-4250-93D7-1CB420C2725C}
+		{679523DE-A065-4974-9DBB-4070245C5336} = {EC809D6F-537C-4250-93D7-1CB420C2725C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BE4EAD97-60D3-4148-9E99-86326E46254E}
