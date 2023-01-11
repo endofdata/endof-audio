@@ -103,7 +103,7 @@ bool AudioInput::OnSetMonitor(IAudioOutput^ value)
 	return true;
 }
 
-bool AudioInput::OnAddTarget(IAudioOutput^ target)
+bool AudioInput::OnAddTarget(IAudioTarget^ target)
 {
 	AudioOutput^ output = safe_cast<AudioOutput^>(target);
 
@@ -115,7 +115,7 @@ bool AudioInput::OnAddTarget(IAudioOutput^ target)
 	return false;
 }
 
-void AudioInput::OnRemoveTarget(IAudioOutput^ target)
+void AudioInput::OnRemoveTarget(IAudioTarget^ target)
 {
 	AudioOutput^ output = safe_cast<AudioOutput^>(target);
 

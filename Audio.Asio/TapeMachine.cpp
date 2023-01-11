@@ -92,7 +92,7 @@ AudioTrack^ TapeMachine::AddTrack()
 {
 	AudioTrack^ result = gcnew AudioTrack(this, m_nextTrackId++);
 
-	result->MonitorOut = m_router->Outputs[0];
+	result->TrackOut = (IAudioTarget^)m_router->Outputs[0];
 
 	m_audioTracks->Add(result);
 

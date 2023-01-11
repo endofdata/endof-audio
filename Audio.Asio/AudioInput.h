@@ -31,8 +31,8 @@ namespace Audio
 
 			protected:
 				virtual bool OnSetMonitor(IAudioOutput^ value) override;
-				virtual bool OnAddTarget(IAudioOutput^ target) override;
-				virtual void OnRemoveTarget(IAudioOutput^ target) override;
+				virtual bool OnAddTarget(IAudioTarget^ target) override;
+				virtual void OnRemoveTarget(IAudioTarget^ target) override;
 
 			private:
 				void InputMeter_MeterUpdate(System::IntPtr sender);

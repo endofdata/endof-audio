@@ -172,19 +172,19 @@ namespace Audio
 				/// <summary>
 				/// Gets or sets the audio input from which audio data can be recorded.
 				/// </summary>
-				property IAudioInput^ RecordIn
+				property IAudioSource^ TrackIn
 				{
-					IAudioInput^ get();
-					void set(IAudioInput^ value);
+					IAudioSource^ get();
+					void set(IAudioSource^ value);
 				}
 
 				/// <summary>
 				/// Gets or sets the audio output to which audio data can be sent.
 				/// </summary>
-				property IAudioOutput^ MonitorOut
+				property IAudioTarget^ TrackOut
 				{
-					IAudioOutput^ get();
-					void set(IAudioOutput^ value);
+					IAudioTarget^ get();
+					void set(IAudioTarget^ value);
 				}
 
 				/// <summary>
@@ -241,9 +241,8 @@ namespace Audio
 
 				int m_trackId;
 				TapeMachine^ m_machine;
-				IAudioInput^ m_recordIn;
-				IAudioOutput^ m_monitorOut;
-				cli::array<System::Single>^ m_pCurrentFrame;
+				IAudioSource^ m_trackIn;
+				IAudioTarget^ m_trackOut;
 
 				System::ComponentModel::PropertyChangedEventHandler^ m_propertyChangedEventHandler;
 			};
