@@ -83,7 +83,7 @@ void AudioTakeBase::Initialize()
 {
 }
 
-int AudioTakeBase::ReadNextFrame(cli::array<float>^ audioBuffer)
-{
-	throw gcnew NotImplementedException();
-}
+//int AudioTakeBase::ReadNextFrame(cli::array<float>^ audioBuffer)
+//{
+//	throw gcnew NotImplementedException();
+//}

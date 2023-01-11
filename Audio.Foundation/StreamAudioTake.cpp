@@ -69,36 +69,36 @@ static bool IsNotZero(float f)
 {
 	return Math::Abs(f) > 0.00001;
 }
-
-int StreamAudioTake::ReadNextFrame(array<float>^ audioBuffer)
-{
-	if (m_sampleStream->Position >= m_sampleStream->Length)
-	{		
-		//Array::Clear(audioBuffer);
-		return -1;
-	}
-
-
-	float lvl = Level;
-	float value = 0.0;
-	int sampleSize = sizeof(float);
-	Span<byte> span = Span<byte>((void*)&value, sampleSize);
-	interior_ptr<float> pTarget = &audioBuffer[0];
-	int count;
-
-	for (count = 0; count < audioBuffer->Length; count++)
-	{
-		if (sampleSize > m_sampleStream->Read(span))
-			break;
-
-		*pTarget++= value * lvl;
-	}
-
-	//int ignored = audioBuffer->Length - count;
-
-	//if (ignored > 0)
-	//{
-	//	Array::Clear(audioBuffer, count, ignored);
-	//}
-	return count;
-}
+//
+//int StreamAudioTake::ReadNextFrame(array<float>^ audioBuffer)
+//{
+//	if (m_sampleStream->Position >= m_sampleStream->Length)
+//	{		
+//		//Array::Clear(audioBuffer);
+//		return -1;
+//	}
+//
+//
+//	float lvl = Level;
+//	float value = 0.0;
+//	int sampleSize = sizeof(float);
+//	Span<byte> span = Span<byte>((void*)&value, sampleSize);
+//	interior_ptr<float> pTarget = &audioBuffer[0];
+//	int count;
+//
+//	for (count = 0; count < audioBuffer->Length; count++)
+//	{
+//		if (sampleSize > m_sampleStream->Read(span))
+//			break;
+//
+//		*pTarget++= value * lvl;
+//	}
+//
+//	//int ignored = audioBuffer->Length - count;
+//
+//	//if (ignored > 0)
+//	//{
+//	//	Array::Clear(audioBuffer, count, ignored);
+//	//}
+//	return count;
+//}

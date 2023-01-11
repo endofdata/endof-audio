@@ -12,7 +12,7 @@ namespace Audio
 	{
 		namespace Interop
 		{
-			public ref class AudioSourceBase abstract : 
+			public ref class AudioSourceBase : 
 				public IAudioSource,
 				public INotifyPropertyChanged
 			{
@@ -62,8 +62,8 @@ namespace Audio
 				virtual void RemoveAllTargets();
 
 			protected:
-				virtual bool OnAddTarget(IAudioTarget^ target) = 0;
-				virtual void OnRemoveTarget(IAudioTarget^ target) = 0;
+				virtual bool OnAddTarget(IAudioTarget^ target);
+				virtual void OnRemoveTarget(IAudioTarget^ target);
 				virtual void OnPropertyChanged(System::String^ propertyName);
 
 			private:

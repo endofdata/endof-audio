@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IAudioTake.h"
+#include "AudioSourceBase.h"
 
 namespace Audio
 {
@@ -10,7 +11,9 @@ namespace Audio
 		{
 			ref class WaveFile;
 
-			public ref class AudioTakeBase : public ::Audio::Foundation::Abstractions::IAudioTake
+			public ref class AudioTakeBase : 
+				public AudioSourceBase, 
+				public ::Audio::Foundation::Abstractions::IAudioTake
 			{
 			public:
 				AudioTakeBase(System::TimeSpan offset, int sampleRate);
@@ -53,7 +56,7 @@ namespace Audio
 
 				virtual void Initialize();
 
-				virtual int ReadNextFrame(cli::array<float>^ audioBuffer);
+				//virtual int ReadNextFrame(cli::array<float>^ audioBuffer);
 
 			private:
 				System::TimeSpan m_offset;

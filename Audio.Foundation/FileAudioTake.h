@@ -35,7 +35,7 @@ namespace Audio
 					virtual System::TimeSpan get() override;
 				}
 
-				virtual int ReadNextFrame(cli::array<System::Single>^ audioBuffer) override;
+				//virtual int ReadNextFrame(cli::array<System::Single>^ audioBuffer) override;
 
 			protected:
 				

@@ -40,7 +40,7 @@ namespace Audio
 
 				void Initialize();
 				bool TrySetPosition(System::TimeSpan position);
-				int ReadNextFrame(cli::array<float>^ audioBuffer);
+				//int ReadNextFrame(cli::array<float>^ audioBuffer);
 			};
 		}
 	}
