@@ -15,7 +15,6 @@ namespace Audio
 		{
 			public ref class AudioInputBase abstract : 
 				public AudioSourceBase,
-				public IAudioSource,
 				public IAudioInput
 			{
 			public:
