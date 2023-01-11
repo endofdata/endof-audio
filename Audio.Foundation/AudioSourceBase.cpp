@@ -66,6 +66,15 @@ void AudioSourceBase::RemoveAllTargets()
 	OnPropertyChanged(TargetsProperty);
 }
 
+bool AudioSourceBase::OnAddTarget(IAudioTarget^ target)
+{
+	return true;
+}
+
+void AudioSourceBase::OnRemoveTarget(IAudioTarget^ target)
+{
+}
+
 void AudioSourceBase::OnPropertyChanged(System::String^ propertyName)
 {
 	PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(propertyName));

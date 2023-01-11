@@ -1,6 +1,9 @@
 #pragma once
 
 #include "FileAudioTake.h"
+#include "IAudioTarget.h"
+
+using namespace Audio::Foundation::Abstractions;
 
 namespace Audio
 {
@@ -8,13 +11,13 @@ namespace Audio
 	{
 		namespace Interop
 		{
-			public ref class AudioRecording sealed : public FileAudioTake
+			public ref class AudioRecording : public FileAudioTake, public IAudioTarget
 			{
 			public:
 				AudioRecording(System::TimeSpan offset, int sampleRate, System::String^ wavStreamFileName);
 				virtual ~AudioRecording();
 
-				void WriteNextFrame(cli::array<System::Single>^ audioData);
+				//void WriteNextFrame(cli::array<System::Single>^ audioData);
 
 				bool Finish();
 

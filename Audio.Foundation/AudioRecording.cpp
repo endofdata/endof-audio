@@ -28,21 +28,21 @@ WaveFile^ AudioRecording::OpenWaveFile(String^ wavStreamFileName)
 	return gcnew WaveFile();
 }
 
-void AudioRecording::WriteNextFrame(array<float>^ audioData)
-{
-	m_lock->WaitOne();
-
-	try
-	{
-		pin_ptr<float> pinnedData = &audioData[0];
-
-		m_stream->Write(ReadOnlySpan<unsigned char>(pinnedData, audioData->Length * sizeof(float)));
-	}
-	finally
-	{
-		m_lock->ReleaseMutex();
-	}
-}
+//void AudioRecording::WriteNextFrame(array<float>^ audioData)
+//{
+//	m_lock->WaitOne();
+//
+//	try
+//	{
+//		pin_ptr<float> pinnedData = &audioData[0];
+//
+//		m_stream->Write(ReadOnlySpan<unsigned char>(pinnedData, audioData->Length * sizeof(float)));
+//	}
+//	finally
+//	{
+//		m_lock->ReleaseMutex();
+//	}
+//}
 
 bool AudioRecording::Finish()
 {
