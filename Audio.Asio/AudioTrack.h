@@ -29,8 +29,8 @@ namespace Audio
 				static initonly System::String^ IsRecordingProperty = gcnew System::String("IsRecording");
 				static initonly System::String^ IsMutedProperty = gcnew System::String("IsMuted");
 				static initonly System::String^ IsSoloProperty = gcnew System::String("IsSolo");
-				static initonly System::String^ RecordInProperty = gcnew System::String("RecordIn");
-				static initonly System::String^ MonitorOutProperty = gcnew System::String("MonitorOut");
+				static initonly System::String^ SourceProperty = gcnew System::String("Source");
+				static initonly System::String^ TargetProperty = gcnew System::String("Target");
 
 				virtual event System::ComponentModel::PropertyChangedEventHandler^ PropertyChanged
 				{
@@ -172,7 +172,7 @@ namespace Audio
 				/// <summary>
 				/// Gets or sets the audio input from which audio data can be recorded.
 				/// </summary>
-				property IAudioSource^ TrackIn
+				property IAudioSource^ Source
 				{
 					IAudioSource^ get();
 					void set(IAudioSource^ value);
@@ -181,7 +181,7 @@ namespace Audio
 				/// <summary>
 				/// Gets or sets the audio output to which audio data can be sent.
 				/// </summary>
-				property IAudioTarget^ TrackOut
+				property IAudioTarget^ Target
 				{
 					IAudioTarget^ get();
 					void set(IAudioTarget^ value);

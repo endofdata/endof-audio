@@ -56,12 +56,12 @@ TapeMachine^ AudioTrack::Machine::get()
 	return m_machine;
 }
 
-IAudioSource^ AudioTrack::TrackIn::get()
+IAudioSource^ AudioTrack::Source::get()
 {
 	return m_trackIn;
 }
 
-void AudioTrack::TrackIn::set(IAudioSource^ value)
+void AudioTrack::Source::set(IAudioSource^ value)
 {
 	if (value != m_trackIn)
 	{
@@ -72,7 +72,7 @@ void AudioTrack::TrackIn::set(IAudioSource^ value)
 
 		m_trackIn = value;
 
-		OnPropertyChanged(RecordInProperty);
+		OnPropertyChanged(SourceProperty);
 		OnPropertyChanged(IsReadyProperty);
 
 		if (nullptr == value)
@@ -88,12 +88,12 @@ void AudioTrack::TrackIn::set(IAudioSource^ value)
 	}
 }
 
-IAudioTarget^ AudioTrack::TrackOut::get()
+IAudioTarget^ AudioTrack::Target::get()
 {
 	return m_trackOut;
 }
 
-void AudioTrack::TrackOut::set(IAudioTarget^ value)
+void AudioTrack::Target::set(IAudioTarget^ value)
 {
 	if (value != m_trackOut)
 	{
@@ -105,7 +105,7 @@ void AudioTrack::TrackOut::set(IAudioTarget^ value)
 		}
 		m_trackOut = value;
 
-		OnPropertyChanged(MonitorOutProperty);
+		OnPropertyChanged(TargetProperty);
 
 		if (nullptr == value)
 		{
