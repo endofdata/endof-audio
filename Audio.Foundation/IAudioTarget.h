@@ -6,14 +6,12 @@ namespace Audio
 	{
 		namespace Abstractions
 		{
-			interface class IAudioSource;
+			interface class IAudioBuffer;
 
 			public interface class IAudioTarget
 			{
 			public:
-				//bool Link(IAudioSource^ source);
-
-				//void Unlink(IAudioSource^ source);
+				int Write(IAudioBuffer^ data);
 			};
 		}
 	}

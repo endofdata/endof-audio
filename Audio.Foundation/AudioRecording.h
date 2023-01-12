@@ -17,7 +17,7 @@ namespace Audio
 				AudioRecording(System::TimeSpan offset, int sampleRate, System::String^ wavStreamFileName);
 				virtual ~AudioRecording();
 
-				//void WriteNextFrame(cli::array<System::Single>^ audioData);
+				virtual int Write(IAudioBuffer^ buffer);
 
 				bool Finish();
 

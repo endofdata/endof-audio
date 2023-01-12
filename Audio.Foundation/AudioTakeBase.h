@@ -56,8 +56,6 @@ namespace Audio
 
 				virtual void Initialize();
 
-				//virtual int ReadNextFrame(cli::array<float>^ audioBuffer);
-
 			private:
 				System::TimeSpan m_offset;
 				int m_sampleRate;

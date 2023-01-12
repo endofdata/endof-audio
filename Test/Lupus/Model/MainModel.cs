@@ -107,12 +107,12 @@ namespace Lupus.Model
 			TapeMachine = tapeMachine ?? throw new ArgumentNullException(nameof(tapeMachine));
 
 			nameFormat ??= "TRK {0}";
-			var defaultInput = tapeMachine.Router.Inputs.FirstOrDefault();
+			var defaultInput = (IAudioSource?)tapeMachine.Router.Inputs.FirstOrDefault();
 
 			for (int i = 0; i < maxTracks; i++)
 			{
 				var audioTrack = tapeMachine.AddTrack();
-				audioTrack.RecordIn = defaultInput;
+				audioTrack.Source = defaultInput;
 				audioTrack.Name = string.Format(nameFormat, i + 1);
 			}
 			SelectedOutput = tapeMachine.Router.Outputs.FirstOrDefault();

@@ -4,7 +4,7 @@ using System;
 
 namespace Test.Audio.Asio
 {
-	internal class WaveFileOutput : IAudioOutput, IDisposable
+	internal class WaveFileOutput : IAudioTarget, IDisposable
 	{
 		private bool _isDisposed;
 
@@ -28,9 +28,9 @@ namespace Test.Audio.Asio
 			WaveFile = new WaveFile(path, format);
 		}
 
-		public void WriteCurrentFrame(float[] frameBuffer, float level, float pan)
+		public int Write(IAudioBuffer buffer)
 		{
-			WaveFile.WriteSamples(frameBuffer, 0, frameBuffer.Length);
+			return WaveFile.WriteSamples(buffer);
 		}
 
 		protected virtual void Dispose(bool disposing)

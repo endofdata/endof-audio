@@ -95,6 +95,23 @@ void AsioRouter::CleanUp(bool isDisposing)
 	}
 }
 
+void AsioRouter::OnInputBufferSwitch(bool writeSecondHalf)
+{
+	try
+	{
+		BufferSwitchManagedCallback^ handler = m_inputBufferSwitchHandler;
+
+		if (handler != nullptr)
+		{
+			handler(!writeSecondHalf);
+		}
+	}
+	catch (Exception^)
+	{
+		IsPoweredOn = false;
+	}
+}
+
 void AsioRouter::OnOutputBufferSwitch(bool writeSecondHalf)
 {
 	try
@@ -105,40 +122,10 @@ void AsioRouter::OnOutputBufferSwitch(bool writeSecondHalf)
 		{
 			handler(writeSecondHalf);
 		}
-
-		for each (AudioOutput^ audioOutput in m_audioOutputPairs)
-		{
-			audioOutput->Send();
-		}
 	}
 	catch (Exception^)
 	{
 		IsPoweredOn = false;
-
-		// TraceSource->TraceEvent(TraceEventType::Critical, 9, ExceptionExtensions::GetMessageChain(ex));
-	}
-}
-
-void AsioRouter::OnInputBufferSwitch(bool writeSecondHalf)
-{
-	try
-	{
-		BufferSwitchManagedCallback^ handler = m_inputBufferSwitchHandler;
-
-		//for each (AudioInput ^ audioInput in m_audioInputs)
-		//{
-		//	audioInput->ReadCurrentFrame()
-		//}
-		if (handler != nullptr)
-		{
-			handler(!writeSecondHalf);
-		}
-	}
-	catch (Exception^)
-	{
-		IsPoweredOn = false;
-
-		// TraceSource->TraceEvent(TraceEventType::Critical, 9, ExceptionExtensions::GetMessageChain(ex));
 	}
 }
 

@@ -82,8 +82,3 @@ bool AudioTakeBase::TrySetPosition(TimeSpan position)
 void AudioTakeBase::Initialize()
 {
 }
-
-//int AudioTakeBase::ReadNextFrame(cli::array<float>^ audioBuffer)
-//{
-//	throw gcnew NotImplementedException();
-//}

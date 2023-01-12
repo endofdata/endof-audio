@@ -2,6 +2,7 @@
 
 #include "IAudioSource.h"
 #include "IAudioTarget.h"
+#include "IAudioBuffer.h"
 
 using namespace Audio::Foundation::Abstractions;
 using namespace System::ComponentModel;
@@ -46,6 +47,12 @@ namespace Audio
 				AudioSourceBase();
 				virtual ~AudioSourceBase();
 
+				property int SampleCount
+				{
+					virtual int get();
+					virtual void set(int value);
+				}
+
 				property System::Boolean IsActive
 				{
 					virtual System::Boolean get();
@@ -60,13 +67,17 @@ namespace Audio
 				virtual bool AddTarget(IAudioTarget^ target);
 				virtual bool RemoveTarget(IAudioTarget^ target);
 				virtual void RemoveAllTargets();
+				virtual int Read(IAudioBuffer^ buffer);
 
 			protected:
 				virtual bool OnAddTarget(IAudioTarget^ target);
 				virtual void OnRemoveTarget(IAudioTarget^ target);
 				virtual void OnPropertyChanged(System::String^ propertyName);
+				virtual int OnRead(IAudioBuffer^ buffer);
 
 			private:
+				int m_sampleCount;
+
 				bool m_isActive;
 				System::Collections::Generic::List<IAudioTarget^>^ m_targets;
 

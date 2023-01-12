@@ -2,7 +2,7 @@
 
 #include "Level.h"
 #include "IAudioOutput.h"
-#include "IAudioTarget.h"
+#include "AudioTargetBase.h"
 
 using namespace Audio::Foundation::Abstractions;
 using namespace System::ComponentModel;
@@ -14,7 +14,7 @@ namespace Audio
 		namespace Interop
 		{
 			public ref class AudioOutputBase abstract : 
-				public IAudioTarget,
+				public AudioTargetBase,
 				public IAudioOutput,
 				public INotifyPropertyChanged
 			{

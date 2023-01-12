@@ -61,16 +61,18 @@ TimeSpan FileAudioTake::Length::get()
 	return WavFile->GetLength(SampleRate);
 }
 
-//int FileAudioTake::ReadNextFrame(array<Single>^ audioBuffer)
-//{
-//	int samples = m_waveFile->ReadSamples(audioBuffer, 0, audioBuffer->Length);
-//	float lvl = Level;
-//
-//	for (int s = 0; s < samples; s++)
-//		audioBuffer[s] *= lvl;
-//
-//	return samples;
-//}
+int FileAudioTake::OnRead(IAudioBuffer^ buffer)
+{
+	int sampleCount = SampleCount;
+
+	int samples = m_waveFile->ReadSamples(buffer);
+
+	for each (IAudioTarget ^ target in Targets)
+	{
+		target->Write(buffer);
+	}
+	return sampleCount;
+}
 
 WaveFile^ FileAudioTake::OpenWaveFile(String^ fileName)
 {

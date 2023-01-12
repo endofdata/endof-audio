@@ -1,10 +1,12 @@
 #include "pch.h"
 #include "AudioSourceBase.h"
 
+using namespace System;
 using namespace Audio::Foundation::Interop;
 using namespace System::Collections::Generic;
 
-AudioSourceBase::AudioSourceBase()
+AudioSourceBase::AudioSourceBase() :
+	m_sampleCount(0)
 {
 	m_targets = gcnew List<IAudioTarget^>();
 }
@@ -13,12 +15,23 @@ AudioSourceBase::~AudioSourceBase()
 {
 }
 
-System::Boolean AudioSourceBase::IsActive::get()
+
+int AudioSourceBase::SampleCount::get()
+{
+	return m_sampleCount;
+}
+
+void AudioSourceBase::SampleCount::set(int value)
+{
+	m_sampleCount = value;
+}
+
+Boolean AudioSourceBase::IsActive::get()
 {
 	return m_isActive;
 }
 
-void AudioSourceBase::IsActive::set(System::Boolean value)
+void AudioSourceBase::IsActive::set(Boolean value)
 {
 	m_isActive = value;
 	OnPropertyChanged(IsActiveProperty);
@@ -66,6 +79,11 @@ void AudioSourceBase::RemoveAllTargets()
 	OnPropertyChanged(TargetsProperty);
 }
 
+int AudioSourceBase::Read(IAudioBuffer^ buffer)
+{
+	return OnRead(buffer);
+}
+
 bool AudioSourceBase::OnAddTarget(IAudioTarget^ target)
 {
 	return true;
@@ -73,6 +91,11 @@ bool AudioSourceBase::OnAddTarget(IAudioTarget^ target)
 
 void AudioSourceBase::OnRemoveTarget(IAudioTarget^ target)
 {
+}
+
+int AudioSourceBase::OnRead(IAudioBuffer^ buffer)
+{
+	return 0;
 }
 
 void AudioSourceBase::OnPropertyChanged(System::String^ propertyName)

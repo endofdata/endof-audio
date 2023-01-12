@@ -8,12 +8,10 @@ AudioOutputBase::AudioOutputBase(int channelId)
 	m_channelId = channelId;
 }
 
-// virtual 
 AudioOutputBase::~AudioOutputBase()
 {
 }
 
-// virtual 
 int AudioOutputBase::ChannelId::get()
 {
 	return m_channelId;

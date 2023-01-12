@@ -183,7 +183,7 @@ void TapeMachine::OnOutputBufferSwitch(bool isSecondHalf)
 
 		for each (AudioTrack^ track in m_audioTracks)
 		{
-			if (track->IsHot == false && track->NextFrame())
+			if (!track->IsHot && track->NextFrame())
 			{
 				hasOutput = true;
 				track->Send();

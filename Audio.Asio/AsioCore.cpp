@@ -503,13 +503,13 @@ void AsioCore::OnBufferSwitch(long doubleBufferIndex, ASIOBool directProcess) co
 
 	for (int iOutput = 0; iOutput < m_iOutputChannelPairs; iOutput++)
 	{
-		IOutputChannelPair* pChannelPair = m_pOutputChannelPairs[iOutput];
+		IOutputChannelPairPtr pChannelPair = m_pOutputChannelPairs[iOutput];
 		pChannelPair->Swap(writeSecondHalf);
 	}
 
 	for (int iInput = 0; iInput < m_iInputChannels; iInput++)
 	{
-		IInputChannel* pChannel = m_pInputChannels[iInput];
+		IInputChannelPtr pChannel = m_pInputChannels[iInput];
 		pChannel->Swap(readSecondHalf);
 		pChannel->Send();
 	}
@@ -520,11 +520,12 @@ void AsioCore::OnBufferSwitch(long doubleBufferIndex, ASIOBool directProcess) co
 	{
 		handler(writeSecondHalf);
 	}
-	//for(int iOutput = 0; iOutput < m_iOutputChannelPairs; iOutput++)
-	//{
-	//	Audio::Asio::OutputChannelPair* pChannelPair = m_pOutputChannelPairs[iOutput];
-	//	pChannelPair->Flush();
-	//}
+	for(int iOutput = 0; iOutput < m_iOutputChannelPairs; iOutput++)
+	{
+		IOutputChannelPairPtr pChannelPair = m_pOutputChannelPairs[iOutput];
+		ISampleReceiverPtr pReceiver = pChannelPair->SampleJoiner;
+		pReceiver->Flush();
+	}
 
 	if (m_outputReadySupport)
 	{

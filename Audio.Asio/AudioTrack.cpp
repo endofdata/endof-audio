@@ -58,19 +58,18 @@ TapeMachine^ AudioTrack::Machine::get()
 
 IAudioSource^ AudioTrack::Source::get()
 {
-	return m_trackIn;
+	return m_source;
 }
 
 void AudioTrack::Source::set(IAudioSource^ value)
 {
-	if (value != m_trackIn)
+	if (value != m_source)
 	{
-		if (nullptr == value)
-		{
-			IsHot = false;
-		}
+		bool wasHot = IsHot;
 
-		m_trackIn = value;
+		IsHot = false;
+
+		m_source = value;
 
 		OnPropertyChanged(SourceProperty);
 		OnPropertyChanged(IsReadyProperty);
@@ -81,8 +80,10 @@ void AudioTrack::Source::set(IAudioSource^ value)
 		}
 		else
 		{
+			IsHot = wasHot;
+
 			IAudioInput^ hwInput = (IAudioInput^)value;
-			String^ channelId = hwInput == nullptr ? "?" : hwInput->ChannelId.ToString();
+			String^ channelId = hwInput == nullptr ? "-" : hwInput->ChannelId.ToString();
 			TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 101, "Trk {0}: RecordIn = channel {1}", m_trackId, channelId);
 		}
 	}
@@ -90,20 +91,18 @@ void AudioTrack::Source::set(IAudioSource^ value)
 
 IAudioTarget^ AudioTrack::Target::get()
 {
-	return m_trackOut;
+	return m_target;
 }
 
 void AudioTrack::Target::set(IAudioTarget^ value)
 {
-	if (value != m_trackOut)
+	if (value != m_target)
 	{
-		bool wasMonitoring = false;
+		bool wasHot = IsHot;
 
-		if (m_trackOut != nullptr && m_trackIn != nullptr)
-		{
-			wasMonitoring = m_trackIn->RemoveTarget(m_trackOut);
-		}
-		m_trackOut = value;
+		IsHot = false;
+
+		m_target = value;
 
 		OnPropertyChanged(TargetProperty);
 
@@ -113,17 +112,16 @@ void AudioTrack::Target::set(IAudioTarget^ value)
 		}
 		else
 		{
-			IAudioOutput^ hwOutput = (IAudioOutput^)value;
-			String^ channelId = hwOutput == nullptr ? "?" : hwOutput->ChannelId.ToString();
-			TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 102, "Trk {0}: MonitorOut = channel pair {1}", m_trackId, channelId);
+			IsHot = wasHot;
 
-			if (wasMonitoring)
-			{
-				m_trackIn->AddTarget(m_trackOut);
-			}
+			IAudioOutput^ hwOutput = (IAudioOutput^)value;
+			String^ channelId = hwOutput == nullptr ? "-" : hwOutput->ChannelId.ToString();
+			TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 102, "Trk {0}: MonitorOut = channel pair {1}", m_trackId, channelId);
 		}
 	}
 }
+
+
 
 //Level AudioTrack::DbFS::get()
 //{
@@ -170,7 +168,7 @@ void AudioTrack::Status::set(TrackStatus value)
 
 bool AudioTrack::IsReady::get()
 {
-	return m_trackIn != nullptr;
+	return m_source != nullptr;
 }
 
 bool AudioTrack::IsHot::get()
@@ -190,12 +188,9 @@ void AudioTrack::IsHot::set(bool value)
 			}
 
 			m_isHot = value;
-			m_trackIn->IsActive = true;
+			m_source->IsActive = true;
 			
-			if (m_trackOut != nullptr)
-			{
-				m_trackIn->AddTarget(m_trackOut);
-			}
+			LinkThrough();
 			Prepare();
 		}
 		else
@@ -204,11 +199,8 @@ void AudioTrack::IsHot::set(bool value)
 
 			if (IsReady)
 			{
-				m_trackIn->IsActive = false;
-				if (m_trackOut != nullptr)
-				{
-					m_trackIn->RemoveTarget(m_trackOut);
-				}
+				m_source->IsActive = false;
+				UnlinkThrough();
 			}
 			m_isHot = value;
 
@@ -230,7 +222,7 @@ void AudioTrack::BeginRecording()
 	if (!IsRecording && IsHot)
 	{
 		m_isRecording = true;
-		m_trackIn->AddTarget(m_recordingTake);
+		m_source->AddTarget(m_recordingTake);
 
 		TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 104, "Trk {0}: IsRecording = {1}", m_trackId, m_isRecording);
 
@@ -297,18 +289,35 @@ void AudioTrack::OnPropertyChanged(System::String^ propertyName)
 	PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(propertyName));
 }
 
-void AudioTrack::InsertTake(IAudioTake^ take)
+bool AudioTrack::LinkThrough()
 {
-	if (nullptr == take)
-		throw gcnew ArgumentNullException();
+	bool isLinked = false;
 
-	take->Initialize();
+	if (m_target != nullptr && m_source != nullptr)
+	{
+		isLinked = m_source->AddTarget(m_target);
+	}
+	return isLinked;
+}
 
-	m_takes->Add(take->Offset, take);
+bool AudioTrack::UnlinkThrough()
+{
+	bool wasLinked = false;
+
+	if (m_target != nullptr && m_source != nullptr)
+	{
+		wasLinked = m_source->RemoveTarget(m_target);
+	}
+	return wasLinked;
 }
 
 bool AudioTrack::AdvancePlaybackTake()
 {
+	if (m_playbackTake != nullptr)
+	{
+		((IAudioSource^)m_playbackTake)->RemoveTarget(m_target);
+	}
+
 	m_playbackTake = m_playbackIndex < m_takes->Count ? m_playbackTake = Enumerable::ElementAtOrDefault(m_takes->Values, m_playbackIndex++) : nullptr;
 	m_isAtEndOfStream = nullptr == m_playbackTake && m_playbackIndex >= m_takes->Count;
 
@@ -318,6 +327,7 @@ bool AudioTrack::AdvancePlaybackTake()
 	}
 	else if(m_playbackTake != nullptr)
 	{
+		((IAudioSource^)m_playbackTake)->AddTarget(m_target);
 		TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 108, "Trk {0}: Take from {1} to {2}", m_trackId, m_playbackTake->Offset, m_playbackTake->End);
 	}
 	else
@@ -339,6 +349,16 @@ void AudioTrack::Prepare()
 	}
 
 	NewTake();
+}
+
+void AudioTrack::InsertTake(IAudioTake^ take)
+{
+	if (nullptr == take)
+		throw gcnew ArgumentNullException();
+
+	take->Initialize();
+
+	m_takes->Add(take->Offset, take);
 }
 
 void AudioTrack::NewTake()
@@ -382,38 +402,34 @@ bool AudioTrack::NextFrame()
 	{
 		if (IsHot)
 		{
-			// TODO: Implement 'CopyCurrentFrame' w/o marshalling?
-			//RecordIn->ReadCurrentFrame(m_pCurrentFrame);
+			// target and recording take are linked to source, when hot/recording
+			//Source->WriteTo(m_target);
 
 			//if (IsRecording)
 			//{
-			//	m_recordingTake->WriteNextFrame(m_pCurrentFrame);
+			//	Source->WriteTo(m_recordingTake);
 			//}
-			return true;
+			//return true;
 		}
 		else
 		{
 			int samplesTotal = 0;
+			IAudioSource^ source = (IAudioSource^)m_playbackTake;
 
 			while (nullptr != m_playbackTake)
 			{
 				// TODO: Handle partial reads in a single frame
 				if (m_playbackTake->Position <= m_machine->Position)
 				{
-					int samplesRead = 0; // m_playbackTake->ReadNextFrame(m_pCurrentFrame);
+					source->Read(nullptr);
 
-					if (0 >= samplesRead)
+					if(m_playbackTake->End <= m_machine->Position)
 					{
-						AdvancePlaybackTake();						
-					}
-					else
-					{
-						samplesTotal += samplesRead;
-
-						if (samplesTotal >= 0) // m_pCurrentFrame->Length)
+						if (!AdvancePlaybackTake())
 						{
 							break;
 						}
+						source = (IAudioSource^)m_playbackTake;
 					}
 				}
 				else

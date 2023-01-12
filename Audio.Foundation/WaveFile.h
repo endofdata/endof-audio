@@ -1,5 +1,6 @@
 #pragma once
 #include "SampleConversion.h"
+#include "IAudioBuffer.h"
 
 namespace Audio
 {
@@ -103,6 +104,21 @@ namespace Audio
 				void Open(System::String^ fileName);
 
 				/// <summary>
+				/// Reads samples from the WaveFile into <paramref name="data"/> buffer
+				/// </summary>
+				/// <param name="data">Target audio buffer</param>
+				/// <returns>Number of samples written to each channel of <paramref name="data"/>.</returns>
+				/// <remarks>
+				/// <para>Multi-channel sample data is distributed over the first n channels of <paramref name="data"/>. If the source contains more 
+				/// channels than the target, additional source channels are ignored. If the source contains less channels than the target, additional 
+				/// target channels are left unmodified.
+				/// </para>
+				/// <para>The WaveFile must be opened in <see cref="Mode.Play"/> mode.
+				/// </para>
+				/// </remarks>
+				int ReadSamples(Audio::Foundation::Abstractions::IAudioBuffer^ data);
+
+				/// <summary>
 				/// Reads <paramref name="count"/> samples from the WaveFile into <paramref name="data"/> buffer at the given <paramref name="offset"/>. 
 				/// </summary>
 				/// <param name="data">Target sample buffer</param>
@@ -111,6 +127,37 @@ namespace Audio
 				/// <returns>Number of samples written to <paramref name="data"/>.</returns>
 				/// <remarks>The WaveFile must be opened in <see cref="Mode.Play"/> mode.</remarks>
 				int ReadSamples(cli::array<System::Single>^ data, int offset, int count);
+
+				/// <summary>
+				/// Reads samples from the WaveFile into <paramref name="data"/> span.
+				/// </summary>
+				/// <param name="data">Span describing the target buffer</param>
+				/// <returns>Number of samples written to <paramref name="data"/>.</returns>
+				/// <remarks>The WaveFile must be opened in <see cref="Mode.Play"/> mode.</remarks>
+				int ReadSamples(System::Memory<float>^ data);
+
+				/// <summary>
+				/// Reads samples from the WaveFile into <paramref name="data"/> span.
+				/// </summary>
+				/// <param name="pData">Unmanaged pointer to target buffer</param>
+				/// <param name="count">Number of float samples to write</param>
+				/// <returns>Number of samples written to <paramref name="pData"/>.</returns>
+				/// <remarks>The WaveFile must be opened in <see cref="Mode.Play"/> mode.</remarks>
+				int ReadSamples(float* pData, int count);
+
+				/// <summary>
+				/// Reads samples from the WaveFile to the <paramref name="output"/> stream.
+				/// </summary>
+				/// <param name="input">Stream from which the samples can be read</param>
+				/// <param name="count">Number of samples to copy.</param>
+				int ReadSamples(System::IO::Stream^ output, int count);
+
+				/// <summary>
+				/// Writes sampels from the <paramref name="data"/> buffer to the WaveFile.
+				/// </summary>
+				/// <param name="buffer">Source sample buffer</param>
+				/// <returns>Number of samples per channel written to the file.</returns>
+				int WriteSamples(Audio::Foundation::Abstractions::IAudioBuffer^ data);
 
 				/// <summary>
 				/// Writes <paramref name="count"/> samples from <paramref name="data"/> buffer at <paramref name="offset"/> to the WaveFile.
@@ -123,10 +170,27 @@ namespace Audio
 				int WriteSamples(cli::array<System::Single>^ data, int offset, int count);
 
 				/// <summary>
+				/// Writes <paramref name="count"/> samples from <paramref name="data"/> span to the WaveFile.
+				/// </summary>
+				/// <param name="data">Sourc sample buffer</param>
+				/// <returns>Number of samples written to the file.</returns>
+				/// <remarks>The WaveFile must be opened in <see cref="Mode.Record"/> mode.</remarks>
+				int WriteSamples(System::ReadOnlySpan<float>^ data);
+
+				/// <summary>
+				/// Writes <paramref name="count"/> samples from <paramref name="pData"/> to the WaveFile.
+				/// </summary>
+				/// <param name="pData">Unmanaged pointer to source data</param>
+				/// <param name="count">Number of samples to copy.</param>
+				/// <remarks>The WaveFile must be opened in <see cref="Mode.Record"/> mode.</remarks>
+				int WriteSamples(const float* pData, int count);
+
+				/// <summary>
 				/// Writes the contents of <paramref name="input"/> to the WaveFile.
 				/// </summary>
 				/// <param name="input">Stream from which the samples can be read</param>
 				/// <param name="count">Number of samples to copy.</param>
+				/// <remarks>The WaveFile must be opened in <see cref="Mode.Record"/> mode.</remarks>
 				int WriteSamples(System::IO::Stream^ input, int count);
 
 				/// <summary>

@@ -159,6 +159,7 @@
     <ClInclude Include="AudioTargetBase.h" />
     <ClInclude Include="ExceptionExtensions.h" />
     <ClInclude Include="FileAudioTake.h" />
+    <ClInclude Include="IAudioBuffer.h" />
     <ClInclude Include="IAudioInput.h" />
     <ClInclude Include="IAudioOutput.h" />
     <ClInclude Include="IAudioSource.h" />

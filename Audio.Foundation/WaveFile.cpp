@@ -4,8 +4,10 @@
 #include <SampleConversionUnmanaged.h>
 
 using namespace System;
+using namespace System::Buffers;
 using namespace System::IO;
 using namespace System::Threading;
+using namespace Audio::Foundation::Abstractions;
 using namespace Audio::Foundation::Interop;
 
 WaveFile::WaveFile() : m_mode(Mode::Closed)
@@ -78,7 +80,7 @@ void WaveFile::Create(String^ fileName, WaveFormat^ format)
 
 	try
 	{
-		m_wavFormat = format;
+		Format = format;
 		m_samplesRecorded = 0;
 		m_mode = Mode::Record;
 		m_wavStream = gcnew FileStream(fileName, FileMode::CreateNew, FileAccess::ReadWrite);
@@ -224,32 +226,166 @@ void WaveFile::Close()
 	}
 }
 
-int WaveFile::ReadSamples(array<float>^ data, int offset, int count)
+int WaveFile::ReadSamples(IAudioBuffer^ data)
 {
 	if (m_mode != Mode::Play)
 	{
 		throw gcnew InvalidOperationException("Invalid Mode.");
 	}
 
-	int sample;
+	int sourceChannels = Format->Channels;
+	int targetChannels = data->ChannelCount;
+	int done;
+	
+	if (sourceChannels == targetChannels == 1)
+	{
+		return ReadSamples((float*)data->SamplePointer[0].ToPointer(), data->SampleCount);
+	}
 
-	for (sample = 0; sample < count; sample++)
+	array<float*>^ pTargets = gcnew array<float*>(targetChannels);
+
+	for (int c = 0; c < targetChannels; c++)
+	{
+		pTargets[c] = (float*)data->SamplePointer[c].ToPointer();
+	}
+
+	for (done = 0; done < data->SampleCount; done++)
+	{
+		for (int c = 0; c < sourceChannels; c++)
+		{
+			if (c > targetChannels)
+			{
+				m_sampleReader();
+			}
+			else
+			{
+				*pTargets[c]++ = m_sampleReader();
+			}
+		}
+	}
+	return done;
+}
+
+int WaveFile::ReadSamples(array<float>^ data, int offset, int count)
+{
+	return ReadSamples(gcnew Memory<float>(data, offset, count));
+}
+
+int WaveFile::ReadSamples(Memory<float>^ data)
+{
+	MemoryHandle^ handle = data->Pin();
+
+	try
+	{
+		return ReadSamples((float*)handle->Pointer, data->Length);
+	}
+	finally
+	{
+		delete handle;
+	}
+}
+
+int WaveFile::ReadSamples(float* pData, int count)
+{
+	if (m_mode != Mode::Play)
+	{
+		throw gcnew InvalidOperationException("Invalid Mode.");
+	}
+
+	int done;
+
+	for (done = 0; done < count; done++)
 	{
 		if (m_binaryReader->BaseStream->Length > m_binaryReader->BaseStream->Position)
 		{
-			data[offset + sample] = m_sampleReader();
+			*pData++ = m_sampleReader();
 		}
 		else
 		{
 			break;
 		}
 	}
+	return done;
+}
 
-	return sample;
+int WaveFile::ReadSamples(Stream^ output, int count)
+{
+	if (m_mode != Mode::Play)
+	{
+		throw gcnew InvalidOperationException("Invalid Mode.");
+	}
+
+	int done;
+
+	BinaryWriter^ writer = gcnew BinaryWriter(output, System::Text::Encoding::Default, true);
+
+	for (done = 0; done < count; done++)
+	{
+		if (m_binaryReader->BaseStream->Length > m_binaryReader->BaseStream->Position)
+		{
+			writer->Write(m_sampleReader());
+		}
+		else
+		{
+			break;
+		}
+	}
+	return done;
+}
+
+int WaveFile::WriteSamples(IAudioBuffer^ data)
+{
+	if (m_mode != Mode::Record)
+	{
+		throw gcnew InvalidOperationException("Invalid Mode.");
+	}
+
+	int sourceChannels = data->ChannelCount;
+	int targetChannels = Format->Channels; 
+	int done;
+
+	if (sourceChannels == targetChannels == 1)
+	{
+		return WriteSamples((float*)data->SamplePointer[0].ToPointer(), data->SampleCount);
+	}
+
+	array<const float*>^ pSources = gcnew array<const float*>(sourceChannels);
+
+	for (int c = 0; c < sourceChannels; c++)
+	{
+		pSources[c] = (const float*)data->SamplePointer[c].ToPointer();
+	}
+
+	for (done = 0; done < data->SampleCount; done++)
+	{
+		for (int c = 0; c < targetChannels; c++)
+		{
+			if (c > sourceChannels)
+			{
+				m_sampleWriter(0.0f);
+			}
+			else
+			{
+				m_sampleWriter(*pSources[c]++);
+			}
+		}
+	}
+
+	return done;
 }
 
 int WaveFile::WriteSamples(array<float>^ data, int offset, int count)
 {
+	return WriteSamples(ReadOnlySpan<float>(data, offset, count));
+}
+
+int WaveFile::WriteSamples(ReadOnlySpan<float>^ data)
+{
+	if (m_mode != Mode::Record)
+	{
+		throw gcnew InvalidOperationException("Invalid Mode.");
+	}
+
 	m_lock->WaitOne();
 	int done = 0;
 
@@ -257,14 +393,40 @@ int WaveFile::WriteSamples(array<float>^ data, int offset, int count)
 	{
 		if (m_mode == Mode::Record)
 		{
-			pin_ptr<float> pinned_data = &data[0];
-			float* pDataPos = pinned_data;
-
-			for (int sample = 0; sample < count; sample++)
+			for each(float sample in data)
 			{
-				m_sampleWriter(*pDataPos++);
+				m_sampleWriter(sample);
 			}
-			done = count;
+			done = data->Length;
+		}
+	}
+	finally
+	{
+		m_lock->ReleaseMutex();
+	}
+	m_samplesRecorded = Nullable<int>();
+
+	return done;
+}
+
+int WaveFile::WriteSamples(const float* pData, int count)
+{
+	if (m_mode != Mode::Record)
+	{
+		throw gcnew InvalidOperationException("Invalid Mode.");
+	}
+
+	m_lock->WaitOne();
+	int done = 0;
+	
+	try
+	{
+		if (m_mode == Mode::Record)
+		{
+			for(done = 0; done < count; done++)
+			{
+				m_sampleWriter(*pData++);
+			}
 		}
 	}
 	finally
@@ -278,6 +440,11 @@ int WaveFile::WriteSamples(array<float>^ data, int offset, int count)
 
 int WaveFile::WriteSamples(Stream^ input, int count)
 {
+	if (m_mode != Mode::Record)
+	{
+		throw gcnew InvalidOperationException("Invalid Mode.");
+	}
+
 	m_lock->WaitOne();
 	int done = 0;
 

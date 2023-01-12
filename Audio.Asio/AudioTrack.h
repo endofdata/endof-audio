@@ -227,6 +227,9 @@ namespace Audio
 
 				bool AdvancePlaybackTake();
 
+				bool UnlinkThrough();
+				bool LinkThrough();
+
 				AudioRecording^ m_recordingTake;
 				IAudioTake^ m_playbackTake;
 				int m_playbackIndex;
@@ -241,8 +244,8 @@ namespace Audio
 
 				int m_trackId;
 				TapeMachine^ m_machine;
-				IAudioSource^ m_trackIn;
-				IAudioTarget^ m_trackOut;
+				IAudioSource^ m_source;
+				IAudioTarget^ m_target;
 
 				System::ComponentModel::PropertyChangedEventHandler^ m_propertyChangedEventHandler;
 			};

@@ -15,6 +15,11 @@ namespace Audio
 			public:
 				AudioTargetBase();
 				virtual ~AudioTargetBase();
+
+				virtual int Write(IAudioBuffer^ buffer);
+
+			protected:
+				virtual int OnWrite(IAudioBuffer^ buffer);
 			};
 		}
 	}

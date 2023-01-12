@@ -195,14 +195,14 @@ namespace Test.Audio.Asio
 
 					using WaveFile takeData = new(takeDataPath, format);
 
-					int done;
+					int done = 0;
 					var buffer = new float[512];
 
 					foreach (var take in track.Takes)
 					{
 						do
 						{
-							done = take.ReadNextFrame(buffer);
+							//done = take.ReadNextFrame(buffer);
 							takeData.WriteSamples(buffer, 0, done);
 
 						} while (done > 0);
@@ -224,7 +224,7 @@ namespace Test.Audio.Asio
 					// Use a WaveFileOuput as the track's output, so that track data
 					// is written in a wave file, when tapeMachine is running
 					using var trackOutput = new WaveFileOutput(trackOutputPath, format);
-					track.MonitorOut = trackOutput;
+					track.Target = trackOutput;
 
 					tapeMachine.IsRunning = true;
 
@@ -232,7 +232,7 @@ namespace Test.Audio.Asio
 
 					tapeMachine.IsRunning = false;
 
-					track.MonitorOut = tapeMachine.Router.Outputs[0];
+					track.Target = (IAudioTarget?)tapeMachine.Router.Outputs[0];
 					tapeMachine.Position = TimeSpan.Zero;
 
 					trackOutput.Dispose();

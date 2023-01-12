@@ -28,21 +28,23 @@ WaveFile^ AudioRecording::OpenWaveFile(String^ wavStreamFileName)
 	return gcnew WaveFile();
 }
 
-//void AudioRecording::WriteNextFrame(array<float>^ audioData)
-//{
-//	m_lock->WaitOne();
-//
-//	try
-//	{
-//		pin_ptr<float> pinnedData = &audioData[0];
-//
-//		m_stream->Write(ReadOnlySpan<unsigned char>(pinnedData, audioData->Length * sizeof(float)));
-//	}
-//	finally
-//	{
-//		m_lock->ReleaseMutex();
-//	}
-//}
+int AudioRecording::Write(IAudioBuffer^ buffer)
+{
+	m_lock->WaitOne();
+
+	try
+	{
+		pin_ptr<float> pinnedData = (float*)buffer->SamplePointer[0].ToPointer();
+
+		m_stream->Write(ReadOnlySpan<unsigned char>(pinnedData, buffer->SampleCount * sizeof(float)));
+
+		return buffer->SampleCount;
+	}
+	finally
+	{
+		m_lock->ReleaseMutex();
+	}
+}
 
 bool AudioRecording::Finish()
 {
@@ -52,7 +54,7 @@ bool AudioRecording::Finish()
 	{
 		m_stream->Flush();
 
-		int recorded = m_stream->Position / sizeof(float);
+		int recorded = m_stream->Position / (int)sizeof(float);
 
 		if (recorded <= 0)
 		{

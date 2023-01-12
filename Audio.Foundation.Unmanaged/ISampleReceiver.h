@@ -20,15 +20,15 @@ namespace Audio
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("3a7970a7-fdb6-4dc6-ba80-540ab339c988")) ISampleReceiver : public IUnknown
 				{
 					/// <summary>
-					/// Resets the sample receiver's internal status
-					/// </summary>
-					void Flush() = 0;
-
-					/// <summary>
 					/// Processes the current sample buffers of the <paramref name="input"/> container
 					/// </summary>
 					/// <param name="input">Input sample container</param>
 					void Receive(ISampleContainerPtr input) = 0;
+
+					/// <summary>
+					/// Flushes received samples down the wire
+					/// </summary>
+					void Flush() = 0;
 				};
 
 				_COM_SMARTPTR_TYPEDEF(ISampleReceiver, __uuidof(ISampleReceiver));
