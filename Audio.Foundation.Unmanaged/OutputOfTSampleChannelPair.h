@@ -79,7 +79,7 @@ namespace Audio
 
 					virtual void Receive(ISampleContainerPtr input)
 					{
-						int inputChannels = input->ChannelCount;
+						int inputChannels = input == nullptr? 0 : input->ChannelCount;
 
 						if (inputChannels > 0)
 						{

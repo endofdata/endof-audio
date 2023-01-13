@@ -74,17 +74,26 @@ void SampleJoiner::put_Target(ISampleReceiverPtr value)
 
 void SampleJoiner::Receive(ISampleContainerPtr container)
 {
-	int maxChannels = min(container->ChannelCount, ChannelCount);
-	float chnLvl = (float)(ChannelCount / container->ChannelCount);
+	int sourceChannels = container == nullptr? 0 : container->ChannelCount;
+	int targetChannels = ChannelCount;
+	float chnLvl = 1.0f;
 
-	for (int c = 0; c < maxChannels; c++)
+	for (int c = 0; c < targetChannels; c++)
 	{
-		const float* pSource = container->Channels[c]->SamplePtr;
 		float* pDest = Channels[c]->SamplePtr;
 
-		for (int i = 0; i < SampleCount; i++)
+		if (c < sourceChannels)
 		{
-			*pDest++ = SampleConversion::AddSignals(*pDest, *pSource++ * chnLvl);
+			const float* pSource = container->Channels[c]->SamplePtr;
+
+			for (int i = 0; i < SampleCount; i++)
+			{
+				*pDest++ = SampleConversion::AddSignals(*pDest, *pSource++ * chnLvl);
+			}
+		}
+		else
+		{
+			ZeroMemory(pDest, SampleCount * sizeof(float));
 		}
 	}
 }
