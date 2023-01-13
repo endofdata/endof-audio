@@ -43,10 +43,6 @@ TapeMachine::TapeMachine(AsioRouter^ router)
 
 	m_audioTracks = gcnew AudioTrackCollection();
 	m_audioTracks->CollectionChanged += gcnew System::Collections::Specialized::NotifyCollectionChangedEventHandler(this, &TapeMachine::AudioTracks_CollectionChanged);
-
-	// Do not attach buffer switch handler, before initialization is complete: the device may already be running
-	m_router->AttachBufferSwitchHandler(gcnew BufferSwitchManagedCallback(this, &TapeMachine::OnInputBufferSwitch), true);
-	m_router->AttachBufferSwitchHandler(gcnew BufferSwitchManagedCallback(this, &TapeMachine::OnOutputBufferSwitch), false);
 }
 
 TapeMachine::~TapeMachine()
@@ -61,11 +57,6 @@ TapeMachine::!TapeMachine()
 
 void TapeMachine::CleanUp(bool fIsDisposing)
 {
-	if (m_router != nullptr)
-	{
-		m_router->DetachBufferSwitchHandler(false);
-		m_router->DetachBufferSwitchHandler(true);
-	}
 	if (m_idleEvent != nullptr)
 	{
 		m_idleEvent->Set();
@@ -173,42 +164,6 @@ void TapeMachine::OnIdle()
 void TapeMachine::OnPropertyChanged(System::String^ propertyName)
 {
 	PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(propertyName));
-}
-
-void TapeMachine::OnOutputBufferSwitch(bool isSecondHalf)
-{
-	if (m_isRunning)
-	{
-		bool hasOutput = false;
-
-		for each (AudioTrack^ track in m_audioTracks)
-		{
-			if (!track->IsHot && track->NextFrame())
-			{
-				hasOutput = true;
-				track->Send();
-			}
-		}
-
-		if (!hasOutput && !IsRecording)
-		{
-			OnIdle();
-		}
-	}
-}
-
-void TapeMachine::OnInputBufferSwitch(bool isSecondHalf)
-{
-	// We process data for each hot track so that input monitoring works
-	// even when tape machine is not running or recording
-	for each (AudioTrack^ track in m_audioTracks)
-	{
-		if (track->IsHot == true)
-		{
-			track->NextFrame();
-			track->Send();
-		}
-	}
 }
 
 String^ TapeMachine::GetTempAudioFileName()

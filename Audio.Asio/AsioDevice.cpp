@@ -90,7 +90,6 @@ AsioDevice::!AsioDevice()
 
 void AsioDevice::CleanUp(bool fIsDisposing)
 {
-	DetachBufferSwitchHandler();
 	delete m_pCore;
 }
 
@@ -114,38 +113,9 @@ void AsioDevice::OnPropertyChanged(System::String^ propertyName)
 	PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(propertyName));
 }
 
-void AsioDevice::AttachBufferSwitchHandler(BufferSwitchManagedCallback^ bufferSwitchHandler)
-{
-	if (bufferSwitchHandler == nullptr)
-	{
-		throw gcnew ArgumentNullException("Parameter 'bufferSwitchHandler' cannot be null.");
-	}
-
-	if (m_delegateHandle.IsAllocated)
-	{
-		DetachBufferSwitchHandler();
-	}
-	//BufferSwitchManagedCallback^ delegateInstance = gcnew BufferSwitchManagedCallback(this, &AsioDevice::test);
-	m_delegateHandle = GCHandle::Alloc(bufferSwitchHandler);
-	IntPtr functionPointer = Marshal::GetFunctionPointerForDelegate(bufferSwitchHandler);
-	m_pCore->BufferSwitch = static_cast<BufferSwitchEventHandler>(functionPointer.ToPointer());
-}
-
-void AsioDevice::DetachBufferSwitchHandler()
-{
-	IsPoweredOn = false;
-	m_pCore->BufferSwitch = NULL;
-
-	if (m_delegateHandle.IsAllocated)
-	{
-		m_delegateHandle.Free();
-	}
-}
-
-
 String^ AsioDevice::DriverName::get()
 {
-	char acTemp[256];
+	char acTemp[MaxAsioDriverName];
 	ZeroMemory(acTemp, sizeof(acTemp));
 	m_pCore->GetDriverName(acTemp);
 	return gcnew String(acTemp);
@@ -228,7 +198,7 @@ System::Collections::Generic::IDictionary<int, String^>^ AsioDevice::AvailableOu
 	Dictionary<int, String^>^ result = gcnew Dictionary<int, String^>;
 
 	int channelMax = m_pCore->OutputChannelPairCount;
-	char buffer[42];
+	char buffer[Audio::Asio::Unmanaged::MaxAsioChannelName];
 
 	for(int channelId = 0; channelId < channelMax; channelId++)
 	{

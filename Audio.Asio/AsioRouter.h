@@ -1,6 +1,5 @@
 #pragma once
 
-#include "BufferSwitchManagedCallback.h"
 #include "AudioOutputCollection.h"
 #include "AudioInputCollection.h"
 #include "AsioDevice.h"
@@ -82,15 +81,9 @@ namespace Audio
 				{
 					int get();
 				}
-
-				void AttachBufferSwitchHandler(BufferSwitchManagedCallback^ bufferSwitchHandler, bool isInput);
-				void DetachBufferSwitchHandler(bool isInput);
-
+								
 			private:
 				void CleanUp(bool fIsDisposing);
-				void OnInputBufferSwitch(bool isSecondHalf);
-				void OnOutputBufferSwitch(bool isSecondHalf);
-				void OnDuplexBufferSwitch(bool isSecondHalf);
 				void OnPropertyChanged(System::String^ propertyName);
 
 				AsioDevice^ m_inputDevice;
@@ -100,8 +93,6 @@ namespace Audio
 				AudioInputCollection^ m_audioInputs;
 				AudioOutputCollection^ m_audioOutputPairs;
 
-				BufferSwitchManagedCallback^ m_inputBufferSwitchHandler;
-				BufferSwitchManagedCallback^ m_outputBufferSwitchHandler;
 
 				System::ComponentModel::PropertyChangedEventHandler^ m_propertyChangedEventHandler;
 			};

@@ -106,7 +106,6 @@
     <ClCompile Include="AsioRouter.cpp" />
     <ClInclude Include="AudioTrack.h" />
     <ClInclude Include="AudioTrackCollection.h" />
-    <ClInclude Include="BufferSwitchManagedCallback.h" />
     <ClInclude Include="ChannelNameEnumerable.h" />
     <ClInclude Include="ChannelNameEnumerator.h" />
     <ClInclude Include="DriverRegistry.h" />
@@ -162,7 +161,6 @@
     </ItemGroup>
     <Copy SourceFiles="@(Dependencies)" DestinationFolder="$(OutDir)" />
   </Target>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

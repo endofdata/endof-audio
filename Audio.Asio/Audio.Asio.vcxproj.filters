@@ -82,9 +82,6 @@
     <ClInclude Include="AsioDeviceCollection.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="BufferSwitchManagedCallback.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="DriverRegistry.h">
       <Filter>Header</Filter>
     </ClInclude>

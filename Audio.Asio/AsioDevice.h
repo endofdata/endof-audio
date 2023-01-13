@@ -1,6 +1,5 @@
 #pragma once
 
-#include "BufferSwitchManagedCallback.h"
 #include <IInputChannel.h>
 #include <IOutputChannelPair.h>
 #include <AsioCore.h>
@@ -159,9 +158,6 @@ namespace Audio
 					int get();
 					void set(int value);
 				}
-
-				void AttachBufferSwitchHandler(BufferSwitchManagedCallback^ bufferSwitchHandler);
-				void DetachBufferSwitchHandler();
 
 				IInputChannelPtr GetInputChannel(int index);
 				IOutputChannelPairPtr GetOutputChannelPair(int index);

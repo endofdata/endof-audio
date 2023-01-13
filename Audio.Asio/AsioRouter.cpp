@@ -47,22 +47,6 @@ AsioRouter::AsioRouter(AsioDevice^ outputDevice, AsioDevice^ inputDevice)
 			m_audioInputs->Add(gcnew AudioInput(inputDevice->SampleRate, pInput, i + 1));
 		}
 	}
-
-	// Do not attach buffer switch handler before initialization is complete: the device may already be running
-	if (outputDevice != inputDevice)
-	{
-		if (inputDevice != nullptr)
-		{
-			inputDevice->AttachBufferSwitchHandler(gcnew BufferSwitchManagedCallback(this, &AsioRouter::OnInputBufferSwitch));
-		}
-		outputDevice->AttachBufferSwitchHandler(gcnew BufferSwitchManagedCallback(this, &AsioRouter::OnOutputBufferSwitch));
-	}
-	else
-	{
-		outputDevice->AttachBufferSwitchHandler(gcnew BufferSwitchManagedCallback(this, &AsioRouter::OnDuplexBufferSwitch));
-	}
-
-	//TraceSource->TraceEvent(TraceEventType::Information, 2, "Created {0} input channel(s) and {1} output channel pair(s).", m_audioInputs->Count, m_audioOutputPairs->Count);
 }
 
 AsioRouter::~AsioRouter()
@@ -92,74 +76,6 @@ void AsioRouter::CleanUp(bool isDisposing)
 	if (m_audioInputs != nullptr)
 	{
 		m_audioInputs->Clear();
-	}
-}
-
-void AsioRouter::OnInputBufferSwitch(bool writeSecondHalf)
-{
-	try
-	{
-		BufferSwitchManagedCallback^ handler = m_inputBufferSwitchHandler;
-
-		if (handler != nullptr)
-		{
-			handler(!writeSecondHalf);
-		}
-	}
-	catch (Exception^)
-	{
-		IsPoweredOn = false;
-	}
-}
-
-void AsioRouter::OnOutputBufferSwitch(bool writeSecondHalf)
-{
-	try
-	{
-		BufferSwitchManagedCallback^ handler = m_outputBufferSwitchHandler;
-
-		if (handler != nullptr)
-		{
-			handler(writeSecondHalf);
-		}
-	}
-	catch (Exception^)
-	{
-		IsPoweredOn = false;
-	}
-}
-
-void AsioRouter::OnDuplexBufferSwitch(bool writeSecondHalf)
-{
-	OnInputBufferSwitch(writeSecondHalf);
-	OnOutputBufferSwitch(writeSecondHalf);
-}
-
-void AsioRouter::AttachBufferSwitchHandler(BufferSwitchManagedCallback^ bufferSwitchHandler, bool isInput)
-{
-	if (bufferSwitchHandler == nullptr)
-	{
-		throw gcnew ArgumentNullException("Parameter 'bufferSwitchHandler' cannot be null.");
-	}
-	if (isInput)
-	{
-		m_inputBufferSwitchHandler = bufferSwitchHandler;
-	}
-	else
-	{
-		m_outputBufferSwitchHandler = bufferSwitchHandler;
-	}
-}
-
-void AsioRouter::DetachBufferSwitchHandler(bool isInput)
-{
-	if (isInput)
-	{
-		m_inputBufferSwitchHandler = nullptr;
-	}
-	else
-	{
-		m_outputBufferSwitchHandler = nullptr;
 	}
 }
 

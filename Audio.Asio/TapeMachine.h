@@ -170,9 +170,6 @@ namespace Audio
 
 				System::String^ GetTempAudioFileName();
 
-				void OnInputBufferSwitch(bool isSecondHalf);
-				void OnOutputBufferSwitch(bool isSecondHalf);
-
 			private:
 				void CleanUp(bool fIsDisposing);
 
