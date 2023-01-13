@@ -74,8 +74,8 @@ AsioDevice::AsioDevice(AsioCore* pCore)
 		throw gcnew ArgumentNullException("Parameter 'pCore' cannot be null.");
 	}
 	m_pCore = pCore;
-	m_activeInputChannels = gcnew List<int>();
-	m_activeOutputChannels = gcnew List<int>();
+	m_activeInputChannelIds = gcnew List<int>();
+	m_activeOutputChannelIds = gcnew List<int>();
 }
 
 AsioDevice::~AsioDevice()
@@ -213,35 +213,35 @@ bool AsioDevice::SelectInputChannel(int channelId, bool isSelected)
 {
 	if (isSelected)
 	{
-		if (!m_activeInputChannels->Contains(channelId))
+		if (!m_activeInputChannelIds->Contains(channelId))
 		{
-			m_activeInputChannels->Add(channelId);
+			m_activeInputChannelIds->Add(channelId);
 		}
 		return true;
 	}
-	return m_activeInputChannels->Remove(channelId);
+	return m_activeInputChannelIds->Remove(channelId);
 }
 
 bool AsioDevice::SelectOutputChannel(int channelId, bool isSelected)
 {
 	if (isSelected)
 	{
-		if (!m_activeOutputChannels->Contains(channelId))
+		if (!m_activeOutputChannelIds->Contains(channelId))
 		{
-			m_activeOutputChannels->Add(channelId);
+			m_activeOutputChannelIds->Add(channelId);
 		}
 		return true;
 	}
-	return m_activeOutputChannels->Remove(channelId);
+	return m_activeOutputChannelIds->Remove(channelId);
 }
 
 void AsioDevice::ActivateChannels()
 {
-	array<int>^ inputChannels = m_activeInputChannels->ToArray();
-	array<int>^ outputChannels = m_activeOutputChannels->ToArray();
+	array<int>^ inputChannelIds = m_activeInputChannelIds->ToArray();
+	array<int>^ outputChannelIds = m_activeOutputChannelIds->ToArray();
 
-	pin_ptr<int> pInput = &inputChannels[0];
-	pin_ptr<int> pOutput = &outputChannels[0];
+	pin_ptr<int> pInputIds = &inputChannelIds[0];
+	pin_ptr<int> pOutputIds = &outputChannelIds[0];
 
-	m_pCore->CreateBuffers(pInput, inputChannels->Length, pOutput, outputChannels->Length, AsioCore::UsePreferredSize);
+	m_pCore->CreateBuffers(pInputIds, inputChannelIds->Length, pOutputIds, outputChannelIds->Length, AsioCore::UsePreferredSize);
 }

@@ -170,8 +170,8 @@ namespace Audio
 				bool m_isPoweredOn;
 				System::Runtime::InteropServices::GCHandle m_delegateHandle;
 				System::ComponentModel::PropertyChangedEventHandler^ m_propertyChangedEventHandler;
-				System::Collections::Generic::List<int>^ m_activeInputChannels;
-				System::Collections::Generic::List<int>^ m_activeOutputChannels;
+				System::Collections::Generic::List<int>^ m_activeInputChannelIds;
+				System::Collections::Generic::List<int>^ m_activeOutputChannelIds;
 			};
 		}
 	}
