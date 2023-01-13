@@ -8,3 +8,22 @@
 #endif
 #endif
 
+namespace Audio
+{
+	namespace Asio
+	{
+		namespace Unmanaged
+		{
+			// max 32 bytes incl. terminating zero
+			const int MaxAsioChannelName = 32;
+
+			// max 32 bytes incl. terminating zero
+			const int MaxAsioDriverName = 32;
+
+			// max 124 bytes incl. teminating zero
+			const int MaxAsioErrorMessage = 124;
+
+
+		}
+	}
+}

@@ -124,7 +124,7 @@ void DriverDescription::put_DriverName(const char* value)
 
 	if (NULL != value)
 	{
-		if (strlen(value) >= MaxAsioDriverName)
+		if (strlen(value) >= Audio::Asio::Unmanaged::MaxAsioDriverName)
 			throw E_INVALIDARG;
 
 		m_pDriverName = _strdup(value);

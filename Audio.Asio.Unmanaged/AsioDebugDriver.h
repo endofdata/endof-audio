@@ -60,7 +60,7 @@ namespace Audio
 				long m_selectedClockSource;
 
 				void* m_pSysHandle;
-				char m_acErrorMessage[MaxAsioErrorMessage + 1];
+				char m_acErrorMessage[Audio::Asio::Unmanaged::MaxAsioErrorMessage + 1];
 				bool m_isStarted;
 				ASIOSamples m_samplePos;
 				ASIOTimeStamp m_timeStamp;

@@ -9,12 +9,6 @@ namespace Audio
 	{
 		namespace Debug
 		{
-			// max 32 bytes incl. terminating zero
-			const int MaxAsioDriverName = 32;
-
-			// max 124 bytes incl.
-			const int MaxAsioErrorMessage = 124;
-
 			class _AUDIO_ASIO_UNMANAGED_API DriverDescription
 			{
 			public:

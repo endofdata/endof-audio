@@ -126,7 +126,7 @@ void AsioDebugDriver::getDriverName(char *name)
 	else
 		pcszOwnName = "ASIO Debug Driver";
 
-	strncpy_s(name, MaxAsioDriverName, pcszOwnName, MaxAsioDriverName - 1);
+	strncpy_s(name, Audio::Asio::Unmanaged::MaxAsioDriverName, pcszOwnName, Audio::Asio::Unmanaged::MaxAsioDriverName - 1);
 }
 
 
@@ -138,7 +138,7 @@ long AsioDebugDriver::getDriverVersion()
 
 void AsioDebugDriver::getErrorMessage(char *string)
 {
-	strncpy_s(string, MaxAsioErrorMessage, m_acErrorMessage, MaxAsioErrorMessage - 1);
+	strncpy_s(string, Audio::Asio::Unmanaged::MaxAsioErrorMessage, m_acErrorMessage, Audio::Asio::Unmanaged::MaxAsioErrorMessage - 1);
 }
 
 DWORD AsioDebugDriver::RunInterruptSimulator()
