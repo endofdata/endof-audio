@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Audio.Asio.Unmanaged.h>
 #include "DriverDescription.h"
 
 // This to have a safe include for IASIO
@@ -11,7 +12,7 @@ namespace Audio
 	{
 		namespace Debug
 		{
-			class AsioDebugDriver : public IASIO
+			class _AUDIO_ASIO_UNMANAGED_API AsioDebugDriver : public IASIO
 			{
 			public:
 				AsioDebugDriver();

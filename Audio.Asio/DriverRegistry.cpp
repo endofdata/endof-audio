@@ -1,11 +1,14 @@
 #include "pch.h"
+#define INITGUID
+#include "AsioDebugDriverGuid.h"
+#undef INITGUID
 #include "DriverRegistry.h"
 using namespace System;
 using namespace System::Collections::ObjectModel;
 using namespace Microsoft::Win32;
 using namespace Audio::Asio::Interop;
 
-#include "AsioDebugDriverGuid.h"
+
 
 RegisteredDriver::RegisteredDriver(Guid clsId, String^ name)
 {

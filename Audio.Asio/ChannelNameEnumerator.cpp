@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ChannelNameEnumerator.h"
 #include "AsioError.h"
-#include "AsioCoreException.h"
+#include "AsioInteropException.h"
 
 using namespace System;
 using namespace Audio::Asio::Interop;
@@ -81,9 +81,10 @@ void ChannelNameEnumerator::ThrowIfFailed(ASIOError error)
 {
 	if (ASE_OK != error)
 	{
-		// Cast does not fail: If error is a known Interop::AsioError enum value, we see the corresponding value, otherwise, the numeric error value.
-		Audio::Asio::Interop::AsioError errorValue = (Audio::Asio::Interop::AsioError)error;
+		//// Cast does not fail: If error is a known Interop::AsioError enum value, we see the corresponding value, otherwise, the numeric error value.
+		//Audio::Asio::Unmanaged::AsioError errorValue = (Audio::Asio::Unmanaged::AsioError)error;
 
-		throw gcnew AsioCoreException(System::String::Format(L"AsioCore: ASIO driver reported error '{0}'.", errorValue), (int)error);
+		//throw gcnew AsioCoreException(System::String::Format(L"AsioCore: ASIO driver reported error '{0}'.", errorValue), (int)error);
+		throw gcnew AsioInteropException(System::String::Format(L"AsioCore: ASIO driver reported error '{0}'.", error), (int)error);
 	}
 }

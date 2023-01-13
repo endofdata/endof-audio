@@ -27,7 +27,4 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <CopyFileToFolders Include="..\..\Audio.Foundation.Unmanaged\bin\Debug\x64\Audio.Foundation.Unmanaged.dll" />
-  </ItemGroup>
 </Project>

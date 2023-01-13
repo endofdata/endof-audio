@@ -6,6 +6,7 @@
 #include "IInputChannel.h"
 #include "ObjectFactory.h"
 
+using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 namespace Audio
@@ -34,7 +35,7 @@ namespace Audio
 						m_refCount(0)
 					{
 						if (NULL == m_pBufferA || NULL == m_pBufferB)
-							throw gcnew AsioCoreException("InputChannel: Buffer pointers must not be NULL.", E_INVALIDARG);
+							throw std::invalid_argument("InputChannel: Buffer pointers must not be NULL.");
 
 						ZeroMemory(m_pBufferA, sampleCount * sizeof(TSample));
 						ZeroMemory(m_pBufferB, sampleCount * sizeof(TSample));

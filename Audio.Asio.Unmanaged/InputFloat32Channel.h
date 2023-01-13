@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Audio.Asio.Unmanaged.h>
 #include <InputOfTSampleChannel.h>
 #include <SampleConversionUnmanaged.h>
 #include <asio.h>

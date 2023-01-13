@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Audio.Asio.Unmanaged.h>
 #include <asio.h>
 
 namespace Audio
@@ -14,7 +15,7 @@ namespace Audio
 			// max 124 bytes incl.
 			const int MaxAsioErrorMessage = 124;
 
-			class DriverDescription
+			class _AUDIO_ASIO_UNMANAGED_API DriverDescription
 			{
 			public:
 				DriverDescription();
@@ -24,8 +25,8 @@ namespace Audio
 
 				DriverDescription& operator = (const DriverDescription& other);
 
-				char* get_DriverName() const;
-				void put_DriverName(char* value);
+				const char* get_DriverName() const;
+				void put_DriverName(const char* value);
 
 				long get_DriverVersion() const;
 				void put_DriverVersion(long value);
@@ -93,6 +94,8 @@ namespace Audio
 				ASIOSampleRate m_sampleRate;
 				ASIOClockSource* m_pClockSources;
 				long m_lNumClockSources;
+
+				static const char* ASIODebugDriverName;
 			};
 
 		}

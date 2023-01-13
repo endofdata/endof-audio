@@ -2,15 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="UsefullStuff.cpp" />
-    <ClCompile Include="AsioCore.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="AsioCoreException.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="AsioDebugDriver.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="AsioInteropException.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -24,9 +15,6 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="AudioTrack.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="DriverDescription.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="DriverRegistry.cpp">
@@ -47,9 +35,6 @@
     <ClCompile Include="AsioRouter.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="AsioCoreCallbacks.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="ChannelNameEnumerator.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -58,21 +43,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AsioCore.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="AsioCoreException.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="AsioDebugDriver.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="AsioDebugDriverGuid.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="AsioError.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="AsioInteropException.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -94,15 +64,6 @@
     <ClInclude Include="AudioTrackCollection.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="DriverDescription.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="InputInt32Channel.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="OutputInt32ChannelPair.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -122,21 +83,6 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="BufferSwitchManagedCallback.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="AsioCoreCallbacks.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="InputFloat32Channel.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="OutputFloat32ChannelPair.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="InputInt24Channel.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="OutputInt24ChannelPair.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="DriverRegistry.h">

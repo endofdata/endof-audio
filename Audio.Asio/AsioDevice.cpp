@@ -1,9 +1,10 @@
 #include "pch.h"
 #include "AsioDevice.h"
-#include "AsioCore.h"
+#include <AsioCore.h>
 #include "DriverRegistry.h"
 
 using namespace Audio::Asio;
+using namespace Audio::Asio::Unmanaged;
 using namespace Audio::Asio::Interop;
 using namespace System;
 using namespace System::ComponentModel;
@@ -210,9 +211,13 @@ System::Collections::Generic::IDictionary<int, String^>^ AsioDevice::AvailableIn
 {
 	Dictionary<int, String^>^ result = gcnew Dictionary<int, String^>;
 
-	int channelId = 0;
-	for each (String ^ name in m_pCore->GetKnownInputChannels())
+	int channelMax = m_pCore->InputChannelCount;
+	char buffer[42];
+
+	for(int channelId = 0; channelId < channelMax; channelId++)
 	{
+		int len = m_pCore->GetKnownInputChannel(channelId, buffer, _countof(buffer));
+		String^ name = gcnew String(buffer);
 		result->Add(channelId++, name);
 	}
 	return result;
@@ -222,9 +227,13 @@ System::Collections::Generic::IDictionary<int, String^>^ AsioDevice::AvailableOu
 {
 	Dictionary<int, String^>^ result = gcnew Dictionary<int, String^>;
 
-	int channelId = 0;
-	for each (String ^ name in m_pCore->GetKnownOutputChannels())
+	int channelMax = m_pCore->OutputChannelPairCount;
+	char buffer[42];
+
+	for(int channelId = 0; channelId < channelMax; channelId++)
 	{
+		int len = m_pCore->GetKnownOutputChannel(channelId, buffer, _countof(buffer));
+		String^ name = gcnew String(buffer);
 		result->Add(channelId++, name);
 	}
 	return result;
@@ -258,5 +267,11 @@ bool AsioDevice::SelectOutputChannel(int channelId, bool isSelected)
 
 void AsioDevice::ActivateChannels()
 {
-	m_pCore->CreateBuffers(m_activeInputChannels->ToArray(), m_activeOutputChannels->ToArray(), AsioCore::UsePreferredSize);
+	array<int>^ inputChannels = m_activeInputChannels->ToArray();
+	array<int>^ outputChannels = m_activeOutputChannels->ToArray();
+
+	pin_ptr<int> pInput = &inputChannels[0];
+	pin_ptr<int> pOutput = &outputChannels[0];
+
+	m_pCore->CreateBuffers(pInput, inputChannels->Length, pOutput, outputChannels->Length, AsioCore::UsePreferredSize);
 }

@@ -31,13 +31,13 @@ void AsioInteropException::GetObjectData(SerializationInfo^ info, StreamingConte
 	info->AddValue("asioError", static_cast<Int32>(m_asioError));
 }
 
-AsioError AsioInteropException::ASIOError::get()
+Audio::Asio::Unmanaged::AsioError AsioInteropException::ASIOError::get()
 {
 	return m_asioError;
 }
 
 void AsioInteropException::GetAsioErrorFromInt(int iErrorCode)
 {
-	m_asioError = static_cast<AsioError>(iErrorCode);
+	m_asioError = static_cast<Audio::Asio::Unmanaged::AsioError>(iErrorCode);
 }
 

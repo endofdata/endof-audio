@@ -3,6 +3,7 @@
 #include "BufferSwitchManagedCallback.h"
 #include <IInputChannel.h>
 #include <IOutputChannelPair.h>
+#include <AsioCore.h>
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
@@ -10,8 +11,6 @@ namespace Audio
 {
 	namespace Asio
 	{
-		class AsioCore;
-
 		namespace Interop
 		{
 			public ref class AsioDevice sealed : public System::ComponentModel::INotifyPropertyChanged
@@ -79,7 +78,7 @@ namespace Audio
 				/// Constructor
 				/// </summary>
 				/// <param name="pCore">ASIO core instance</param>
-				AsioDevice(AsioCore* pCore);
+				AsioDevice(Audio::Asio::Unmanaged::AsioCore* pCore);
 								
 				~AsioDevice();
 				!AsioDevice();
@@ -171,7 +170,7 @@ namespace Audio
 				void CleanUp(bool fIsDisposing);
 				void OnPropertyChanged(System::String^ propertyName);
 
-				AsioCore* m_pCore;
+				Audio::Asio::Unmanaged::AsioCore* m_pCore;
 				bool m_isPoweredOn;
 				System::Runtime::InteropServices::GCHandle m_delegateHandle;
 				System::ComponentModel::PropertyChangedEventHandler^ m_propertyChangedEventHandler;

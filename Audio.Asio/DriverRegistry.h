@@ -1,4 +1,4 @@
-#include "pch.h"
+#pragma once
 
 using namespace System;
 using namespace System::Collections::ObjectModel;

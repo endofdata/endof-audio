@@ -3,6 +3,8 @@
 
 using namespace Audio::Asio::Debug;
 
+const char* DriverDescription::ASIODebugDriverName = "ASIODebugDriver";
+
 DriverDescription::DriverDescription() :
 	m_pDriverName(NULL),
 	m_lDriverVersion(0),
@@ -26,7 +28,7 @@ DriverDescription::DriverDescription() :
 
 	CopyMemory(m_sampleRate.ieee, &sampleRate, sizeof(sampleRate));
 
-	DriverName = "ASIODebugDriver";
+	DriverName = DriverDescription::ASIODebugDriverName;
 	DriverVersion = 1;
 
 	InputChannels = 2;
@@ -107,12 +109,12 @@ const ASIOClockSource* DriverDescription::GetClockSourceArray(long& numClockSour
 	return m_pClockSources;
 }
 
-char* DriverDescription::get_DriverName() const
+const char* DriverDescription::get_DriverName() const
 {
 	return m_pDriverName;
 }
 
-void DriverDescription::put_DriverName(char* value)
+void DriverDescription::put_DriverName(const char* value)
 {
 	if (NULL != m_pDriverName)
 	{

@@ -1,14 +1,15 @@
 #pragma once
 
+#include <Audio.Asio.Unmanaged.h>
 #include <asio.h>
 
 namespace Audio
 {
 	namespace Asio
 	{
-		namespace Interop
+		namespace Unmanaged
 		{
-			public enum class AsioError
+			enum class _AUDIO_ASIO_UNMANAGED_API AsioError
 			{
 				None = ASE_OK,								// This value will be returned whenever the call succeeded
 

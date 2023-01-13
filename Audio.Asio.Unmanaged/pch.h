@@ -9,6 +9,15 @@
 
 // add headers that you want to pre-compile here
 #include "framework.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <asio.h>
+//#include <iasiodrv.h>
+#include <guiddef.h>
+#include <math.h>
+#include <algorithm>
+#include <functional>
+#include <vector>
 #include <stdexcept>
-
+#include <comdef.h>
 #endif //PCH_H

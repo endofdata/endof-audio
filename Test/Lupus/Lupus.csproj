@@ -1,19 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+		<Platforms>x64</Platforms>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Audio.Asio\Audio.Asio.vcxproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Audio.Asio\Audio.Asio.vcxproj" />
+	</ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy ..\..\Audio.Foundation.Unmanaged\bin\$(Configuration)\x64\Audio.Foundation.Unmanaged.* .\bin\$(Configuration)\net6.0-windows" />
-  </Target>
+	<Target Name="CopyDependencies" AfterTargets="Build" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<Message Text="Copy dependencies to $(OutDir)" Importance="high" />
+		<ItemGroup>
+			<Dependencies Include="..\..\Audio.Asio.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Asio.Unmanaged.dll" />
+			<Dependencies Include="..\..\Audio.Asio.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Asio.Unmanaged.pdb" />
+			<Dependencies Include="..\..\Audio.Foundation.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Foundation.Unmanaged.dll" />
+			<Dependencies Include="..\..\Audio.Foundation.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Foundation.Unmanaged.pdb" />
+		</ItemGroup>
+		<Copy SourceFiles="@(Dependencies)" DestinationFolder="$(OutputPath)" />
+	</Target>
 
 </Project>

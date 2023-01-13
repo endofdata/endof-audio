@@ -3,8 +3,7 @@
 #include "AsioCore.h"
 #include "AsioCoreException.h"
 
-using namespace System;
-using namespace Audio::Asio;
+using namespace Audio::Asio::Unmanaged;
 
 // static
 AsioCoreCallbacks* AsioCoreCallbacks::s_UsedDevices[] = { NULL, NULL, NULL };
@@ -47,7 +46,7 @@ AsioCoreCallbacks& AsioCoreCallbacks::Create(AsioCore* pCore)
 			return *(s_UsedDevices[index]);
 		}
 	}
-	throw gcnew InvalidOperationException("Maximum number of active devices exceeded.");
+	throw std::out_of_range("Maximum number of active devices exceeded.");
 }
 
 AsioCoreCallbacks::AsioCoreCallbacks(AsioCore* pCore, ASIOCallbacks& callbacks, int deviceIndex) : 
@@ -55,7 +54,7 @@ AsioCoreCallbacks::AsioCoreCallbacks(AsioCore* pCore, ASIOCallbacks& callbacks, 
 {
 	if (pCore == NULL)
 	{
-		throw gcnew ArgumentNullException("Parameter 'pCore' cannot be null.");
+		throw std::invalid_argument("Parameter 'pCore' cannot be null.");
 	}
 }
 

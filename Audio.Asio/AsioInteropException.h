@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AsioError.h"
+#include <AsioError.h>
 
 namespace Audio
 {
@@ -20,9 +20,9 @@ namespace Audio
 				virtual void GetObjectData(System::Runtime::Serialization::SerializationInfo^ info, 
 					System::Runtime::Serialization::StreamingContext context) override;
 
-				property AsioError ASIOError
+				property Unmanaged::AsioError ASIOError
 				{
-					AsioError get();
+					Unmanaged::AsioError get();
 				}
 			private:
 				AsioInteropException(System::Runtime::Serialization::SerializationInfo^ info, 
@@ -30,7 +30,7 @@ namespace Audio
 
 				void GetAsioErrorFromInt(int iErrorCode);
 
-				AsioError m_asioError;
+				Unmanaged::AsioError m_asioError;
 			};
 		}
 	}

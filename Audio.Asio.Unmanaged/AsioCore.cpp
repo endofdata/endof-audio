@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "AsioCore.h"
-#include "AsioError.h"
 #include "AsioCoreException.h"
+#include "AsioError.h"
 #include "AsioDebugDriver.h"
 #include "AsioDebugDriverGuid.h"
 #include "InputInt32Channel.h"
@@ -10,13 +10,10 @@
 #include "OutputInt32ChannelPair.h"
 #include "OutputInt24ChannelPair.h"
 #include "OutputFloat32ChannelPair.h"
-#include "ChannelNameEnumerable.h"
 
-using namespace Audio::Asio;
-using namespace Audio::Asio::Interop;
-using namespace Audio::Foundation::Abstractions;
-using namespace System::Collections::Generic;
-using namespace System;
+using namespace Audio::Asio::Unmanaged;
+//using namespace Audio::Asio::Interop;
+//using namespace Audio::Foundation::Abstractions;
 
 // static
 AsioCore* AsioCore::CreateInstance(REFCLSID clsid)
@@ -25,7 +22,7 @@ AsioCore* AsioCore::CreateInstance(REFCLSID clsid)
 
 	if (NULL == pCore)
 	{
-		throw gcnew AsioCoreException("AsioCore: Not enough memory for ASIO instance.", E_OUTOFMEMORY);
+		throw AsioCoreException("AsioCore: Not enough memory for ASIO instance.", E_OUTOFMEMORY);
 	}
 
 	try
@@ -34,19 +31,17 @@ AsioCore* AsioCore::CreateInstance(REFCLSID clsid)
 	}
 	catch (const std::exception& unmanagedError)
 	{
-		int error = pCore->LastError != S_OK ? pCore->LastError : E_UNEXPECTED;
-		System::String^ details = gcnew System::String(unmanagedError.what());
+		AsioCoreException exception(unmanagedError.what(), pCore->LastError != S_OK ? pCore->LastError : E_UNEXPECTED);
 
 		delete pCore;
 
-		throw gcnew AsioCoreException(System::String::Format("AsioCore: Initilaization failed. {0} (0x{1:X})", details, error), error);
+		throw exception;
 	}
-	catch (AsioCoreException^)
+	catch (AsioCoreException)
 	{
 		delete pCore;
 		throw;
 	}
-
 	return pCore;
 }
 
@@ -100,7 +95,7 @@ void AsioCore::Initialize(REFCLSID clsid)
 	// The driver for Steinberg UR-RT2 for example requires STA.
 	if (S_OK != hr)
 	{
-		throw gcnew AsioCoreException("AsioCore: Failed to create COM instance for ASIO driver.", hr);
+		throw AsioCoreException("AsioCore: Failed to create COM instance for ASIO driver.", hr);
 	}
 
 	ASIODriverInfo driverInfo = ASIODriverInfo();
@@ -122,8 +117,7 @@ void AsioCore::Initialize(REFCLSID clsid)
 		{
 		}
 
-		String^ message = msgBuffer[0] != 0 ? gcnew String(msgBuffer) : "Driver did not initialise properly";
-		throw gcnew AsioCoreException(message);
+		throw AsioCoreException(msgBuffer[0] != 0 ? msgBuffer : "Driver did not initialise properly");
 	}
 	else
 	{
@@ -160,9 +154,6 @@ void AsioCore::CleanUp()
 
 		m_pDriver->Release();
 		m_pDriver = NULL;
-
-		System::GC::Collect();
-		System::GC::WaitForPendingFinalizers();
 	}
 	if (NULL != m_pCoreCallbacks)
 	{
@@ -202,7 +193,7 @@ void AsioCore::SelectSampleRate()
 {
 	if (m_pDriver == NULL)
 	{
-		throw gcnew AsioCoreException("Driver not initialized");
+		throw AsioCoreException("Driver not initialized");
 	}
 
 	ThrowIfFailed(m_pDriver->getSampleRate(&m_sampleRate));
@@ -225,12 +216,12 @@ void AsioCore::SelectSampleRate()
 
 		if (SampleRate == 0.0)
 		{
-			throw gcnew AsioCoreException("Driver does not use supported sample rates 48k or 44.1k.", E_UNEXPECTED);
+			throw AsioCoreException("Driver does not use supported sample rates 48k or 44.1k.", E_UNEXPECTED);
 		}
 	}
 }
 
-void AsioCore::CreateBuffers(array<int>^ inputChannelIds, array<int>^ outputChannelIds, int sampleCount)
+void AsioCore::CreateBuffers(const int inputChannelIds[], int numInputIds, const int outputChannelIds[], int numOutputIds, int sampleCount)
 {
 	int requestedBufferSize = 0;
 
@@ -245,14 +236,18 @@ void AsioCore::CreateBuffers(array<int>^ inputChannelIds, array<int>^ outputChan
 
 	if (m_iHwPinCount > 0)
 	{
-		m_pHwBufferInfo = new ASIOBufferInfo[inputChannelIds->Length + outputChannelIds->Length];
+		m_pHwBufferInfo = new ASIOBufferInfo[numInputIds + numOutputIds];
 		if (NULL == m_pHwBufferInfo)
-			throw gcnew AsioCoreException("AsioCore: Not enough memory for array of ASIOBufferInfo.", E_OUTOFMEMORY);
+		{
+			throw AsioCoreException("AsioCore: Not enough memory for array of ASIOBufferInfo.", E_OUTOFMEMORY);
+		}
 
 		int iIdx = 0;
 
-		for each (int iInput in inputChannelIds)
+		for(int id = 0; id < numInputIds; id++)
 		{
+			int iInput = inputChannelIds[id];
+
 			m_pHwBufferInfo[iIdx].isInput = ASIOTrue;
 			m_pHwBufferInfo[iIdx].channelNum = iInput;
 			m_pHwBufferInfo[iIdx].buffers[0] = NULL;
@@ -260,8 +255,10 @@ void AsioCore::CreateBuffers(array<int>^ inputChannelIds, array<int>^ outputChan
 			iIdx++;
 		}
 
-		for each (int iOutput in outputChannelIds)
+		for(int id = 0; id < numOutputIds; id++)
 		{
+			int iOutput = outputChannelIds[id];
+
 			m_pHwBufferInfo[iIdx].isInput = ASIOFalse;
 			m_pHwBufferInfo[iIdx].channelNum = iOutput;
 			m_pHwBufferInfo[iIdx].buffers[0] = NULL;
@@ -277,8 +274,8 @@ void AsioCore::CreateBuffers(array<int>^ inputChannelIds, array<int>^ outputChan
 
 		try
 		{
-			CreateInputChannels(0, inputChannelIds->Length);
-			CreateOutputChannels(inputChannelIds->Length, outputChannelIds->Length);
+			CreateInputChannels(0, numInputIds);
+			CreateOutputChannels(numInputIds, numOutputIds);
 		}
 		catch (...)
 		{
@@ -295,7 +292,7 @@ void AsioCore::CreateInputChannels(int offset, int count)
 		// each input channel splits the signal to two sample buffers
 		m_pInputChannels = (IInputChannel**)new IInputChannel*[count];
 		if (NULL == m_pInputChannels)
-			throw gcnew AsioCoreException("AsioCore: Not enough memory for InputChannel array.", E_OUTOFMEMORY);
+			throw AsioCoreException("AsioCore: Not enough memory for InputChannel array.", E_OUTOFMEMORY);
 
 		ZeroMemory(m_pInputChannels, sizeof(IInputChannel*) * count);
 
@@ -327,11 +324,11 @@ void AsioCore::CreateInputChannels(int offset, int count)
 					SampleCount));
 				break;
 			default:
-				throw gcnew AsioCoreException("AsioCore: Unsupported sample type.", E_UNEXPECTED);
+				throw AsioCoreException("AsioCore: Unsupported sample type.", E_UNEXPECTED);
 			}
 			
 			if (NULL == m_pInputChannels[m_iInputChannels])
-				throw gcnew AsioCoreException("AsioCore: Not enough memory for InputChannel instance.", E_OUTOFMEMORY);
+				throw AsioCoreException("AsioCore: Not enough memory for InputChannel instance.", E_OUTOFMEMORY);
 
 			m_pInputChannels[m_iInputChannels]->AddRef();
 			m_iInputChannels++;
@@ -348,7 +345,7 @@ void AsioCore::CreateOutputChannels(int offset, int count)
 		// each output channel is linked to two hardware outputs
 		m_pOutputChannelPairs = (IOutputChannelPair**)new IOutputChannelPair*[pairCount];
 		if (NULL == m_pOutputChannelPairs)
-			throw gcnew AsioCoreException("AsioCore: Not enough memory for OutputChannelPair array.", E_OUTOFMEMORY);
+			throw AsioCoreException("AsioCore: Not enough memory for OutputChannelPair array.", E_OUTOFMEMORY);
 
 		ZeroMemory(m_pOutputChannelPairs, sizeof(IOutputChannelPair*) * pairCount);
 
@@ -391,10 +388,10 @@ void AsioCore::CreateOutputChannels(int offset, int count)
 					SampleCount));
 				break;
 			default:
-				throw gcnew AsioCoreException("AsioCore: Unsupported sample type.", E_UNEXPECTED);
+				throw AsioCoreException("AsioCore: Unsupported sample type.", E_UNEXPECTED);
 			}
 			if (NULL == m_pOutputChannelPairs[m_iOutputChannelPairs])
-				throw gcnew AsioCoreException("AsioCore: Not enough memory for OutputChannelPair instance.", E_OUTOFMEMORY);
+				throw AsioCoreException("AsioCore: Not enough memory for OutputChannelPair instance.", E_OUTOFMEMORY);
 
 			m_pOutputChannelPairs[m_iOutputChannelPairs]->AddRef();
 			m_iOutputChannelPairs++;
@@ -592,10 +589,7 @@ void AsioCore::ThrowIfFailed(ASIOError error)
 	{
 		m_lastError = error;
 
-		// Cast does not fail: If error is a known Interop::AsioError enum value, we see the corresponding value, otherwise, the numeric error value.
-		Audio::Asio::Interop::AsioError errorValue = (Audio::Asio::Interop::AsioError)error;
-		
-		throw gcnew AsioCoreException(System::String::Format(L"AsioCore: ASIO driver reported error '{0}'.", errorValue), (int)error);
+		throw AsioCoreException("AsioCore: ASIO driver reported error.", (int)error);
 	}
 }
 
@@ -656,7 +650,7 @@ void AsioCore::put_SampleRate(double rate)
 
 	if (SampleRate != rate)
 	{
-		throw gcnew AsioCoreException(System::String::Format("Failed to set sample rate to {0:N1}", rate));
+		throw AsioCoreException("Failed to set sample rate");
 	}
 }
 
@@ -681,12 +675,31 @@ void AsioCore::put_BufferSwitchEventHandler(BufferSwitchEventHandler value)
 	m_bufferSwitchEventHandler = value;
 }
 
-IEnumerable<String^>^ AsioCore::GetKnownInputChannels()
+int AsioCore::GetKnownChannel(ASIOBool isInput, int index, char* pcBuffer, int max)
 {
-	return gcnew ChannelNameEnumerable(m_pDriver, true, m_iHwInputCount);
+	ASIOChannelInfo channelInfo;
+
+	ZeroMemory(pcBuffer, max);
+
+	channelInfo.isInput = isInput;
+	channelInfo.channel = index;
+
+	ThrowIfFailed(m_pDriver->getChannelInfo(&channelInfo));
+
+	if (strncpy_s(pcBuffer, max, channelInfo.name, _countof(channelInfo.name)))
+	{
+		return 0;
+	}
+	return (int)strnlen(pcBuffer, max);
 }
 
-IEnumerable<String^>^ AsioCore::GetKnownOutputChannels()
+int AsioCore::GetKnownInputChannel(int index, char* pcBuffer, int max)
 {
-	return gcnew ChannelNameEnumerable(m_pDriver, false, m_iHwOutputCount);
+	return GetKnownChannel(ASIOTrue, index, pcBuffer, max);
 }
+
+int AsioCore::GetKnownOutputChannel(int index, char* pcBuffer, int max)
+{
+	return GetKnownChannel(ASIOFalse, index, pcBuffer, max);
+}
+

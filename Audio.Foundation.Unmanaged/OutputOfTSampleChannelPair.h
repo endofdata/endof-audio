@@ -3,7 +3,9 @@
 #include "IOutputChannelPair.h"
 #include "ISampleReceiver.h"
 #include "UnknownBase.h"
+#include "ObjectFactory.h"
 
+using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 namespace Audio
@@ -39,7 +41,7 @@ namespace Audio
 						m_refCount(0)
 					{
 						if (NULL == pBufferLeftA || NULL == pBufferLeftB || NULL == pBufferRightA || NULL == pBufferRightB)
-							throw gcnew AsioCoreException("OutputChannelPair: Buffer pointers must not be NULL.", E_INVALIDARG);
+							throw std::invalid_argument("OutputChannelPair: Buffer pointers must not be NULL.");
 
 						ZeroMemory(m_pOutputLeftA, sampleCount * sizeof(TSample));
 						ZeroMemory(m_pOutputRightA, sampleCount * sizeof(TSample));
