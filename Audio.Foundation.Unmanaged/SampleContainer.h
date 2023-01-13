@@ -11,15 +11,13 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class SampleContainer : public SampleContainerBase, public Audio::Foundation::Unmanaged::Abstractions::ISampleContainer
+			class SampleContainer : public SampleContainerBase
 			{
 			public:
 				SampleContainer(int sampleCount, int channelCount);
 				virtual ~SampleContainer();
 
 				DECLARE_IUNKNOWN
-
-				DECLARE_SAMPLECONTAINER
 
 			protected:
 				virtual bool GetInterface(REFIID riid, void** pResult);

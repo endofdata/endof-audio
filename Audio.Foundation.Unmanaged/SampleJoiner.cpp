@@ -19,7 +19,7 @@ SampleJoiner::~SampleJoiner()
 
 IMPLEMENT_IUNKNOWN(SampleJoiner)
 
-IMPLEMENT_SAMPLECONTAINER(SampleJoiner)
+//IMPLEMENT_SAMPLECONTAINER(SampleJoiner)
 
 
 bool SampleJoiner::GetInterface(REFIID iid, void** ppvResult)

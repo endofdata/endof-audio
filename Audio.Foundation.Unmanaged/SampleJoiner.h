@@ -17,8 +17,7 @@ namespace Audio
 		{
 			class SampleJoiner : public SampleContainerBase, 
 				public Abstractions::ISampleJoiner,
-				public Abstractions::ISampleReceiver,
-				public Abstractions::ISampleContainer
+				public Abstractions::ISampleReceiver
 			{
 			public:
 				SampleJoiner(int sampleCount, int channelCount);
@@ -33,7 +32,7 @@ namespace Audio
 
 				DECLARE_IUNKNOWN
 
-				DECLARE_SAMPLECONTAINER
+				//DECLARE_SAMPLECONTAINER
 
 			protected:
 				virtual bool GetInterface(REFIID riid, void** pResult);

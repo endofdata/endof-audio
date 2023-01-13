@@ -18,8 +18,6 @@ SampleContainer::~SampleContainer()
 
 IMPLEMENT_IUNKNOWN(SampleContainer)
 
-IMPLEMENT_SAMPLECONTAINER(SampleContainer)
-
 bool SampleContainer::GetInterface(REFIID iid, void** ppvResult)
 {
 	if (iid == __uuidof(IUnknown))

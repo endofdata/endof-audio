@@ -1,53 +1,8 @@
 #pragma once
 
 #include "ISampleBuffer.h"
+#include "ISampleContainer.h"
 #include <vector>
-
-#define DECLARE_SAMPLECONTAINER												\
-	virtual bool get_IsActive();											\
-	virtual void put_IsActive(bool value);									\
-	virtual int get_SampleCount();											\
-	virtual void put_SampleCount(int sampleCount);							\
-	virtual int get_ChannelCount();											\
-	virtual void put_ChannelCount(int channelCount);						\
-	virtual Abstractions::ISampleBufferPtr get_Channel(int index);
-
-#define IMPLEMENT_SAMPLECONTAINER(TYPE_NAME)								\
-																			\
-	bool TYPE_NAME::get_IsActive()											\
-	{																		\
-		return SampleContainerBase::get_IsActive();							\
-	}																		\
-																			\
-	void TYPE_NAME::put_IsActive(bool value)								\
-	{																		\
-		SampleContainerBase::put_IsActive(value);							\
-	}																		\
-																			\
-	int TYPE_NAME::get_SampleCount()										\
-	{																		\
-		return SampleContainerBase::get_SampleCount();						\
-	}																		\
-																			\
-	void TYPE_NAME::put_SampleCount(int sampleCount)						\
-	{																		\
-		return SampleContainerBase::put_SampleCount(sampleCount);			\
-	}																		\
-																			\
-	int TYPE_NAME::get_ChannelCount()										\
-	{																		\
-		return SampleContainerBase::get_ChannelCount();						\
-	}																		\
-																			\
-	void TYPE_NAME::put_ChannelCount(int channelCount)						\
-	{																		\
-		return SampleContainerBase::put_ChannelCount(channelCount);			\
-	}																		\
-																			\
-	Abstractions::ISampleBufferPtr TYPE_NAME::get_Channel(int index)		\
-	{																		\
-		return SampleContainerBase::get_Channel(index);						\
-	}
 
 namespace Audio
 {
@@ -55,7 +10,7 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class SampleContainerBase
+			class SampleContainerBase : public Abstractions::ISampleContainer
 			{
 			public:
 				SampleContainerBase(int sampleCount, int channelCount);
