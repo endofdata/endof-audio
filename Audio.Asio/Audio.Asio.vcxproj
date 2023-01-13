@@ -106,8 +106,6 @@
     <ClCompile Include="AsioRouter.cpp" />
     <ClInclude Include="AudioTrack.h" />
     <ClInclude Include="AudioTrackCollection.h" />
-    <ClInclude Include="ChannelNameEnumerable.h" />
-    <ClInclude Include="ChannelNameEnumerator.h" />
     <ClInclude Include="DriverRegistry.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="resource.h" />
@@ -121,8 +119,6 @@
     <ClCompile Include="AudioOutput.cpp" />
     <ClCompile Include="AudioTrack.cpp" />
     <ClCompile Include="AudioTrackCollection.cpp" />
-    <ClCompile Include="ChannelNameEnumerable.cpp" />
-    <ClCompile Include="ChannelNameEnumerator.cpp" />
     <ClCompile Include="DriverRegistry.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
