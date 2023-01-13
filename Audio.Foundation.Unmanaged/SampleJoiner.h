@@ -32,8 +32,6 @@ namespace Audio
 
 				DECLARE_IUNKNOWN
 
-				//DECLARE_SAMPLECONTAINER
-
 			protected:
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
