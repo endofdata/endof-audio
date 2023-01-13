@@ -26,7 +26,7 @@ namespace Audio
 				virtual void RemoveTarget(Abstractions::ISampleReceiverPtr channel);
 				virtual void RemoveAllTargets();
 
-				virtual void RouteToTargets();
+				virtual void Push();
 
 				DECLARE_IUNKNOWN
 

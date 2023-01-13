@@ -66,6 +66,7 @@ namespace Audio
 								m_pDirectMonitor->DirectOut(pSource, true, true);
 							}
 
+							// Convert the incoming samples to float and write them to the container
 							int sampleCount = m_pContainer->SampleCount;
 							float* pDest = m_pContainer->Channels[0]->SamplePtr;
 
@@ -78,7 +79,8 @@ namespace Audio
 
 					virtual void Send()
 					{
-						m_pSharer->RouteToTargets();
+						// Push the samples form the container to all targets attached to the sharer
+						m_pSharer->Push();
 					}
 
 					virtual bool get_IsActive()

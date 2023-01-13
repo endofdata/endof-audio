@@ -67,7 +67,7 @@ void SampleSharer::RemoveAllTargets()
 	m_vecTargets.clear();
 }
 
-void SampleSharer::RouteToTargets()
+void SampleSharer::Push()
 {
 	if (m_pSource != NULL)
 	{

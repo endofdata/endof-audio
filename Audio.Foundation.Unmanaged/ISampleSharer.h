@@ -62,7 +62,7 @@ namespace Audio
 					/// <summary>
 					/// Routes the input samples of <see cref="Source"/> to all items in the <see cref="Targets"/> collection
 					/// </summary>
-					void RouteToTargets() = 0;
+					void Push() = 0;
 				};
 
 				_COM_SMARTPTR_TYPEDEF(ISampleSharer, __uuidof(ISampleSharer));
