@@ -47,9 +47,17 @@ namespace Audio
 
 				int GetDriverVersion();
 
-				int GetKnownInputChannel(int index, char* pcOut, int max);
+				int GetHardwareInputName(int index, char* pcOut, int max);
 
-				int GetKnownOutputChannel(int index, char* pcOut, int max);
+				int GetHardwareOutputName(int index, char* pcOut, int max);
+
+				_declspec(property(get = get_HardwareInputCount)) int HardwareInputCount;
+
+				int get_HardwareInputCount();
+
+				_declspec(property(get = get_HardwareOutputCount)) int HardwareOutputCount;
+
+				int get_HardwareOutputCount();
 
 				_declspec(property(get = get_InputChannelCount)) int InputChannelCount;
 
@@ -145,7 +153,7 @@ namespace Audio
 
 				void ThrowIfFailed(ASIOError error);
 
-				int GetKnownChannel(ASIOBool isInput, int index, char* pcOut, int max);
+				int GetHardwareChannelName(ASIOBool isInput, int index, char* pcOut, int max);
 
 				IASIO* m_pDriver;
 

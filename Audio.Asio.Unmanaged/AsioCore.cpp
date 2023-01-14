@@ -300,38 +300,45 @@ void AsioCore::CreateInputChannels(int offset, int count)
 
 		for (int iIdx = offset; iIdx < offset + count; iIdx++)
 		{
+			IInputChannelPtr input = NULL;
+
 			switch(m_sampleType)
 			{
 			case ASIOSTInt32LSB:
-				m_pInputChannels[m_iInputChannels] = dynamic_cast<IInputChannel*>(new Audio::Asio::InputInt32Channel(
+				input = new Audio::Asio::InputInt32Channel(
 					m_pHwBufferInfo[iIdx].channelNum,
 					(int*)m_pHwBufferInfo[iIdx].buffers[0],
 					(int*)m_pHwBufferInfo[iIdx].buffers[1],
-					SampleCount));
+					SampleCount);
 				break;
 			case ASIOSTInt24LSB:
-				m_pInputChannels[m_iInputChannels] = dynamic_cast<IInputChannel*>(new Audio::Asio::InputInt24Channel(
+				input = new Audio::Asio::InputInt24Channel(
 					m_pHwBufferInfo[iIdx].channelNum,
 					(byte*)m_pHwBufferInfo[iIdx].buffers[0],
 					(byte*)m_pHwBufferInfo[iIdx].buffers[1],
-					SampleCount));
+					SampleCount);
 				break;
 			case ASIOSTFloat32LSB:
-				m_pInputChannels[m_iInputChannels] = dynamic_cast<IInputChannel*>(new Audio::Asio::InputFloat32Channel(
+				input = new Audio::Asio::InputFloat32Channel(
 					m_pHwBufferInfo[iIdx].channelNum,
 					(float*)m_pHwBufferInfo[iIdx].buffers[0],
 					(float*)m_pHwBufferInfo[iIdx].buffers[1],
-					SampleCount));
+					SampleCount);
 				break;
 			default:
 				throw AsioCoreException("AsioCore: Unsupported sample type.", E_UNEXPECTED);
 			}
-			
-			if (NULL == m_pInputChannels[m_iInputChannels])
+
+			if (NULL == input)
 				throw AsioCoreException("AsioCore: Not enough memory for InputChannel instance.", E_OUTOFMEMORY);
 
-			m_pInputChannels[m_iInputChannels]->AddRef();
-			m_iInputChannels++;
+			if (m_iInputChannels < count)
+			{
+				m_pInputChannels[m_iInputChannels] = input.Detach();
+
+				//m_pInputChannels[m_iInputChannels]->AddRef();
+				m_iInputChannels++;
+			}
 		}
 	}
 }
@@ -353,48 +360,54 @@ void AsioCore::CreateOutputChannels(int offset, int count)
 
 		for (int pair = 0; pair < pairCount; pair++)
 		{
+			IOutputChannelPairPtr outputPair = NULL;
+
 			int iIdx = offset + pair * 2;
 
 			switch (m_sampleType)
 			{
 			case ASIOSTInt32LSB:
-				m_pOutputChannelPairs[m_iOutputChannelPairs] = dynamic_cast<IOutputChannelPair*>(new ::Audio::Asio::OutputInt32ChannelPair(
+				outputPair = new ::Audio::Asio::OutputInt32ChannelPair(
 					m_pHwBufferInfo[iIdx].channelNum,
 					(int*)m_pHwBufferInfo[iIdx].buffers[0],
 					(int*)m_pHwBufferInfo[iIdx].buffers[1],
 					m_pHwBufferInfo[iIdx + 1].channelNum,
 					(int*)m_pHwBufferInfo[iIdx + 1].buffers[0],
 					(int*)m_pHwBufferInfo[iIdx + 1].buffers[1],
-					SampleCount));
+					SampleCount);
 				break;
 			case ASIOSTInt24LSB:
-				m_pOutputChannelPairs[m_iOutputChannelPairs] = dynamic_cast<IOutputChannelPair*>(new ::Audio::Asio::OutputInt24ChannelPair(
+				outputPair = new ::Audio::Asio::OutputInt24ChannelPair(
 					m_pHwBufferInfo[iIdx].channelNum,
 					(byte*)m_pHwBufferInfo[iIdx].buffers[0],
 					(byte*)m_pHwBufferInfo[iIdx].buffers[1],
 					m_pHwBufferInfo[iIdx + 1].channelNum,
 					(byte*)m_pHwBufferInfo[iIdx + 1].buffers[0],
 					(byte*)m_pHwBufferInfo[iIdx + 1].buffers[1],
-					SampleCount));
+					SampleCount);
 				break;			
 			case ASIOSTFloat32LSB:
-				m_pOutputChannelPairs[m_iOutputChannelPairs] = dynamic_cast<IOutputChannelPair*>(new ::Audio::Asio::OutputFloat32ChannelPair(
+				outputPair = new ::Audio::Asio::OutputFloat32ChannelPair(
 					m_pHwBufferInfo[iIdx].channelNum,
 					(float*)m_pHwBufferInfo[iIdx].buffers[0],
 					(float*)m_pHwBufferInfo[iIdx].buffers[1],
 					m_pHwBufferInfo[iIdx + 1].channelNum,
 					(float*)m_pHwBufferInfo[iIdx + 1].buffers[0],
 					(float*)m_pHwBufferInfo[iIdx + 1].buffers[1],
-					SampleCount));
+					SampleCount);
 				break;
 			default:
 				throw AsioCoreException("AsioCore: Unsupported sample type.", E_UNEXPECTED);
 			}
-			if (NULL == m_pOutputChannelPairs[m_iOutputChannelPairs])
+
+			if (outputPair == NULL)
 				throw AsioCoreException("AsioCore: Not enough memory for OutputChannelPair instance.", E_OUTOFMEMORY);
 
-			m_pOutputChannelPairs[m_iOutputChannelPairs]->AddRef();
-			m_iOutputChannelPairs++;
+			if (m_iOutputChannelPairs < pairCount)
+			{
+				m_pOutputChannelPairs[m_iOutputChannelPairs] = outputPair.Detach();
+				m_iOutputChannelPairs++;
+			}
 		}
 	}
 }
@@ -506,9 +519,9 @@ void AsioCore::OnBufferSwitch(long doubleBufferIndex, ASIOBool directProcess) co
 
 	for (int iInput = 0; iInput < m_iInputChannels; iInput++)
 	{
-		IInputChannelPtr pChannel = m_pInputChannels[iInput];
-		pChannel->Swap(readSecondHalf);
-		pChannel->Send();
+		ISampleSourcePtr pChannel = m_pInputChannels[iInput];
+		pChannel->Pull(readSecondHalf);
+		pChannel->Push();
 	}
 
 	BufferSwitchEventHandler handler = m_bufferSwitchEventHandler;
@@ -598,6 +611,16 @@ ASIOError AsioCore::get_LastError()
 	return m_lastError;
 }
 
+int AsioCore::get_HardwareInputCount()
+{
+	return m_iHwInputCount;
+}
+
+int AsioCore::get_HardwareOutputCount()
+{
+	return m_iHwOutputCount;
+}
+
 int AsioCore::get_InputChannelCount()
 {
 	return m_iInputChannels;
@@ -675,7 +698,7 @@ void AsioCore::put_BufferSwitchEventHandler(BufferSwitchEventHandler value)
 	m_bufferSwitchEventHandler = value;
 }
 
-int AsioCore::GetKnownChannel(ASIOBool isInput, int index, char* pcBuffer, int max)
+int AsioCore::GetHardwareChannelName(ASIOBool isInput, int index, char* pcBuffer, int max)
 {
 	ASIOChannelInfo channelInfo;
 
@@ -693,13 +716,13 @@ int AsioCore::GetKnownChannel(ASIOBool isInput, int index, char* pcBuffer, int m
 	return (int)strnlen(pcBuffer, max);
 }
 
-int AsioCore::GetKnownInputChannel(int index, char* pcBuffer, int max)
+int AsioCore::GetHardwareInputName(int index, char* pcBuffer, int max)
 {
-	return GetKnownChannel(ASIOTrue, index, pcBuffer, max);
+	return GetHardwareChannelName(ASIOTrue, index, pcBuffer, max);
 }
 
-int AsioCore::GetKnownOutputChannel(int index, char* pcBuffer, int max)
+int AsioCore::GetHardwareOutputName(int index, char* pcBuffer, int max)
 {
-	return GetKnownChannel(ASIOFalse, index, pcBuffer, max);
+	return GetHardwareChannelName(ASIOFalse, index, pcBuffer, max);
 }
 
