@@ -7,11 +7,10 @@ using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 
 
-Timeline::Timeline()
+Timeline::Timeline() : m_refCount(0)
 {
 
 }
-
 
 Timeline::~Timeline()
 {

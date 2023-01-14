@@ -1,11 +1,11 @@
 #include "pch.h"
 #include "StreamWriter.h"
-#include <ostream>
 
 using namespace Audio::Foundation::Unmanaged;
 
 StreamWriter::StreamWriter(std::ostream& output) :
-	m_output(output)
+	m_output(output),
+	m_refCount(0)
 {
 }
 
@@ -39,7 +39,7 @@ void StreamWriter::Receive(ISampleContainerPtr input)
 	if (channels == 1)
 	{
 		const float* pSrc = input->Channels[0]->SamplePtr;
-		std::streamsize size = input->SampleCount * sizeof(float);
+		std::streamsize size = samples * sizeof(float);
 
 		m_output.write((const char*)pSrc, size);
 	}

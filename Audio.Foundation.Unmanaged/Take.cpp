@@ -7,7 +7,8 @@ Take::Take(int id, ISampleContainerPtr container, Time position, Time length) :
 	m_id(id),
 	m_container(container),
 	m_position(position),
-	m_length(length)
+	m_length(length),
+	m_refCount(0)
 {
 }
 

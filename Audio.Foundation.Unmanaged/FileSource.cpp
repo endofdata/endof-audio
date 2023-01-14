@@ -9,7 +9,8 @@ FileSource::FileSource(const std::string& filename, ISampleContainerPtr containe
 	m_reader(filename),
 	m_container(container),
 	m_sharer(NULL),
-	m_isActive(false)
+	m_isActive(false),
+	m_refCount(0)
 {
 	m_sharer = ObjectFactory::CreateSampleSharer();
 	m_sharer->Source = m_container;
