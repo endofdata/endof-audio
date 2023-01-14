@@ -29,9 +29,9 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <ctrl:LoopTrack Grid.Column="0"
-                TrackName="{Binding Tracks[0].Name}" Level="{Binding Tracks[0].Level}" DbFS="{Binding Tracks[0].RecordIn.DbFS}" 
+                TrackName="{Binding Tracks[0].Name}" Level="{Binding Tracks[0].Level}" DbFS="{Binding Tracks[0].Source.DbFS}" 
                 IsHot="{Binding Tracks[0].IsHot,Mode=TwoWay}" IsSolo="{Binding Tracks[0].IsSolo}" IsMuted="{Binding Tracks[0].IsMuted}"
-                SelectedInput="{Binding Tracks[0].RecordIn}" Inputs="{Binding Router.Inputs}" x:Name="Track0"/>
+                SelectedInput="{Binding Tracks[0].Source}" Inputs="{Binding Router.Inputs}" x:Name="Track0"/>
             <ctrl:LoopTrack Grid.Column="1" TrackName="Trk 2"/>
             <ctrl:LoopTrack Grid.Column="2" TrackName="Trk 3"/>
             <ctrl:LoopTrack Grid.Column="3" TrackName="Trk 4"/>
