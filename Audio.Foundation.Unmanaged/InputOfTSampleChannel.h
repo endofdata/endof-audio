@@ -4,6 +4,7 @@
 #include "SampleContainer.h"
 #include "SampleSharer.h"
 #include "IInputChannel.h"
+#include "ISampleSource.h"
 #include "ObjectFactory.h"
 
 using namespace Audio::Foundation::Unmanaged;
@@ -18,7 +19,7 @@ namespace Audio
 			namespace Templates
 			{
 				template<typename TSample, int SAMPLE_TYPE>
-				class InputOfTSampleChannel : public IInputChannel
+				class InputOfTSampleChannel : public ISampleSource
 				{
 				public:
 					/*! \brief Constructor
@@ -51,7 +52,7 @@ namespace Audio
 					{
 					}
 
-					virtual void Swap(bool readSecondHalf)
+					virtual void Pull(bool readSecondHalf)
 					{
 						m_readSecondHalf = readSecondHalf;
 
@@ -77,7 +78,7 @@ namespace Audio
 						}
 					}
 
-					virtual void Send()
+					virtual void Push()
 					{
 						// Push the samples form the container to all targets attached to the sharer
 						m_pSharer->Push();
@@ -121,6 +122,11 @@ namespace Audio
 						if (riid == _uuidof(IUnknown))
 						{
 							*pResult = dynamic_cast<IUnknown*>(this);
+							return true;
+						}
+						if (riid == _uuidof(ISampleSource))
+						{
+							*pResult = dynamic_cast<ISampleSource*>(this);
 							return true;
 						}
 						if (riid == _uuidof(IInputChannel))
