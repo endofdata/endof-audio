@@ -6,7 +6,13 @@
 #include "SampleJoiner.h"
 #include "SampleSharer.h"
 #include "FileWriter.h"
+#include "FileSource.h"
+#include "Take.h"
+#include "Timeline.h"
+
 #include <stdexcept>
+
+int ObjectFactory::LastTakeId = 0;
 
 using namespace Audio::Foundation::Unmanaged;
 
@@ -41,7 +47,31 @@ IMeterChannelPtr ObjectFactory::CreateMeterChannel(int sampleRate, int channelCo
 }
 
 // static 
-ISampleReceiverPtr ObjectFactory::CreateSampleReceiver(const std::string& filename)
+ISampleReceiverPtr ObjectFactory::CreateFileReceiver(const std::string& filename)
 {
 	return new FileWriter(filename);
+}
+
+// static 
+ISampleSourcePtr ObjectFactory::CreateFileSource(int sampleCount, int channelCount, const std::string& filename)
+{
+	return new FileSource(filename, CreateSampleContainer(sampleCount, channelCount));
+}
+
+// static
+ITakePtr ObjectFactory::CreateTake(ISampleContainerPtr container, Time position, Time length)
+{
+	return new Take(NextTakeId(), container, position, length);
+}
+
+// static 
+ITimelinePtr ObjectFactory::CreateTimeline()
+{
+	return new Timeline();
+}
+
+int ObjectFactory::NextTakeId()
+{
+	// HACK: This could overflow after a few billions of added takes
+	return ++LastTakeId;
 }
