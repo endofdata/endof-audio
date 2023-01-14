@@ -26,7 +26,9 @@ AudioInput::AudioInput(int sampleRate, IInputChannelPtr pHwChannel, int id) :
 
 	m_pInputChannel = pHwChannel.Detach();
 
-	int inputChannels = m_pInputChannel->SampleSharer->Source->ChannelCount;
+	ISampleSharerPtr sampleSharer = ((ISampleSourcePtr)m_pInputChannel)->SampleSharer;
+
+	int inputChannels = sampleSharer->Source->ChannelCount;
 
 	m_pInputMeter = Audio::Foundation::Unmanaged::ObjectFactory::CreateMeterChannel(sampleRate, inputChannels).Detach();
 	m_pInputMeter->RMSTime = 100;
@@ -34,7 +36,7 @@ AudioInput::AudioInput(int sampleRate, IInputChannelPtr pHwChannel, int id) :
 	m_meterUpdateDelegateHandle = GCHandle::Alloc(meterUpdateDelegate);
 	m_pInputMeter->MeterUpdate = static_cast<MeterChannelCallback>(Marshal::GetFunctionPointerForDelegate(meterUpdateDelegate).ToPointer());
 
-	m_pInputChannel->SampleSharer->AddTarget(m_pInputMeter);
+	sampleSharer->AddTarget(m_pInputMeter);
 }
 
 AudioInput::~AudioInput()
@@ -109,7 +111,7 @@ bool AudioInput::OnAddTarget(IAudioTarget^ target)
 
 	if (output != nullptr)
 	{
-		m_pInputChannel->SampleSharer->AddTarget(output->OutputChannelPair->SampleJoiner);
+		((ISampleSourcePtr)m_pInputChannel)->SampleSharer->AddTarget(output->OutputChannelPair->SampleJoiner);
 		return true;
 	}
 	return false;
@@ -119,7 +121,7 @@ void AudioInput::OnRemoveTarget(IAudioTarget^ target)
 {
 	AudioOutput^ output = safe_cast<AudioOutput^>(target);
 
-	m_pInputChannel->SampleSharer->RemoveTarget(output->OutputChannelPair->SampleJoiner);
+	((ISampleSourcePtr)m_pInputChannel)->SampleSharer->RemoveTarget(output->OutputChannelPair->SampleJoiner);
 }
 
 void AudioInput::InputMeter_MeterUpdate(IntPtr sender)

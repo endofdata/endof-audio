@@ -181,12 +181,12 @@ System::Collections::Generic::IDictionary<int, String^>^ AsioDevice::AvailableIn
 {
 	Dictionary<int, String^>^ result = gcnew Dictionary<int, String^>;
 
-	int channelMax = m_pCore->InputChannelCount;
+	int channelMax = m_pCore->HardwareInputCount;
 	char buffer[42];
 
 	for(int channelId = 0; channelId < channelMax; channelId++)
 	{
-		int len = m_pCore->GetKnownInputChannel(channelId, buffer, _countof(buffer));
+		int len = m_pCore->GetHardwareInputName(channelId, buffer, _countof(buffer));
 		String^ name = gcnew String(buffer);
 		result->Add(channelId++, name);
 	}
@@ -197,12 +197,12 @@ System::Collections::Generic::IDictionary<int, String^>^ AsioDevice::AvailableOu
 {
 	Dictionary<int, String^>^ result = gcnew Dictionary<int, String^>;
 
-	int channelMax = m_pCore->OutputChannelPairCount;
+	int channelMax = m_pCore->HardwareOutputCount;
 	char buffer[Audio::Asio::Unmanaged::MaxAsioChannelName];
 
 	for(int channelId = 0; channelId < channelMax; channelId++)
 	{
-		int len = m_pCore->GetKnownOutputChannel(channelId, buffer, _countof(buffer));
+		int len = m_pCore->GetHardwareOutputName(channelId, buffer, _countof(buffer));
 		String^ name = gcnew String(buffer);
 		result->Add(channelId++, name);
 	}
@@ -240,8 +240,8 @@ void AsioDevice::ActivateChannels()
 	array<int>^ inputChannelIds = m_activeInputChannelIds->ToArray();
 	array<int>^ outputChannelIds = m_activeOutputChannelIds->ToArray();
 
-	pin_ptr<int> pInputIds = &inputChannelIds[0];
-	pin_ptr<int> pOutputIds = &outputChannelIds[0];
+	pin_ptr<int> pInputIds = inputChannelIds->Length > 0? &inputChannelIds[0] : nullptr;
+	pin_ptr<int> pOutputIds = outputChannelIds->Length > 0? &outputChannelIds[0] : nullptr;
 
 	m_pCore->CreateBuffers(pInputIds, inputChannelIds->Length, pOutputIds, outputChannelIds->Length, AsioCore::UsePreferredSize);
 }
