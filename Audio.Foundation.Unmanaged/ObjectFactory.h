@@ -12,6 +12,7 @@
 #include <IMeterChannel.h>
 #include <ITake.h>
 #include <ITimeline.h>
+#include <string>
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 

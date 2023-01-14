@@ -19,7 +19,7 @@ namespace Audio
 			namespace Templates
 			{
 				template<typename TSample, int SAMPLE_TYPE>
-				class InputOfTSampleChannel : public ISampleSource
+				class InputOfTSampleChannel : public ISampleSource, public IInputChannel
 				{
 				public:
 					/*! \brief Constructor
