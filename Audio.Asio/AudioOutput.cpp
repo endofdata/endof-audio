@@ -16,10 +16,10 @@ using namespace Audio::Foundation::Unmanaged::Abstractions;
 AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPairPtr pHwChannel, int id) : 
 	AudioOutputBase(id),
 	m_isDisposed(false),
-	m_pOutputChannelPair(NULL),
-	m_pOutputMeter(NULL)
+	m_pOutputChannelPair(nullptr),
+	m_pOutputMeter(nullptr)
 {
-	if(NULL == pHwChannel)
+	if(nullptr == pHwChannel)
 		throw gcnew ArgumentNullException();
 
 	m_pOutputChannelPair = pHwChannel.Detach();
@@ -54,15 +54,15 @@ void AudioOutput::CleanUp(bool isDisposing)
 	{
 		m_isDisposed = true;
 
-		if (NULL != m_pOutputMeter)
+		if (nullptr != m_pOutputMeter)
 		{
 			m_pOutputMeter->Release();
-			m_pOutputMeter = NULL;
+			m_pOutputMeter = nullptr;
 		}
-		if (NULL != m_pOutputChannelPair)
+		if (nullptr != m_pOutputChannelPair)
 		{
 			m_pOutputChannelPair->Release();
-			m_pOutputChannelPair = NULL;
+			m_pOutputChannelPair = nullptr;
 		}
 
 		m_meterUpdateDelegateHandle.Free();

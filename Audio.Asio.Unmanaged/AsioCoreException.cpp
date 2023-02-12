@@ -3,7 +3,7 @@
 
 using namespace Audio::Asio;
 
-AsioCoreException::AsioCoreException() : AsioCoreException(NULL, E_FAIL)
+AsioCoreException::AsioCoreException() : AsioCoreException(nullptr, E_FAIL)
 {
 }
 
@@ -13,20 +13,20 @@ AsioCoreException::AsioCoreException(const char* pcszMessage) : AsioCoreExceptio
 
 AsioCoreException::AsioCoreException(const char* pcszMessage, int code)
 {
-	if (pcszMessage != NULL)
+	if (pcszMessage != nullptr)
 	{
 		m_pcszMessage = _strdup(pcszMessage);
 	}
 	else
 	{
-		m_pcszMessage = NULL;
+		m_pcszMessage = nullptr;
 	}
 	m_error = code;
 }
 
 AsioCoreException::~AsioCoreException()
 {
-	if (m_pcszMessage != NULL)
+	if (m_pcszMessage != nullptr)
 	{
 		free(m_pcszMessage);
 	}

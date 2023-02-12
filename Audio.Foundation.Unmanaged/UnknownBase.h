@@ -13,12 +13,12 @@
 	HRESULT STDMETHODCALLTYPE TYPE_NAME::QueryInterface(							\
 		const IID& riid, void** ppvObject)											\
 	{																				\
-		if (ppvObject == NULL)														\
+		if (ppvObject == nullptr)														\
 		{																			\
 			return E_INVALIDARG;													\
 		}																			\
 																					\
-		*ppvObject = NULL;															\
+		*ppvObject = nullptr;															\
 																					\
 		if (GetInterface(riid, ppvObject))											\
 		{																			\
@@ -47,12 +47,12 @@
 #define TEMPLATED_IUNKNOWN															\
 	HRESULT STDMETHODCALLTYPE QueryInterface(const IID& riid, void** ppvObject)		\
 	{																				\
-		if (ppvObject == NULL)														\
+		if (ppvObject == nullptr)														\
 		{																			\
 			return E_INVALIDARG;													\
 		}																			\
 																					\
-		*ppvObject = NULL;															\
+		*ppvObject = nullptr;															\
 																					\
 		if (GetInterface(riid, ppvObject))											\
 		{																			\

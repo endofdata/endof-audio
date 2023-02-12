@@ -21,7 +21,7 @@ AudioInput::AudioInput(int sampleRate, IInputChannelPtr pHwChannel, int id) :
 	AudioInputBase(id),
 	m_isDisposed(false)
 {
-	if(NULL == pHwChannel)
+	if(nullptr == pHwChannel)
 		throw gcnew ArgumentNullException();
 
 	m_pInputChannel = pHwChannel.Detach();
@@ -57,17 +57,17 @@ void AudioInput::CleanUp(bool isDisposing)
 
 		RemoveAllTargets();
 
-		if (m_pInputChannel != NULL)
+		if (m_pInputChannel != nullptr)
 		{
 			m_pInputChannel->Release();
-			m_pInputChannel = NULL;
+			m_pInputChannel = nullptr;
 		}
 
-		if (m_pInputMeter != NULL)
+		if (m_pInputMeter != nullptr)
 		{
-			m_pInputMeter->MeterUpdate = NULL;
+			m_pInputMeter->MeterUpdate = nullptr;
 			m_pInputMeter->Release();
-			m_pInputMeter = NULL;
+			m_pInputMeter = nullptr;
 		}
 
 		m_meterUpdateDelegateHandle.Free();
@@ -88,7 +88,7 @@ bool AudioInput::OnSetMonitor(IAudioOutput^ value)
 
 		if (output == nullptr)
 		{
-			m_pInputChannel->DirectMonitor = NULL;
+			m_pInputChannel->DirectMonitor = nullptr;
 			return false;
 		}
 		else
@@ -98,7 +98,7 @@ bool AudioInput::OnSetMonitor(IAudioOutput^ value)
 	}
 	else
 	{
-		m_pInputChannel->DirectMonitor = NULL;
+		m_pInputChannel->DirectMonitor = nullptr;
 	}
 	AudioInputBase::Monitor = value;
 

@@ -87,7 +87,7 @@ int WaveFormat::WriteHeaderChunks(Stream^ wavStream)
 
 int WaveFormat::ReadToData(Stream^ wavStream)
 {
-	unsigned char* pChunkBuffer = NULL;
+	unsigned char* pChunkBuffer = nullptr;
 	int totalSize = 0;
 
 	try
@@ -151,7 +151,7 @@ int WaveFormat::ReadToData(Stream^ wavStream)
 	}
 	finally
 	{
-		if(NULL != pChunkBuffer)
+		if(nullptr != pChunkBuffer)
 			delete[] pChunkBuffer;
 	}
 	return totalSize;

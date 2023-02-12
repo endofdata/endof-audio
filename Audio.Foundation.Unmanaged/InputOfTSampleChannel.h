@@ -29,14 +29,14 @@ namespace Audio
 						m_iAsioChannel(iAsioChannel),
 						m_pBufferA(pBufferA),
 						m_pBufferB(pBufferB),
-						m_pDirectMonitor(NULL),
-						m_pContainer(NULL),
-						m_pSharer(NULL),
+						m_pDirectMonitor(nullptr),
+						m_pContainer(nullptr),
+						m_pSharer(nullptr),
 						m_readSecondHalf(false),
 						m_refCount(0)
 					{
-						if (NULL == m_pBufferA || NULL == m_pBufferB)
-							throw std::invalid_argument("InputChannel: Buffer pointers must not be NULL.");
+						if (nullptr == m_pBufferA || nullptr == m_pBufferB)
+							throw std::invalid_argument("InputChannel: Buffer pointers must not be nullptr.");
 
 						ZeroMemory(m_pBufferA, sampleCount * sizeof(TSample));
 						ZeroMemory(m_pBufferB, sampleCount * sizeof(TSample));
@@ -62,7 +62,7 @@ namespace Audio
 							SelectBufferPointer(pSource);
 
 							// if monitor is attached, send to both monitor channels
-							if (NULL != m_pDirectMonitor)
+							if (nullptr != m_pDirectMonitor)
 							{
 								m_pDirectMonitor->DirectOut(pSource, true, true);
 							}
@@ -134,7 +134,7 @@ namespace Audio
 							*pResult = dynamic_cast<IInputChannel*>(this);
 							return true;
 						}
-						*pResult = NULL;
+						*pResult = nullptr;
 						return false;
 					}
 

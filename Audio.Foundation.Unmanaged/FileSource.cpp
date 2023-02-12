@@ -8,7 +8,7 @@ using namespace Audio::Foundation::Unmanaged;
 FileSource::FileSource(const std::string& filename, ISampleContainerPtr container) :
 	m_reader(filename),
 	m_container(container),
-	m_sharer(NULL),
+	m_sharer(nullptr),
 	m_isActive(false),
 	m_refCount(0)
 {

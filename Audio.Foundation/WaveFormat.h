@@ -386,7 +386,7 @@ struct BroadcastAudioExtensionChunk : public ChunkHeader
 	unsigned short wMaxTruePeakLevel;		// unsigned short : «Maximum True Peak Level of the file expressed as dBTP (multiplied by 100) » */
 	unsigned short wMaxMomentaryLoudness;	// unsigned short : «Highest value of the Momentary Loudness Level of the file in LUFS (multiplied by 100) » */
 	unsigned short wMaxShortTermLoudness;	// unsigned short : «Highest value of the Short-Term Loudness Level of the file in LUFS (multiplied	by 100) » */
-	unsigned char acReserved[180];			// 180 bytes, reserved for future use, set to “NULL” */
+	unsigned char acReserved[180];			// 180 bytes, reserved for future use, set to “nullptr” */
 	//	char acCodingHistory[];					// ASCII : « History coding » */
 
 	BroadcastAudioExtensionChunk()

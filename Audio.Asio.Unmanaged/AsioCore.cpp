@@ -20,7 +20,7 @@ AsioCore* AsioCore::CreateInstance(REFCLSID clsid)
 {
 	AsioCore* pCore = new AsioCore();
 
-	if (NULL == pCore)
+	if (nullptr == pCore)
 	{
 		throw AsioCoreException("AsioCore: Not enough memory for ASIO instance.", E_OUTOFMEMORY);
 	}
@@ -47,7 +47,7 @@ AsioCore* AsioCore::CreateInstance(REFCLSID clsid)
 
 
 AsioCore::AsioCore() :
-	m_pDriver(NULL),
+	m_pDriver(nullptr),
 	m_iInputLatency(0),
 	m_iOutputLatency(0),
 	m_iSampleCount(0),
@@ -55,14 +55,14 @@ AsioCore::AsioCore() :
 	m_iHwInputCount(0),
 	m_iHwOutputCount(0),
 	m_iHwPinCount(0),
-	m_pHwBufferInfo(NULL),
+	m_pHwBufferInfo(nullptr),
 	m_iInputChannels(0),
-	m_pInputChannels(NULL),
+	m_pInputChannels(nullptr),
 	m_iOutputChannelPairs(0),
-	m_pOutputChannelPairs(NULL),
+	m_pOutputChannelPairs(nullptr),
 	m_iCurrentMonitorInput(-1),
-	m_bufferSwitchEventHandler(NULL),
-	m_pCoreCallbacks(NULL),
+	m_bufferSwitchEventHandler(nullptr),
+	m_pCoreCallbacks(nullptr),
 	m_sampleType(-1)
 {
 	m_supportedBufferSize.Init();
@@ -77,7 +77,7 @@ AsioCore::~AsioCore()
 void AsioCore::Initialize(REFCLSID clsid)
 {
 	HRESULT hr;
-	IASIO* pDriver = NULL;
+	IASIO* pDriver = nullptr;
 
 	if (clsid == CLSID_AsioDebugDriver)
 	{
@@ -88,7 +88,7 @@ void AsioCore::Initialize(REFCLSID clsid)
 	else
 	{
 		// clsid is used twice by intention
-		hr = CoCreateInstance(clsid, NULL, CLSCTX_INPROC_SERVER, clsid, (void**)&pDriver);
+		hr = CoCreateInstance(clsid, nullptr, CLSCTX_INPROC_SERVER, clsid, (void**)&pDriver);
 	}
 
 	// If the error is E_NOINTERFACE (0x80004002), this may be caused by invalid COM initialization
@@ -100,7 +100,7 @@ void AsioCore::Initialize(REFCLSID clsid)
 
 	ASIODriverInfo driverInfo = ASIODriverInfo();
 	driverInfo.asioVersion = 2;
-	driverInfo.sysRef = NULL;
+	driverInfo.sysRef = nullptr;
 
 	if (ASIOTrue != pDriver->init(&driverInfo))
 	{
@@ -147,18 +147,18 @@ void AsioCore::Initialize(REFCLSID clsid)
 
 void AsioCore::CleanUp()
 {
-	if (NULL != m_pDriver)
+	if (nullptr != m_pDriver)
 	{
 		Stop();
 		DisposeBuffers();
 
 		m_pDriver->Release();
-		m_pDriver = NULL;
+		m_pDriver = nullptr;
 	}
-	if (NULL != m_pCoreCallbacks)
+	if (nullptr != m_pCoreCallbacks)
 	{
 		delete m_pCoreCallbacks;
-		m_pCoreCallbacks = NULL;
+		m_pCoreCallbacks = nullptr;
 	}
 }
 
@@ -191,7 +191,7 @@ int AsioCore::GetDriverVersion()
 
 void AsioCore::SelectSampleRate()
 {
-	if (m_pDriver == NULL)
+	if (m_pDriver == nullptr)
 	{
 		throw AsioCoreException("Driver not initialized");
 	}
@@ -237,7 +237,7 @@ void AsioCore::CreateBuffers(const int inputChannelIds[], int numInputIds, const
 	if (m_iHwPinCount > 0)
 	{
 		m_pHwBufferInfo = new ASIOBufferInfo[numInputIds + numOutputIds];
-		if (NULL == m_pHwBufferInfo)
+		if (nullptr == m_pHwBufferInfo)
 		{
 			throw AsioCoreException("AsioCore: Not enough memory for array of ASIOBufferInfo.", E_OUTOFMEMORY);
 		}
@@ -250,8 +250,8 @@ void AsioCore::CreateBuffers(const int inputChannelIds[], int numInputIds, const
 
 			m_pHwBufferInfo[iIdx].isInput = ASIOTrue;
 			m_pHwBufferInfo[iIdx].channelNum = iInput;
-			m_pHwBufferInfo[iIdx].buffers[0] = NULL;
-			m_pHwBufferInfo[iIdx].buffers[1] = NULL;
+			m_pHwBufferInfo[iIdx].buffers[0] = nullptr;
+			m_pHwBufferInfo[iIdx].buffers[1] = nullptr;
 			iIdx++;
 		}
 
@@ -261,8 +261,8 @@ void AsioCore::CreateBuffers(const int inputChannelIds[], int numInputIds, const
 
 			m_pHwBufferInfo[iIdx].isInput = ASIOFalse;
 			m_pHwBufferInfo[iIdx].channelNum = iOutput;
-			m_pHwBufferInfo[iIdx].buffers[0] = NULL;
-			m_pHwBufferInfo[iIdx].buffers[1] = NULL;
+			m_pHwBufferInfo[iIdx].buffers[0] = nullptr;
+			m_pHwBufferInfo[iIdx].buffers[1] = nullptr;
 			iIdx++;
 		}
 
@@ -291,7 +291,7 @@ void AsioCore::CreateInputChannels(int offset, int count)
 	{
 		// each input channel splits the signal to two sample buffers
 		m_pInputChannels = (IInputChannel**)new IInputChannel*[count];
-		if (NULL == m_pInputChannels)
+		if (nullptr == m_pInputChannels)
 			throw AsioCoreException("AsioCore: Not enough memory for InputChannel array.", E_OUTOFMEMORY);
 
 		ZeroMemory(m_pInputChannels, sizeof(IInputChannel*) * count);
@@ -300,7 +300,7 @@ void AsioCore::CreateInputChannels(int offset, int count)
 
 		for (int iIdx = offset; iIdx < offset + count; iIdx++)
 		{
-			IInputChannelPtr input = NULL;
+			IInputChannelPtr input = nullptr;
 
 			switch(m_sampleType)
 			{
@@ -329,7 +329,7 @@ void AsioCore::CreateInputChannels(int offset, int count)
 				throw AsioCoreException("AsioCore: Unsupported sample type.", E_UNEXPECTED);
 			}
 
-			if (NULL == input)
+			if (nullptr == input)
 				throw AsioCoreException("AsioCore: Not enough memory for InputChannel instance.", E_OUTOFMEMORY);
 
 			if (m_iInputChannels < count)
@@ -351,7 +351,7 @@ void AsioCore::CreateOutputChannels(int offset, int count)
 	{
 		// each output channel is linked to two hardware outputs
 		m_pOutputChannelPairs = (IOutputChannelPair**)new IOutputChannelPair*[pairCount];
-		if (NULL == m_pOutputChannelPairs)
+		if (nullptr == m_pOutputChannelPairs)
 			throw AsioCoreException("AsioCore: Not enough memory for OutputChannelPair array.", E_OUTOFMEMORY);
 
 		ZeroMemory(m_pOutputChannelPairs, sizeof(IOutputChannelPair*) * pairCount);
@@ -360,7 +360,7 @@ void AsioCore::CreateOutputChannels(int offset, int count)
 
 		for (int pair = 0; pair < pairCount; pair++)
 		{
-			IOutputChannelPairPtr outputPair = NULL;
+			IOutputChannelPairPtr outputPair = nullptr;
 
 			int iIdx = offset + pair * 2;
 
@@ -400,7 +400,7 @@ void AsioCore::CreateOutputChannels(int offset, int count)
 				throw AsioCoreException("AsioCore: Unsupported sample type.", E_UNEXPECTED);
 			}
 
-			if (outputPair == NULL)
+			if (outputPair == nullptr)
 				throw AsioCoreException("AsioCore: Not enough memory for OutputChannelPair instance.", E_OUTOFMEMORY);
 
 			if (m_iOutputChannelPairs < pairCount)
@@ -419,12 +419,12 @@ void AsioCore::DisposeBuffers()
 
 	DisposeInputChannels();
 
-	if (NULL != m_pHwBufferInfo)
+	if (nullptr != m_pHwBufferInfo)
 	{
 		ASIOError ase = m_pDriver->disposeBuffers();
 
 		delete[] m_pHwBufferInfo;
-		m_pHwBufferInfo = NULL;
+		m_pHwBufferInfo = nullptr;
 
 		ThrowIfFailed(ase);
 	}
@@ -432,11 +432,11 @@ void AsioCore::DisposeBuffers()
 
 void AsioCore::DisposeInputChannels()
 {
-	if (NULL != m_pInputChannels)
+	if (nullptr != m_pInputChannels)
 	{
 		for (int i = 0; i < m_iInputChannels; i++)
 		{
-			if (NULL != m_pInputChannels[i])
+			if (nullptr != m_pInputChannels[i])
 			{
 				m_pInputChannels[i]->Release();
 				//switch (m_sampleType)
@@ -454,17 +454,17 @@ void AsioCore::DisposeInputChannels()
 			}
 		}
 		delete[] m_pInputChannels;
-		m_pInputChannels = NULL;
+		m_pInputChannels = nullptr;
 	}
 }
 
 void AsioCore::DisposeOutputChannels()
 {
-	if (NULL != m_pOutputChannelPairs)
+	if (nullptr != m_pOutputChannelPairs)
 	{
 		for (int i = 0; i < m_iOutputChannelPairs; i++)
 		{
-			if (NULL != m_pOutputChannelPairs[i])
+			if (nullptr != m_pOutputChannelPairs[i])
 			{
 				m_pOutputChannelPairs[i]->Release();
 				//switch (m_sampleType)
@@ -482,7 +482,7 @@ void AsioCore::DisposeOutputChannels()
 			}
 		}
 		delete[] m_pOutputChannelPairs;
-		m_pOutputChannelPairs = NULL;
+		m_pOutputChannelPairs = nullptr;
 	}
 }
 
@@ -490,7 +490,7 @@ void AsioCore::SetInputMonitoring(int iInputChannel, int iOutputPair)
 {
 	if (m_iCurrentMonitorInput >= 0)
 	{
-		m_pInputChannels[m_iCurrentMonitorInput]->DirectMonitor = NULL;
+		m_pInputChannels[m_iCurrentMonitorInput]->DirectMonitor = nullptr;
 		m_iCurrentMonitorInput = -1;
 	}
 	if (0 <= iInputChannel && iInputChannel < m_iInputChannels)
@@ -526,7 +526,7 @@ void AsioCore::OnBufferSwitch(long doubleBufferIndex, ASIOBool directProcess) co
 
 	BufferSwitchEventHandler handler = m_bufferSwitchEventHandler;
 
-	if (NULL != handler)
+	if (nullptr != handler)
 	{
 		handler(writeSecondHalf);
 	}
@@ -628,7 +628,7 @@ int AsioCore::get_InputChannelCount()
 
 IInputChannel* AsioCore::get_InputChannel(int iChannel)
 {
-	IInputChannel* value = NULL;
+	IInputChannel* value = nullptr;
 
 	if (0 <= iChannel && iChannel < m_iInputChannels)
 	{
@@ -644,7 +644,7 @@ int AsioCore::get_OutputChannelPairCount()
 
 IOutputChannelPair* AsioCore::get_OutputChannelPair(int iChannel)
 {
-	IOutputChannelPair* value = NULL;
+	IOutputChannelPair* value = nullptr;
 
 	if (0 <= iChannel && iChannel < m_iOutputChannelPairs)
 	{

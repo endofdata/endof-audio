@@ -7,10 +7,10 @@ using namespace Audio::Wasapi;
 using namespace System;
 
 DeviceEnumerator::DeviceEnumerator() :
-    m_pUnmanaged(NULL)
+    m_pUnmanaged(nullptr)
 {
-    IMMDeviceEnumerator* pUnmanaged = NULL;
-    WasapiCoreException::ThrowOnError(CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void**)&pUnmanaged), gcnew String("Failed to create instance of MMDeviceEnumerator"));
+    IMMDeviceEnumerator* pUnmanaged = nullptr;
+    WasapiCoreException::ThrowOnError(CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void**)&pUnmanaged), gcnew String("Failed to create instance of MMDeviceEnumerator"));
     m_pUnmanaged = pUnmanaged;
 }
 
@@ -26,17 +26,17 @@ DeviceEnumerator::!DeviceEnumerator()
 
 void DeviceEnumerator::CleanUp()
 {
-    if (m_pUnmanaged != NULL)
+    if (m_pUnmanaged != nullptr)
     {
         m_pUnmanaged->Release();
-        m_pUnmanaged = NULL;
+        m_pUnmanaged = nullptr;
     }
 }
 
 
 Device^ DeviceEnumerator::DefaultAudioEndpoint::get()
 {
-    IMMDevice* pUnmanaged = NULL;
+    IMMDevice* pUnmanaged = nullptr;
 
     WasapiCoreException::ThrowOnError(m_pUnmanaged->GetDefaultAudioEndpoint(eCapture, eConsole, &pUnmanaged), gcnew String("Error querying default audio endpoint"));
 

@@ -8,7 +8,7 @@ using namespace Audio::Wasapi;
 
 AudioClient::AudioClient(IAudioClient* pUnmanaged) : 
 	m_pUnmanaged(pUnmanaged), 
-	m_pMixFormat(NULL)
+	m_pMixFormat(nullptr)
 {
 }
 
@@ -24,15 +24,15 @@ AudioClient::!AudioClient()
 
 void AudioClient::CleanUp()
 {
-	if (m_pMixFormat != NULL)
+	if (m_pMixFormat != nullptr)
 	{
 		CoTaskMemFree(m_pMixFormat);
 	}
 
-	if (m_pUnmanaged != NULL)
+	if (m_pUnmanaged != nullptr)
 	{
 		m_pUnmanaged->Release();
-		m_pUnmanaged = NULL;
+		m_pUnmanaged = nullptr;
 	}
 }
 
@@ -53,7 +53,7 @@ void AudioClient::Initialize(double requestDurationMs, WAVEFORMATEX& format)
 
 void AudioClient::Initialize(double requestDurationMs, WAVEFORMATEX& format, bool isExclusive)
 {
-	WasapiCoreException::ThrowOnError(m_pUnmanaged->Initialize(isExclusive ? AUDCLNT_SHAREMODE_EXCLUSIVE : AUDCLNT_SHAREMODE_SHARED, 0, (REFERENCE_TIME)(requestDurationMs * REFTIMES_PER_MILLISEC), 0, &format, NULL),
+	WasapiCoreException::ThrowOnError(m_pUnmanaged->Initialize(isExclusive ? AUDCLNT_SHAREMODE_EXCLUSIVE : AUDCLNT_SHAREMODE_SHARED, 0, (REFERENCE_TIME)(requestDurationMs * REFTIMES_PER_MILLISEC), 0, &format, nullptr),
 		String::Format("Failed to initialize AudioClient with requestDuration {0:N} ms', channels: {1}, sample rate: {2}, sample bits: {3}, is exclusive: {4}",
 			requestDurationMs, format.nChannels, format.nSamplesPerSec, format.wBitsPerSample, isExclusive));
 
@@ -81,7 +81,7 @@ void AudioClient::Stop()
 
 WAVEFORMATEX& AudioClient::MixFormat::get()
 {
-	if (m_pMixFormat == NULL)
+	if (m_pMixFormat == nullptr)
 	{
 		UpdateMixFormat();
 	}
@@ -117,10 +117,10 @@ void AudioClient::RecordingLoop(Action<ReadOnlySpan<byte>, int>^ callback)
 
 void AudioClient::UpdateMixFormat()
 {
-	if (m_pMixFormat != NULL)
+	if (m_pMixFormat != nullptr)
 	{
 		CoTaskMemFree(m_pMixFormat);
-		m_pMixFormat = NULL;
+		m_pMixFormat = nullptr;
 	}
 	WAVEFORMATEX* pDeviceFormat;
 	WasapiCoreException::ThrowOnError(m_pUnmanaged->GetMixFormat(&pDeviceFormat), "Error requesting mix format");

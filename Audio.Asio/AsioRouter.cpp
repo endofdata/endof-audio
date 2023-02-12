@@ -28,7 +28,7 @@ AsioRouter::AsioRouter(AsioDevice^ outputDevice, AsioDevice^ inputDevice)
 	for (int o = 0; o < outputDevice->OutputChannelPairCount; o++)
 	{
 		IOutputChannelPairPtr pOutputPair = outputDevice->GetOutputChannelPair(o);
-		if (pOutputPair == NULL)
+		if (pOutputPair == nullptr)
 		{
 			throw gcnew InvalidOperationException("Output channel pair is not allocated.");
 		}
@@ -40,7 +40,7 @@ AsioRouter::AsioRouter(AsioDevice^ outputDevice, AsioDevice^ inputDevice)
 		for (int i = 0; i < inputDevice->InputChannelCount; i++)
 		{
 			IInputChannelPtr pInput = inputDevice->GetInputChannel(i);
-			if(pInput == NULL)
+			if(pInput == nullptr)
 			{
 				throw gcnew InvalidOperationException("Input channel is not allocated.");
 			}

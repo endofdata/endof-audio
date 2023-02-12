@@ -12,7 +12,7 @@ using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 SampleSharer::SampleSharer() : 
 	m_refCount(0), 
-	m_pSource(NULL)
+	m_pSource(nullptr)
 {
 }
 
@@ -69,7 +69,7 @@ void SampleSharer::RemoveAllTargets()
 
 void SampleSharer::Push()
 {
-	if (m_pSource != NULL)
+	if (m_pSource != nullptr)
 	{
 		for_each(m_vecTargets.begin(), m_vecTargets.end(), [this](ISampleReceiverPtr item)
 		{

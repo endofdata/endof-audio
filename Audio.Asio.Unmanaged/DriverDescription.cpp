@@ -6,7 +6,7 @@ using namespace Audio::Asio::Debug;
 const char* DriverDescription::ASIODebugDriverName = "ASIODebugDriver";
 
 DriverDescription::DriverDescription() :
-	m_pDriverName(NULL),
+	m_pDriverName(nullptr),
 	m_lDriverVersion(0),
 	m_lInputChannels(0),
 	m_lOutputChannels(0),
@@ -16,7 +16,7 @@ DriverDescription::DriverDescription() :
 	m_lMaxBufferSize(0),
 	m_lPreferredBufferSize(0),
 	m_lGranularity(0),
-	m_pClockSources(NULL),
+	m_pClockSources(nullptr),
 	m_lNumClockSources(0)
 {
 	ZeroMemory(m_sampleRate.ieee, sizeof(m_sampleRate.ieee));
@@ -56,7 +56,7 @@ DriverDescription::DriverDescription() :
 }
 
 DriverDescription::DriverDescription(const DriverDescription& other) :
-	m_pDriverName(NULL),
+	m_pDriverName(nullptr),
 	m_lDriverVersion(0),
 	m_lInputChannels(0),
 	m_lOutputChannels(0),
@@ -66,7 +66,7 @@ DriverDescription::DriverDescription(const DriverDescription& other) :
 	m_lMaxBufferSize(0),
 	m_lPreferredBufferSize(0),
 	m_lGranularity(0),
-	m_pClockSources(NULL),
+	m_pClockSources(nullptr),
 	m_lNumClockSources(0) 
 {
 	ZeroMemory(m_sampleRate.ieee, sizeof(m_sampleRate.ieee));
@@ -76,7 +76,7 @@ DriverDescription::DriverDescription(const DriverDescription& other) :
 
 DriverDescription::~DriverDescription()
 {
-	this->DriverName = NULL;
+	this->DriverName = nullptr;
 	this->NumClockSources = 0;
 }
 
@@ -116,13 +116,13 @@ const char* DriverDescription::get_DriverName() const
 
 void DriverDescription::put_DriverName(const char* value)
 {
-	if (NULL != m_pDriverName)
+	if (nullptr != m_pDriverName)
 	{
 		free(m_pDriverName);
-		m_pDriverName = NULL;
+		m_pDriverName = nullptr;
 	}
 
-	if (NULL != value)
+	if (nullptr != value)
 	{
 		if (strlen(value) >= Audio::Asio::Unmanaged::MaxAsioDriverName)
 			throw E_INVALIDARG;
@@ -256,18 +256,18 @@ void DriverDescription::put_NumClockSources(long value)
 {
 	if (value != m_lNumClockSources)
 	{
-		if (NULL != m_pClockSources)
+		if (nullptr != m_pClockSources)
 		{
 			m_lNumClockSources = 0;
 
 			delete[] m_pClockSources;
-			m_pClockSources = NULL;
+			m_pClockSources = nullptr;
 		}
 		if (0 < value)
 		{
 			m_pClockSources = new ASIOClockSource[value];
 
-			if (NULL == m_pClockSources)
+			if (nullptr == m_pClockSources)
 				throw E_OUTOFMEMORY;
 		}
 		m_lNumClockSources = value;

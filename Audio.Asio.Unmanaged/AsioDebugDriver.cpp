@@ -8,16 +8,16 @@ using namespace Audio::Asio::Debug;
 
 AsioDebugDriver::AsioDebugDriver() :
 	m_description(),
-	m_pSysHandle(NULL),
+	m_pSysHandle(nullptr),
 	m_isStarted(false),
 	m_selectedClockSource(-1),
-	m_pCallbacks(NULL),
+	m_pCallbacks(nullptr),
 	m_lNumChannels(0),
 	m_lBufferSize(0),
-	m_pTheBigBufferForAll(NULL),
-	m_hThread(NULL),
+	m_pTheBigBufferForAll(nullptr),
+	m_hThread(nullptr),
 	m_dwThreadId(0),
-	m_hevStop(NULL),
+	m_hevStop(nullptr),
 	m_dwInterruptInterval(100)
 {
 	ZeroMemory(m_acErrorMessage, sizeof(m_acErrorMessage));
@@ -33,16 +33,16 @@ AsioDebugDriver::AsioDebugDriver() :
 
 AsioDebugDriver::AsioDebugDriver(const DriverDescription& description) :
 	m_description(description),
-	m_pSysHandle(NULL),
+	m_pSysHandle(nullptr),
 	m_isStarted(false),
 	m_selectedClockSource(-1),
-	m_pCallbacks(NULL),
+	m_pCallbacks(nullptr),
 	m_lNumChannels(0),
 	m_lBufferSize(0),
-	m_pTheBigBufferForAll(NULL),
-	m_hThread(NULL),
+	m_pTheBigBufferForAll(nullptr),
+	m_hThread(nullptr),
 	m_dwThreadId(0),
-	m_hevStop(NULL),
+	m_hevStop(nullptr),
 	m_dwInterruptInterval(100)
 {
 	ZeroMemory(m_acErrorMessage, sizeof(m_acErrorMessage));
@@ -65,12 +65,12 @@ AsioDebugDriver::~AsioDebugDriver()
 
 HRESULT AsioDebugDriver::QueryInterface(REFIID riid, void **ppvObject)
 {
-	if (NULL == ppvObject)
+	if (nullptr == ppvObject)
 		return E_POINTER;
 
 	HRESULT hr = S_OK;
 
-	*ppvObject = NULL;
+	*ppvObject = nullptr;
 
 	if (riid == IID_IUnknown)
 		*ppvObject = dynamic_cast<IUnknown*>(this);
@@ -121,7 +121,7 @@ void AsioDebugDriver::getDriverName(char *name)
 {
 	const char* pcszOwnName;
 
-	if (NULL != m_description.DriverName)
+	if (nullptr != m_description.DriverName)
 		pcszOwnName = m_description.DriverName;
 	else
 		pcszOwnName = "ASIO Debug Driver";
@@ -150,7 +150,7 @@ DWORD AsioDebugDriver::RunInterruptSimulator()
 	{
 		ASIOCallbacks* pCallbacks = m_pCallbacks;
 
-		if (NULL != pCallbacks)
+		if (nullptr != pCallbacks)
 		{
 			m_pCallbacks->bufferSwitch(lBufferIndex, ASIOTrue);
 			lBufferIndex = (lBufferIndex == 0) ? 1 : 0;
@@ -186,8 +186,8 @@ ASIOError AsioDebugDriver::start()
 	if (!m_isStarted)
 	{
 		m_isStarted = true;
-		m_hevStop = CreateEvent(NULL, FALSE, FALSE, NULL);
-		m_hThread = CreateThread(NULL, 0, InterruptSimulatorThreadEntry, this, 0, &m_dwThreadId);
+		m_hevStop = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+		m_hThread = CreateThread(nullptr, 0, InterruptSimulatorThreadEntry, this, 0, &m_dwThreadId);
 
 		result = ASE_OK;
 	}
@@ -224,10 +224,10 @@ ASIOError AsioDebugDriver::stop()
 
 ASIOError AsioDebugDriver::getChannels(long *numInputChannels, long *numOutputChannels)
 {
-	if (NULL != numInputChannels)
+	if (nullptr != numInputChannels)
 		*numInputChannels = m_description.InputChannels;
 
-	if (NULL != numOutputChannels)
+	if (nullptr != numOutputChannels)
 		*numOutputChannels = m_description.OutputChannels;
 
 	return ASE_OK;
@@ -236,10 +236,10 @@ ASIOError AsioDebugDriver::getChannels(long *numInputChannels, long *numOutputCh
 
 ASIOError AsioDebugDriver::getLatencies(long *inputLatency, long *outputLatency)
 {
-	if (NULL != inputLatency)
+	if (nullptr != inputLatency)
 		*inputLatency = m_description.InputLatency;
 
-	if (NULL != outputLatency)
+	if (nullptr != outputLatency)
 		*outputLatency = m_description.OutputLatency;
 
 	return ASE_OK;
@@ -249,13 +249,13 @@ ASIOError AsioDebugDriver::getLatencies(long *inputLatency, long *outputLatency)
 ASIOError AsioDebugDriver::getBufferSize(long *minSize, long *maxSize,
 	long *preferredSize, long *granularity)
 {
-	if (NULL != minSize)
+	if (nullptr != minSize)
 		*minSize = m_description.MinBufferSize;
 
-	if (NULL != maxSize)
+	if (nullptr != maxSize)
 		*maxSize = m_description.MaxBufferSize;
 
-	if (NULL != preferredSize)
+	if (nullptr != preferredSize)
 		*preferredSize = m_description.PreferredBufferSize;
 
 	return ASE_OK;
@@ -269,7 +269,7 @@ ASIOError AsioDebugDriver::canSampleRate(ASIOSampleRate sampleRate)
 
 ASIOError AsioDebugDriver::getSampleRate(ASIOSampleRate *sampleRate)
 {
-	if(NULL != sampleRate)
+	if(nullptr != sampleRate)
 		*sampleRate = m_description.SampleRate;
 
 	return ASE_OK;
@@ -285,10 +285,10 @@ ASIOError AsioDebugDriver::setSampleRate(ASIOSampleRate sampleRate)
 
 ASIOError AsioDebugDriver::getClockSources(ASIOClockSource *clocks, long *numSources)
 {
-	if (NULL == clocks)
+	if (nullptr == clocks)
 		return ASE_InvalidParameter;
 
-	if (NULL == numSources)
+	if (nullptr == numSources)
 		return ASE_InvalidParameter;
 
 	long lDefinedSources = m_description.NumClockSources;
@@ -312,7 +312,7 @@ ASIOError AsioDebugDriver::getClockSources(ASIOClockSource *clocks, long *numSou
 		}
 	}
 
-	if (NULL != numSources)
+	if (nullptr != numSources)
 		*numSources = lFoundSources;
 
 	return ASE_OK;
@@ -332,10 +332,10 @@ ASIOError AsioDebugDriver::setClockSource(long reference)
 
 ASIOError AsioDebugDriver::getSamplePosition(ASIOSamples *sPos, ASIOTimeStamp *tStamp)
 {
-	if (NULL != sPos)
+	if (nullptr != sPos)
 		*sPos = m_samplePos;
 
-	if (NULL != tStamp)
+	if (nullptr != tStamp)
 		*tStamp = m_timeStamp;
 
 	return ASE_OK;
@@ -344,7 +344,7 @@ ASIOError AsioDebugDriver::getSamplePosition(ASIOSamples *sPos, ASIOTimeStamp *t
 
 ASIOError AsioDebugDriver::getChannelInfo(ASIOChannelInfo *info)
 {
-	if (NULL == info)
+	if (nullptr == info)
 		return ASE_InvalidParameter;
 
 	ASIOError result = ASE_InvalidParameter;
@@ -378,7 +378,7 @@ ASIOError AsioDebugDriver::getChannelInfo(ASIOChannelInfo *info)
 ASIOError AsioDebugDriver::createBuffers(ASIOBufferInfo *bufferInfos, long numChannels,
 	long bufferSize, ASIOCallbacks *callbacks)
 {
-	if (NULL == bufferInfos)
+	if (nullptr == bufferInfos)
 		return ASE_InvalidParameter;
 
 	if (numChannels <= 0 || numChannels > m_description.InputChannels + m_description.OutputChannels)
@@ -393,7 +393,7 @@ ASIOError AsioDebugDriver::createBuffers(ASIOBufferInfo *bufferInfos, long numCh
 
 	m_pTheBigBufferForAll = new int[bufferSize * 2 * numChannels];
 
-	if (NULL == m_pTheBigBufferForAll)
+	if (nullptr == m_pTheBigBufferForAll)
 		result = ASE_NoMemory;
 	else
 	{
@@ -416,13 +416,13 @@ ASIOError AsioDebugDriver::createBuffers(ASIOBufferInfo *bufferInfos, long numCh
 
 ASIOError AsioDebugDriver::disposeBuffers()
 {
-	if (NULL != m_pTheBigBufferForAll)
+	if (nullptr != m_pTheBigBufferForAll)
 	{
 		delete[] m_pTheBigBufferForAll;
-		m_pTheBigBufferForAll = NULL;
+		m_pTheBigBufferForAll = nullptr;
 	}
 
-	m_pCallbacks = NULL;
+	m_pCallbacks = nullptr;
 	m_lBufferSize = 0;
 	m_lNumChannels = 0;
 

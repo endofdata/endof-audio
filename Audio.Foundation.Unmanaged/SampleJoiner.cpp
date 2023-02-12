@@ -8,7 +8,7 @@ using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 SampleJoiner::SampleJoiner(int sampleCount, int channelCount) :
 	SampleContainerBase(sampleCount, channelCount),
-	m_pTarget(NULL),
+	m_pTarget(nullptr),
 	m_refCount(0)
 {
 }
@@ -47,7 +47,7 @@ bool SampleJoiner::GetInterface(REFIID iid, void** ppvResult)
 
 void SampleJoiner::Flush()
 {
-	if (NULL != m_pTarget)
+	if (nullptr != m_pTarget)
 	{
 		m_pTarget->Receive(this);
 		m_pTarget->Flush();

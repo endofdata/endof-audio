@@ -35,13 +35,13 @@ namespace Audio
 						m_iAsioChannelRight(iAsioChannelRight),
 						m_pOutputRightA(pBufferRightA),
 						m_pOutputRightB(pBufferRightB),
-						m_pJoiner(NULL),
+						m_pJoiner(nullptr),
 						m_sampleCount(sampleCount),
 						m_writeSecondHalf(true),
 						m_refCount(0)
 					{
-						if (NULL == pBufferLeftA || NULL == pBufferLeftB || NULL == pBufferRightA || NULL == pBufferRightB)
-							throw std::invalid_argument("OutputChannelPair: Buffer pointers must not be NULL.");
+						if (nullptr == pBufferLeftA || nullptr == pBufferLeftB || nullptr == pBufferRightA || nullptr == pBufferRightB)
+							throw std::invalid_argument("OutputChannelPair: Buffer pointers must not be nullptr.");
 
 						ZeroMemory(m_pOutputLeftA, sampleCount * sizeof(TSample));
 						ZeroMemory(m_pOutputRightA, sampleCount * sizeof(TSample));
@@ -150,7 +150,7 @@ namespace Audio
 							*pResult = dynamic_cast<ISampleReceiver*>(this);
 							return true;
 						}
-						*pResult = NULL;
+						*pResult = nullptr;
 						return false;
 					}
 

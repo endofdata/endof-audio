@@ -22,10 +22,10 @@ CaptureClient::!CaptureClient()
 
 void CaptureClient::CleanUp()
 {
-	if (m_pUnmanaged != NULL)
+	if (m_pUnmanaged != nullptr)
 	{
 		m_pUnmanaged->Release();
-		m_pUnmanaged = NULL;
+		m_pUnmanaged = nullptr;
 	}
 }
 
@@ -41,7 +41,7 @@ int CaptureClient::NextPacketLength::get()
 bool CaptureClient::Read(Action<ReadOnlySpan<byte>, int>^ callback)
 {
 	// Get the available data in the shared buffer.
-	byte* pData = NULL;
+	byte* pData = nullptr;
 	UINT32 framesAvailable = 0;
 	DWORD flags = 0;
 
@@ -50,7 +50,7 @@ bool CaptureClient::Read(Action<ReadOnlySpan<byte>, int>^ callback)
 		return false;
 	}
 
-	WasapiCoreException::ThrowOnError(m_pUnmanaged->GetBuffer(&pData, &framesAvailable, &flags, NULL, NULL), "Error reading next capture buffer");
+	WasapiCoreException::ThrowOnError(m_pUnmanaged->GetBuffer(&pData, &framesAvailable, &flags, nullptr, nullptr), "Error reading next capture buffer");
 
 	int bufferSize = framesAvailable * m_frameSize;
 

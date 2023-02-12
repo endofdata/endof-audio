@@ -21,18 +21,18 @@ Device::!Device()
 
 void Device::CleanUp()
 {
-    if (m_pUnmanaged != NULL)
+    if (m_pUnmanaged != nullptr)
     {
         m_pUnmanaged->Release();
-        m_pUnmanaged = NULL;
+        m_pUnmanaged = nullptr;
     }
 }
 
 AudioClient^ Device::Activate()
 {
-    IAudioClient* pUnmanaged = NULL;
+    IAudioClient* pUnmanaged = nullptr;
 
-    WasapiCoreException::ThrowOnError(m_pUnmanaged->Activate(__uuidof(IAudioClient), CLSCTX_ALL, NULL, (void**)&pUnmanaged), "Cannot activate device");
+    WasapiCoreException::ThrowOnError(m_pUnmanaged->Activate(__uuidof(IAudioClient), CLSCTX_ALL, nullptr, (void**)&pUnmanaged), "Cannot activate device");
 
     return gcnew AudioClient(pUnmanaged);
 }

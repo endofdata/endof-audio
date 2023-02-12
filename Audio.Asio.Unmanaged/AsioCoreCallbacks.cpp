@@ -6,7 +6,7 @@
 using namespace Audio::Asio::Unmanaged;
 
 // static
-AsioCoreCallbacks* AsioCoreCallbacks::s_UsedDevices[] = { NULL, NULL, NULL };
+AsioCoreCallbacks* AsioCoreCallbacks::s_UsedDevices[] = { nullptr, nullptr, nullptr };
 // static, must match number of items in s_UsedDevices which is limited by number of EntryPoints
 const int AsioCoreCallbacks::MaxDeviceCount = 3;
 
@@ -15,7 +15,7 @@ AsioCoreCallbacks& AsioCoreCallbacks::Create(AsioCore* pCore)
 {
 	for (int index = 0; index < MaxDeviceCount; index++)
 	{
-		if (s_UsedDevices[index] == NULL)
+		if (s_UsedDevices[index] == nullptr)
 		{
 			ASIOCallbacks callbacks;
 
@@ -52,7 +52,7 @@ AsioCoreCallbacks& AsioCoreCallbacks::Create(AsioCore* pCore)
 AsioCoreCallbacks::AsioCoreCallbacks(AsioCore* pCore, ASIOCallbacks& callbacks, int deviceIndex) : 
 	m_pCore(pCore), m_callbacks(callbacks), m_deviceIndex(deviceIndex)
 {
-	if (pCore == NULL)
+	if (pCore == nullptr)
 	{
 		throw std::invalid_argument("Parameter 'pCore' cannot be null.");
 	}
@@ -60,7 +60,7 @@ AsioCoreCallbacks::AsioCoreCallbacks(AsioCore* pCore, ASIOCallbacks& callbacks, 
 
 AsioCoreCallbacks::~AsioCoreCallbacks()
 {
-	s_UsedDevices[m_deviceIndex] = NULL;
+	s_UsedDevices[m_deviceIndex] = nullptr;
 }
 
 ASIOCallbacks& AsioCoreCallbacks::get_Callbacks()

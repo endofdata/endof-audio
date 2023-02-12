@@ -13,8 +13,8 @@ const float MeterChannel::DbFSMin = -1000.0f;
 MeterChannel::MeterChannel(int sampleRate, int channelCount) :
 	m_sampleRate(sampleRate),
 	m_iSamplesPerRMSFrame(880), // ~20 ms @ 44.1 kHz
-	m_meterUpdate(NULL),
-	m_pWriteThrough(NULL),
+	m_meterUpdate(nullptr),
+	m_pWriteThrough(nullptr),
 	m_refCount(0)
 {
 	m_vecSumUp.resize(channelCount, 0.0);
@@ -48,7 +48,7 @@ bool MeterChannel::GetInterface(REFIID iid, void** ppvResult)
 		return true;
 	}
 
-	*ppvResult = NULL;
+	*ppvResult = nullptr;
 	return false;
 }
 
@@ -68,7 +68,7 @@ void MeterChannel::Flush()
 
 void MeterChannel::Receive(ISampleContainerPtr input)
 {
-	if (m_pWriteThrough != NULL)
+	if (m_pWriteThrough != nullptr)
 	{
 		m_pWriteThrough->Receive(input);
 	}
@@ -146,6 +146,6 @@ void MeterChannel::OnMeterUpdate()
 {
 	MeterChannelCallback handler = m_meterUpdate;
 
-	if (NULL != handler)
+	if (nullptr != handler)
 		handler(this);
 }
