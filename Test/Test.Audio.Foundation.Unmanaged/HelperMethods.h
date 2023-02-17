@@ -19,6 +19,8 @@ namespace Test
 					static void TestSampleBuffer(ISampleBufferPtr pBuffer, int sampleCount);
 
 					static void TestSampleContainer(ISampleContainerPtr pContainer, int sampleCount, int channelCount);
+
+					static ISampleContainerPtr HelperMethods::CreateTestContainer(int sampleCount, int channelCount);
 				};
 			}
 		}

@@ -15,7 +15,7 @@ namespace Audio
 			public:
 				/*! \brief Constructor
 
-					Creates the buffers for the float sample data
+					Creates the buffers for the internal sample data
 
 					\param[in] iSamples		Number of samples to buffer.
 				*/
@@ -28,19 +28,19 @@ namespace Audio
 				virtual ~SampleBuffer();
 
 				//! \brief Clear internal buffer
-				void Flush();
+				void Clear();
 
 				//! \brief Property getter for Sample
-				float get_Sample(int iIdx);
+				sample get_Sample(int iIdx);
 
 				//! \brief Property setter for Sample
-				void put_Sample(int iIdx, float value);
+				void put_Sample(int iIdx, sample value);
 
 				//! \brief Property getter for SampleCount
 				int get_SampleCount();
 
 				//!\brief Property getter for SamplePtr
-				float* get_SamplePtr();
+				sample* get_SamplePtr();
 
 				DECLARE_IUNKNOWN
 
@@ -48,7 +48,7 @@ namespace Audio
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
-				float* m_pSamples;
+				sample* m_pSamples;
 				int m_iSamples;
 			};
 		}

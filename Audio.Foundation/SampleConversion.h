@@ -14,8 +14,9 @@ namespace Audio
 		class SampleConversion
 		{
 		public:
-			static int Int32ToFloatConverter(array<System::Byte>^ buffer, int count, array<System::Byte>^ output);
-			static int Int16ToFloatConverter(array<System::Byte>^ buffer, int count, array<System::Byte>^ output);
+			static int Int32ToSampleConverter(array<System::Byte>^ buffer, int count, array<System::Byte>^ output);
+			static int Int16ToSampleConverter(array<System::Byte>^ buffer, int count, array<System::Byte>^ output);
+			static int SampleToFloatConverter(array<System::Byte>^ buffer, int count, array<System::Single>^ output);
 			static int IdentityConverter(int sampleSize, array<System::Byte>^ buffer, int count, array<System::Byte>^ output);
 		};
 	}

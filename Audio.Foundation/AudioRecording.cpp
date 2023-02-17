@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "Audio.Foundation.Unmanaged.h"
 #include "AudioRecording.h"
 #include "WaveFile.h"
 #include "WaveFormat.h"
@@ -34,9 +35,9 @@ int AudioRecording::Write(IAudioBuffer^ buffer)
 
 	try
 	{
-		pin_ptr<float> pinnedData = (float*)buffer->SamplePointer[0].ToPointer();
+		pin_ptr<sample> pinnedData = (sample*)buffer->SamplePointer[0].ToPointer();
 
-		m_stream->Write(ReadOnlySpan<unsigned char>(pinnedData, buffer->SampleCount * sizeof(float)));
+		m_stream->Write(ReadOnlySpan<unsigned char>(pinnedData, buffer->SampleCount * sizeof(sample)));
 
 		return buffer->SampleCount;
 	}
@@ -54,7 +55,7 @@ bool AudioRecording::Finish()
 	{
 		m_stream->Flush();
 
-		int recorded = m_stream->Position / (int)sizeof(float);
+		int recorded = m_stream->Position / (int)sizeof(sample);
 
 		if (recorded <= 0)
 		{
@@ -73,7 +74,11 @@ bool AudioRecording::Finish()
 			WavFile->Create(Filename, format);
 
 			m_stream->Position = 0;
-			WavFile->WriteSamples(m_stream, recorded);
+
+			array<float>^ floatSamples = gcnew array<float>(recorded * sizeof(float));
+			SampleConversion::SampleToFloatConverter(m_stream->ToArray(), recorded, floatSamples);
+		
+			WavFile->WriteSamples(floatSamples, 0, recorded);
 
 			// Reopen in play-mode
 			WavFile->Open(Filename);

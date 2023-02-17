@@ -6,12 +6,12 @@ using namespace Audio::Foundation::Unmanaged;
 
 SampleBuffer::SampleBuffer(int iSamples) : m_refCount(0)
 {
-	m_pSamples = new float[iSamples];
+	m_pSamples = new sample[iSamples];
 	if(nullptr == m_pSamples)
 		throw new std::invalid_argument("SampleBuffer: Not enough memory for sample data buffer.");
 
 	m_iSamples = iSamples;
-	Flush();
+	Clear();
 }
 
 SampleBuffer::~SampleBuffer()
@@ -37,17 +37,17 @@ bool SampleBuffer::GetInterface(REFIID iid, void** ppvResult)
 
 }
 
-void SampleBuffer::Flush()
+void SampleBuffer::Clear()
 {
-	ZeroMemory(m_pSamples, sizeof(float) * m_iSamples);
+	ZeroMemory(m_pSamples, sizeof(sample) * m_iSamples);
 }
 
-float SampleBuffer::get_Sample(int iIdx)
+sample SampleBuffer::get_Sample(int iIdx)
 {
 	return m_pSamples[iIdx];
 }
 
-void SampleBuffer::put_Sample(int iIdx, float value)
+void SampleBuffer::put_Sample(int iIdx, sample value)
 {
 	m_pSamples[iIdx] = value;
 }
@@ -57,7 +57,7 @@ int SampleBuffer::get_SampleCount()
 	return m_iSamples;
 }
 
-float* SampleBuffer::get_SamplePtr()
+sample* SampleBuffer::get_SamplePtr()
 {
 	return m_pSamples;
 }

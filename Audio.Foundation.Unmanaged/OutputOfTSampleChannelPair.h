@@ -84,8 +84,8 @@ namespace Audio
 						if (inputChannels > 0)
 						{
 							int rightChannel = inputChannels == 1 ? 0 : 1;
-							const float* pSourceLeft = input->Channels[0]->SamplePtr;
-							const float* pSourceRight = input->Channels[rightChannel]->SamplePtr;
+							const sample* pSourceLeft = input->Channels[0]->SamplePtr;
+							const sample* pSourceRight = input->Channels[rightChannel]->SamplePtr;
 
 							TSample* pTargetLeft;
 							TSample* pTargetRight;
@@ -169,7 +169,7 @@ namespace Audio
 						}
 					}
 
-					virtual void WriteSample(float value, TSample*& pTarget) = 0;
+					virtual void WriteSample(sample value, TSample*& pTarget) = 0;
 
 					int m_iAsioChannelLeft;
 					TSample* m_pOutputLeftA;

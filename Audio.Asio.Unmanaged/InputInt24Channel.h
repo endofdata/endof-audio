@@ -22,7 +22,7 @@ namespace Audio
 			}
 
 		private:
-			inline float ReadSample(byte*& pSource)
+			inline sample ReadSample(byte*& pSource)
 			{
 				int unpacked = 0;
 
@@ -32,7 +32,7 @@ namespace Audio
 					unpacked += *pSource++;
 				}
 				
-				return SampleConversion::Int32ToFloat(unpacked);
+				return SampleConversion::Int32ToSample(unpacked);
 			}
 		};
 	}

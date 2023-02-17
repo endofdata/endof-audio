@@ -23,7 +23,7 @@ namespace Audio
 			}
 
 		private:
-			inline void WriteSample(float value, int*& pTarget)
+			inline void WriteSample(sample value, int*& pTarget)
 			{
 				*pTarget++ = SampleConversion::SaturatedConvert32(value, 1.0f);
 			}

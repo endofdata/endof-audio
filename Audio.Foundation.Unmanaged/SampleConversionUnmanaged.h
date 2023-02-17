@@ -10,20 +10,18 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			const float FloatMaxRange32 = 2147483647.f;
-			//const float FloatMaxRange = 1073741823.f;
-			const float Int32ToFloatFactor = (1.f / FloatMaxRange32);
-			//const float FloatToIntFactor = (FloatMaxRange * 0.5f);
-			const float FloatToInt32Factor = FloatMaxRange32;
+			const double SampleMaxRange32 = 2147483647.0;
+			const double Int32ToSampleFactor = (1.f / SampleMaxRange32);
+			const double SampleToInt32Factor = SampleMaxRange32;
 
-			const float FloatMaxRange16 = 32767.f;
-			const float Int16ToFloatFactor = (1.f / FloatMaxRange16);
-			const float FloatToInt16Factor = FloatMaxRange16;
+			const double SampleMaxRange16 = 32767.0;
+			const double Int16ToSampleFactor = (1.0 / SampleMaxRange16);
+			const double SampleToInt16Factor = SampleMaxRange16;
 
-			const float LevelMax = 1.0f;
-			const float PanCenter = 0.0f;
-			const float PanLeft = -1.0f;
-			const float PanRight = +1.0f;
+			const double LevelMax = 1.0;
+			const double PanCenter = 0.0;
+			const double PanLeft = -1.0;
+			const double PanRight = +1.0;
 
 			class _AUDIO_FOUNDATION_UNMANAGED_API SampleConversion
 			{
@@ -37,78 +35,98 @@ namespace Audio
 				/// <param name="pan">Pan position</param>
 				/// <param name="factorLeft">Receives the factor for the left channel</param>
 				/// <param name="factorRight">Receives the factor for the right channel</param>
-				static inline void LevelAndPanFactor(float level, float pan, float& factorLeft, float& factorRight)
+				static inline void LevelAndPanFactor(double level, double pan, double& factorLeft, double& factorRight)
 				{
 					factorLeft = (pan + PanLeft) * -0.5f * level;
 					factorRight = (pan + PanRight) * 0.5f * level;
 				}
 
 				/// <summary>
-				/// Converts a 32-bit integer sample to a float sample
+				/// Converts a 32-bit integer sample to an internal <see cref="sample"/>
 				/// </summary>
-				/// <param name="sample">Sample to convert</param>
+				/// <param name="value">Sample to convert</param>
 				/// <returns>Float sample</returns>
-				static inline float Int32ToFloat(int sample)
+				static inline sample Int32ToSample(int value)
 				{
-					return sample * Int32ToFloatFactor;
+					return value * Int32ToSampleFactor;
 				}
 
 				/// <summary>
-				/// Converts a float sample to 32-bit integer
+				/// Converts an internal <see cref="sample"/> to 32-bit integer
 				/// </summary>
-				/// <param name="sample">Sample to convert</param>
+				/// <param name="value">Sample to convert</param>
 				/// <returns>Integer sample</returns>
-				static inline int FloatToInt32(float sample)
+				static inline int SampleToInt32(sample value)
 				{
-					return SaturatedConvert32(sample, 1.0);
+					return SaturatedConvert32(value, 1.0);
 				}
 
 				/// <summary>
-				/// Converts a 16-bit integer sample to a float sample
+				/// Converts a 16-bit integer sample to an internal sample
 				/// </summary>
-				/// <param name="sample">Sample to convert</param>
+				/// <param name="value">Sample to convert</param>
 				/// <returns>Float sample</returns>
-				static inline float Int16ToFloat(short sample)
+				static inline sample Int16ToSample(short value)
 				{
-					return sample * Int16ToFloatFactor;
+					return value * Int16ToSampleFactor;
 				}
 
 				/// <summary>
-				/// Converts a 16-bit integer sample to a float sample
+				/// Converts an internal sample to a 16-bit integer
 				/// </summary>
-				/// <param name="sample">Sample to convert</param>
+				/// <param name="value">Sample to convert</param>
 				/// <returns>Float sample</returns>
-				static inline short FloatToInt16(float sample)
+				static inline short SampleToInt16(sample value)
 				{
-					return SaturatedConvert16(sample, 1.0);
+					return SaturatedConvert16(value, 1.0);
 				}
 
-				/*! \brief A helper, which adds saturation during sample conversion from float to int 32
+				/// <summary>
+				/// Converts a 32-bit float to an internal sample
+				/// </summary>
+				/// <param name="value">Sample to convert</param>
+				/// <returns>Float sample</returns>
+				static inline sample SampleToFloat(float value)
+				{
+					return (sample)value;
+				}
+
+				/// <summary>
+				/// Converts an internal sample to a 32-bit float
+				/// </summary>
+				/// <param name="value">Sample to convert</param>
+				/// <returns>Float sample</returns>
+				static inline float SampleToFloat(sample value)
+				{
+					return (float)value;
+				}
+
+				/*! \brief A helper, which adds saturation during sample conversion from internal sample to int 32
 
 					The original implementation did only saturation, integer conversion within the
 					same method was added by myself.
 
-					\param[in] sample		32-bit float sample to convert
+					\param[in] value		internal sample to convert
 					\param[in] maxValue		Maximum sample value (usually 1.0f)
 					\return					Int32 little endian sample
 				*/
-				static inline int SaturatedConvert32(float sample, float maxValue)
+				static inline int SaturatedConvert32(sample value, sample maxValue)
 				{
-					return (int)((fabsf(sample + maxValue) - fabsf(sample - maxValue)) * FloatToInt32Factor);
+					return (int)((fabsl(value + maxValue) - fabsl(value - maxValue)) * SampleToInt32Factor);
 				}
 
-				/*! \brief A helper, which adds saturation during sample conversion from float to int 16
+				/*! \brief A helper, which adds saturation during sample conversion from internal sample to int 16
 
 					The original implementation did only saturation, integer conversion within the
 					same method was added by myself.
 
-					\param[in] sample		16-bit float sample to convert
+					\param[in] value		internal sample to convert
 					\param[in] maxValue		Maximum sample value (usually 1.0f)
 					\return					Int16 little endian sample
 				*/
-				static inline int SaturatedConvert16(float sample, float maxValue)
+				static inline int SaturatedConvert16(sample value, sample maxValue)
 				{
-					return (int)((fabsf(sample + maxValue) - fabsf(sample - maxValue)) * FloatToInt16Factor);
+					return (int)((fabsl(value + maxValue) - fabsl(value - maxValue)) * SampleToInt16Factor);
 				}
 
 				/// <summary>
@@ -117,22 +135,22 @@ namespace Audio
 				/// <param name="first">First signal</param>
 				/// <param name="second">Second signal</param>
 				/// <returns>Sum of <paramref name="first"/> and <paramref name="second"/> signal</returns>
-				static inline float AddSignals(float first, float second)
+				static inline sample AddSignals(sample first, sample second)
 				{
 					return first + second;
 				}
 
 
-				static void ContinueRMSSumUp(float* pSamples, int iSamplesMax, double& sumUp)
+				static void ContinueRMSSumUp(sample* pSamples, int iSamplesMax, double& sumUp)
 				{
 					for (int i = 0; i < iSamplesMax; i++)
 					{
-						float sample = *pSamples++;
+						sample sample = *pSamples++;
 						sumUp += sample * sample;
 					}
 				}
 
-				static double DbFullScaleRMS(float* pSamples, int iSamplesMax)
+				static double DbFullScaleRMS(sample* pSamples, int iSamplesMax)
 				{
 					double sumUp = 0.0f;
 					ContinueRMSSumUp(pSamples, iSamplesMax, sumUp);

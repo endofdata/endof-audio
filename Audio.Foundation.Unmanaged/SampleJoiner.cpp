@@ -55,7 +55,7 @@ void SampleJoiner::Flush()
 
 	for (int c = 0; c < ChannelCount; c++)
 	{
-		Channels[c]->Flush();
+		Channels[c]->Clear();
 	}
 }
 
@@ -77,11 +77,11 @@ void SampleJoiner::Receive(ISampleContainerPtr container)
 
 	for (int c = 0; c < targetChannels; c++)
 	{
-		float* pDest = Channels[c]->SamplePtr;
+		sample* pDest = Channels[c]->SamplePtr;
 
 		if (c < sourceChannels)
 		{
-			const float* pSource = container->Channels[c]->SamplePtr;
+			const sample* pSource = container->Channels[c]->SamplePtr;
 
 			for (int i = 0; i < SampleCount; i++)
 			{
@@ -90,7 +90,7 @@ void SampleJoiner::Receive(ISampleContainerPtr container)
 		}
 		else
 		{
-			ZeroMemory(pDest, SampleCount * sizeof(float));
+			ZeroMemory(pDest, SampleCount * sizeof(sample));
 		}
 	}
 }

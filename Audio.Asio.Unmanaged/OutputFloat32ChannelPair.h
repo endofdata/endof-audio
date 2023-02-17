@@ -21,7 +21,7 @@ namespace Audio
 			}
 
 		private:
-			inline void WriteSample(float value, float*& pTarget)
+			inline void WriteSample(sample value, float*& pTarget)
 			{
 				*pTarget++ = value;
 			}

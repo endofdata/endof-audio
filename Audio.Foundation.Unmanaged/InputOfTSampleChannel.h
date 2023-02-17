@@ -67,9 +67,9 @@ namespace Audio
 								m_pDirectMonitor->DirectOut(pSource, true, true);
 							}
 
-							// Convert the incoming samples to float and write them to the container
+							// Convert the incoming samples to internal and write them to the container
 							int sampleCount = m_pContainer->SampleCount;
-							float* pDest = m_pContainer->Channels[0]->SamplePtr;
+							sample* pDest = m_pContainer->Channels[0]->SamplePtr;
 
 							for (int i = 0; i < sampleCount; i++)
 							{
@@ -144,7 +144,7 @@ namespace Audio
 						pSource = m_readSecondHalf ? m_pBufferB : m_pBufferA;
 					}
 
-					virtual float ReadSample(TSample*& pSource) = 0;
+					virtual sample ReadSample(TSample*& pSource) = 0;
 
 					int m_iAsioChannel;
 					TSample* m_pBufferA;

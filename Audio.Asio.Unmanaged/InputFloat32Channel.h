@@ -21,9 +21,9 @@ namespace Audio
 			}
 
 		private:
-			inline float ReadSample(float*& pSource)
+			inline sample ReadSample(float*& pSource)
 			{
-				return *pSource++;
+				return (sample)*pSource++;
 			}
 		};
 	}

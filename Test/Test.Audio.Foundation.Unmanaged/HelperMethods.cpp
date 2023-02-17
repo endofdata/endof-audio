@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "HelperMethods.h"
 #include "CppUnitTest.h"
+#include <ObjectFactory.h>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Audio::Foundation::Unmanaged;
@@ -13,7 +14,7 @@ void HelperMethods::TestSampleBuffer(ISampleBufferPtr pBuffer, int sampleCount)
 
 	for (int s = 0; s < sampleCount; s++)
 	{
-		float testValue = (float)s / 12.0f;
+		sample testValue = (sample)s / 12.0f;
 		pBuffer->Samples[s] = testValue;
 
 		Assert::AreEqual(testValue, pBuffer->Samples[s], L"Buffer read/write retains value");
@@ -31,4 +32,20 @@ void HelperMethods::TestSampleContainer(ISampleContainerPtr pContainer, int samp
 	{
 		HelperMethods::TestSampleBuffer(pContainer->Channels[c], sampleCount);
 	}
+}
+
+ISampleContainerPtr HelperMethods::CreateTestContainer(int sampleCount, int channelCount)
+{
+	ISampleContainerPtr container = ObjectFactory::CreateSampleContainer(sampleCount, channelCount);
+
+	for (int c = 0; c < channelCount; c++)
+	{
+		sample* pSamples = container->Channels[c]->SamplePtr;
+
+		for (int s = 0; s < sampleCount; s++)
+		{
+			*pSamples++ = (sample)sin((double)s / 100.0);
+		}
+	}
+	return container;
 }

@@ -477,22 +477,22 @@ int WaveFile::WriteSamples(Stream^ input, int count)
 
 float WaveFile::ReadPCM16()
 {
-	return Audio::Foundation::Unmanaged::SampleConversion::Int16ToFloat(m_binaryReader->ReadInt16());
+	return Audio::Foundation::Unmanaged::SampleConversion::Int16ToSample(m_binaryReader->ReadInt16());
 }
 
 void WaveFile::WritePCM16(float value)
 {
-	m_binaryWriter->Write(Audio::Foundation::Unmanaged::SampleConversion::FloatToInt16(value));
+	m_binaryWriter->Write(Audio::Foundation::Unmanaged::SampleConversion::SampleToInt16(value));
 }
 
 float WaveFile::ReadPCM32()
 {
-	return Audio::Foundation::Unmanaged::SampleConversion::Int32ToFloat(m_binaryReader->ReadInt32());
+	return Audio::Foundation::Unmanaged::SampleConversion::Int32ToSample(m_binaryReader->ReadInt32());
 }
 
 void WaveFile::WritePCM32(float value)
 {
-	m_binaryWriter->Write(Audio::Foundation::Unmanaged::SampleConversion::FloatToInt32(value));
+	m_binaryWriter->Write(Audio::Foundation::Unmanaged::SampleConversion::SampleToInt32(value));
 }
 
 float WaveFile::ReadFloat()
