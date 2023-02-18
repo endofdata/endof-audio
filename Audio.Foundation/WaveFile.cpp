@@ -9,6 +9,7 @@ using namespace System::IO;
 using namespace System::Threading;
 using namespace Audio::Foundation::Abstractions;
 using namespace Audio::Foundation::Interop;
+using namespace Audio::Foundation::Unmanaged;
 
 WaveFile::WaveFile() : m_mode(Mode::Closed)
 {
@@ -239,14 +240,14 @@ int WaveFile::ReadSamples(IAudioBuffer^ data)
 	
 	if (sourceChannels == targetChannels == 1)
 	{
-		return ReadSamples((float*)data->SamplePointer[0].ToPointer(), data->SampleCount);
+		return ReadSamples((sample*)data->SamplePointer[0].ToPointer(), data->SampleCount);
 	}
 
-	array<float*>^ pTargets = gcnew array<float*>(targetChannels);
+	array<sample*>^ pTargets = gcnew array<sample*>(targetChannels);
 
 	for (int c = 0; c < targetChannels; c++)
 	{
-		pTargets[c] = (float*)data->SamplePointer[c].ToPointer();
+		pTargets[c] = (sample*)data->SamplePointer[c].ToPointer();
 	}
 
 	for (done = 0; done < data->SampleCount; done++)
@@ -266,18 +267,18 @@ int WaveFile::ReadSamples(IAudioBuffer^ data)
 	return done;
 }
 
-int WaveFile::ReadSamples(array<float>^ data, int offset, int count)
+int WaveFile::ReadSamples(array<sample>^ data, int offset, int count)
 {
-	return ReadSamples(gcnew Memory<float>(data, offset, count));
+	return ReadSamples(gcnew Memory<sample>(data, offset, count));
 }
 
-int WaveFile::ReadSamples(Memory<float>^ data)
+int WaveFile::ReadSamples(Memory<sample>^ data)
 {
 	MemoryHandle^ handle = data->Pin();
 
 	try
 	{
-		return ReadSamples((float*)handle->Pointer, data->Length);
+		return ReadSamples((sample*)handle->Pointer, data->Length);
 	}
 	finally
 	{
@@ -285,7 +286,7 @@ int WaveFile::ReadSamples(Memory<float>^ data)
 	}
 }
 
-int WaveFile::ReadSamples(float* pData, int count)
+int WaveFile::ReadSamples(sample* pData, int count)
 {
 	if (m_mode != Mode::Play)
 	{
@@ -346,14 +347,14 @@ int WaveFile::WriteSamples(IAudioBuffer^ data)
 
 	if (sourceChannels == targetChannels == 1)
 	{
-		return WriteSamples((float*)data->SamplePointer[0].ToPointer(), data->SampleCount);
+		return WriteSamples((sample*)data->SamplePointer[0].ToPointer(), data->SampleCount);
 	}
 
-	array<const float*>^ pSources = gcnew array<const float*>(sourceChannels);
+	array<const sample*>^ pSources = gcnew array<const sample*>(sourceChannels);
 
 	for (int c = 0; c < sourceChannels; c++)
 	{
-		pSources[c] = (const float*)data->SamplePointer[c].ToPointer();
+		pSources[c] = (const sample*)data->SamplePointer[c].ToPointer();
 	}
 
 	for (done = 0; done < data->SampleCount; done++)
@@ -374,12 +375,12 @@ int WaveFile::WriteSamples(IAudioBuffer^ data)
 	return done;
 }
 
-int WaveFile::WriteSamples(array<float>^ data, int offset, int count)
+int WaveFile::WriteSamples(array<sample>^ data, int offset, int count)
 {
-	return WriteSamples(ReadOnlySpan<float>(data, offset, count));
+	return WriteSamples(ReadOnlySpan<sample>(data, offset, count));
 }
 
-int WaveFile::WriteSamples(ReadOnlySpan<float>^ data)
+int WaveFile::WriteSamples(ReadOnlySpan<sample>^ data)
 {
 	if (m_mode != Mode::Record)
 	{
@@ -393,9 +394,9 @@ int WaveFile::WriteSamples(ReadOnlySpan<float>^ data)
 	{
 		if (m_mode == Mode::Record)
 		{
-			for each(float sample in data)
+			for each(sample value in data)
 			{
-				m_sampleWriter(sample);
+				m_sampleWriter(value);
 			}
 			done = data->Length;
 		}
@@ -409,7 +410,7 @@ int WaveFile::WriteSamples(ReadOnlySpan<float>^ data)
 	return done;
 }
 
-int WaveFile::WriteSamples(const float* pData, int count)
+int WaveFile::WriteSamples(const sample* pData, int count)
 {
 	if (m_mode != Mode::Record)
 	{
@@ -454,9 +455,10 @@ int WaveFile::WriteSamples(Stream^ input, int count)
 
 		try
 		{
-			for (int sample = 0; sample < count; sample++)
+			for (int s = 0; s < count; s++)
 			{
-				float value = reader->ReadSingle();
+				// This must match the typedef of sample
+				sample value = reader->ReadDouble();
 				m_sampleWriter(value);
 				done++;
 			}
@@ -475,34 +477,34 @@ int WaveFile::WriteSamples(Stream^ input, int count)
 	return done;
 }
 
-float WaveFile::ReadPCM16()
+sample WaveFile::ReadPCM16()
 {
-	return Audio::Foundation::Unmanaged::SampleConversion::Int16ToSample(m_binaryReader->ReadInt16());
+	return Unmanaged::SampleConversion::Int16ToSample(m_binaryReader->ReadInt16());
 }
 
-void WaveFile::WritePCM16(float value)
+void WaveFile::WritePCM16(sample value)
 {
-	m_binaryWriter->Write(Audio::Foundation::Unmanaged::SampleConversion::SampleToInt16(value));
+	m_binaryWriter->Write(Unmanaged::SampleConversion::SampleToInt16(value));
 }
 
-float WaveFile::ReadPCM32()
+sample WaveFile::ReadPCM32()
 {
-	return Audio::Foundation::Unmanaged::SampleConversion::Int32ToSample(m_binaryReader->ReadInt32());
+	return Unmanaged::SampleConversion::Int32ToSample(m_binaryReader->ReadInt32());
 }
 
-void WaveFile::WritePCM32(float value)
+void WaveFile::WritePCM32(sample value)
 {
-	m_binaryWriter->Write(Audio::Foundation::Unmanaged::SampleConversion::SampleToInt32(value));
+	m_binaryWriter->Write(Unmanaged::SampleConversion::SampleToInt32(value));
 }
 
-float WaveFile::ReadFloat()
+sample WaveFile::ReadFloat()
 {
-	return m_binaryReader->ReadSingle();
+	return Unmanaged::SampleConversion::Float32ToSample(m_binaryReader->ReadSingle());
 }
 
-void WaveFile::WriteFloat(float value)
+void WaveFile::WriteFloat(sample value)
 {
-	m_binaryWriter->Write(value);
+	m_binaryWriter->Write(Unmanaged::SampleConversion::SampleToFloat32(value));
 }
 
 

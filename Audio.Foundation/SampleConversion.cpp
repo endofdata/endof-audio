@@ -53,28 +53,27 @@ int SampleConversion::Int16ToSampleConverter(array<Byte>^ buffer, int count, arr
 }
 
 // static 
-int SampleConversion::SampleToFloatConverter(array<Byte>^ buffer, int count, array<Single>^ output)
+int SampleConversion::Float32ToSampleConverter(array<Byte>^ buffer, int count, array<byte>^ output)
 {
 	if (buffer->Length < count)
 		throw gcnew ArgumentException("Source buffer is too small.");
 
-	int sampleCount = (int)(count / sizeof(sample));
+	int sampleCount = (int)(count / sizeof(float));
 
 	if (output->Length < sampleCount)
 		throw gcnew ArgumentException("Destination buffer is too small.");
 
 	pin_ptr<unsigned char> pinnedBuffer = &buffer[0];
-	pin_ptr<float> pinnedOutput = &output[0];
+	pin_ptr<unsigned char> pinnedOutput = &output[0];
 
-	sample* pSrc = (sample*)pinnedBuffer;
-	float* pDst = (float*)pinnedOutput;
+	float* pSrc = (float*)pinnedBuffer;
+	sample* pDst = (sample*)pinnedOutput;
 
 	for (int sample = 0; sample < sampleCount; sample++)
-		*pDst++ = Audio::Foundation::Unmanaged::SampleConversion::SampleToFloat(*pSrc++);
+		*pDst++ = Audio::Foundation::Unmanaged::SampleConversion::Float32ToSample(*pSrc++);
 
 	return sampleCount;
 }
-
 
 // static 
 int SampleConversion::IdentityConverter(int sampleSize, array<Byte>^ buffer, int count, array<Byte>^ output)
@@ -101,4 +100,27 @@ int SampleConversion::IdentityConverter(int sampleSize, array<Byte>^ buffer, int
 		CopyMemory(pinnedOutput, pinnedBuffer, count);
 	}
 	return count / sampleSize;
+}
+
+// static 
+int SampleConversion::SampleToFloat32Converter(array<Byte>^ buffer, int count, array<Single>^ output)
+{
+	if (buffer->Length < count)
+		throw gcnew ArgumentException("Source buffer is too small.");
+
+	int sampleCount = (int)(count / sizeof(sample));
+
+	if (output->Length < sampleCount)
+		throw gcnew ArgumentException("Destination buffer is too small.");
+
+	pin_ptr<unsigned char> pinnedBuffer = &buffer[0];
+	pin_ptr<float> pinnedOutput = &output[0];
+
+	sample* pSrc = (sample*)pinnedBuffer;
+	float* pDst = (float*)pinnedOutput;
+
+	for (int sample = 0; sample < sampleCount; sample++)
+		*pDst++ = Audio::Foundation::Unmanaged::SampleConversion::SampleToFloat32(*pSrc++);
+
+	return sampleCount;
 }

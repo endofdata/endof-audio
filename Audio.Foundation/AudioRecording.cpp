@@ -74,11 +74,8 @@ bool AudioRecording::Finish()
 			WavFile->Create(Filename, format);
 
 			m_stream->Position = 0;
-
-			array<float>^ floatSamples = gcnew array<float>(recorded * sizeof(float));
-			SampleConversion::SampleToFloatConverter(m_stream->ToArray(), recorded, floatSamples);
 		
-			WavFile->WriteSamples(floatSamples, 0, recorded);
+			WavFile->WriteSamples(m_stream, recorded);
 
 			// Reopen in play-mode
 			WavFile->Open(Filename);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <math.h>
+#include <Audio.Foundation.Unmanaged.h>
 
 namespace Audio
 {
@@ -8,16 +9,18 @@ namespace Audio
 	{
 
 		delegate int BufferConverter(array<System::Byte>^ rawBytes, int count, array<System::Byte>^ output);
-		delegate float SampleReader();
-		delegate void SampleWriter(float sample);
+		delegate sample SampleReader();
+		delegate void SampleWriter(sample sample);
 
 		class SampleConversion
 		{
 		public:
 			static int Int32ToSampleConverter(array<System::Byte>^ buffer, int count, array<System::Byte>^ output);
 			static int Int16ToSampleConverter(array<System::Byte>^ buffer, int count, array<System::Byte>^ output);
-			static int SampleToFloatConverter(array<System::Byte>^ buffer, int count, array<System::Single>^ output);
+			static int Float32ToSampleConverter(array<System::Byte>^ buffer, int count, array<System::Byte>^ output);
 			static int IdentityConverter(int sampleSize, array<System::Byte>^ buffer, int count, array<System::Byte>^ output);
+
+			static int SampleToFloat32Converter(array<System::Byte>^ buffer, int count, array<System::Single>^ output);
 		};
 	}
 }
