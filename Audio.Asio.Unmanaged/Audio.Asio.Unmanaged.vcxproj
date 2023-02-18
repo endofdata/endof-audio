@@ -97,12 +97,6 @@
     <ClInclude Include="Audio.Asio.Unmanaged.h" />
     <ClInclude Include="DriverDescription.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="InputFloat32Channel.h" />
-    <ClInclude Include="InputInt24Channel.h" />
-    <ClInclude Include="InputInt32Channel.h" />
-    <ClInclude Include="OutputFloat32ChannelPair.h" />
-    <ClInclude Include="OutputInt24ChannelPair.h" />
-    <ClInclude Include="OutputInt32ChannelPair.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>

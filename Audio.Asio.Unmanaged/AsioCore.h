@@ -137,6 +137,8 @@ namespace Audio
 
 				void CreateOutputChannels(int offset, int count);
 
+				int MapSampleType(ASIOSampleType asioSampleType);
+
 				void DisposeBuffers();
 
 				void DisposeInputChannels();

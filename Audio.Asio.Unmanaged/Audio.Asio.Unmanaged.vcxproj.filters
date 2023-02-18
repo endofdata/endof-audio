@@ -36,24 +36,6 @@
     <ClInclude Include="DriverDescription.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="InputFloat32Channel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="InputInt24Channel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="InputInt32Channel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OutputFloat32ChannelPair.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OutputInt24ChannelPair.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OutputInt32ChannelPair.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AsioError.h">
       <Filter>Header Files</Filter>
     </ClInclude>

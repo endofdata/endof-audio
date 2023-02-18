@@ -4,16 +4,11 @@
 #include "AsioError.h"
 #include "AsioDebugDriver.h"
 #include "AsioDebugDriverGuid.h"
-#include "InputInt32Channel.h"
-#include "InputInt24Channel.h"
-#include "InputFloat32Channel.h"
-#include "OutputInt32ChannelPair.h"
-#include "OutputInt24ChannelPair.h"
-#include "OutputFloat32ChannelPair.h"
+#include <ObjectFactory.h>
+#include <SampleType.h>
 
 using namespace Audio::Asio::Unmanaged;
-//using namespace Audio::Asio::Interop;
-//using namespace Audio::Foundation::Abstractions;
+using namespace Audio::Foundation::Unmanaged;
 
 // static
 AsioCore* AsioCore::CreateInstance(REFCLSID clsid)
@@ -63,6 +58,7 @@ AsioCore::AsioCore() :
 	m_iCurrentMonitorInput(-1),
 	m_bufferSwitchEventHandler(nullptr),
 	m_pCoreCallbacks(nullptr),
+	m_lastError(ASE_OK),
 	m_sampleType(-1)
 {
 	m_supportedBufferSize.Init();
@@ -300,34 +296,11 @@ void AsioCore::CreateInputChannels(int offset, int count)
 
 		for (int iIdx = offset; iIdx < offset + count; iIdx++)
 		{
-			IInputChannelPtr input = nullptr;
-
-			switch(m_sampleType)
-			{
-			case ASIOSTInt32LSB:
-				input = new Audio::Asio::InputInt32Channel(
-					m_pHwBufferInfo[iIdx].channelNum,
-					(int*)m_pHwBufferInfo[iIdx].buffers[0],
-					(int*)m_pHwBufferInfo[iIdx].buffers[1],
-					SampleCount);
-				break;
-			case ASIOSTInt24LSB:
-				input = new Audio::Asio::InputInt24Channel(
-					m_pHwBufferInfo[iIdx].channelNum,
-					(byte*)m_pHwBufferInfo[iIdx].buffers[0],
-					(byte*)m_pHwBufferInfo[iIdx].buffers[1],
-					SampleCount);
-				break;
-			case ASIOSTFloat32LSB:
-				input = new Audio::Asio::InputFloat32Channel(
-					m_pHwBufferInfo[iIdx].channelNum,
-					(float*)m_pHwBufferInfo[iIdx].buffers[0],
-					(float*)m_pHwBufferInfo[iIdx].buffers[1],
-					SampleCount);
-				break;
-			default:
-				throw AsioCoreException("AsioCore: Unsupported sample type.", E_UNEXPECTED);
-			}
+			IInputChannelPtr input = ObjectFactory::CreateInputChannel(MapSampleType(m_sampleType),
+				m_pHwBufferInfo[iIdx].channelNum,
+				m_pHwBufferInfo[iIdx].buffers[0],
+				m_pHwBufferInfo[iIdx].buffers[1],
+				SampleCount);
 
 			if (nullptr == input)
 				throw AsioCoreException("AsioCore: Not enough memory for InputChannel instance.", E_OUTOFMEMORY);
@@ -340,6 +313,21 @@ void AsioCore::CreateInputChannels(int offset, int count)
 				m_iInputChannels++;
 			}
 		}
+	}
+}
+
+int AsioCore::MapSampleType(ASIOSampleType asioSampleType)
+{
+	switch (asioSampleType)
+	{
+	case ASIOSTInt32LSB:
+		return Int32LSB;
+	case ASIOSTInt24LSB:
+		return Int24LSB;
+	case ASIOSTFloat32LSB:
+		return Float32LSB;
+	default:
+		throw AsioCoreException("AsioCore: Unsupported sample type.", E_UNEXPECTED);
 	}
 }
 
@@ -360,45 +348,16 @@ void AsioCore::CreateOutputChannels(int offset, int count)
 
 		for (int pair = 0; pair < pairCount; pair++)
 		{
-			IOutputChannelPairPtr outputPair = nullptr;
-
 			int iIdx = offset + pair * 2;
 
-			switch (m_sampleType)
-			{
-			case ASIOSTInt32LSB:
-				outputPair = new ::Audio::Asio::OutputInt32ChannelPair(
-					m_pHwBufferInfo[iIdx].channelNum,
-					(int*)m_pHwBufferInfo[iIdx].buffers[0],
-					(int*)m_pHwBufferInfo[iIdx].buffers[1],
-					m_pHwBufferInfo[iIdx + 1].channelNum,
-					(int*)m_pHwBufferInfo[iIdx + 1].buffers[0],
-					(int*)m_pHwBufferInfo[iIdx + 1].buffers[1],
-					SampleCount);
-				break;
-			case ASIOSTInt24LSB:
-				outputPair = new ::Audio::Asio::OutputInt24ChannelPair(
-					m_pHwBufferInfo[iIdx].channelNum,
-					(byte*)m_pHwBufferInfo[iIdx].buffers[0],
-					(byte*)m_pHwBufferInfo[iIdx].buffers[1],
-					m_pHwBufferInfo[iIdx + 1].channelNum,
-					(byte*)m_pHwBufferInfo[iIdx + 1].buffers[0],
-					(byte*)m_pHwBufferInfo[iIdx + 1].buffers[1],
-					SampleCount);
-				break;			
-			case ASIOSTFloat32LSB:
-				outputPair = new ::Audio::Asio::OutputFloat32ChannelPair(
-					m_pHwBufferInfo[iIdx].channelNum,
-					(float*)m_pHwBufferInfo[iIdx].buffers[0],
-					(float*)m_pHwBufferInfo[iIdx].buffers[1],
-					m_pHwBufferInfo[iIdx + 1].channelNum,
-					(float*)m_pHwBufferInfo[iIdx + 1].buffers[0],
-					(float*)m_pHwBufferInfo[iIdx + 1].buffers[1],
-					SampleCount);
-				break;
-			default:
-				throw AsioCoreException("AsioCore: Unsupported sample type.", E_UNEXPECTED);
-			}
+			IOutputChannelPairPtr outputPair = ObjectFactory::CreateOutputChannelPair(MapSampleType(m_sampleType),
+				m_pHwBufferInfo[iIdx].channelNum,
+				m_pHwBufferInfo[iIdx].buffers[0],
+				m_pHwBufferInfo[iIdx].buffers[1],
+				m_pHwBufferInfo[iIdx + 1].channelNum,
+				m_pHwBufferInfo[iIdx + 1].buffers[0],
+				m_pHwBufferInfo[iIdx + 1].buffers[1],
+				SampleCount);
 
 			if (outputPair == nullptr)
 				throw AsioCoreException("AsioCore: Not enough memory for OutputChannelPair instance.", E_OUTOFMEMORY);
@@ -439,18 +398,6 @@ void AsioCore::DisposeInputChannels()
 			if (nullptr != m_pInputChannels[i])
 			{
 				m_pInputChannels[i]->Release();
-				//switch (m_sampleType)
-				//{
-				//case ASIOSTInt32LSB:
-				//	delete dynamic_cast<InputInt32Channel*>(m_pInputChannels[i]);
-				//	break;
-				//case ASIOSTInt24LSB:
-				//	delete dynamic_cast<InputInt24Channel*>(m_pInputChannels[i]);
-				//	break;
-				//case ASIOSTFloat32LSB:
-				//	delete dynamic_cast<InputFloat32Channel*>(m_pInputChannels[i]);
-				//	break;
-				//}
 			}
 		}
 		delete[] m_pInputChannels;
@@ -467,18 +414,6 @@ void AsioCore::DisposeOutputChannels()
 			if (nullptr != m_pOutputChannelPairs[i])
 			{
 				m_pOutputChannelPairs[i]->Release();
-				//switch (m_sampleType)
-				//{
-				//case ASIOSTInt32LSB:
-				//	delete dynamic_cast<OutputInt32ChannelPair*>(m_pOutputChannelPairs[i]);
-				//	break;
-				//case ASIOSTInt24LSB:
-				//	delete dynamic_cast<OutputInt24ChannelPair*>(m_pOutputChannelPairs[i]);
-				//	break;
-				//case ASIOSTFloat32LSB:
-				//	delete dynamic_cast<OutputFloat32ChannelPair*>(m_pOutputChannelPairs[i]);
-				//	break;
-				//}
 			}
 		}
 		delete[] m_pOutputChannelPairs;
@@ -514,29 +449,22 @@ void AsioCore::OnBufferSwitch(long doubleBufferIndex, ASIOBool directProcess) co
 	for (int iOutput = 0; iOutput < m_iOutputChannelPairs; iOutput++)
 	{
 		IOutputChannelPairPtr pChannelPair = m_pOutputChannelPairs[iOutput];
-		pChannelPair->Swap(writeSecondHalf);
+		pChannelPair->OnNextBuffer(writeSecondHalf);
 	}
 
 	for (int iInput = 0; iInput < m_iInputChannels; iInput++)
 	{
-		ISampleSourcePtr pChannel = m_pInputChannels[iInput];
-		pChannel->Pull(readSecondHalf);
-		pChannel->Push();
+		IInputChannelPtr pChannel = m_pInputChannels[iInput];
+		pChannel->OnNextBuffer(readSecondHalf);
 	}
 
-	BufferSwitchEventHandler handler = m_bufferSwitchEventHandler;
+	//BufferSwitchEventHandler handler = m_bufferSwitchEventHandler;
 
-	if (nullptr != handler)
-	{
-		handler(writeSecondHalf);
-	}
-	for(int iOutput = 0; iOutput < m_iOutputChannelPairs; iOutput++)
-	{
-		IOutputChannelPairPtr pChannelPair = m_pOutputChannelPairs[iOutput];
-		ISampleReceiverPtr pReceiver = pChannelPair->SampleJoiner;
-		pReceiver->Flush();
-	}
-
+	//if (nullptr != handler)
+	//{
+	//	handler(writeSecondHalf);
+	//}
+	
 	if (m_outputReadySupport)
 	{
 		m_pDriver->outputReady();
