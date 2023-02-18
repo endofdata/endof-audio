@@ -42,17 +42,6 @@ namespace Audio
 					/// Gets the sample buffers for the allocated channels
 					/// </summary>
 					_declspec(property(get = get_Channel)) ISampleBufferPtr Channels[];
-
-					/// <summary>
-					/// Gets or sets a value indicating whether the sample container is active
-					/// </summary>
-					/// <remarks>
-					/// Currently this is only used to control whether an input channel processes incoming data.
-					/// </remarks>
-					_declspec(property(get = get_IsActive, put = put_IsActive)) bool IsActive;
-
-					bool get_IsActive() = 0;
-					void put_IsActive(bool value) = 0;
 				};
 
 				_COM_SMARTPTR_TYPEDEF(ISampleContainer, __uuidof(ISampleContainer));

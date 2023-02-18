@@ -4,7 +4,7 @@
 #include "SampleContainer.h"
 #include "SampleSharer.h"
 #include "IInputChannel.h"
-#include "ISampleSource.h"
+#include "ISampleProcessor.h"
 #include "ObjectFactory.h"
 
 using namespace Audio::Foundation::Unmanaged;
@@ -19,7 +19,7 @@ namespace Audio
 			namespace Templates
 			{
 				template<typename TSample, int SAMPLE_TYPE>
-				class InputOfTSampleChannel : public ISampleSource, public IInputChannel
+				class InputOfTSampleChannel : public IInputChannel
 				{
 				public:
 					/*! \brief Constructor
@@ -31,8 +31,9 @@ namespace Audio
 						m_pBufferB(pBufferB),
 						m_pDirectMonitor(nullptr),
 						m_pContainer(nullptr),
-						m_pSharer(nullptr),
 						m_readSecondHalf(false),
+						m_isActive(false),
+						m_pFirst(nullptr),
 						m_refCount(0)
 					{
 						if (nullptr == m_pBufferA || nullptr == m_pBufferB)
@@ -42,8 +43,6 @@ namespace Audio
 						ZeroMemory(m_pBufferB, sampleCount * sizeof(TSample));
 
 						m_pContainer = ObjectFactory::CreateSampleContainer(sampleCount, 1);
-						m_pSharer = ObjectFactory::CreateSampleSharer();
-						m_pSharer->Source = m_pContainer;
 					}
 
 					/*! \brief Destructor
@@ -52,11 +51,11 @@ namespace Audio
 					{
 					}
 
-					virtual void Pull(bool readSecondHalf)
+					virtual void OnNextBuffer(bool readSecondHalf)
 					{
 						m_readSecondHalf = readSecondHalf;
 
-						if (m_pContainer->IsActive)
+						if (IsActive && HasFirst)
 						{
 							TSample* pSource;
 							SelectBufferPointer(pSource);
@@ -75,23 +74,23 @@ namespace Audio
 							{
 								*pDest = ReadSample(pSource);
 							}
+							m_pFirst->Process(m_pContainer);
 						}
-					}
-
-					virtual void Push()
-					{
-						// Push the samples form the container to all targets attached to the sharer
-						m_pSharer->Push();
 					}
 
 					virtual bool get_IsActive()
 					{
-						return m_pContainer->IsActive;
+						return m_isActive;
 					}
 
 					virtual void put_IsActive(bool value)
 					{
-						m_pContainer->IsActive = value;
+						m_isActive = value;
+					}
+
+					virtual bool get_SupportsDirectMonitor()
+					{
+						return true;
 					}
 
 					virtual IOutputChannelPairPtr get_DirectMonitor()
@@ -104,14 +103,29 @@ namespace Audio
 						m_pDirectMonitor = value;
 					}
 
+					virtual bool get_HasDirectMonitor()
+					{
+						return m_pDirectMonitor != nullptr;
+					}
+
 					virtual int get_SampleType()
 					{
 						return SAMPLE_TYPE;
 					}
 
-					virtual ISampleSharerPtr get_SampleSharer()
+					virtual ISampleProcessorPtr get_First()
 					{
-						return m_pSharer;
+						return m_pFirst;
+					}
+
+					virtual void put_First(ISampleProcessorPtr value)
+					{
+						m_pFirst = value;
+					}
+
+					virtual bool get_HasFirst()
+					{
+						return m_pFirst != nullptr;
 					}
 
 					TEMPLATED_IUNKNOWN
@@ -122,11 +136,6 @@ namespace Audio
 						if (riid == _uuidof(IUnknown))
 						{
 							*pResult = dynamic_cast<IUnknown*>(this);
-							return true;
-						}
-						if (riid == _uuidof(ISampleSource))
-						{
-							*pResult = dynamic_cast<ISampleSource*>(this);
 							return true;
 						}
 						if (riid == _uuidof(IInputChannel))
@@ -151,11 +160,10 @@ namespace Audio
 					TSample* m_pBufferB;
 					bool m_readSecondHalf;
 
+					bool m_isActive;
 					IOutputChannelPairPtr m_pDirectMonitor;
-
-					// was derived from...
 					ISampleContainerPtr m_pContainer;
-					ISampleSharerPtr m_pSharer;
+					ISampleProcessorPtr m_pFirst;
 
 					unsigned long m_refCount;
 				};

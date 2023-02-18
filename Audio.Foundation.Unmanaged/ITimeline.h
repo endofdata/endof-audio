@@ -22,13 +22,14 @@ namespace Audio
 
 					_declspec(property(get = get_TakeCount)) int TakeCount;
 
-					ITakePtr get_Take(int id) = 0;
+					ITakePtr get_Take(int index) = 0;
 
 					_declspec(property(get = get_Take)) ITakePtr Takes[];
 
 					int AddTake(ITakePtr take) = 0;
-					bool RemoveTake(int id) = 0;
-					bool MoveTake(int id, Time to) = 0;
+					bool RemoveTake(int takeId) = 0;
+					bool MoveTake(int takeId, Time to) = 0;
+					ITakePtr FindTake(int takeId) = 0;
 				};
 			}
 		}

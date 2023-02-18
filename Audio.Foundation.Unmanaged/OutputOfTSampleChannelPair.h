@@ -17,7 +17,7 @@ namespace Audio
 			namespace Templates
 			{
 				template <typename TSample, int SAMPLE_TYPE, size_t SAMPLE_SIZE>
-				class OutputOfTSampleChannelPair : public IOutputChannelPair, public ISampleReceiver
+				class OutputOfTSampleChannelPair : public IOutputChannelPair, public ISampleProcessor
 				{
 				public:
 					/*! \brief Constructor
@@ -35,7 +35,6 @@ namespace Audio
 						m_iAsioChannelRight(iAsioChannelRight),
 						m_pOutputRightA(pBufferRightA),
 						m_pOutputRightB(pBufferRightB),
-						m_pJoiner(nullptr),
 						m_sampleCount(sampleCount),
 						m_writeSecondHalf(true),
 						m_refCount(0)
@@ -47,10 +46,6 @@ namespace Audio
 						ZeroMemory(m_pOutputRightA, sampleCount * sizeof(TSample));
 						ZeroMemory(m_pOutputLeftB, sampleCount * sizeof(TSample));
 						ZeroMemory(m_pOutputRightB, sampleCount * sizeof(TSample));
-
-						m_pJoiner = ObjectFactory::CreateSampleJoiner(sampleCount, 2);
-
-						m_pJoiner->Target = this;
 					}
 
 					/*! \brief Destructor
@@ -68,40 +63,10 @@ namespace Audio
 
 						\param[in] writeSecondHalf	If true, the second buffer half gets activated.
 					*/
-					virtual void Swap(bool writeSecondHalf)
+					virtual void OnNextBuffer(bool writeSecondHalf)
 					{
 						m_writeSecondHalf = writeSecondHalf;
 					}
-
-					virtual void Flush()
-					{
-					}
-
-					virtual void Receive(ISampleContainerPtr input)
-					{
-						int inputChannels = input == nullptr? 0 : input->ChannelCount;
-
-						if (inputChannels > 0)
-						{
-							int rightChannel = inputChannels == 1 ? 0 : 1;
-							const sample* pSourceLeft = input->Channels[0]->SamplePtr;
-							const sample* pSourceRight = input->Channels[rightChannel]->SamplePtr;
-
-							TSample* pTargetLeft;
-							TSample* pTargetRight;
-
-							SelectBufferPointer(pTargetLeft, pTargetRight);
-
-							for (int i = 0; i < m_sampleCount; i++)
-							{
-								WriteSample(*pSourceLeft++, pTargetLeft);
-								WriteSample(*pSourceRight++, pTargetRight);
-							}
-						}
-					}
-
-
-					//int get_SampleCount();
 
 					virtual void DirectOut(void* pBuffer, bool fLeft, bool fRight)
 					{
@@ -125,9 +90,52 @@ namespace Audio
 						return SAMPLE_TYPE;
 					}
 
-					virtual ISampleJoinerPtr get_SampleJoiner()
+					virtual bool get_IsActive()
 					{
-						return m_pJoiner;
+						return m_isActive;
+					}
+
+					virtual void put_IsActive(bool value)
+					{
+						m_isActive = value;
+					}
+
+					virtual ISampleProcessorPtr get_Next()
+					{
+						return m_pNext;
+					}
+
+					virtual void put_Next(ISampleProcessorPtr value)
+					{
+						m_pNext = value;
+					}
+
+					virtual bool get_HasNext()
+					{
+						return m_pNext != nullptr;
+					}
+
+					virtual void Process(ISampleContainerPtr container)
+					{
+						int inputChannels = container == nullptr ? 0 : container->ChannelCount;
+
+						if (inputChannels > 0)
+						{
+							int rightChannel = inputChannels == 1 ? 0 : 1;
+							const sample* pSourceLeft = container->Channels[0]->SamplePtr;
+							const sample* pSourceRight = container->Channels[rightChannel]->SamplePtr;
+
+							TSample* pTargetLeft;
+							TSample* pTargetRight;
+
+							SelectBufferPointer(pTargetLeft, pTargetRight);
+
+							for (int i = 0; i < m_sampleCount; i++)
+							{
+								WriteSample(*pSourceLeft++, pTargetLeft);
+								WriteSample(*pSourceRight++, pTargetRight);
+							}
+						}
 					}
 
 					TEMPLATED_IUNKNOWN
@@ -145,9 +153,9 @@ namespace Audio
 							*pResult = dynamic_cast<IOutputChannelPair*>(this);
 							return true;
 						}
-						if (riid == _uuidof(ISampleReceiver))
+						if (riid == _uuidof(ISampleProcessor))
 						{
-							*pResult = dynamic_cast<ISampleReceiver*>(this);
+							*pResult = dynamic_cast<ISampleProcessor*>(this);
 							return true;
 						}
 						*pResult = nullptr;
@@ -178,8 +186,10 @@ namespace Audio
 					TSample* m_pOutputRightA;
 					TSample* m_pOutputRightB;
 					int m_sampleCount;
+
+					bool m_isActive;
 					bool m_writeSecondHalf;
-					ISampleJoinerPtr m_pJoiner;
+					ISampleProcessorPtr m_pNext;
 
 					unsigned long m_refCount;
 				};

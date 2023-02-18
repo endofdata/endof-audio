@@ -16,9 +16,6 @@ namespace Audio
 				SampleContainerBase(int sampleCount, int channelCount);
 				virtual ~SampleContainerBase();
 
-				virtual bool get_IsActive();
-				virtual void put_IsActive(bool value);
-
 				virtual int get_SampleCount();
 				virtual void put_SampleCount(int sampleCount);
 

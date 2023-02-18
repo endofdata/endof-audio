@@ -38,7 +38,7 @@ bool SampleSharer::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-void SampleSharer::AddTarget(ISampleReceiverPtr target)
+void SampleSharer::AddTarget(ISampleProcessorPtr target)
 {
 	target.AddRef();
 
@@ -48,9 +48,9 @@ void SampleSharer::AddTarget(ISampleReceiverPtr target)
 	m_vecTargets.push_back(target);
 }
 
-void SampleSharer::RemoveTarget(ISampleReceiverPtr target)
+void SampleSharer::RemoveTarget(ISampleProcessorPtr target)
 {
-	vector<ISampleReceiverPtr>::iterator newEnd =
+	vector<ISampleProcessorPtr>::iterator newEnd =
 	remove_if(m_vecTargets.begin(), m_vecTargets.end(), [&target](ISampleReceiverPtr item) 
 	{ 
 		if(item == target)
@@ -71,9 +71,9 @@ void SampleSharer::Push()
 {
 	if (m_pSource != nullptr)
 	{
-		for_each(m_vecTargets.begin(), m_vecTargets.end(), [this](ISampleReceiverPtr item)
+		for_each(m_vecTargets.begin(), m_vecTargets.end(), [this](ISampleProcessorPtr item)
 		{
-			item->Receive(m_pSource);
+			item->Process(m_pSource);
 		});
 	}
 }
@@ -88,7 +88,7 @@ ISampleContainerPtr SampleSharer::get_Source()
 	return m_pSource;
 }
 
-ISampleReceiverPtr SampleSharer::get_Target(int index)
+ISampleProcessorPtr SampleSharer::get_Target(int index)
 {
 	return m_vecTargets.at(index);
 }

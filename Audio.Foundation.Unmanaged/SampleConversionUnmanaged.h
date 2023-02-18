@@ -58,7 +58,7 @@ namespace Audio
 				/// <returns>Integer sample</returns>
 				static inline int SampleToInt32(sample value)
 				{
-					return SaturatedConvert32(value, 1.0);
+					return SaturatedConvertInt32(value, 1.0);
 				}
 
 				/// <summary>
@@ -78,7 +78,7 @@ namespace Audio
 				/// <returns>Float sample</returns>
 				static inline short SampleToInt16(sample value)
 				{
-					return SaturatedConvert16(value, 1.0);
+					return SaturatedConvertInt16(value, 1.0);
 				}
 
 				/// <summary>
@@ -86,7 +86,7 @@ namespace Audio
 				/// </summary>
 				/// <param name="value">Sample to convert</param>
 				/// <returns>Float sample</returns>
-				static inline sample SampleToFloat(float value)
+				static inline sample Float32ToSample(float value)
 				{
 					return (sample)value;
 				}
@@ -96,37 +96,53 @@ namespace Audio
 				/// </summary>
 				/// <param name="value">Sample to convert</param>
 				/// <returns>Float sample</returns>
-				static inline float SampleToFloat(sample value)
+				static inline float SampleToFloat32(sample value)
 				{
-					return (float)value;
+					return SaturatedConvertFloat32(value, 1.0);
 				}
 
-				/*! \brief A helper, which adds saturation during sample conversion from internal sample to int 32
-
-					The original implementation did only saturation, integer conversion within the
-					same method was added by myself.
+				/*! \brief A helper, which adds saturation during sample conversion from internal sample to 32-bit int
 
 					\param[in] value		internal sample to convert
 					\param[in] maxValue		Maximum sample value (usually 1.0f)
-					\return					Int32 little endian sample
+					\return					32-bit int little endian sample
 				*/
-				static inline int SaturatedConvert32(sample value, sample maxValue)
+				static inline int SaturatedConvertInt32(sample value, sample maxValue)
 				{
-					return (int)((fabsl(value + maxValue) - fabsl(value - maxValue)) * SampleToInt32Factor);
+					return (int)(Saturated(value, maxValue) * SampleToInt32Factor);
 				}
 
-				/*! \brief A helper, which adds saturation during sample conversion from internal sample to int 16
-
-					The original implementation did only saturation, integer conversion within the
-					same method was added by myself.
+				/*! \brief A helper, which adds saturation during sample conversion from internal sample to 16-bit int
 
 					\param[in] value		internal sample to convert
 					\param[in] maxValue		Maximum sample value (usually 1.0f)
-					\return					Int16 little endian sample
+					\return					16-bit int little endian sample
 				*/
-				static inline int SaturatedConvert16(sample value, sample maxValue)
+				static inline int SaturatedConvertInt16(sample value, sample maxValue)
 				{
-					return (int)((fabsl(value + maxValue) - fabsl(value - maxValue)) * SampleToInt16Factor);
+					return (int)(Saturated(value, maxValue) * SampleToInt16Factor);
+				}
+
+				/*! \brief A helper, which adds saturation during sample conversion from internal sample to 32-bit floaat
+
+					\param[in] value		internal sample to convert
+					\param[in] maxValue		Maximum sample value (usually 1.0f)
+					\return					32-bit float little endian sample
+				*/
+				static inline float SaturatedConvertFloat32(sample value, sample maxValue)
+				{
+					return (float)(Saturated(value, maxValue) * SampleToInt16Factor);
+				}
+
+				/*! \brief Basic saturation
+
+					\param[in] value		internal sample to convert
+					\param[in] maxValue		Maximum sample value (usually 1.0f)
+					\return					Saturated internal sample
+				*/
+				static inline sample Saturated(sample value, sample maxValue)
+				{
+					return fabsl(value + maxValue) - fabsl(value - maxValue);
 				}
 
 				/// <summary>

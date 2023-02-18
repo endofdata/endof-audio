@@ -1,7 +1,6 @@
 #pragma once
 
-#include "ISampleSource.h"
-#include "ISampleContainer.h"
+#include "IInputChannel.h"
 #include <string>
 #include "FileReader.h"
 #include "UnknownBase.h"
@@ -14,7 +13,7 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class FileSource : public ISampleSource
+			class FileSource : public IInputChannel
 			{
 			public:
 				FileSource(const std::string& filename, ISampleContainerPtr container);
@@ -24,14 +23,24 @@ namespace Audio
 
 				_declspec(property(get = get_Filename)) const std::string& Filename;
 
-				virtual bool get_IsActive();
-				virtual void put_IsActive(bool value);
+				int get_SampleType();
 
-				virtual ISampleSharerPtr get_SampleSharer();
+				ISampleProcessorPtr get_First();
+				void put_First(ISampleProcessorPtr value);
 
-				virtual void Pull(bool readSecondHalf);
+				bool get_HasFirst();
 
-				virtual void Push();
+				bool get_IsActive();
+				void put_IsActive(bool value);
+
+				bool get_SupportsDirectMonitor();
+
+				IOutputChannelPairPtr get_DirectMonitor();
+				void put_DirectMonitor(IOutputChannelPairPtr value);
+
+				bool get_HasDirectMonitor();
+
+				void OnNextBuffer(bool readSecondHalf);
 
 				DECLARE_IUNKNOWN
 
@@ -41,8 +50,8 @@ namespace Audio
 			private:
 				bool m_isActive;
 				FileReader m_reader;
-				ISampleContainerPtr m_container;
-				ISampleSharerPtr m_sharer;
+				ISampleContainerPtr m_pContainer;
+				ISampleProcessorPtr m_pFirst;
 			};
 		}
 	}

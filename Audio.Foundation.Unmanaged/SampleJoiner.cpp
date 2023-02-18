@@ -2,12 +2,11 @@
 #include "SampleJoiner.h"
 #include "SampleConversionUnmanaged.h"
 #include <algorithm>
-
+#include <functional>
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
-SampleJoiner::SampleJoiner(int sampleCount, int channelCount) :
-	SampleContainerBase(sampleCount, channelCount),
+SampleJoiner::SampleJoiner() :
 	m_pTarget(nullptr),
 	m_refCount(0)
 {
@@ -31,66 +30,50 @@ bool SampleJoiner::GetInterface(REFIID iid, void** ppvResult)
 		*ppvResult = dynamic_cast<ISampleJoiner*>(this);
 		return true;
 	}
-	if (iid == __uuidof(ISampleReceiver))
-	{
-		*ppvResult = dynamic_cast<ISampleReceiver*>(this);
-		return true;
-	}
-	if (iid == __uuidof(ISampleContainer))
-	{
-		*ppvResult = dynamic_cast<ISampleContainer*>(this);
-		return true;
-	}
 	return false;
 }
 
-
-void SampleJoiner::Flush()
+void SampleJoiner::AddSource(ISampleContainerPtr Source)
 {
-	if (nullptr != m_pTarget)
-	{
-		m_pTarget->Receive(this);
-		m_pTarget->Flush();
-	}
+	Source.AddRef();
 
-	for (int c = 0; c < ChannelCount; c++)
-	{
-		Channels[c]->Clear();
-	}
+	// do not allow two sends to the same destination
+	RemoveSource(Source);
+
+	m_vecSources.push_back(Source);
 }
 
-ISampleReceiverPtr SampleJoiner::get_Target()
+void SampleJoiner::RemoveSource(ISampleContainerPtr Source)
+{
+	std::vector<ISampleContainerPtr>::iterator newEnd =
+		remove_if(m_vecSources.begin(), m_vecSources.end(), [&Source](ISampleContainerPtr item)
+	{
+		if (item == Source)
+		{
+			return true;
+		}
+		return false;
+	});
+	m_vecSources.erase(newEnd, m_vecSources.end());
+}
+
+void SampleJoiner::RemoveAllSources()
+{
+	m_vecSources.clear();
+}
+
+ISampleProcessorPtr SampleJoiner::get_Target()
 {
 	return m_pTarget;
 }
 
-void SampleJoiner::put_Target(ISampleReceiverPtr value)
+void SampleJoiner::put_Target(ISampleProcessorPtr value)
 {
 	m_pTarget = value;
 }
 
-void SampleJoiner::Receive(ISampleContainerPtr container)
+ISampleContainerPtr SampleJoiner::get_Source(int index)
 {
-	int sourceChannels = container == nullptr? 0 : container->ChannelCount;
-	int targetChannels = ChannelCount;
-	float chnLvl = 1.0f;
-
-	for (int c = 0; c < targetChannels; c++)
-	{
-		sample* pDest = Channels[c]->SamplePtr;
-
-		if (c < sourceChannels)
-		{
-			const sample* pSource = container->Channels[c]->SamplePtr;
-
-			for (int i = 0; i < SampleCount; i++)
-			{
-				*pDest++ = SampleConversion::AddSignals(*pDest, *pSource++ * chnLvl);
-			}
-		}
-		else
-		{
-			ZeroMemory(pDest, SampleCount * sizeof(sample));
-		}
-	}
+	return m_vecSources.at(index);
 }
+

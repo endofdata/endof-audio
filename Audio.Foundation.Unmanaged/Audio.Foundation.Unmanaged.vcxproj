@@ -91,23 +91,29 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Audio.Foundation.Unmanaged.h" />
+    <ClInclude Include="AudioFoundationException.h" />
     <ClInclude Include="FileReader.h" />
     <ClInclude Include="FileSource.h" />
     <ClInclude Include="FileWriter.h" />
     <ClInclude Include="IInputChannel.h" />
     <ClInclude Include="IMeterChannel.h" />
+    <ClInclude Include="InputFloat32Channel.h" />
+    <ClInclude Include="InputInt24Channel.h" />
+    <ClInclude Include="InputInt32Channel.h" />
     <ClInclude Include="InputOfTSampleChannel.h" />
     <ClInclude Include="IOutputChannelPair.h" />
     <ClInclude Include="ISampleBuffer.h" />
     <ClInclude Include="ISampleContainer.h" />
     <ClInclude Include="ISampleJoiner.h" />
-    <ClInclude Include="ISampleReceiver.h" />
     <ClInclude Include="ISampleSharer.h" />
-    <ClInclude Include="ISampleSource.h" />
+    <ClInclude Include="ISampleProcessor.h" />
     <ClInclude Include="ITake.h" />
     <ClInclude Include="ITimeline.h" />
     <ClInclude Include="MeterChannel.h" />
     <ClInclude Include="ObjectFactory.h" />
+    <ClInclude Include="OutputFloat32ChannelPair.h" />
+    <ClInclude Include="OutputInt24ChannelPair.h" />
+    <ClInclude Include="OutputInt32ChannelPair.h" />
     <ClInclude Include="OutputOfTSampleChannelPair.h" />
     <ClInclude Include="SampleBuffer.h" />
     <ClInclude Include="SampleContainer.h" />
@@ -117,6 +123,7 @@
     <ClInclude Include="SampleSharer.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="SampleType.h" />
     <ClInclude Include="StreamReader.h" />
     <ClInclude Include="StreamWriter.h" />
     <ClInclude Include="Take.h" />
@@ -124,6 +131,7 @@
     <ClInclude Include="UnknownBase.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AudioFoundationException.cpp" />
     <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="FileSource.cpp" />
     <ClCompile Include="FileWriter.cpp" />

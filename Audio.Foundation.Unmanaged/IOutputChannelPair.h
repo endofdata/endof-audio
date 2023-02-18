@@ -18,13 +18,33 @@ namespace Audio
 				{
 					int get_SampleType() = 0;
 
+					/// <summary>
+					/// Gets or sets the sample type provided by this input
+					/// </summary>
 					_declspec(property(get = get_SampleType)) int SampleType;
 
-					ISampleJoinerPtr get_SampleJoiner() = 0;
 
-					_declspec(property(get = get_SampleJoiner)) ISampleJoinerPtr SampleJoiner;
+					bool get_IsActive() = 0;
+					void put_IsActive(bool value) = 0;
 
-					void Swap(bool writeSecondHalf) = 0;
+					/// <summary>
+					/// Gets or sets a value indicating whether this channel is active
+					/// </summary>
+					_declspec(property(get = get_IsActive, put = put_IsActive)) bool IsActive;
+
+
+					/// <summary>
+					/// Processes the next audio buffer
+					/// </summary>
+					/// <param name="readSecondHalf">ASIO specific: is this the second half-buffer?</param>
+					void OnNextBuffer(bool writeSecondHalf) = 0;
+
+					/// <summary>
+					/// Processed native sample buffers for direct monitoring
+					/// </summary>
+					/// <param name="pBuffer">Native sample buffer</param>
+					/// <param name="fLeft">Level for left channel</param>
+					/// <param name="fRight">Level for right channel</param>
 					void DirectOut(void* pBuffer, bool fLeft, bool fRight) = 0;
 				};
 

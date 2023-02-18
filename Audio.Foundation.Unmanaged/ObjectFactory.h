@@ -3,7 +3,7 @@
 #pragma once
 
 #include <Audio.Foundation.Unmanaged.h>
-#include <ISampleSource.h>
+#include <ISampleProcessor.h>
 #include <ISampleReceiver.h>
 #include <ISampleBuffer.h>
 #include <ISampleContainer.h>
@@ -12,6 +12,7 @@
 #include <IMeterChannel.h>
 #include <ITake.h>
 #include <ITimeline.h>
+#include <IInputChannel.h>
 #include <string>
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -31,17 +32,22 @@ namespace Audio
 
 				static ISampleSharerPtr CreateSampleSharer();
 
-				static ISampleJoinerPtr CreateSampleJoiner(int sampleCount, int channelCount);
+				static ISampleJoinerPtr CreateSampleJoiner();
 
 				static IMeterChannelPtr CreateMeterChannel(int sampleRate, int channelCount);
 
 				static ISampleReceiverPtr CreateFileReceiver(const std::string& filename);
 
-				static ISampleSourcePtr CreateFileSource(int sampleCount, int channelCount, const std::string& filename);
+				static ISampleProcessorPtr CreateFileSource(int sampleCount, int channelCount, const std::string& filename);
 
 				static ITakePtr CreateTake(ISampleContainerPtr container, Time position, Time length);
 
 				static ITimelinePtr CreateTimeline();
+
+				static IInputChannelPtr CreateInputChannel(int sampleType, int hwChannelId, void* pHwBufferA, void* pHwBufferB, int sampleCount);
+
+				static IOutputChannelPairPtr CreateOutputChannelPair(int sampleTpe,
+					int hwChannelId1, void* pBufferA1, void* pBufferB1, int hwChannelId2, void* pBufferA2, void* pBufferB2, int sampleCount);
 
 			private:
 				ObjectFactory();

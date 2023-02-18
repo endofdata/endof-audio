@@ -62,18 +62,6 @@ void SampleContainerBase::put_SampleCount(int sampleCount)
 }
 
 // virtual
-bool SampleContainerBase::get_IsActive()
-{
-	return m_isActive;
-}
-
-// virtual
-void SampleContainerBase::put_IsActive(bool value)
-{
-	m_isActive = value;
-}
-
-// virtual
 int SampleContainerBase::get_ChannelCount()
 {
 	return (int)m_vecChannels.size();

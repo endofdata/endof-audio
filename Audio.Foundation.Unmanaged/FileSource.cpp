@@ -7,13 +7,9 @@ using namespace Audio::Foundation::Unmanaged;
 
 FileSource::FileSource(const std::string& filename, ISampleContainerPtr container) :
 	m_reader(filename),
-	m_container(container),
-	m_sharer(nullptr),
-	m_isActive(false),
-	m_refCount(0)
+	m_refCount(0),
+	m_pContainer(container)
 {
-	m_sharer = ObjectFactory::CreateSampleSharer();
-	m_sharer->Source = m_container;
 }
 
 FileSource::~FileSource()
@@ -26,12 +22,12 @@ bool FileSource::GetInterface(REFIID iid, void** ppvResult)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(dynamic_cast<ISampleSource*>(this));
+		*ppvResult = dynamic_cast<IUnknown*>(dynamic_cast<ISampleProcessor*>(this));
 		return true;
 	}
-	if (iid == __uuidof(ISampleSource))
+	if (iid == __uuidof(ISampleProcessor))
 	{
-		*ppvResult = dynamic_cast<ISampleSource*>(this);
+		*ppvResult = dynamic_cast<ISampleProcessor*>(this);
 		return true;
 	}
 	return false;
@@ -43,10 +39,29 @@ const std::string& FileSource::get_Filename() const
 	return m_reader.Filename;
 }
 
+int FileSource::get_SampleType()
+{
+	return 0;
+}
+
+ISampleProcessorPtr FileSource::get_First()
+{
+	return m_pFirst;
+}
+
+void FileSource::put_First(ISampleProcessorPtr value)
+{
+	m_pFirst = value;
+}
+
+bool FileSource::get_HasFirst()
+{
+	return m_pFirst != nullptr;
+}
 
 bool FileSource::get_IsActive()
 {
-	return m_isActive;
+	return (bool)m_isActive;
 }
 
 void FileSource::put_IsActive(bool value)
@@ -54,20 +69,31 @@ void FileSource::put_IsActive(bool value)
 	m_isActive = value;
 }
 
-
-ISampleSharerPtr FileSource::get_SampleSharer()
+bool FileSource::get_SupportsDirectMonitor()
 {
-	return m_sharer;
+	return false;
 }
 
-
-void FileSource::Pull(bool readSecondHalf)
+IOutputChannelPairPtr FileSource::get_DirectMonitor()
 {
-	m_reader.Read(m_container);
+	return nullptr;
 }
 
-
-void FileSource::Push()
+void FileSource::put_DirectMonitor(IOutputChannelPairPtr value)
 {
-	m_sharer->Push();
 }
+
+bool FileSource::get_HasDirectMonitor()
+{
+	return false;
+}
+
+void FileSource::OnNextBuffer(bool readSecondHalf)
+{
+	if (IsActive && HasFirst)
+	{
+		m_reader.Read(m_pContainer);
+		m_pFirst->Process(m_pContainer);
+	}
+}
+
