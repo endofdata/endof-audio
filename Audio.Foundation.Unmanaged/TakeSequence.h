@@ -4,7 +4,7 @@
 
 #include "Audio.Foundation.Unmanaged.h"
 #include "UnknownBase.h"
-#include "ITimeline.h"
+#include "ITakeSequence.h"
 #include "ISampleProcessor.h"
 #include <vector>
 
@@ -16,11 +16,11 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class Timeline : public ITimeline, public ISampleProcessor
+			class TakeSequence : public ITakeSequence, public ISampleProcessor
 			{
 			public:
-				Timeline();
-				virtual ~Timeline();
+				TakeSequence();
+				virtual ~TakeSequence();
 
 				virtual int get_TakeCount();
 
@@ -37,6 +37,7 @@ namespace Audio
 				bool get_HasNext();
 
 				void Process(ISampleContainerPtr container);
+
 				DECLARE_IUNKNOWN
 
 			protected:

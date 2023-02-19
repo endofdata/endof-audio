@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Timeline.h"
+#include "TakeSequence.h"
 #include <algorithm>
 #include "ObjectFactory.h"
 
@@ -8,28 +8,28 @@ using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 
 
-Timeline::Timeline() :
+TakeSequence::TakeSequence() :
 	m_isActive(false),
 	m_refCount(0)
 {
 }
 
-Timeline::~Timeline()
+TakeSequence::~TakeSequence()
 {
 }
 
-IMPLEMENT_IUNKNOWN(Timeline)
+IMPLEMENT_IUNKNOWN(TakeSequence)
 
-bool Timeline::GetInterface(REFIID iid, void** ppvResult)
+bool TakeSequence::GetInterface(REFIID iid, void** ppvResult)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(dynamic_cast<ITimeline*>(this));
+		*ppvResult = dynamic_cast<IUnknown*>(dynamic_cast<ITakeSequence*>(this));
 		return true;
 	}
-	if (iid == __uuidof(ITimeline))
+	if (iid == __uuidof(ITakeSequence))
 	{
-		*ppvResult = dynamic_cast<ITimeline*>(this);
+		*ppvResult = dynamic_cast<ITakeSequence*>(this);
 		return true;
 	}
 	if (iid == __uuidof(ISampleProcessor))
@@ -40,13 +40,13 @@ bool Timeline::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-int Timeline::get_TakeCount()
+int TakeSequence::get_TakeCount()
 {
 	return (int)m_takes.size();
 }
 
 
-ITakePtr Timeline::get_Take(int index)
+ITakePtr TakeSequence::get_Take(int index)
 {
 	if (index < 0 || index >= m_takes.size())
 	{
@@ -55,7 +55,7 @@ ITakePtr Timeline::get_Take(int index)
 	return m_takes[index];
 }
 
-int Timeline::AddTake(ITakePtr take)
+int TakeSequence::AddTake(ITakePtr take)
 {
 	Time position = take->Position;
 
@@ -65,7 +65,7 @@ int Timeline::AddTake(ITakePtr take)
 	return take->Id;
 }
 
-bool Timeline::RemoveTake(int takeId)
+bool TakeSequence::RemoveTake(int takeId)
 {
 	auto takeToRemove = FindTake(takeId);
 
@@ -80,7 +80,7 @@ bool Timeline::RemoveTake(int takeId)
 	return false;
 }
 
-bool Timeline::MoveTake(int takeId, Time to)
+bool TakeSequence::MoveTake(int takeId, Time to)
 {
 	auto takeToMove = FindTake(takeId);
 
@@ -96,7 +96,7 @@ bool Timeline::MoveTake(int takeId, Time to)
 	return false;
 }
 
-ITakePtr Timeline::FindTake(int takeId)
+ITakePtr TakeSequence::FindTake(int takeId)
 {
 	auto matches = std::find_if(m_takes.begin(), m_takes.end(), [takeId](ITakePtr t) { return t->Id == takeId;  });
 
@@ -108,22 +108,22 @@ ITakePtr Timeline::FindTake(int takeId)
 }
 
 
-ISampleProcessorPtr Timeline::get_Next()
+ISampleProcessorPtr TakeSequence::get_Next()
 {
 	return m_pNext;
 }
 
-void Timeline::put_Next(ISampleProcessorPtr value)
+void TakeSequence::put_Next(ISampleProcessorPtr value)
 {
 	m_pNext = value;
 }
 
-bool Timeline::get_HasNext()
+bool TakeSequence::get_HasNext()
 {
 	return m_pNext != nullptr;
 }
 
-void Timeline::Process(ISampleContainerPtr container)
+void TakeSequence::Process(ISampleContainerPtr container)
 {
 	if (HasNext)
 	{

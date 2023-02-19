@@ -12,11 +12,11 @@ namespace Audio
 		{
 			namespace Abstractions
 			{
-				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("87b0be8d-e08e-4f47-af6b-78bdac98f595")) ITimeline;
+				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("87b0be8d-e08e-4f47-af6b-78bdac98f595")) ITakeSequence;
 
-				_COM_SMARTPTR_TYPEDEF(ITimeline, __uuidof(ITimeline));
+				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ITakeSequence, __uuidof(ITakeSequence));
 
-				__interface ITimeline : public IUnknown
+				__interface ITakeSequence : public IUnknown
 				{
 					int get_TakeCount() = 0;
 
