@@ -1,7 +1,8 @@
 #pragma once
 
 #include "ISampleContainer.h"
-#include "SampleContainerBase.h"
+#include "ISampleSource.h"
+#include "UnknownBase.h"
 #include <istream>
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -12,16 +13,29 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class StreamReader
+			class StreamReader : public ISampleSource
 			{
 			public:
-				StreamReader(std::istream& input);
+				StreamReader(std::istream& input, ISampleContainerPtr container);
 				virtual ~StreamReader();
 
-				void Read(ISampleContainerPtr target);
+				ISampleProcessorPtr get_First();
+				void put_First(ISampleProcessorPtr value);
+
+				bool get_HasFirst();
+
+				void OnNextBuffer(bool readSecondHalf);
+
+				ISampleContainerPtr get_Container();
+
+				DECLARE_IUNKNOWN
+
+			protected:
+				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
-
+				ISampleProcessorPtr m_pFirst;
+				ISampleContainerPtr m_pContainer;
 				std::istream& m_input;
 			};
 		}
