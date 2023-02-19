@@ -2,9 +2,8 @@
 #include "pch.h"
 #include "OutputOfTSampleChannelPair.h"
 #include "SampleContainer.h"
-#include "SampleSharer.h"
 #include "IInputChannel.h"
-#include "ISampleProcessor.h"
+#include "ISampleSource.h"
 #include "ObjectFactory.h"
 
 using namespace Audio::Foundation::Unmanaged;
@@ -19,7 +18,7 @@ namespace Audio
 			namespace Templates
 			{
 				template<typename TSample, int SAMPLE_TYPE>
-				class InputOfTSampleChannel : public IInputChannel
+				class InputOfTSampleChannel : public IInputChannel, public ISampleSource
 				{
 				public:
 					/*! \brief Constructor
@@ -38,9 +37,6 @@ namespace Audio
 					{
 						if (nullptr == m_pBufferA || nullptr == m_pBufferB)
 							throw std::invalid_argument("InputChannel: Buffer pointers must not be nullptr.");
-
-						ZeroMemory(m_pBufferA, sampleCount * sizeof(TSample));
-						ZeroMemory(m_pBufferB, sampleCount * sizeof(TSample));
 
 						m_pContainer = ObjectFactory::CreateSampleContainer(sampleCount, 1);
 					}
@@ -72,10 +68,15 @@ namespace Audio
 
 							for (int i = 0; i < sampleCount; i++)
 							{
-								*pDest = ReadSample(pSource);
+								*pDest++ = ReadSample(pSource);
 							}
 							m_pFirst->Process(m_pContainer);
 						}
+					}
+
+					virtual ISampleContainerPtr get_Container()
+					{
+						return m_pContainer;
 					}
 
 					virtual bool get_IsActive()
@@ -135,12 +136,17 @@ namespace Audio
 					{
 						if (riid == _uuidof(IUnknown))
 						{
-							*pResult = dynamic_cast<IUnknown*>(this);
+							*pResult = dynamic_cast<IUnknown*>(dynamic_cast<IInputChannel*>(this));
 							return true;
 						}
 						if (riid == _uuidof(IInputChannel))
 						{
 							*pResult = dynamic_cast<IInputChannel*>(this);
+							return true;
+						}
+						if (riid == _uuidof(ISampleSource))
+						{
+							*pResult = dynamic_cast<ISampleSource*>(this);
 							return true;
 						}
 						*pResult = nullptr;
