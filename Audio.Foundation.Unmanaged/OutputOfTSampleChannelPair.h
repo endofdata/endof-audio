@@ -1,7 +1,7 @@
 #pragma once
 
 #include "IOutputChannelPair.h"
-#include "ISampleReceiver.h"
+#include "ISampleProcessor.h"
 #include "UnknownBase.h"
 #include "ObjectFactory.h"
 
@@ -41,11 +41,6 @@ namespace Audio
 					{
 						if (nullptr == pBufferLeftA || nullptr == pBufferLeftB || nullptr == pBufferRightA || nullptr == pBufferRightB)
 							throw std::invalid_argument("OutputChannelPair: Buffer pointers must not be nullptr.");
-
-						ZeroMemory(m_pOutputLeftA, sampleCount * sizeof(TSample));
-						ZeroMemory(m_pOutputRightA, sampleCount * sizeof(TSample));
-						ZeroMemory(m_pOutputLeftB, sampleCount * sizeof(TSample));
-						ZeroMemory(m_pOutputRightB, sampleCount * sizeof(TSample));
 					}
 
 					/*! \brief Destructor
@@ -145,7 +140,7 @@ namespace Audio
 					{
 						if (riid == _uuidof(IUnknown))
 						{
-							*pResult = dynamic_cast<IUnknown*>(dynamic_cast<ISampleReceiver*>(this));
+							*pResult = dynamic_cast<IUnknown*>(dynamic_cast<IOutputChannelPair*>(this));
 							return true;
 						}
 						if (riid == _uuidof(IOutputChannelPair))
