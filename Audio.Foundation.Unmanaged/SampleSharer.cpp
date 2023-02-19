@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <functional>
 #include <stdexcept>
-#include "ISampleReceiver.h"
 #include "ObjectFactory.h"
 
 using namespace std;
@@ -12,7 +11,7 @@ using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 SampleSharer::SampleSharer() : 
 	m_refCount(0), 
-	m_pSource(nullptr)
+	m_pNext(nullptr)
 {
 }
 
@@ -26,13 +25,18 @@ bool SampleSharer::GetInterface(REFIID iid, void** ppvResult)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(this);
+		*ppvResult = dynamic_cast<IUnknown*>(dynamic_cast<ISampleSharer*>(this));
 		return true;
 	}
 
 	if (iid == __uuidof(ISampleSharer))
 	{
 		*ppvResult = dynamic_cast<ISampleSharer*>(this);
+		return true;
+	}
+	if (iid == __uuidof(ISampleProcessor))
+	{
+		*ppvResult = dynamic_cast<ISampleProcessor*>(this);
 		return true;
 	}
 	return false;
@@ -50,8 +54,7 @@ void SampleSharer::AddTarget(ISampleProcessorPtr target)
 
 void SampleSharer::RemoveTarget(ISampleProcessorPtr target)
 {
-	vector<ISampleProcessorPtr>::iterator newEnd =
-	remove_if(m_vecTargets.begin(), m_vecTargets.end(), [&target](ISampleReceiverPtr item) 
+	auto newEnd = remove_if(m_vecTargets.begin(), m_vecTargets.end(), [&target](ISampleProcessorPtr item)
 	{ 
 		if(item == target)
 		{
@@ -67,28 +70,35 @@ void SampleSharer::RemoveAllTargets()
 	m_vecTargets.clear();
 }
 
-void SampleSharer::Push()
-{
-	if (m_pSource != nullptr)
-	{
-		for_each(m_vecTargets.begin(), m_vecTargets.end(), [this](ISampleProcessorPtr item)
-		{
-			item->Process(m_pSource);
-		});
-	}
-}
-
-void SampleSharer::put_Source(ISampleContainerPtr value)
-{
-	m_pSource = value;
-}
-
-ISampleContainerPtr SampleSharer::get_Source()
-{
-	return m_pSource;
-}
-
 ISampleProcessorPtr SampleSharer::get_Target(int index)
 {
 	return m_vecTargets.at(index);
+}
+
+ISampleProcessorPtr SampleSharer::get_Next()
+{
+	return m_pNext;
+}
+
+void SampleSharer::put_Next(ISampleProcessorPtr value)
+{
+	m_pNext = value;
+}
+
+bool SampleSharer::get_HasNext()
+{
+	return m_pNext != nullptr;
+}
+
+void SampleSharer::Process(ISampleContainerPtr container)
+{
+	std::for_each(m_vecTargets.begin(), m_vecTargets.end(), [&container](ISampleProcessorPtr item)
+	{
+		item->Process(container);
+	});
+
+	if (HasNext)
+	{
+		m_pNext->Process(container);
+	}
 }

@@ -5,28 +5,32 @@
 #include "ISampleSharer.h"
 #include <vector>
 
+using namespace Audio::Foundation::Unmanaged::Abstractions;
+
 namespace Audio
 {
 	namespace Foundation
 	{
 		namespace Unmanaged
 		{
-			class SampleSharer : public Audio::Foundation::Unmanaged::Abstractions::ISampleSharer
+			class SampleSharer : public ISampleSharer, public ISampleProcessor
 			{
 			public:
 				SampleSharer();
 				virtual ~SampleSharer();
 
-				virtual void put_Source(Abstractions::ISampleContainerPtr value);
-				virtual Abstractions::ISampleContainerPtr get_Source();
+				virtual ISampleProcessorPtr get_Target(int iIdx);
 
-				virtual Abstractions::ISampleProcessorPtr get_Target(int iIdx);
-
-				virtual void AddTarget(Abstractions::ISampleProcessorPtr channel);
-				virtual void RemoveTarget(Abstractions::ISampleProcessorPtr channel);
+				virtual void AddTarget(ISampleProcessorPtr channel);
+				virtual void RemoveTarget(ISampleProcessorPtr channel);
 				virtual void RemoveAllTargets();
 
-				virtual void Push();
+				ISampleProcessorPtr get_Next();
+				void put_Next(ISampleProcessorPtr value);
+
+				bool get_HasNext();
+
+				void Process(ISampleContainerPtr container);
 
 				DECLARE_IUNKNOWN
 
@@ -34,8 +38,8 @@ namespace Audio
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
-				Abstractions::ISampleContainerPtr m_pSource;
-				std::vector<Abstractions::ISampleProcessorPtr> m_vecTargets;
+				ISampleProcessorPtr m_pNext;
+				std::vector<ISampleProcessorPtr> m_vecTargets;
 			};
 		}
 	}
