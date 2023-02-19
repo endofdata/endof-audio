@@ -4,14 +4,14 @@
 
 #include <Audio.Foundation.Unmanaged.h>
 #include <ISampleProcessor.h>
-#include <ISampleReceiver.h>
+#include <ISampleSource.h>
 #include <ISampleBuffer.h>
 #include <ISampleContainer.h>
 #include <ISampleJoiner.h>
 #include <ISampleSharer.h>
 #include <IMeterChannel.h>
 #include <ITake.h>
-#include <ITimeline.h>
+#include <ITakeSequence.h>
 #include <IInputChannel.h>
 #include <string>
 
@@ -36,13 +36,13 @@ namespace Audio
 
 				static IMeterChannelPtr CreateMeterChannel(int sampleRate, int channelCount);
 
-				static ISampleReceiverPtr CreateFileReceiver(const std::string& filename);
+				static ISampleProcessorPtr CreateFileProcessor(const std::string& filename);
 
-				static ISampleProcessorPtr CreateFileSource(int sampleCount, int channelCount, const std::string& filename);
+				static ISampleSourcePtr CreateFileSource(int sampleCount, int channelCount, const std::string& filename);
 
 				static ITakePtr CreateTake(ISampleContainerPtr container, Time position, Time length);
 
-				static ITimelinePtr CreateTimeline();
+				static ITakeSequencePtr CreateTakeSequence();
 
 				static IInputChannelPtr CreateInputChannel(int sampleType, int hwChannelId, void* pHwBufferA, void* pHwBufferB, int sampleCount);
 

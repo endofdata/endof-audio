@@ -8,7 +8,7 @@
 #include "FileWriter.h"
 #include "FileSource.h"
 #include "Take.h"
-#include "Timeline.h"
+#include "TakeSequence.h"
 #include "InputInt32Channel.h"
 #include "InputInt24Channel.h"
 #include "InputFloat32Channel.h"
@@ -49,12 +49,12 @@ IMeterChannelPtr ObjectFactory::CreateMeterChannel(int sampleRate, int channelCo
 	return new MeterChannel(sampleRate, channelCount);
 }
 
-ISampleReceiverPtr ObjectFactory::CreateFileReceiver(const std::string& filename)
+ISampleProcessorPtr ObjectFactory::CreateFileProcessor(const std::string& filename)
 {
 	return new FileWriter(filename);
 }
 
-ISampleProcessorPtr ObjectFactory::CreateFileSource(int sampleCount, int channelCount, const std::string& filename)
+ISampleSourcePtr ObjectFactory::CreateFileSource(int sampleCount, int channelCount, const std::string& filename)
 {
 	return new FileSource(filename, CreateSampleContainer(sampleCount, channelCount));
 }
@@ -64,34 +64,24 @@ ITakePtr ObjectFactory::CreateTake(ISampleContainerPtr container, Time position,
 	return new Take(NextTakeId(), container, position, length);
 }
 
-ITimelinePtr ObjectFactory::CreateTimeline()
+ITakeSequencePtr ObjectFactory::CreateTakeSequence()
 {
-	return new Timeline();
+	return new TakeSequence();
 }
 
 IInputChannelPtr ObjectFactory::CreateInputChannel(int sampleType, int hwChannelId, void* pHwBufferA, void* pHwBufferB, int sampleCount)
 {
-	IInputChannelPtr input = nullptr;
-
 	switch (sampleType)
 	{
 	case Int32LSB:
-		input = new InputInt32Channel(hwChannelId, (int*)pHwBufferA, (int*)pHwBufferB, sampleCount);
-		break;
+		return new InputInt32Channel(hwChannelId, (int*)pHwBufferA, (int*)pHwBufferB, sampleCount);
 	case Int24LSB:
-		input = new InputInt24Channel(hwChannelId, (byte*)pHwBufferA, (byte*)pHwBufferB, sampleCount);
-		break;
+		return new InputInt24Channel(hwChannelId, (byte*)pHwBufferA, (byte*)pHwBufferB, sampleCount);
 	case Float32LSB:
-		input = new InputFloat32Channel(hwChannelId, (float*)pHwBufferA, (float*)pHwBufferB, sampleCount);
-		break;
+		return new InputFloat32Channel(hwChannelId, (float*)pHwBufferA, (float*)pHwBufferB, sampleCount);
 	default:
 		throw AudioFoundationException("Unsupported sample type.", E_UNEXPECTED);
 	}
-
-	if (nullptr == input)
-		throw AudioFoundationException("Not enough memory for InputChannel instance.", E_OUTOFMEMORY);
-
-	return input;
 }
 
 IOutputChannelPairPtr ObjectFactory::CreateOutputChannelPair(int sampleType, int hwChannelId1, void* pBufferA1, void* pBufferB1, int hwChannelId2, void* pBufferA2, void* pBufferB2, int sampleCount)
