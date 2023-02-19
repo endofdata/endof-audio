@@ -20,60 +20,73 @@ bool StreamWriter::GetInterface(REFIID iid, void** ppvResult)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(dynamic_cast<ISampleReceiver*>(this));
+		*ppvResult = dynamic_cast<IUnknown*>(this);
 		return true;
 	}
-	if (iid == __uuidof(ISampleReceiver))
+	if (iid == __uuidof(ISampleProcessor))
 	{
-		*ppvResult = dynamic_cast<ISampleReceiver*>(this);
+		*ppvResult = dynamic_cast<ISampleProcessor*>(this);
 		return true;
 	}
 	return false;
 }
 
-void StreamWriter::Receive(ISampleContainerPtr input)
+ISampleProcessorPtr StreamWriter::get_Next()
 {
-	int samples = input->SampleCount;
-	int channels = input->ChannelCount;
+	return m_pNext;
+}
 
-	if (channels == 1)
+void StreamWriter::put_Next(ISampleProcessorPtr value)
+{
+	m_pNext = value;
+}
+
+bool StreamWriter::get_HasNext()
+{
+	return m_pNext != nullptr;
+}
+
+void StreamWriter::Process(ISampleContainerPtr container)
+{
+	if (HasNext)
 	{
-		const sample* pSrc = input->Channels[0]->SamplePtr;
-		std::streamsize size = samples * sizeof(sample);
+		int samples = container->SampleCount;
+		int channels = container->ChannelCount;
 
-		m_output.write((const char*)pSrc, size);
-	}
-	else
-	{
-		// HACK: This limits the maximum number of input channels to 16. But usually, we will only have one or two anyway.
-		const sample* arSrc[16];
-
-		if (channels > 16)
+		if (channels == 1)
 		{
-			channels = 16;
+			const sample* pSrc = container->Channels[0]->SamplePtr;
+			std::streamsize size = samples * sizeof(sample);
+
+			m_output.write((const char*)pSrc, size);
 		}
-
-		for (int c = 0; c < channels; c++)
+		else
 		{
-			arSrc[c] = input->Channels[c]->SamplePtr;
-		}
+			// HACK: This limits the maximum number of input channels to 16. But usually, we will only have one or two anyway.
+			const sample* arSrc[16];
 
-		for (int s = 0; s < samples; s++)
-		{
+			if (channels > 16)
+			{
+				channels = 16;
+			}
+
 			for (int c = 0; c < channels; c++)
 			{
-				const sample** ppSrc = &arSrc[c];
+				arSrc[c] = container->Channels[c]->SamplePtr;
+			}
 
-				m_output.write((const char*)*ppSrc, sizeof(sample));
+			for (int s = 0; s < samples; s++)
+			{
+				for (int c = 0; c < channels; c++)
+				{
+					const sample** ppSrc = &arSrc[c];
 
-				(*ppSrc)++;
+					m_output.write((const char*)*ppSrc, sizeof(sample));
+
+					(*ppSrc)++;
+				}
 			}
 		}
 	}
 }
-
-void StreamWriter::Flush()
-{
-}
-
 

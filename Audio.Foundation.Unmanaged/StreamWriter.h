@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ISampleReceiver.h"
+#include "ISampleProcessor.h"
 #include "UnknownBase.h"
 #include <ostream>
 
@@ -12,14 +12,18 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class StreamWriter : public ISampleReceiver
+			class StreamWriter : public ISampleProcessor
 			{
 			public:
 				StreamWriter(std::ostream& output);
 				virtual ~StreamWriter();
 
-				void Receive(ISampleContainerPtr input);
-				void Flush();
+				ISampleProcessorPtr get_Next();
+				void put_Next(ISampleProcessorPtr value);
+
+				bool get_HasNext();
+
+				void Process(ISampleContainerPtr container);
 
 				DECLARE_IUNKNOWN
 
@@ -27,7 +31,7 @@ namespace Audio
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
-
+				ISampleProcessorPtr m_pNext;
 				std::ostream& m_output;
 			};
 		}
