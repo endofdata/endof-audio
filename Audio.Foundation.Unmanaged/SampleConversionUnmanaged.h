@@ -62,7 +62,7 @@ namespace Audio
 				/// <returns>Integer sample</returns>
 				static inline int SampleToInt32(sample value)
 				{
-					return value * SampleToInt32Factor;
+					return static_cast<int>(value * SampleToInt32Factor);
 				}
 
 				/// <summary>
@@ -82,7 +82,7 @@ namespace Audio
 				/// <returns>Integer sample</returns>
 				static inline int SampleToInt24(sample value)
 				{
-					return value * SampleToInt24Factor;
+					return static_cast<int>(value * SampleToInt24Factor);
 				}
 
 				/// <summary>
@@ -102,7 +102,7 @@ namespace Audio
 				/// <returns>Float sample</returns>
 				static inline short SampleToInt16(sample value)
 				{
-					return value * SampleToInt16Factor;
+					return static_cast<short>(value * SampleToInt16Factor);
 				}
 
 				/// <summary>
