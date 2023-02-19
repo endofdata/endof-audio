@@ -6,6 +6,7 @@
 #include "AsioDebugDriverGuid.h"
 #include <ObjectFactory.h>
 #include <SampleType.h>
+#include <functional>
 
 using namespace Audio::Asio::Unmanaged;
 using namespace Audio::Foundation::Unmanaged;
@@ -51,10 +52,6 @@ AsioCore::AsioCore() :
 	m_iHwOutputCount(0),
 	m_iHwPinCount(0),
 	m_pHwBufferInfo(nullptr),
-	m_iInputChannels(0),
-	m_pInputChannels(nullptr),
-	m_iOutputChannelPairs(0),
-	m_pOutputChannelPairs(nullptr),
 	m_iCurrentMonitorInput(-1),
 	m_bufferSwitchEventHandler(nullptr),
 	m_pCoreCallbacks(nullptr),
@@ -285,15 +282,6 @@ void AsioCore::CreateInputChannels(int offset, int count)
 {
 	if (count > 0)
 	{
-		// each input channel splits the signal to two sample buffers
-		m_pInputChannels = (IInputChannel**)new IInputChannel*[count];
-		if (nullptr == m_pInputChannels)
-			throw AsioCoreException("AsioCore: Not enough memory for InputChannel array.", E_OUTOFMEMORY);
-
-		ZeroMemory(m_pInputChannels, sizeof(IInputChannel*) * count);
-
-		m_iInputChannels = 0;
-
 		for (int iIdx = offset; iIdx < offset + count; iIdx++)
 		{
 			IInputChannelPtr input = ObjectFactory::CreateInputChannel(MapSampleType(m_sampleType),
@@ -305,13 +293,14 @@ void AsioCore::CreateInputChannels(int offset, int count)
 			if (nullptr == input)
 				throw AsioCoreException("AsioCore: Not enough memory for InputChannel instance.", E_OUTOFMEMORY);
 
-			if (m_iInputChannels < count)
-			{
-				m_pInputChannels[m_iInputChannels] = input.Detach();
+			ISampleSourcePtr source = nullptr;
+			input->QueryInterface(&source);
 
-				//m_pInputChannels[m_iInputChannels]->AddRef();
-				m_iInputChannels++;
-			}
+			if(nullptr == source)
+				throw AsioCoreException("AsioCore: Input channel does not implement ISampleSource.", E_OUTOFMEMORY);
+
+			m_inputChannels.push_back(input);
+			m_sampleSources.push_back(source);
 		}
 	}
 }
@@ -337,15 +326,6 @@ void AsioCore::CreateOutputChannels(int offset, int count)
 
 	if (pairCount > 0)
 	{
-		// each output channel is linked to two hardware outputs
-		m_pOutputChannelPairs = (IOutputChannelPair**)new IOutputChannelPair*[pairCount];
-		if (nullptr == m_pOutputChannelPairs)
-			throw AsioCoreException("AsioCore: Not enough memory for OutputChannelPair array.", E_OUTOFMEMORY);
-
-		ZeroMemory(m_pOutputChannelPairs, sizeof(IOutputChannelPair*) * pairCount);
-
-		m_iOutputChannelPairs = 0;
-
 		for (int pair = 0; pair < pairCount; pair++)
 		{
 			int iIdx = offset + pair * 2;
@@ -362,11 +342,7 @@ void AsioCore::CreateOutputChannels(int offset, int count)
 			if (outputPair == nullptr)
 				throw AsioCoreException("AsioCore: Not enough memory for OutputChannelPair instance.", E_OUTOFMEMORY);
 
-			if (m_iOutputChannelPairs < pairCount)
-			{
-				m_pOutputChannelPairs[m_iOutputChannelPairs] = outputPair.Detach();
-				m_iOutputChannelPairs++;
-			}
+			m_outputChannelPairs.push_back(outputPair);
 		}
 	}
 }
@@ -391,48 +367,26 @@ void AsioCore::DisposeBuffers()
 
 void AsioCore::DisposeInputChannels()
 {
-	if (nullptr != m_pInputChannels)
-	{
-		for (int i = 0; i < m_iInputChannels; i++)
-		{
-			if (nullptr != m_pInputChannels[i])
-			{
-				m_pInputChannels[i]->Release();
-			}
-		}
-		delete[] m_pInputChannels;
-		m_pInputChannels = nullptr;
-	}
+	m_inputChannels.clear();
 }
 
 void AsioCore::DisposeOutputChannels()
 {
-	if (nullptr != m_pOutputChannelPairs)
-	{
-		for (int i = 0; i < m_iOutputChannelPairs; i++)
-		{
-			if (nullptr != m_pOutputChannelPairs[i])
-			{
-				m_pOutputChannelPairs[i]->Release();
-			}
-		}
-		delete[] m_pOutputChannelPairs;
-		m_pOutputChannelPairs = nullptr;
-	}
+	m_outputChannelPairs.clear();
 }
 
 void AsioCore::SetInputMonitoring(int iInputChannel, int iOutputPair)
 {
 	if (m_iCurrentMonitorInput >= 0)
 	{
-		m_pInputChannels[m_iCurrentMonitorInput]->DirectMonitor = nullptr;
+		m_inputChannels[m_iCurrentMonitorInput]->DirectMonitor = nullptr;
 		m_iCurrentMonitorInput = -1;
 	}
-	if (0 <= iInputChannel && iInputChannel < m_iInputChannels)
+	if (0 <= iInputChannel && iInputChannel < m_inputChannels.size())
 	{
-		if (0 <= iOutputPair && iOutputPair < m_iOutputChannelPairs)
+		if (0 <= iOutputPair && iOutputPair < m_outputChannelPairs.size())
 		{
-			m_pInputChannels[iInputChannel]->DirectMonitor = m_pOutputChannelPairs[iOutputPair];
+			m_inputChannels[iInputChannel]->DirectMonitor = m_outputChannelPairs[iOutputPair];
 			m_iCurrentMonitorInput = iInputChannel;
 		}
 	}
@@ -446,17 +400,15 @@ void AsioCore::OnBufferSwitch(long doubleBufferIndex, ASIOBool directProcess) co
 	bool writeSecondHalf = doubleBufferIndex != 0;
 	bool readSecondHalf = doubleBufferIndex == 0;
 
-	for (int iOutput = 0; iOutput < m_iOutputChannelPairs; iOutput++)
+	std::for_each(m_outputChannelPairs.begin(), m_outputChannelPairs.end(), [writeSecondHalf](IOutputChannelPairPtr pChannelPair)
 	{
-		IOutputChannelPairPtr pChannelPair = m_pOutputChannelPairs[iOutput];
 		pChannelPair->OnNextBuffer(writeSecondHalf);
-	}
+	});
 
-	for (int iInput = 0; iInput < m_iInputChannels; iInput++)
+	std::for_each(m_sampleSources.begin(), m_sampleSources.end(), [readSecondHalf](ISampleSourcePtr pSource)
 	{
-		IInputChannelPtr pChannel = m_pInputChannels[iInput];
-		pChannel->OnNextBuffer(readSecondHalf);
-	}
+		pSource->OnNextBuffer(readSecondHalf);
+	});
 
 	//BufferSwitchEventHandler handler = m_bufferSwitchEventHandler;
 
@@ -551,32 +503,32 @@ int AsioCore::get_HardwareOutputCount()
 
 int AsioCore::get_InputChannelCount()
 {
-	return m_iInputChannels;
+	return (int)m_inputChannels.size();
 }
 
 IInputChannel* AsioCore::get_InputChannel(int iChannel)
 {
 	IInputChannel* value = nullptr;
 
-	if (0 <= iChannel && iChannel < m_iInputChannels)
+	if (0 <= iChannel && iChannel < m_inputChannels.size())
 	{
-		value = m_pInputChannels[iChannel];
+		value = m_inputChannels[iChannel];
 	}
 	return value;
 }
 
 int AsioCore::get_OutputChannelPairCount()
 {
-	return m_iOutputChannelPairs;
+	return (int)m_outputChannelPairs.size();
 }
 
 IOutputChannelPair* AsioCore::get_OutputChannelPair(int iChannel)
 {
 	IOutputChannelPair* value = nullptr;
 
-	if (0 <= iChannel && iChannel < m_iOutputChannelPairs)
+	if (0 <= iChannel && iChannel < m_outputChannelPairs.size())
 	{
-		value = m_pOutputChannelPairs[iChannel];
+		value = m_outputChannelPairs[iChannel];
 	}
 	return value;
 }

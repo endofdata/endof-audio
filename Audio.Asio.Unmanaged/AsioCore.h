@@ -9,7 +9,9 @@
 #endif
 #include <asio.h>
 #include <iasiodrv.h>
+#include <vector>
 #include <IInputChannel.h>
+#include <ISampleSource.h>
 #include <IOutputChannelPair.h>
 #include "AsioCoreCallbacks.h"
 
@@ -170,11 +172,10 @@ namespace Audio
 				int m_iHwPinCount;
 				ASIOBufferInfo* m_pHwBufferInfo;
 
-				int m_iInputChannels;
-				IInputChannel** m_pInputChannels;
+				std::vector<IInputChannelPtr> m_inputChannels;			
+				std::vector<ISampleSourcePtr> m_sampleSources;
 
-				int m_iOutputChannelPairs;
-				IOutputChannelPair** m_pOutputChannelPairs;
+				std::vector<IOutputChannelPairPtr> m_outputChannelPairs;
 
 				int m_iCurrentMonitorInput;
 
