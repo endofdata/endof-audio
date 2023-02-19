@@ -6,9 +6,9 @@ using namespace Audio::Foundation::Unmanaged;
 
 
 FileSource::FileSource(const std::string& filename, ISampleContainerPtr container) :
-	m_reader(filename),
-	m_refCount(0),
-	m_pContainer(container)
+	m_reader(filename, container),
+	m_pFirst(nullptr),
+	m_refCount(0)
 {
 }
 
@@ -59,41 +59,17 @@ bool FileSource::get_HasFirst()
 	return m_pFirst != nullptr;
 }
 
-bool FileSource::get_IsActive()
+ISampleContainerPtr FileSource::get_Container()
 {
-	return (bool)m_isActive;
-}
-
-void FileSource::put_IsActive(bool value)
-{
-	m_isActive = value;
-}
-
-bool FileSource::get_SupportsDirectMonitor()
-{
-	return false;
-}
-
-IOutputChannelPairPtr FileSource::get_DirectMonitor()
-{
-	return nullptr;
-}
-
-void FileSource::put_DirectMonitor(IOutputChannelPairPtr value)
-{
-}
-
-bool FileSource::get_HasDirectMonitor()
-{
-	return false;
+	return m_reader.Container;
 }
 
 void FileSource::OnNextBuffer(bool readSecondHalf)
 {
-	if (IsActive && HasFirst)
+	if (HasFirst)
 	{
-		m_reader.Read(m_pContainer);
-		m_pFirst->Process(m_pContainer);
+		m_reader.OnNextBuffer(readSecondHalf);
+		m_pFirst->Process(m_reader.Container);
 	}
 }
 

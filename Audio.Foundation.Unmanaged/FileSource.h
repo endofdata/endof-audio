@@ -13,7 +13,7 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class FileSource : public IInputChannel
+			class FileSource : public ISampleSource
 			{
 			public:
 				FileSource(const std::string& filename, ISampleContainerPtr container);
@@ -30,17 +30,9 @@ namespace Audio
 
 				bool get_HasFirst();
 
-				bool get_IsActive();
-				void put_IsActive(bool value);
-
-				bool get_SupportsDirectMonitor();
-
-				IOutputChannelPairPtr get_DirectMonitor();
-				void put_DirectMonitor(IOutputChannelPairPtr value);
-
-				bool get_HasDirectMonitor();
-
 				void OnNextBuffer(bool readSecondHalf);
+
+				ISampleContainerPtr get_Container();
 
 				DECLARE_IUNKNOWN
 
@@ -48,7 +40,6 @@ namespace Audio
 				bool GetInterface(REFIID iid, void** ppvResult);
 
 			private:
-				bool m_isActive;
 				FileReader m_reader;
 				ISampleContainerPtr m_pContainer;
 				ISampleProcessorPtr m_pFirst;
