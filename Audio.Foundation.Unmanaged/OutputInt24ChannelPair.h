@@ -27,7 +27,7 @@ namespace Audio
 			private:
 				inline void WriteSample(sample value, byte*& pTarget)
 				{
-					int unpacked = SampleConversion::SaturatedConvertInt32(value, 1.0);
+					int unpacked = SampleConversion::SampleToInt24(value);
 
 					for (int i = 0; i < 3; i++)
 					{

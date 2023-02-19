@@ -27,7 +27,7 @@ namespace Audio
 			private:
 				inline void WriteSample(sample value, int*& pTarget)
 				{
-					*pTarget++ = SampleConversion::SaturatedConvertInt32(value, 1.0);
+					*pTarget++ = SampleConversion::SampleToInt32(value);
 				}
 			};
 		}
