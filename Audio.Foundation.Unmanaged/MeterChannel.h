@@ -2,7 +2,7 @@
 
 #include "Audio.Foundation.Unmanaged.h"
 #include "UnknownBase.h"
-#include "ISampleReceiver.h"
+#include "ISampleProcessor.h"
 #include "IMeterChannel.h"
 #include <vector>
 
@@ -15,15 +15,11 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class MeterChannel : public ISampleReceiver, public IMeterChannel
+			class MeterChannel : public IMeterChannel, public ISampleProcessor
 			{
 			public:
 				MeterChannel(int sampleRate, int channelCount);
 				virtual ~MeterChannel();
-
-				virtual void Flush();
-
-				virtual void Receive(ISampleContainerPtr inputBuffer);
 
 				virtual int get_ChannelCount();
 
@@ -35,8 +31,14 @@ namespace Audio
 				virtual MeterChannelCallback get_MeterUpdate();
 				virtual void put_MeterUpdate(MeterChannelCallback value);
 
-				virtual ISampleReceiverPtr get_WriteThrough();
-				virtual void put_WriteThrough(ISampleReceiverPtr value);
+				virtual void Reset();
+
+				virtual ISampleProcessorPtr get_Next();
+				virtual void put_Next(ISampleProcessorPtr value);
+
+				virtual bool get_HasNext();
+
+				virtual void Process(ISampleContainerPtr inputBuffer);
 
 				DECLARE_IUNKNOWN
 
@@ -49,7 +51,7 @@ namespace Audio
 				static const float DbFSMin;
 
 				MeterChannelCallback m_meterUpdate;
-				ISampleReceiverPtr m_pWriteThrough;
+				ISampleProcessorPtr m_pNext;
 
 				int m_sampleRate;
 				int m_iSamplesPerRMSFrame;

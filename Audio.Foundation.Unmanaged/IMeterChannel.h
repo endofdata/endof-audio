@@ -4,7 +4,6 @@
 #include <Windows.h>
 #include <Audio.Foundation.Unmanaged.h>
 #include <comdef.h>
-#include <ISampleReceiver.h>
 
 namespace Audio
 {
@@ -16,7 +15,7 @@ namespace Audio
 			{
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("fcc39f32-a0c4-4ece-a562-0a051c153a95")) IMeterChannel;
 
-				_COM_SMARTPTR_TYPEDEF(IMeterChannel, __uuidof(IMeterChannel));
+				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(IMeterChannel, __uuidof(IMeterChannel));
 
 				typedef int(__stdcall* MeterChannelCallback)(IMeterChannelPtr pSender);
 
@@ -41,10 +40,7 @@ namespace Audio
 
 					_declspec(property(get = get_MeterUpdate, put = put_MeterUpdate)) MeterChannelCallback MeterUpdate;
 
-					ISampleReceiverPtr get_WriteThrough() = 0;
-					void put_WriteThrough(ISampleReceiverPtr value) = 0;
-
-					_declspec(property(get = get_WriteThrough, put = put_WriteThrough)) ISampleReceiverPtr WriteThrough;
+					void Reset() = 0;
 				};
 			}
 		}
