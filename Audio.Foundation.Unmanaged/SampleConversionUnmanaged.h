@@ -11,8 +11,12 @@ namespace Audio
 		namespace Unmanaged
 		{
 			const double SampleMaxRange32 = 2147483647.0;
-			const double Int32ToSampleFactor = (1.f / SampleMaxRange32);
+			const double Int32ToSampleFactor = (1.0 / SampleMaxRange32);
 			const double SampleToInt32Factor = SampleMaxRange32;
+
+			const double SampleMaxRange24 = 49150.5;
+			const double Int24ToSampleFactor = (1.0 / SampleMaxRange24);
+			const double SampleToInt24Factor = SampleMaxRange24;
 
 			const double SampleMaxRange16 = 32767.0;
 			const double Int16ToSampleFactor = (1.0 / SampleMaxRange16);
@@ -58,7 +62,27 @@ namespace Audio
 				/// <returns>Integer sample</returns>
 				static inline int SampleToInt32(sample value)
 				{
-					return SaturatedConvertInt32(value, 1.0);
+					return value * SampleToInt32Factor;
+				}
+
+				/// <summary>
+				/// Converts a 24-bit integer sample to an internal <see cref="sample"/>
+				/// </summary>
+				/// <param name="value">Sample to convert</param>
+				/// <returns>Float sample</returns>
+				static inline sample Int24ToSample(int value)
+				{
+					return value * Int24ToSampleFactor;
+				}
+
+				/// <summary>
+				/// Converts an internal <see cref="sample"/> to 24-bit integer
+				/// </summary>
+				/// <param name="value">Sample to convert</param>
+				/// <returns>Integer sample</returns>
+				static inline int SampleToInt24(sample value)
+				{
+					return value * SampleToInt24Factor;
 				}
 
 				/// <summary>
@@ -78,7 +102,7 @@ namespace Audio
 				/// <returns>Float sample</returns>
 				static inline short SampleToInt16(sample value)
 				{
-					return SaturatedConvertInt16(value, 1.0);
+					return value * SampleToInt16Factor;
 				}
 
 				/// <summary>
@@ -88,7 +112,7 @@ namespace Audio
 				/// <returns>Float sample</returns>
 				static inline sample Float32ToSample(float value)
 				{
-					return (sample)value;
+					return static_cast<sample>(value);
 				}
 
 				/// <summary>
@@ -98,7 +122,7 @@ namespace Audio
 				/// <returns>Float sample</returns>
 				static inline float SampleToFloat32(sample value)
 				{
-					return SaturatedConvertFloat32(value, 1.0);
+					return static_cast<float>(value);
 				}
 
 				/*! \brief A helper, which adds saturation during sample conversion from internal sample to 32-bit int
@@ -109,7 +133,18 @@ namespace Audio
 				*/
 				static inline int SaturatedConvertInt32(sample value, sample maxValue)
 				{
-					return (int)(Saturated(value, maxValue) * SampleToInt32Factor);
+					return static_cast<int>(Saturated(value, maxValue) * SampleToInt32Factor);
+				}
+
+				/*! \brief A helper, which adds saturation during sample conversion from internal sample to 24-bit int
+
+					\param[in] value		internal sample to convert
+					\param[in] maxValue		Maximum sample value (usually 1.0f)
+					\return					24-bit int little endian sample
+				*/
+				static inline int SaturatedConvertInt24(sample value, sample maxValue)
+				{
+					return static_cast<int>(Saturated(value, maxValue) * SampleToInt24Factor);
 				}
 
 				/*! \brief A helper, which adds saturation during sample conversion from internal sample to 16-bit int
@@ -120,7 +155,7 @@ namespace Audio
 				*/
 				static inline int SaturatedConvertInt16(sample value, sample maxValue)
 				{
-					return (int)(Saturated(value, maxValue) * SampleToInt16Factor);
+					return static_cast<int>(Saturated(value, maxValue) * SampleToInt16Factor);
 				}
 
 				/*! \brief A helper, which adds saturation during sample conversion from internal sample to 32-bit floaat
@@ -131,7 +166,7 @@ namespace Audio
 				*/
 				static inline float SaturatedConvertFloat32(sample value, sample maxValue)
 				{
-					return (float)(Saturated(value, maxValue) * SampleToInt16Factor);
+					return static_cast<float>(Saturated(value, maxValue));
 				}
 
 				/*! \brief Basic saturation
