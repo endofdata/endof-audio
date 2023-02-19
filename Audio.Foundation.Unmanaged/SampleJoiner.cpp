@@ -3,11 +3,12 @@
 #include "SampleConversionUnmanaged.h"
 #include <algorithm>
 #include <functional>
+
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 SampleJoiner::SampleJoiner() :
-	m_pTarget(nullptr),
+	m_pNext(nullptr),
 	m_refCount(0)
 {
 }
@@ -28,6 +29,11 @@ bool SampleJoiner::GetInterface(REFIID iid, void** ppvResult)
 	if (iid == __uuidof(ISampleJoiner))
 	{
 		*ppvResult = dynamic_cast<ISampleJoiner*>(this);
+		return true;
+	}
+	if (iid == __uuidof(ISampleProcessor))
+	{
+		*ppvResult = dynamic_cast<ISampleProcessor*>(this);
 		return true;
 	}
 	return false;
@@ -62,18 +68,56 @@ void SampleJoiner::RemoveAllSources()
 	m_vecSources.clear();
 }
 
-ISampleProcessorPtr SampleJoiner::get_Target()
-{
-	return m_pTarget;
-}
-
-void SampleJoiner::put_Target(ISampleProcessorPtr value)
-{
-	m_pTarget = value;
-}
-
 ISampleContainerPtr SampleJoiner::get_Source(int index)
 {
 	return m_vecSources.at(index);
 }
 
+ISampleProcessorPtr SampleJoiner::get_Next()
+{
+	return m_pNext;
+}
+
+void SampleJoiner::put_Next(ISampleProcessorPtr value)
+{
+	m_pNext = value;
+}
+
+bool SampleJoiner::get_HasNext()
+{
+	return m_pNext != nullptr;
+}
+
+void SampleJoiner::Process(ISampleContainerPtr container)
+{
+	if (HasNext)
+	{
+		int targetChannelCount = container->ChannelCount;
+
+		if (targetChannelCount > 0)
+		{
+			int targetSampleCount = container->Channels[0]->SampleCount;
+
+			std::for_each(m_vecSources.begin(), m_vecSources.end(), [this, &container, targetChannelCount, targetSampleCount](ISampleContainerPtr item)
+			{
+				int maxChannels = std::min(targetChannelCount, item->ChannelCount);
+
+				for (int c = 0; c < maxChannels; c++)
+				{
+					ISampleBufferPtr channel = item->Channels[c];
+
+					int maxSamples = std::min(targetSampleCount, channel->SampleCount);
+
+					const sample* pSource = channel->SamplePtr;
+					sample* pTarget = container->Channels[c]->SamplePtr;
+
+					for (int s = 0; s < maxSamples; s++)
+					{
+						*pTarget++ += *pSource++;
+					}
+				}
+			});
+		}
+		m_pNext->Process(container);
+	}
+}

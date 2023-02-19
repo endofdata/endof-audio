@@ -17,12 +17,6 @@ namespace Audio
 			{				
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("519e9d40-db0b-42c4-b435-90d7ec67206a")) ISampleJoiner : public IUnknown
 				{
-					_declspec(property(get = get_Target, put = put_Target)) ISampleProcessorPtr Target;
-
-					ISampleProcessorPtr get_Target() = 0;
-					void put_Target(ISampleProcessorPtr value) = 0;
-
-
 					/// <summary>
 					/// Gets one item from the <see cref="Sources"/> collection at the given <paramref name="index"/>
 					/// </summary>
@@ -53,7 +47,7 @@ namespace Audio
 					void RemoveAllSources() = 0;
 				};
 
-				_COM_SMARTPTR_TYPEDEF(ISampleJoiner, __uuidof(ISampleJoiner));
+				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ISampleJoiner, __uuidof(ISampleJoiner));
 			}
 		}
 	}

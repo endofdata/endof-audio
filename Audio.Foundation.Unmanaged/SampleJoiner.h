@@ -15,14 +15,11 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class SampleJoiner : public Abstractions::ISampleJoiner
+			class SampleJoiner : public ISampleJoiner, public ISampleProcessor
 			{
 			public:
 				SampleJoiner();
 				virtual ~SampleJoiner();
-
-				virtual ISampleProcessorPtr get_Target();
-				virtual void put_Target(ISampleProcessorPtr value);
 
 				ISampleContainerPtr get_Source(int index);
 
@@ -32,13 +29,20 @@ namespace Audio
 
 				void RemoveAllSources();
 
+				ISampleProcessorPtr get_Next();
+				void put_Next(ISampleProcessorPtr value);
+
+				bool get_HasNext();
+
+				void Process(ISampleContainerPtr container);
+
 				DECLARE_IUNKNOWN
 
 			protected:
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
-				ISampleProcessorPtr m_pTarget;
+				ISampleProcessorPtr m_pNext;
 				std::vector<ISampleContainerPtr> m_vecSources;
 			};
 		}
