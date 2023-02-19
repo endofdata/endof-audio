@@ -44,7 +44,7 @@ namespace Audio
 					_declspec(property(get = get_Channel)) ISampleBufferPtr Channels[];
 				};
 
-				_COM_SMARTPTR_TYPEDEF(ISampleContainer, __uuidof(ISampleContainer));
+				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ISampleContainer, __uuidof(ISampleContainer));
 			}
 		}
 	}

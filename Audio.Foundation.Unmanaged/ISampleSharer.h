@@ -49,7 +49,7 @@ namespace Audio
 					void RemoveAllTargets() = 0;
 				};
 
-				_COM_SMARTPTR_TYPEDEF(ISampleSharer, __uuidof(ISampleSharer));
+				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ISampleSharer, __uuidof(ISampleSharer));
 			}
 		}
 	}

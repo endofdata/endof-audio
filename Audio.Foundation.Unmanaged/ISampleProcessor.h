@@ -16,7 +16,7 @@ namespace Audio
 			{				
 				__interface __declspec(uuid("c69caa40-5cd1-4ae1-9101-e84a503a79ec")) ISampleProcessor;
 
-				_COM_SMARTPTR_TYPEDEF(ISampleProcessor, __uuidof(ISampleProcessor));
+				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ISampleProcessor, __uuidof(ISampleProcessor));
 
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("c69caa40-5cd1-4ae1-9101-e84a503a79ec")) ISampleProcessor : public IUnknown
 				{

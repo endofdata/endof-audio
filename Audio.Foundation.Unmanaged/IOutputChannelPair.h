@@ -48,7 +48,7 @@ namespace Audio
 					void DirectOut(void* pBuffer, bool fLeft, bool fRight) = 0;
 				};
 
-				_COM_SMARTPTR_TYPEDEF(IOutputChannelPair, __uuidof(IOutputChannelPair));
+				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(IOutputChannelPair, __uuidof(IOutputChannelPair));
 			}
 		}
 	}

@@ -49,7 +49,7 @@ namespace Audio
 					int get_SampleCount() = 0;
 				};
 
-				_COM_SMARTPTR_TYPEDEF(ISampleBuffer, __uuidof(ISampleBuffer));
+				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ISampleBuffer, __uuidof(ISampleBuffer));
 			}
 		}
 	}
