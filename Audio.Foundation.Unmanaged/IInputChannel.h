@@ -16,7 +16,7 @@ namespace Audio
 			namespace Abstractions
 			{
 				/// <summary>
-				/// Connects an input <see cref="ISampleContainer"/> to a target <see cref="ISampleSharer"/> with optional monitoring.
+				/// A hardware input channel
 				/// </summary>
 				/// <remarks>
 				/// Incoming hardware buffers are converted to internal sample format and distributed as two-channel sample container.
@@ -29,23 +29,6 @@ namespace Audio
 					/// Gets or sets the sample type provided by this input
 					/// </summary>
 					_declspec(property(get = get_SampleType)) int SampleType;
-
-
-					ISampleProcessorPtr get_First() = 0;
-					void put_First(ISampleProcessorPtr value) = 0;
-
-					/// <summary>
-					/// Gets or sets the first sample processor in the processing chain
-					/// </summary>
-					_declspec(property(get = get_First, put = put_First)) ISampleProcessorPtr First;
-
-
-					bool get_HasFirst() = 0;
-
-					/// <summary>
-					/// Gets a value indicating whether a sample processor is available
-					/// </summary>
-					_declspec(property(get = get_HasFirst)) bool HasFirst;
 
 
 					bool get_SupportsDirectMonitor() = 0;
@@ -82,15 +65,9 @@ namespace Audio
 					/// Gets or sets a value indicating whether this channel is active
 					/// </summary>
 					_declspec(property(get = get_IsActive, put = put_IsActive)) bool IsActive;
-
-					/// <summary>
-					/// Processes the next audio buffer
-					/// </summary>
-					/// <param name="readSecondHalf">ASIO specific: is this the second half-buffer?</param>
-					void OnNextBuffer(bool readSecondHalf) = 0;
 				};
 
-				_COM_SMARTPTR_TYPEDEF(IInputChannel, __uuidof(IInputChannel));
+				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(IInputChannel, __uuidof(IInputChannel));
 			}
 		}
 	}
