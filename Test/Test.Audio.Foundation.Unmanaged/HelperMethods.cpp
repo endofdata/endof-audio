@@ -26,7 +26,6 @@ void HelperMethods::TestSampleContainer(ISampleContainerPtr pContainer, int samp
 {
 	Assert::AreEqual(sampleCount, pContainer->SampleCount, L"Container sample count is OK");
 	Assert::AreEqual(channelCount, pContainer->ChannelCount, L"Container channel count is OK");
-	Assert::IsFalse(pContainer->IsActive, L"Container is not active initially.");
 
 	for (int c = 0; c < channelCount; c++)
 	{

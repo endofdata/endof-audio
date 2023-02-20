@@ -103,11 +103,17 @@
     </ClCompile>
     <ClCompile Include="SampleBufferTests.cpp" />
     <ClCompile Include="SampleContainerTests.cpp" />
+    <ClCompile Include="SampleTransferTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Constants.h" />
     <ClInclude Include="HelperMethods.h" />
     <ClInclude Include="pch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Audio.Foundation.Unmanaged\Audio.Foundation.Unmanaged.vcxproj">
+      <Project>{c4d38b7d-afa0-4138-bc06-ecb238fe579b}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Target Name="CopyDependencies" AfterTargets="Build" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Message Text="Copy dependencies to $(OutDir)" Importance="high" />
