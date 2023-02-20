@@ -6,6 +6,7 @@
 #include "SampleJoiner.h"
 #include "SampleSharer.h"
 #include "FileWriter.h"
+#include "ContainerWriter.h"
 #include "FileSource.h"
 #include "Take.h"
 #include "TakeSequence.h"
@@ -49,9 +50,19 @@ IMeterChannelPtr ObjectFactory::CreateMeterChannel(int sampleRate, int channelCo
 	return new MeterChannel(sampleRate, channelCount);
 }
 
-ISampleProcessorPtr ObjectFactory::CreateFileProcessor(const std::string& filename)
+ISampleProcessorPtr ObjectFactory::CreateToFileProcessor(const std::string& filename)
 {
 	return new FileWriter(filename);
+}
+
+ISampleProcessorPtr ObjectFactory::CreateToStreamProcessor(std::ostream& output)
+{
+	return new StreamWriter(output);
+}
+
+ISampleProcessorPtr ObjectFactory::CreateToContainerProcessor(ISampleContainerPtr target)
+{
+	return new ContainerWriter(target);
 }
 
 ISampleSourcePtr ObjectFactory::CreateFileSource(int sampleCount, int channelCount, const std::string& filename)

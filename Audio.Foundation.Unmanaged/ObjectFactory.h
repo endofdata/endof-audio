@@ -36,7 +36,11 @@ namespace Audio
 
 				static IMeterChannelPtr CreateMeterChannel(int sampleRate, int channelCount);
 
-				static ISampleProcessorPtr CreateFileProcessor(const std::string& filename);
+				static ISampleProcessorPtr CreateToFileProcessor(const std::string& filename);
+
+				static ISampleProcessorPtr CreateToStreamProcessor(std::ostream& output);
+
+				static ISampleProcessorPtr CreateToContainerProcessor(ISampleContainerPtr target);
 
 				static ISampleSourcePtr CreateFileSource(int sampleCount, int channelCount, const std::string& filename);
 
