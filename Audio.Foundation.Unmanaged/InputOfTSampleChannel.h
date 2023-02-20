@@ -64,7 +64,7 @@ namespace Audio
 
 							// Convert the incoming samples to internal and write them to the container
 							int sampleCount = m_pContainer->SampleCount;
-							sample* pDest = m_pContainer->Channels[0]->SamplePtr;
+							Sample* pDest = m_pContainer->Channels[0]->SamplePtr;
 
 							for (int i = 0; i < sampleCount; i++)
 							{
@@ -159,7 +159,7 @@ namespace Audio
 						pSource = m_readSecondHalf ? m_pBufferB : m_pBufferA;
 					}
 
-					virtual sample ReadSample(TSample*& pSource) = 0;
+					virtual Sample ReadSample(TSample*& pSource) = 0;
 
 					int m_iAsioChannel;
 					TSample* m_pBufferA;

@@ -55,15 +55,15 @@ void StreamWriter::Process(ISampleContainerPtr container)
 
 		if (channels == 1)
 		{
-			const sample* pSrc = container->Channels[0]->SamplePtr;
-			std::streamsize size = samples * sizeof(sample);
+			const Sample* pSrc = container->Channels[0]->SamplePtr;
+			std::streamsize size = samples * sizeof(Sample);
 
 			m_output.write((const char*)pSrc, size);
 		}
 		else
 		{
 			// HACK: This limits the maximum number of input channels to 16. But usually, we will only have one or two anyway.
-			const sample* arSrc[16];
+			const Sample* arSrc[16];
 
 			if (channels > 16)
 			{
@@ -79,9 +79,9 @@ void StreamWriter::Process(ISampleContainerPtr container)
 			{
 				for (int c = 0; c < channels; c++)
 				{
-					const sample** ppSrc = &arSrc[c];
+					const Sample** ppSrc = &arSrc[c];
 
-					m_output.write((const char*)*ppSrc, sizeof(sample));
+					m_output.write((const char*)*ppSrc, sizeof(Sample));
 
 					(*ppSrc)++;
 				}

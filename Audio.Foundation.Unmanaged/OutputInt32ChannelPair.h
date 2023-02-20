@@ -25,7 +25,7 @@ namespace Audio
 				}
 
 			private:
-				inline void WriteSample(sample value, int*& pTarget)
+				inline void WriteSample(Sample value, int*& pTarget)
 				{
 					*pTarget++ = SampleConversion::SampleToInt32(value);
 				}

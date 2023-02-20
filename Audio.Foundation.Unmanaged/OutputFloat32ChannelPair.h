@@ -25,7 +25,7 @@ namespace Audio
 				}
 
 			private:
-				inline void WriteSample(sample value, float*& pTarget)
+				inline void WriteSample(Sample value, float*& pTarget)
 				{
 					*pTarget++ = SampleConversion::SampleToFloat32(value);
 				}

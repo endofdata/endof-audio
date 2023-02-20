@@ -167,10 +167,10 @@ namespace Test
 					}
 
 				private:
-					void InitSampleBuffers(ISampleContainerPtr pContainer, sample valueChn0, sample valueChn1)
+					void InitSampleBuffers(ISampleContainerPtr pContainer, Sample valueChn0, Sample valueChn1)
 					{
-						sample* pSamplesChn0 = pContainer->Channels[0]->SamplePtr;
-						sample* pSamplesChn1 = pContainer->Channels[1]->SamplePtr;
+						Sample* pSamplesChn0 = pContainer->Channels[0]->SamplePtr;
+						Sample* pSamplesChn1 = pContainer->Channels[1]->SamplePtr;
 						int sampleCount = pContainer->SampleCount;
 
 						for (int i = 0; i < sampleCount; i++)
@@ -268,7 +268,7 @@ namespace Test
 							}
 						}
 
-						void AssertBufferValue(const std::unique_ptr<int>& buffer, sample value)
+						void AssertBufferValue(const std::unique_ptr<int>& buffer, Sample value)
 						{
 							int* p = buffer.get();
 							int convertedValue = SampleConversion::SampleToInt32(value);
@@ -287,7 +287,7 @@ namespace Test
 							return std::unique_ptr<int>(new int[_sampleCount]);
 						}
 
-						void InitInt32Buffer(std::unique_ptr<int>& buffer, sample initialValue = 0.0)
+						void InitInt32Buffer(std::unique_ptr<int>& buffer, Sample initialValue = 0.0)
 						{
 							int* writePos = buffer.get();
 

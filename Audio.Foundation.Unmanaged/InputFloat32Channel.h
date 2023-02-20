@@ -24,7 +24,7 @@ namespace Audio
 				}
 
 			private:
-				inline sample ReadSample(float*& pSource)
+				inline Sample ReadSample(float*& pSource)
 				{
 					return SampleConversion::Float32ToSample(*pSource++);
 				}

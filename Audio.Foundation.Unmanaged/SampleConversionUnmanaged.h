@@ -50,7 +50,7 @@ namespace Audio
 				/// </summary>
 				/// <param name="value">Sample to convert</param>
 				/// <returns>Float sample</returns>
-				static inline sample Int32ToSample(int value)
+				static inline Sample Int32ToSample(int value)
 				{
 					return value * Int32ToSampleFactor;
 				}
@@ -60,7 +60,7 @@ namespace Audio
 				/// </summary>
 				/// <param name="value">Sample to convert</param>
 				/// <returns>Integer sample</returns>
-				static inline int SampleToInt32(sample value)
+				static inline int SampleToInt32(Sample value)
 				{
 					return static_cast<int>(value * SampleToInt32Factor);
 				}
@@ -70,7 +70,7 @@ namespace Audio
 				/// </summary>
 				/// <param name="value">Sample to convert</param>
 				/// <returns>Float sample</returns>
-				static inline sample Int24ToSample(int value)
+				static inline Sample Int24ToSample(int value)
 				{
 					return value * Int24ToSampleFactor;
 				}
@@ -80,7 +80,7 @@ namespace Audio
 				/// </summary>
 				/// <param name="value">Sample to convert</param>
 				/// <returns>Integer sample</returns>
-				static inline int SampleToInt24(sample value)
+				static inline int SampleToInt24(Sample value)
 				{
 					return static_cast<int>(value * SampleToInt24Factor);
 				}
@@ -90,7 +90,7 @@ namespace Audio
 				/// </summary>
 				/// <param name="value">Sample to convert</param>
 				/// <returns>Float sample</returns>
-				static inline sample Int16ToSample(short value)
+				static inline Sample Int16ToSample(short value)
 				{
 					return value * Int16ToSampleFactor;
 				}
@@ -100,7 +100,7 @@ namespace Audio
 				/// </summary>
 				/// <param name="value">Sample to convert</param>
 				/// <returns>Float sample</returns>
-				static inline short SampleToInt16(sample value)
+				static inline short SampleToInt16(Sample value)
 				{
 					return static_cast<short>(value * SampleToInt16Factor);
 				}
@@ -110,9 +110,9 @@ namespace Audio
 				/// </summary>
 				/// <param name="value">Sample to convert</param>
 				/// <returns>Float sample</returns>
-				static inline sample Float32ToSample(float value)
+				static inline Sample Float32ToSample(float value)
 				{
-					return static_cast<sample>(value);
+					return static_cast<Sample>(value);
 				}
 
 				/// <summary>
@@ -120,7 +120,7 @@ namespace Audio
 				/// </summary>
 				/// <param name="value">Sample to convert</param>
 				/// <returns>Float sample</returns>
-				static inline float SampleToFloat32(sample value)
+				static inline float SampleToFloat32(Sample value)
 				{
 					return static_cast<float>(value);
 				}
@@ -131,7 +131,7 @@ namespace Audio
 					\param[in] maxValue		Maximum sample value (usually 1.0f)
 					\return					32-bit int little endian sample
 				*/
-				static inline int SaturatedConvertInt32(sample value, sample maxValue)
+				static inline int SaturatedConvertInt32(Sample value, Sample maxValue)
 				{
 					return static_cast<int>(Saturated(value, maxValue) * SampleToInt32Factor);
 				}
@@ -142,7 +142,7 @@ namespace Audio
 					\param[in] maxValue		Maximum sample value (usually 1.0f)
 					\return					24-bit int little endian sample
 				*/
-				static inline int SaturatedConvertInt24(sample value, sample maxValue)
+				static inline int SaturatedConvertInt24(Sample value, Sample maxValue)
 				{
 					return static_cast<int>(Saturated(value, maxValue) * SampleToInt24Factor);
 				}
@@ -153,7 +153,7 @@ namespace Audio
 					\param[in] maxValue		Maximum sample value (usually 1.0f)
 					\return					16-bit int little endian sample
 				*/
-				static inline int SaturatedConvertInt16(sample value, sample maxValue)
+				static inline int SaturatedConvertInt16(Sample value, Sample maxValue)
 				{
 					return static_cast<int>(Saturated(value, maxValue) * SampleToInt16Factor);
 				}
@@ -164,7 +164,7 @@ namespace Audio
 					\param[in] maxValue		Maximum sample value (usually 1.0f)
 					\return					32-bit float little endian sample
 				*/
-				static inline float SaturatedConvertFloat32(sample value, sample maxValue)
+				static inline float SaturatedConvertFloat32(Sample value, Sample maxValue)
 				{
 					return static_cast<float>(Saturated(value, maxValue));
 				}
@@ -175,7 +175,7 @@ namespace Audio
 					\param[in] maxValue		Maximum sample value (usually 1.0f)
 					\return					Saturated internal sample
 				*/
-				static inline sample Saturated(sample value, sample maxValue)
+				static inline Sample Saturated(Sample value, Sample maxValue)
 				{
 					return fabsl(value + maxValue) - fabsl(value - maxValue);
 				}
@@ -186,22 +186,22 @@ namespace Audio
 				/// <param name="first">First signal</param>
 				/// <param name="second">Second signal</param>
 				/// <returns>Sum of <paramref name="first"/> and <paramref name="second"/> signal</returns>
-				static inline sample AddSignals(sample first, sample second)
+				static inline Sample AddSignals(Sample first, Sample second)
 				{
 					return first + second;
 				}
 
 
-				static void ContinueRMSSumUp(sample* pSamples, int iSamplesMax, double& sumUp)
+				static void ContinueRMSSumUp(Sample* pSamples, int iSamplesMax, double& sumUp)
 				{
 					for (int i = 0; i < iSamplesMax; i++)
 					{
-						sample sample = *pSamples++;
-						sumUp += sample * sample;
+						Sample value = *pSamples++;
+						sumUp += value * value;
 					}
 				}
 
-				static double DbFullScaleRMS(sample* pSamples, int iSamplesMax)
+				static double DbFullScaleRMS(Sample* pSamples, int iSamplesMax)
 				{
 					double sumUp = 0.0f;
 					ContinueRMSSumUp(pSamples, iSamplesMax, sumUp);

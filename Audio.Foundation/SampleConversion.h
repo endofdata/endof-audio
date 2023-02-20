@@ -9,8 +9,8 @@ namespace Audio
 	{
 
 		delegate int BufferConverter(array<System::Byte>^ rawBytes, int count, array<System::Byte>^ output);
-		delegate sample SampleReader();
-		delegate void SampleWriter(sample sample);
+		delegate Sample SampleReader();
+		delegate void SampleWriter(Sample sample);
 
 		class SampleConversion
 		{

@@ -24,25 +24,25 @@ namespace Audio
 					/// <summary>
 					/// The sample buffer
 					/// </summary>
-					_declspec(property(get = get_Sample, put = put_Sample)) sample Samples[]; //!< Gets or sets the sample at the given index
+					_declspec(property(get = get_Sample, put = put_Sample)) Sample Samples[]; //!< Gets or sets the sample at the given index
 
 					/// <summary>
 					/// Gets the sample at the specified <paramref name="index"/>
 					/// </summary>
 					/// <param name="index">Zero-based sample index</param>
 					/// <returns>Sample value</returns>
-					sample get_Sample(int index) = 0;
+					Sample get_Sample(int index) = 0;
 
 					/// <summary>
 					/// Sets the sample <paramref name="value"/> at the specified <paramref name="index"/>
 					/// </summary>
 					/// <param name="index">Zero-based sample index</param>
 					/// <param name="value">Sample value to set</param>
-					void put_Sample(int index, sample value) = 0;
+					void put_Sample(int index, Sample value) = 0;
 
-					_declspec(property(get = get_SamplePtr)) sample* SamplePtr; //!< Gets the address of the unmanaged sample buffer
+					_declspec(property(get = get_SamplePtr)) Sample* SamplePtr; //!< Gets the address of the unmanaged sample buffer
 
-					sample* get_SamplePtr() = 0;
+					Sample* get_SamplePtr() = 0;
 
 					_declspec(property(get = get_SampleCount)) int SampleCount; //!< Gets the maximum number of samples in the buffer
 

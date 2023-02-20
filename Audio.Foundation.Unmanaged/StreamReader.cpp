@@ -58,15 +58,15 @@ void StreamReader::OnNextBuffer(bool readSecondHalf)
 
 	if (channels == 1)
 	{
-		sample* pDst = m_pContainer->Channels[0]->SamplePtr;
-		std::streamsize size = samples * sizeof(sample);
+		Sample* pDst = m_pContainer->Channels[0]->SamplePtr;
+		std::streamsize size = samples * sizeof(Sample);
 
 		m_input.read((char*)pDst, size);
 	}
 	else
 	{
 		// HACK: This limits the maximum number of input channels to 16. But usually, we will only have one or two anyway.
-		sample* arDst[16];
+		Sample* arDst[16];
 
 		if (channels > 16)
 		{
@@ -82,9 +82,9 @@ void StreamReader::OnNextBuffer(bool readSecondHalf)
 		{
 			for (int c = 0; c < channels; c++)
 			{
-				sample** ppDst = &arDst[c];
+				Sample** ppDst = &arDst[c];
 
-				m_input.read((char*)*ppDst, sizeof(sample));
+				m_input.read((char*)*ppDst, sizeof(Sample));
 
 				(*ppDst)++;
 			}

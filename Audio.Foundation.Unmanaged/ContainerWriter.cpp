@@ -60,7 +60,7 @@ void ContainerWriter::Process(ISampleContainerPtr container)
 
 		int maxSamples = std::min(targetChannel->SampleCount, sourceChannel->SampleCount);
 
-		std::memcpy(targetChannel->SamplePtr, sourceChannel->SamplePtr, maxSamples * sizeof(sample));
+		std::memcpy(targetChannel->SamplePtr, sourceChannel->SamplePtr, maxSamples * sizeof(Sample));
 	}
 	if (HasNext)
 	{

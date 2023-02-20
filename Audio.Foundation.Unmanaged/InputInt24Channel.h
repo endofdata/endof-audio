@@ -23,7 +23,7 @@ namespace Audio
 				}
 
 			private:
-				inline sample ReadSample(byte*& pSource)
+				inline Sample ReadSample(byte*& pSource)
 				{
 					int unpacked = 0;
 

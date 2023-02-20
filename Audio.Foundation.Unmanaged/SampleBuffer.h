@@ -31,16 +31,16 @@ namespace Audio
 				void Clear();
 
 				//! \brief Property getter for Sample
-				sample get_Sample(int iIdx);
+				Sample get_Sample(int iIdx);
 
 				//! \brief Property setter for Sample
-				void put_Sample(int iIdx, sample value);
+				void put_Sample(int iIdx, Sample value);
 
 				//! \brief Property getter for SampleCount
 				int get_SampleCount();
 
 				//!\brief Property getter for SamplePtr
-				sample* get_SamplePtr();
+				Sample* get_SamplePtr();
 
 				DECLARE_IUNKNOWN
 
@@ -48,7 +48,7 @@ namespace Audio
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
-				sample* m_pSamples;
+				Sample* m_pSamples;
 				int m_iSamples;
 			};
 		}

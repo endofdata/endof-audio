@@ -8,5 +8,5 @@
 #endif
 #endif
 
-typedef double sample;
+typedef double Sample;
 

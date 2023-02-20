@@ -108,8 +108,8 @@ void SampleJoiner::Process(ISampleContainerPtr container)
 
 					int maxSamples = std::min(targetSampleCount, channel->SampleCount);
 
-					const sample* pSource = channel->SamplePtr;
-					sample* pTarget = container->Channels[c]->SamplePtr;
+					const Sample* pSource = channel->SamplePtr;
+					Sample* pTarget = container->Channels[c]->SamplePtr;
 
 					for (int s = 0; s < maxSamples; s++)
 					{

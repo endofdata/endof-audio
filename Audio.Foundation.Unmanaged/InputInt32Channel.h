@@ -22,7 +22,7 @@ namespace Audio
 				}
 
 			private:
-				inline sample ReadSample(int*& pSource)
+				inline Sample ReadSample(int*& pSource)
 				{
 					return SampleConversion::Int32ToSample(*pSource++);
 				}

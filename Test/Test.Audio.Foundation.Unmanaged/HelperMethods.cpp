@@ -14,7 +14,7 @@ void HelperMethods::TestSampleBuffer(ISampleBufferPtr pBuffer, int sampleCount)
 
 	for (int s = 0; s < sampleCount; s++)
 	{
-		sample testValue = (sample)s / 12.0f;
+		Sample testValue = (Sample)s / 12.0f;
 		pBuffer->Samples[s] = testValue;
 
 		Assert::AreEqual(testValue, pBuffer->Samples[s], L"Buffer read/write retains value");
@@ -39,11 +39,11 @@ ISampleContainerPtr HelperMethods::CreateTestContainer(int sampleCount, int chan
 
 	for (int c = 0; c < channelCount; c++)
 	{
-		sample* pSamples = container->Channels[c]->SamplePtr;
+		Sample* pSamples = container->Channels[c]->SamplePtr;
 
 		for (int s = 0; s < sampleCount; s++)
 		{
-			*pSamples++ = (sample)sin((double)s / 100.0);
+			*pSamples++ = (Sample)sin((double)s / 100.0);
 		}
 	}
 	return container;

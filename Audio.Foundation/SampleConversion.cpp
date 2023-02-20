@@ -14,14 +14,14 @@ int SampleConversion::Int32ToSampleConverter(array<Byte>^ buffer, int count, arr
 
 	int sampleCount = (int)(count / sizeof(int));
 
-	if (output->Length < (int)(sizeof(sample) * sampleCount))
+	if (output->Length < (int)(sizeof(Sample) * sampleCount))
 		throw gcnew ArgumentException("Destination buffer is too small.");
 
 	pin_ptr<unsigned char> pinnedBuffer = &buffer[0];
 	pin_ptr<unsigned char> pinnedOutput = &output[0];
 
 	int* pSrc = (int*)pinnedBuffer;
-	sample* pDst = (sample*)pinnedOutput;
+	Sample* pDst = (Sample*)pinnedOutput;
 
 	for (int sample = 0; sample < sampleCount; sample++)
 		*pDst++ = Audio::Foundation::Unmanaged::SampleConversion::Int32ToSample(*pSrc++);
@@ -37,14 +37,14 @@ int SampleConversion::Int16ToSampleConverter(array<Byte>^ buffer, int count, arr
 
 	int sampleCount = (int)(count / sizeof(short));
 
-	if (output->Length < (int)(sizeof(sample) * sampleCount))
+	if (output->Length < (int)(sizeof(Sample) * sampleCount))
 		throw gcnew ArgumentException("Destination buffer is too small.");
 
 	pin_ptr<unsigned char> pinnedBuffer = &buffer[0];
 	pin_ptr<unsigned char> pinnedOutput = &output[0];
 
 	short* pSrc = (short*)pinnedBuffer;
-	sample* pDst = (sample*)pinnedOutput;
+	Sample* pDst = (Sample*)pinnedOutput;
 
 	for (int sample = 0; sample < sampleCount; sample++)
 		*pDst++ = Audio::Foundation::Unmanaged::SampleConversion::Int16ToSample(*pSrc++);
@@ -67,7 +67,7 @@ int SampleConversion::Float32ToSampleConverter(array<Byte>^ buffer, int count, a
 	pin_ptr<unsigned char> pinnedOutput = &output[0];
 
 	float* pSrc = (float*)pinnedBuffer;
-	sample* pDst = (sample*)pinnedOutput;
+	Sample* pDst = (Sample*)pinnedOutput;
 
 	for (int sample = 0; sample < sampleCount; sample++)
 		*pDst++ = Audio::Foundation::Unmanaged::SampleConversion::Float32ToSample(*pSrc++);
@@ -108,7 +108,7 @@ int SampleConversion::SampleToFloat32Converter(array<Byte>^ buffer, int count, a
 	if (buffer->Length < count)
 		throw gcnew ArgumentException("Source buffer is too small.");
 
-	int sampleCount = (int)(count / sizeof(sample));
+	int sampleCount = (int)(count / sizeof(Sample));
 
 	if (output->Length < sampleCount)
 		throw gcnew ArgumentException("Destination buffer is too small.");
@@ -116,7 +116,7 @@ int SampleConversion::SampleToFloat32Converter(array<Byte>^ buffer, int count, a
 	pin_ptr<unsigned char> pinnedBuffer = &buffer[0];
 	pin_ptr<float> pinnedOutput = &output[0];
 
-	sample* pSrc = (sample*)pinnedBuffer;
+	Sample* pSrc = (Sample*)pinnedBuffer;
 	float* pDst = (float*)pinnedOutput;
 
 	for (int sample = 0; sample < sampleCount; sample++)
