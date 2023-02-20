@@ -39,20 +39,17 @@ namespace Test
 							}
 						}
 
-						ISampleJoinerPtr pWriteThrough = ObjectFactory::CreateSampleJoiner(Constants::SampleCount, Constants::ChannelCount);
+						ISampleContainerPtr pResultBuffers = ObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
+						ISampleProcessorPtr pTarget = ObjectFactory::CreateToContainerProcessor(pResultBuffers);
+						
 
-						pMeterChannel->WriteThrough = pWriteThrough;
+						ISampleProcessorPtr pMeterProcessor = nullptr;
+						Assert::AreEqual(S_OK, pMeterChannel->QueryInterface(&pMeterProcessor), L"Can get ISampleProcessor from IMeterChannel");
 
-						ISampleReceiverPtr pMeterInput;
-						Assert::AreEqual(S_OK, pMeterChannel->QueryInterface(&pMeterInput));
+						pMeterProcessor->Next = pTarget;
+						pMeterProcessor->Process(pTestBuffers);
 
-						pMeterInput->Receive(pTestBuffers);
-
-						ISampleContainerPtr pResultBuffers;
-						Assert::AreEqual(S_OK, pWriteThrough->QueryInterface(&pResultBuffers));
-
-						Assert::AreEqual(Constants::ChannelCount, pResultBuffers->ChannelCount, L"Write-through channel count OK");
-						Assert::AreEqual(Constants::SampleCount, pResultBuffers->SampleCount, L"Write-through channel count OK");
+						bool debugHelper = false;
 
 						for (int c = 0; c < Constants::ChannelCount; c++)
 						{
