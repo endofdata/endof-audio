@@ -10,3 +10,6 @@
 #include <functional>
 #include <vector>
 #include <vcclr.h>
+
+// I don't know how to fix the 4996 (ReadOnlySpan<T> is deprecated) 
+#pragma warning(disable: 4996)
