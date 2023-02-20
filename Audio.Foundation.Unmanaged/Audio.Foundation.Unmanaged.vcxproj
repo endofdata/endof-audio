@@ -92,6 +92,7 @@
   <ItemGroup>
     <ClInclude Include="Audio.Foundation.Unmanaged.h" />
     <ClInclude Include="AudioFoundationException.h" />
+    <ClInclude Include="ContainerWriter.h" />
     <ClInclude Include="FileReader.h" />
     <ClInclude Include="FileSource.h" />
     <ClInclude Include="FileWriter.h" />
@@ -107,8 +108,9 @@
     <ClInclude Include="ISampleJoiner.h" />
     <ClInclude Include="ISampleSharer.h" />
     <ClInclude Include="ISampleProcessor.h" />
+    <ClInclude Include="ISampleSource.h" />
     <ClInclude Include="ITake.h" />
-    <ClInclude Include="ITimeline.h" />
+    <ClInclude Include="ITakeSequence.h" />
     <ClInclude Include="MeterChannel.h" />
     <ClInclude Include="ObjectFactory.h" />
     <ClInclude Include="OutputFloat32ChannelPair.h" />
@@ -117,7 +119,6 @@
     <ClInclude Include="OutputOfTSampleChannelPair.h" />
     <ClInclude Include="SampleBuffer.h" />
     <ClInclude Include="SampleContainer.h" />
-    <ClInclude Include="SampleContainerBase.h" />
     <ClInclude Include="SampleConversionUnmanaged.h" />
     <ClInclude Include="SampleJoiner.h" />
     <ClInclude Include="SampleSharer.h" />
@@ -127,11 +128,12 @@
     <ClInclude Include="StreamReader.h" />
     <ClInclude Include="StreamWriter.h" />
     <ClInclude Include="Take.h" />
-    <ClInclude Include="Timeline.h" />
+    <ClInclude Include="TakeSequence.h" />
     <ClInclude Include="UnknownBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioFoundationException.cpp" />
+    <ClCompile Include="ContainerWriter.cpp" />
     <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="FileSource.cpp" />
     <ClCompile Include="FileWriter.cpp" />
@@ -139,7 +141,6 @@
     <ClCompile Include="ObjectFactory.cpp" />
     <ClCompile Include="SampleBuffer.cpp" />
     <ClCompile Include="SampleContainer.cpp" />
-    <ClCompile Include="SampleContainerBase.cpp" />
     <ClCompile Include="SampleJoiner.cpp" />
     <ClCompile Include="SampleSharer.cpp" />
     <ClCompile Include="dllmain.cpp" />
@@ -150,7 +151,7 @@
     <ClCompile Include="StreamReader.cpp" />
     <ClCompile Include="StreamWriter.cpp" />
     <ClCompile Include="Take.cpp" />
-    <ClCompile Include="Timeline.cpp" />
+    <ClCompile Include="TakeSequence.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

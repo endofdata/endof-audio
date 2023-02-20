@@ -72,9 +72,6 @@
     <ClInclude Include="UnknownBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SampleContainerBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="IMeterChannel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -84,13 +81,13 @@
     <ClInclude Include="FileWriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ITimeline.h">
+    <ClInclude Include="ITakeSequence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ITake.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Timeline.h">
+    <ClInclude Include="TakeSequence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Take.h">
@@ -132,6 +129,12 @@
     <ClInclude Include="AudioFoundationException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ISampleSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ContainerWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -158,9 +161,6 @@
     <ClCompile Include="ObjectFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SampleContainerBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="StreamWriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -170,7 +170,7 @@
     <ClCompile Include="Take.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Timeline.cpp">
+    <ClCompile Include="TakeSequence.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StreamReader.cpp">
@@ -183,6 +183,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AudioFoundationException.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ContainerWriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
