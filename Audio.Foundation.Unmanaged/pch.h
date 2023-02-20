@@ -15,4 +15,6 @@
 #include <istream>
 #include <fstream>
 
+// I don't know how to fix the 4996 (ReadOnlySpan<T> is deprecated) and I don't care for 4251 (no dll interface for com_ptr_t<>)
+#pragma warning(disable: 4996 4251)
 #endif //PCH_H
