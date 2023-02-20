@@ -12,8 +12,6 @@ namespace Audio
 		{
 			namespace Abstractions
 			{
-				typedef long long int Time;
-
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("933cf1fb-3110-449a-b22f-69c0b5c6e090")) ITake;
 
 				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ITake, __uuidof(ITake));

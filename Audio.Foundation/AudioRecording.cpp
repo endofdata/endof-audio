@@ -8,6 +8,7 @@ using namespace System;
 using namespace System::IO;
 using namespace System::Threading;
 using namespace Audio::Foundation::Interop;
+using namespace Audio::Foundation::Unmanaged;
 
 AudioRecording::AudioRecording(TimeSpan offset, int sampleRate, String^ wavStreamFileName)
 	: FileAudioTake(offset, sampleRate, wavStreamFileName)
@@ -35,9 +36,9 @@ int AudioRecording::Write(IAudioBuffer^ buffer)
 
 	try
 	{
-		pin_ptr<sample> pinnedData = (sample*)buffer->SamplePointer[0].ToPointer();
+		pin_ptr<Sample> pinnedData = (Sample*)buffer->SamplePointer[0].ToPointer();
 
-		m_stream->Write(ReadOnlySpan<unsigned char>(pinnedData, buffer->SampleCount * sizeof(sample)));
+		m_stream->Write(ReadOnlySpan<unsigned char>(pinnedData, buffer->SampleCount * sizeof(Sample)));
 
 		return buffer->SampleCount;
 	}
@@ -55,7 +56,7 @@ bool AudioRecording::Finish()
 	{
 		m_stream->Flush();
 
-		int recorded = m_stream->Position / (int)sizeof(sample);
+		int recorded = (int)(m_stream->Position / sizeof(Sample));
 
 		if (recorded <= 0)
 		{

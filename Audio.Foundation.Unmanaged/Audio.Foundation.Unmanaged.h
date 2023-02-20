@@ -8,5 +8,15 @@
 #endif
 #endif
 
-typedef double Sample;
+namespace Audio
+{
+	namespace Foundation
+	{
+		namespace Unmanaged
+		{
+			typedef double Sample;
+			typedef long long int Time;
+		}
+	}
+}
 

@@ -7,10 +7,9 @@ namespace Audio
 {
 	namespace Foundation
 	{
-
 		delegate int BufferConverter(array<System::Byte>^ rawBytes, int count, array<System::Byte>^ output);
-		delegate Sample SampleReader();
-		delegate void SampleWriter(Sample sample);
+		delegate Unmanaged::Sample SampleReader();
+		delegate void SampleWriter(Unmanaged::Sample sample);
 
 		class SampleConversion
 		{

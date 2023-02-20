@@ -2,6 +2,8 @@
 #include "SampleConversion.h"
 #include "IAudioBuffer.h"
 
+using namespace Audio::Foundation::Unmanaged;
+
 namespace Audio
 {
 	namespace Foundation
