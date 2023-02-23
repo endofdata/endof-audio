@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "ToStringImpl.h"
 #include "CppUnitTest.h"
 #include "HelperMethods.h"
 #include "Constants.h"
@@ -29,7 +30,8 @@ namespace Test
 
 					TEST_METHOD(BasicInitialization)
 					{
-						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence();
+						IHostClockPtr pHostClock = ObjectFactory::CreateHostClock();
+						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pHostClock);
 
 						Assert::AreEqual(0, pTakeSequence->get_TakeCount(), L"New takeSequence has no takes");
 						int sampleRate = Constants::SampleRate;
@@ -37,8 +39,8 @@ namespace Test
 
 						ISampleContainerPtr container = ObjectFactory::CreateSampleContainer((int)(sampleRate * seconds), 2);
 
-						Time position = 0;
-						Time length = (Time)(seconds * 1000);
+						AudioTime position = 0;
+						AudioTime length = (AudioTime)(seconds * 1000);
 
 						ITakePtr pTake = ObjectFactory::CreateTake(container, position, length);
 
@@ -51,7 +53,7 @@ namespace Test
 
 						Assert::AreEqual(takeId, pTakeFromTakeSequence->Id, L"Take-ID is OK");
 
-						Time movedPosition = (Time)(seconds * 3000);
+						AudioTime movedPosition = (AudioTime)(seconds * 3000);
 						Assert::IsTrue(pTakeSequence->MoveTake(takeId, movedPosition), L"Can move take by ID");
 
 						ITakePtr pMovedTake = pTakeSequence->FindTake(takeId);
@@ -119,7 +121,8 @@ namespace Test
 						pOutputPair->QueryInterface<ISampleProcessor>(&pOutputPairProcessor);
 						Assert::IsNotNull(pOutputPairProcessor.GetInterfacePtr(), L"Can access ISampleProcessor from IOutputChannelPair");
 
-						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence();
+						IHostClockPtr pHostClock = ObjectFactory::CreateHostClock();
+						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pHostClock);
 						Assert::IsNotNull(pTakeSequence.GetInterfacePtr(), L"Can create take sequence");
 
 						ISampleProcessorPtr pTakeSequenceProcessor = nullptr;
@@ -138,8 +141,8 @@ namespace Test
 
 						InitSampleBuffers(pContainer, -0.16, -0.32);
 
-						Time position = 0;
-						Time length = (Time)(seconds * 1000);
+						AudioTime position = 0;
+						AudioTime length = AudioTime::FromSeconds(seconds);
 						ITakePtr pTake = ObjectFactory::CreateTake(pContainer, position, length);
 						Assert::IsNotNull(pTake.GetInterfacePtr(), L"Can create audio take");
 
@@ -149,6 +152,7 @@ namespace Test
 						bool writeSecondHalf = !readSecondHalf;
 
 						pInput->IsActive = true;
+						pHostClock->Start();
 
 						pOutputPair->OnNextBuffer(writeSecondHalf);
 						pInputSource->OnNextBuffer(readSecondHalf);
