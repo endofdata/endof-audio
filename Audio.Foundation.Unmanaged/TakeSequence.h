@@ -6,6 +6,7 @@
 #include "UnknownBase.h"
 #include "ITakeSequence.h"
 #include "ISampleProcessor.h"
+#include "IHostClock.h"
 #include <vector>
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -19,7 +20,7 @@ namespace Audio
 			class TakeSequence : public ITakeSequence, public ISampleProcessor
 			{
 			public:
-				TakeSequence();
+				TakeSequence(IHostClockPtr hostClock);
 				virtual ~TakeSequence();
 
 				virtual int get_TakeCount();
@@ -28,8 +29,11 @@ namespace Audio
 
 				virtual int AddTake(ITakePtr item);
 				virtual bool RemoveTake(int takeId);
-				virtual bool MoveTake(int takeId, Time to);
+				virtual bool MoveTake(int takeId, AudioTime to);
 				virtual ITakePtr FindTake(int takeId);
+
+				virtual AudioTime get_PlayPosition();
+				virtual void put_PlayPosition(AudioTime value);
 
 				ISampleProcessorPtr get_Next();
 				void put_Next(ISampleProcessorPtr value);
@@ -45,10 +49,14 @@ namespace Audio
 
 			private:
 
-				bool m_isActive;
+				IHostClockPtr m_pHostClock;
 
 				std::vector<ITakePtr> m_takes;
 				std::vector<ITakePtr>::iterator m_playPosition;
+				AudioTime m_currentTime;
+
+				std::vector<ITakePtr>::iterator m_scheduledTake;
+				AudioTime m_scheduledTime;
 
 				ISampleProcessorPtr m_pNext;
 			};

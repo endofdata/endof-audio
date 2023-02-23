@@ -12,6 +12,7 @@
 #include <IMeterChannel.h>
 #include <ITake.h>
 #include <ITakeSequence.h>
+#include <IHostClock.h>
 #include <IInputChannel.h>
 #include <string>
 
@@ -44,9 +45,13 @@ namespace Audio
 
 				static ISampleSourcePtr CreateFileSource(int sampleCount, int channelCount, const std::string& filename);
 
-				static ITakePtr CreateTake(ISampleContainerPtr container, Time position, Time length);
+				static ITakePtr CreateTake(ISampleContainerPtr container, AudioTime position, IHostClockPtr hostClock);
 
-				static ITakeSequencePtr CreateTakeSequence();
+				static ITakePtr CreateTake(ISampleContainerPtr container, AudioTime position, AudioTime length);
+
+				static IHostClockPtr CreateHostClock(int sampleRate = 0);
+
+				static ITakeSequencePtr CreateTakeSequence(IHostClockPtr hostClock);
 
 				static IInputChannelPtr CreateInputChannel(int sampleType, int hwChannelId, void* pHwBufferA, void* pHwBufferB, int sampleCount);
 

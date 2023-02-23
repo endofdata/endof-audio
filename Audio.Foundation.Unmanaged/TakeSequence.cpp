@@ -8,8 +8,12 @@ using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 
 
-TakeSequence::TakeSequence() :
-	m_isActive(false),
+TakeSequence::TakeSequence(IHostClockPtr hostClock) :
+	m_pHostClock(hostClock),
+	m_currentTime(0),
+	m_playPosition(m_takes.end()),
+	m_scheduledTake(m_takes.end()),
+	m_scheduledTime(0),
 	m_refCount(0)
 {
 }
@@ -57,10 +61,11 @@ ITakePtr TakeSequence::get_Take(int index)
 
 int TakeSequence::AddTake(ITakePtr take)
 {
-	Time position = take->Position;
+	AudioTime position = take->Position;
 
 	m_takes.insert(std::find_if(m_takes.begin(), m_takes.end(), [position](ITakePtr t) { return t->Position >= position;  }), take);
-	m_playPosition = m_takes.begin();
+	m_scheduledTake = m_takes.begin();
+	put_PlayPosition(m_pHostClock->CurrentTime);
 
 	return take->Id;
 }
@@ -73,14 +78,15 @@ bool TakeSequence::RemoveTake(int takeId)
 	{
 		auto result = std::remove(m_takes.begin(), m_takes.end(), takeToRemove);
 		m_takes.erase(result, m_takes.end());
-		m_playPosition = m_takes.begin();
+		m_scheduledTake = m_takes.begin();
+		put_PlayPosition(m_pHostClock->CurrentTime);
 
 		return true;
 	}
 	return false;
 }
 
-bool TakeSequence::MoveTake(int takeId, Time to)
+bool TakeSequence::MoveTake(int takeId, AudioTime to)
 {
 	auto takeToMove = FindTake(takeId);
 
@@ -98,7 +104,7 @@ bool TakeSequence::MoveTake(int takeId, Time to)
 
 ITakePtr TakeSequence::FindTake(int takeId)
 {
-	auto matches = std::find_if(m_takes.begin(), m_takes.end(), [takeId](ITakePtr t) { return t->Id == takeId;  });
+	auto matches = std::find_if(m_takes.begin(), m_takes.end(), [takeId](const ITakePtr& t) { return t->Id == takeId;  });
 
 	if (matches == m_takes.end())
 	{
@@ -107,6 +113,32 @@ ITakePtr TakeSequence::FindTake(int takeId)
 	return matches[0];
 }
 
+AudioTime TakeSequence::get_PlayPosition()
+{
+	return m_currentTime;
+}
+
+void TakeSequence::put_PlayPosition(AudioTime currentTime)
+{
+	if(m_scheduledTake != m_takes.end())
+	{
+		if (!(*m_scheduledTake)->HasDataAt(currentTime))
+		{
+			if (currentTime < m_currentTime)
+			{
+				m_scheduledTake = m_takes.begin();
+			}
+			m_scheduledTake = std::find_if(m_scheduledTake, m_takes.end(), [currentTime](const ITakePtr& t) { return t->EndPosition < currentTime; });
+
+			if (m_scheduledTake != m_takes.end())
+			{
+				m_scheduledTime = (*m_scheduledTake)->Position;
+			}
+		}
+	}
+	m_playPosition = m_takes.end();
+	m_currentTime = currentTime;
+}
 
 ISampleProcessorPtr TakeSequence::get_Next()
 {
@@ -124,7 +156,38 @@ bool TakeSequence::get_HasNext()
 }
 
 void TakeSequence::Process(ISampleContainerPtr container)
-{
+{	
+	bool hasTake = false;
+
+	if (m_scheduledTake != m_takes.end())
+	{
+		m_currentTime = m_pHostClock->CurrentTime;
+
+		if (m_currentTime >= m_scheduledTime)
+		{
+			m_playPosition = m_scheduledTake;
+			m_scheduledTake = m_takes.end();
+			hasTake = true;
+		}
+	}
+	else
+	{
+		hasTake = m_playPosition != m_takes.end();
+	}
+	if (hasTake)
+	{
+		int done = (*m_playPosition)->ReadSamplesTo(container);
+
+		if (!done)
+		{
+			m_scheduledTake = m_playPosition + 1;
+			if (m_scheduledTake != m_takes.end())
+			{
+				m_scheduledTime = (*m_scheduledTake)->Position;
+			}
+			m_playPosition = m_takes.end();
+		}
+	}
 	if (HasNext)
 	{
 		m_pNext->Process(container);

@@ -51,17 +51,8 @@ bool ContainerWriter::get_HasNext()
 
 void ContainerWriter::Process(ISampleContainerPtr container)
 {
-	int maxChannels = std::min(m_pTarget->ChannelCount, container->ChannelCount);
-	
-	for(int c = 0; c < maxChannels; c++)
-	{
-		ISampleBufferPtr targetChannel = m_pTarget->Channels[c];
-		ISampleBufferPtr sourceChannel = container->Channels[c];
+	container->CopyTo(m_pTarget, 0, container->SampleCount, 0);
 
-		int maxSamples = std::min(targetChannel->SampleCount, sourceChannel->SampleCount);
-
-		std::memcpy(targetChannel->SamplePtr, sourceChannel->SamplePtr, maxSamples * sizeof(Sample));
-	}
 	if (HasNext)
 	{
 		m_pNext->Process(container);

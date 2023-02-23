@@ -17,6 +17,7 @@
 #include "OutputInt24ChannelPair.h"
 #include "OutputFloat32ChannelPair.h"
 #include "AudioFoundationException.h"
+#include "HostClock.h"
 
 #include <stdexcept>
 
@@ -70,14 +71,29 @@ ISampleSourcePtr ObjectFactory::CreateFileSource(int sampleCount, int channelCou
 	return new FileSource(filename, CreateSampleContainer(sampleCount, channelCount));
 }
 
-ITakePtr ObjectFactory::CreateTake(ISampleContainerPtr container, Time position, Time length)
+ITakePtr ObjectFactory::CreateTake(ISampleContainerPtr container, AudioTime position, IHostClockPtr hostClock)
+{
+	AudioTime length = AudioTime::FromSeconds(container->SampleCount / hostClock->SampleRate);
+
+	return CreateTake(container, position, length);
+}
+
+ITakePtr ObjectFactory::CreateTake(ISampleContainerPtr container, AudioTime position, AudioTime length)
 {
 	return new Take(NextTakeId(), container, position, length);
 }
 
-ITakeSequencePtr ObjectFactory::CreateTakeSequence()
+IHostClockPtr ObjectFactory::CreateHostClock(int sampleRate)
+{	
+	// If no samplerate is specified, use 48,000. Otherwise check lower limit of 8,000
+	sampleRate = sampleRate == 0 ? 48000 : sampleRate < 8000 ? 8000 : sampleRate;
+
+	return new HostClock(std::max(8000, sampleRate));
+}
+
+ITakeSequencePtr ObjectFactory::CreateTakeSequence(IHostClockPtr hostClock)
 {
-	return new TakeSequence();
+	return new TakeSequence(hostClock);
 }
 
 IInputChannelPtr ObjectFactory::CreateInputChannel(int sampleType, int hwChannelId, void* pHwBufferA, void* pHwBufferB, int sampleCount)

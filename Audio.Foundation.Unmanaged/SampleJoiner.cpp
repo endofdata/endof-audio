@@ -96,26 +96,9 @@ void SampleJoiner::Process(ISampleContainerPtr container)
 
 		if (targetChannelCount > 0)
 		{
-			int targetSampleCount = container->Channels[0]->SampleCount;
-
-			std::for_each(m_vecSources.begin(), m_vecSources.end(), [this, &container, targetChannelCount, targetSampleCount](ISampleContainerPtr item)
+			std::for_each(m_vecSources.begin(), m_vecSources.end(), [this, &container](ISampleContainerPtr item)
 			{
-				int maxChannels = std::min(targetChannelCount, item->ChannelCount);
-
-				for (int c = 0; c < maxChannels; c++)
-				{
-					ISampleBufferPtr channel = item->Channels[c];
-
-					int maxSamples = std::min(targetSampleCount, channel->SampleCount);
-
-					const Sample* pSource = channel->SamplePtr;
-					Sample* pTarget = container->Channels[c]->SamplePtr;
-
-					for (int s = 0; s < maxSamples; s++)
-					{
-						*pTarget++ += *pSource++;
-					}
-				}
+				item->AddTo(container, 0, item->SampleCount, 0);
 			});
 		}
 		m_pNext->Process(container);

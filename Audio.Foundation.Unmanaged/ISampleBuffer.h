@@ -14,10 +14,14 @@ namespace Audio
 		{
 			namespace Abstractions
 			{
+				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("7df79f36-35fb-4449-b72d-5952c1f4fdbc")) ISampleBuffer;
+
+				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ISampleBuffer, __uuidof(ISampleBuffer));
+
 				/// <summary>
 				/// An unmanaged memory buffer for samples in internal <see cref="sample"> format
 				/// </summary>
-				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("7df79f36-35fb-4449-b72d-5952c1f4fdbc")) ISampleBuffer : public IUnknown
+				__interface ISampleBuffer : public IUnknown
 				{
 					void Clear() = 0;
 
@@ -31,7 +35,7 @@ namespace Audio
 					/// </summary>
 					/// <param name="index">Zero-based sample index</param>
 					/// <returns>Sample value</returns>
-					Sample get_Sample(int index) = 0;
+					Sample get_Sample(int index) const = 0;
 
 					/// <summary>
 					/// Sets the sample <paramref name="value"/> at the specified <paramref name="index"/>
@@ -46,10 +50,12 @@ namespace Audio
 
 					_declspec(property(get = get_SampleCount)) int SampleCount; //!< Gets the maximum number of samples in the buffer
 
-					int get_SampleCount() = 0;
-				};
+					int get_SampleCount() const = 0;
 
-				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ISampleBuffer, __uuidof(ISampleBuffer));
+					int AddTo(ISampleBufferPtr other, int sampleOffset, int sampleCount, int targetOffset) const = 0;
+
+					int CopyTo(ISampleBufferPtr other, int sampleOffset, int sampleCount, int targetOffset) const = 0;
+				};
 			}
 		}
 	}

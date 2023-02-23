@@ -15,7 +15,6 @@ namespace Audio
 		namespace Unmanaged
 		{
 			typedef double Sample;
-			typedef long long int Time;
 		}
 	}
 }

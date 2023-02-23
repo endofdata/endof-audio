@@ -62,6 +62,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>D:\Gamer I5\Documents\Projects\Audio\Audio.Foundation.Unmanaged;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -80,6 +81,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>D:\Gamer I5\Documents\Projects\Audio\Audio.Foundation.Unmanaged;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -96,6 +98,8 @@
     <ClInclude Include="FileReader.h" />
     <ClInclude Include="FileSource.h" />
     <ClInclude Include="FileWriter.h" />
+    <ClInclude Include="HostClock.h" />
+    <ClInclude Include="IHostClock.h" />
     <ClInclude Include="IInputChannel.h" />
     <ClInclude Include="IMeterChannel.h" />
     <ClInclude Include="InputFloat32Channel.h" />
@@ -118,7 +122,9 @@
     <ClInclude Include="OutputInt32ChannelPair.h" />
     <ClInclude Include="OutputOfTSampleChannelPair.h" />
     <ClInclude Include="SampleBuffer.h" />
+    <ClInclude Include="SampleBufferSpan.h" />
     <ClInclude Include="SampleContainer.h" />
+    <ClInclude Include="SampleContainerSpan.h" />
     <ClInclude Include="SampleConversionUnmanaged.h" />
     <ClInclude Include="SampleJoiner.h" />
     <ClInclude Include="SampleSharer.h" />
@@ -129,18 +135,23 @@
     <ClInclude Include="StreamWriter.h" />
     <ClInclude Include="Take.h" />
     <ClInclude Include="TakeSequence.h" />
+    <ClInclude Include="AudioTime.h" />
     <ClInclude Include="UnknownBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioFoundationException.cpp" />
+    <ClCompile Include="AudioTime.cpp" />
     <ClCompile Include="ContainerWriter.cpp" />
     <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="FileSource.cpp" />
     <ClCompile Include="FileWriter.cpp" />
+    <ClCompile Include="HostClock.cpp" />
     <ClCompile Include="MeterChannel.cpp" />
     <ClCompile Include="ObjectFactory.cpp" />
     <ClCompile Include="SampleBuffer.cpp" />
+    <ClCompile Include="SampleBufferSpan.cpp" />
     <ClCompile Include="SampleContainer.cpp" />
+    <ClCompile Include="SampleContainerSpan.cpp" />
     <ClCompile Include="SampleJoiner.cpp" />
     <ClCompile Include="SampleSharer.cpp" />
     <ClCompile Include="dllmain.cpp" />

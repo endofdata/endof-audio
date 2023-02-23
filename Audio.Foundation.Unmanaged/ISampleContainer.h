@@ -14,12 +14,16 @@ namespace Audio
 		{
 			namespace Abstractions
 			{
-				/// <summary>
+				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("4d5806ba-6683-48e6-93bb-2e6025e00226")) ISampleContainer;
+
+				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ISampleContainer, __uuidof(ISampleContainer));
+
+					/// <summary>
 				/// Exposes two channels of samples as unmanaged <see cref="ISampleBuffer"/> instances
 				/// </summary>
-				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("4d5806ba-6683-48e6-93bb-2e6025e00226")) ISampleContainer : public IUnknown
+				__interface ISampleContainer : public IUnknown
 				{
-					virtual int get_SampleCount() = 0;
+					virtual int get_SampleCount() const = 0;
 					virtual void put_SampleCount(int sampleCount) = 0;
 
 					/// <summary>
@@ -27,7 +31,7 @@ namespace Audio
 					/// </summary>
 					_declspec(property(get = get_SampleCount, put = put_SampleCount)) int SampleCount;
 
-					virtual int get_ChannelCount() = 0;
+					virtual int get_ChannelCount() const = 0;
 					virtual void put_ChannelCount(int channelCount) = 0;
 
 					/// <summary>
@@ -42,9 +46,14 @@ namespace Audio
 					/// Gets the sample buffers for the allocated channels
 					/// </summary>
 					_declspec(property(get = get_Channel)) ISampleBufferPtr Channels[];
+
+					virtual int AddTo(ISampleContainerPtr other, int sampleOffset, int sampleCount, int targetOffset) const = 0;
+
+					virtual int CopyTo(ISampleContainerPtr other, int sampleOffset, int sampleCount, int targetOffset) const = 0;
+
+					virtual ISampleContainerPtr Span(int fromSample, int toSample) = 0;
 				};
 
-				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ISampleContainer, __uuidof(ISampleContainer));
 			}
 		}
 	}

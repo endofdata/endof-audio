@@ -5,6 +5,7 @@
 #include <ISampleContainer.h>
 #include <ITake.h>
 #include <UnknownBase.h>
+#include <AudioTime.h>
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
@@ -17,18 +18,28 @@ namespace Audio
 			class Take : public ITake
 			{
 			public:
-				Take(int id, ISampleContainerPtr container, Time position, Time length);
+				Take(int id, ISampleContainerPtr container, AudioTime position, AudioTime length);
 				virtual ~Take();
 
-				virtual int get_Id();
+				virtual int get_Id() const;
 
-				virtual Time get_Position();
-				virtual void put_Position(Time value);
+				virtual AudioTime get_Position() const;
+				virtual void put_Position(AudioTime value);
 
-				virtual Time get_Length();
-				virtual void put_Length(Time value);
+				virtual AudioTime get_Length() const;
+				virtual void put_Length(AudioTime value);
+
+				virtual AudioTime get_EndPosition() const;
 
 				virtual ISampleContainerPtr get_Container();
+
+				virtual bool HasDataAt(AudioTime position) const;
+
+				bool SeekTo(AudioTime offset, AudioSeek kind);
+
+				int AddTo(ISampleContainerPtr target, int sampleOffset, int sampleCount, int targetOffset) const;
+
+				int ReadSamplesTo(ISampleContainerPtr target);
 
 				DECLARE_IUNKNOWN
 
@@ -37,9 +48,10 @@ namespace Audio
 
 			private:
 				int m_id;
-				ISampleContainerPtr m_container;
-				Time m_position;
-				Time m_length;
+				ISampleContainerPtr m_pContainer;
+				AudioTime m_position;
+				AudioTime m_length;
+				AudioTime m_readOffset;
 			};
 			
 		}
