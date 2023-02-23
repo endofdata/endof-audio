@@ -67,6 +67,7 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -85,6 +86,7 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -96,6 +98,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="HelperMethods.cpp" />
+    <ClCompile Include="IteratorTests.cpp" />
     <ClCompile Include="MeterChannelTests.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -109,6 +112,7 @@
     <ClInclude Include="Constants.h" />
     <ClInclude Include="HelperMethods.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="ToStringImpl.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Audio.Foundation.Unmanaged\Audio.Foundation.Unmanaged.vcxproj">
