@@ -176,7 +176,7 @@ void TakeSequence::Process(ISampleContainerPtr container)
 	}
 	if (hasTake)
 	{
-		int done = (*m_playPosition)->ReadSamplesTo(container);
+		int done = (*m_playPosition)->ReadSamplesTo(container, 0, container->ChannelCount, 0);
 
 		if (!done)
 		{

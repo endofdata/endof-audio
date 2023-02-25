@@ -51,7 +51,7 @@ bool ContainerWriter::get_HasNext()
 
 void ContainerWriter::Process(ISampleContainerPtr container)
 {
-	container->CopyTo(m_pTarget, 0, container->SampleCount, 0);
+	container->CopyTo(m_pTarget, 0, container->SampleCount, 0, container->ChannelCount, 0, 0);
 
 	if (HasNext)
 	{

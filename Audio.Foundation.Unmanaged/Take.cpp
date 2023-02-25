@@ -104,14 +104,14 @@ bool Take::SeekTo(AudioTime offset, AudioSeek kind)
 	return false;
 }
 
-int Take::AddTo(ISampleContainerPtr target, int sampleOffset, int sampleCount, int targetOffset) const
+int Take::AddTo(ISampleContainerPtr target, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const
 {
-	return m_pContainer->AddTo(target, sampleOffset, sampleCount, targetOffset);
+	return m_pContainer->AddTo(target, sampleOffset, sampleCount, channelOffset, channelCount, targetSampleOffset, targetChannelOffset);
 }
 
-int Take::ReadSamplesTo(ISampleContainerPtr target)
+int Take::ReadSamplesTo(ISampleContainerPtr target, int channelOffset, int channelCount, int targetChannelOffset)
 {
-	int done = AddTo(target, m_readOffset, target->SampleCount, 0);
+	int done = AddTo(target, m_readOffset, target->SampleCount, channelOffset, channelCount, 0, targetChannelOffset);
 
 	m_readOffset += done;
 

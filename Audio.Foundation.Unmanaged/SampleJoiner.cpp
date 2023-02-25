@@ -98,7 +98,7 @@ void SampleJoiner::Process(ISampleContainerPtr container)
 		{
 			std::for_each(m_vecSources.begin(), m_vecSources.end(), [this, &container](ISampleContainerPtr item)
 			{
-				item->AddTo(container, 0, item->SampleCount, 0);
+				item->AddTo(container, 0, item->SampleCount, 0, item->ChannelCount, 0, 0);
 			});
 		}
 		m_pNext->Process(container);

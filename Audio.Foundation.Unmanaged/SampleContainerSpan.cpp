@@ -76,33 +76,33 @@ ISampleBufferPtr SampleContainerSpan::get_Channel(int index)
 	return m_vecChannels.at(index);
 }
 
-int SampleContainerSpan::AddTo(ISampleContainerPtr other, int sampleOffset, int sampleCount, int targetOffset) const
+int SampleContainerSpan::AddTo(ISampleContainerPtr other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const
 {
-	int maxChannels = std::min(other->ChannelCount, ChannelCount);
+	int maxChannels = std::min(channelCount, std::min(other->ChannelCount - targetChannelOffset, ChannelCount - channelOffset));
 	int done = 0;
 
 	for (int c = 0; c < maxChannels; c++)
 	{
-		done = m_vecChannels[c]->AddTo(other->Channels[c], sampleOffset, sampleCount, targetOffset);
+		done = m_vecChannels[c + channelOffset]->AddTo(other->Channels[c + targetChannelOffset], sampleOffset, sampleCount, targetSampleOffset);
 	}
 	return done;
 }
 
-int SampleContainerSpan::CopyTo(ISampleContainerPtr other, int sampleOffset, int sampleCount, int targetOffset) const
+int SampleContainerSpan::CopyTo(ISampleContainerPtr other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const
 {
-	int maxChannels = std::min(other->ChannelCount, ChannelCount);
+	int maxChannels = std::min(channelCount, std::min(other->ChannelCount - targetChannelOffset, ChannelCount - channelOffset));
 	int done = 0;
 
 	for (int c = 0; c < maxChannels; c++)
 	{
-		done = m_vecChannels[c]->CopyTo(other->Channels[c], sampleOffset, sampleCount, targetOffset);
+		done = m_vecChannels[c + channelOffset]->CopyTo(other->Channels[c + targetChannelOffset], sampleOffset, sampleCount, targetSampleOffset);
 	}
 	return done;
 }
 
-ISampleContainerPtr SampleContainerSpan::Span(int sampleOffset, int sampleCount)
+ISampleContainerPtr SampleContainerSpan::Span(int sampleOffset, int sampleCount, int channelOffset, int channelCount)
 {
-	int maxChannels = ChannelCount;
+	int maxChannels = std::min(channelCount, ChannelCount - channelOffset);
 	int offset = std::min(SampleCount, sampleOffset);
 	int count = std::min(SampleCount - offset, sampleCount);
 
@@ -111,7 +111,7 @@ ISampleContainerPtr SampleContainerSpan::Span(int sampleOffset, int sampleCount)
 
 	for (int c = 0; c < maxChannels; c++)
 	{
-		buffers[c] = new SampleBufferSpan(&Channels[c++]->SamplePtr[offset], count);
+		buffers[c] = new SampleBufferSpan(&Channels[channelOffset + c]->SamplePtr[offset], count);
 	}
 
 	return new SampleContainerSpan(buffers);

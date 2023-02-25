@@ -70,9 +70,9 @@ namespace Audio
 
 					bool SeekTo(AudioTime offset, AudioSeek kind) = 0;
 
-					int AddTo(ISampleContainerPtr target, int sampleOffset, int sampleCount, int targetOffset) const = 0;
+					int AddTo(ISampleContainerPtr target, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const = 0;
 
-					int ReadSamplesTo(ISampleContainerPtr target) = 0;
+					int ReadSamplesTo(ISampleContainerPtr target, int channelOffset, int channelCount, int targetChannelOffset) = 0;
 				};
 			}
 		}
