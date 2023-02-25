@@ -4,6 +4,7 @@
 #include "HelperMethods.h"
 #include "Constants.h"
 #include <ISampleBuffer.h>
+#include <ISampleSharer.h>
 #include <IInputChannel.h>
 #include <IOutputChannelPair.h>
 #include <ObjectFactory.h>
@@ -30,8 +31,9 @@ namespace Test
 
 					TEST_METHOD(BasicInitialization)
 					{
+						ISampleContainerPtr pTargetContainer = ObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
 						IHostClockPtr pHostClock = ObjectFactory::CreateHostClock();
-						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pHostClock);
+						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pHostClock, pTargetContainer);
 
 						Assert::AreEqual(0, pTakeSequence->get_TakeCount(), L"New takeSequence has no takes");
 						int sampleRate = Constants::SampleRate;
@@ -107,29 +109,32 @@ namespace Test
 
 					TEST_METHOD(ProcessingChainWithSequence)
 					{
+						// Create hardware buffers, input channel, output channel pair
 						HardwareBuffers hwBuffers(Constants::SampleCount);
-
 						IInputChannelPtr pInput = hwBuffers.CreateInputChannel(0);
+						IOutputChannelPairPtr pOutputPair = hwBuffers.CreateOutputChannelPair(0, 1);
 
+						// Get sample source for input
 						ISampleSourcePtr pInputSource = nullptr;
 						pInput->QueryInterface<ISampleSource>(&pInputSource);
 						Assert::IsNotNull(pInputSource.GetInterfacePtr(), L"Can access ISampleSource from IInputChannel");
 
-						IOutputChannelPairPtr pOutputPair = hwBuffers.CreateOutputChannelPair(0, 1);
-
-						ISampleProcessorPtr pOutputPairProcessor = nullptr;
-						pOutputPair->QueryInterface<ISampleProcessor>(&pOutputPairProcessor);
-						Assert::IsNotNull(pOutputPairProcessor.GetInterfacePtr(), L"Can access ISampleProcessor from IOutputChannelPair");
-
+						// Create take sequence with target container for sample mix
+						ISampleContainerPtr pTargetContainer = ObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
 						IHostClockPtr pHostClock = ObjectFactory::CreateHostClock();
-						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pHostClock);
+						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pHostClock, pTargetContainer);
 						Assert::IsNotNull(pTakeSequence.GetInterfacePtr(), L"Can create take sequence");
 
+						// Take sequence processes output of input channel
 						ISampleProcessorPtr pTakeSequenceProcessor = nullptr;
 						pTakeSequence->QueryInterface<ISampleProcessor>(&pTakeSequenceProcessor);
 						Assert::IsNotNull(pTakeSequenceProcessor.GetInterfacePtr(), L"Can access ISampleProcessor from ITakeSequence");
-
 						pInputSource->First = pTakeSequenceProcessor;
+
+						// Output channel pair processes output of take sequence
+						ISampleProcessorPtr pOutputPairProcessor = nullptr;
+						pOutputPair->QueryInterface<ISampleProcessor>(&pOutputPairProcessor);
+						Assert::IsNotNull(pOutputPairProcessor.GetInterfacePtr(), L"Can access ISampleProcessor from IOutputChannelPair");
 						pTakeSequenceProcessor->Next = pOutputPairProcessor;
 
 						int sampleRate = Constants::SampleRate;
@@ -157,7 +162,7 @@ namespace Test
 						pOutputPair->OnNextBuffer(writeSecondHalf);
 						pInputSource->OnNextBuffer(readSecondHalf);
 
-						hwBuffers.AssertBufferTransfers(writeSecondHalf);
+						hwBuffers.AssertBufferTransfers(writeSecondHalf, pContainer);
 
 						hwBuffers.ResetBuffers();
 
@@ -167,7 +172,7 @@ namespace Test
 						pOutputPair->OnNextBuffer(writeSecondHalf);
 						pInputSource->OnNextBuffer(readSecondHalf);
 
-						hwBuffers.AssertBufferTransfers(writeSecondHalf);
+						hwBuffers.AssertBufferTransfers(writeSecondHalf, pContainer);
 					}
 
 				private:
@@ -230,15 +235,23 @@ namespace Test
 							return pOutputPair;
 						}
 
-						void AssertBufferTransfers(bool writeSecondHalf)
+						void AssertBufferTransfers(bool writeSecondHalf, const ISampleContainerPtr& pMixedIn = nullptr)
 						{
 							int ioTolerance = 2;
+							const Sample* pMixedInLeft = nullptr;
+							const Sample* pMixedInRight = nullptr;
 
-							if (writeSecondHalf)
+							if (pMixedIn != nullptr)
 							{
+								pMixedInLeft = pMixedIn->Channels[0]->SamplePtr;
+								pMixedInRight = pMixedIn->Channels[1]->SamplePtr;
+							}
+							
+							if (writeSecondHalf)
+							{								
 								// Input buffer A copied to output buffers B1 and B2
-								AssertBufferEquals(_inBufferA, _outBufferB1, ioTolerance);
-								AssertBufferEquals(_inBufferA, _outBufferB2, ioTolerance);
+								AssertBufferEquals(_inBufferA, _outBufferB1, ioTolerance, pMixedInLeft);
+								AssertBufferEquals(_inBufferA, _outBufferB2, ioTolerance, pMixedInRight);
 								// Output buffers A1 and A2 are not modified
 								AssertBufferValue(_outBufferA1, 0.04);
 								AssertBufferValue(_outBufferA2, 0.16);
@@ -246,8 +259,8 @@ namespace Test
 							else
 							{
 								// Input buffer B copied to output buffers A1 and A2
-								AssertBufferEquals(_inBufferB, _outBufferA1, ioTolerance);
-								AssertBufferEquals(_inBufferB, _outBufferA2, ioTolerance);
+								AssertBufferEquals(_inBufferB, _outBufferA1, ioTolerance, pMixedInLeft);
+								AssertBufferEquals(_inBufferB, _outBufferA2, ioTolerance, pMixedInRight);
 								// Output buffers B1 and B2 are not modified
 								AssertBufferValue(_outBufferB1, 0.08);
 								AssertBufferValue(_outBufferB2, 0.32);
@@ -258,7 +271,7 @@ namespace Test
 							AssertBufferValue(_inBufferB, 0.02);
 						}
 
-						void AssertBufferEquals(const std::unique_ptr<int>& bufferX, const std::unique_ptr<int>& bufferY, int tolerance = 0)
+						void AssertBufferEquals(const std::unique_ptr<int>& bufferX, const std::unique_ptr<int>& bufferY, int tolerance = 0, const Sample* pOffset = nullptr)
 						{
 							int* pX = bufferX.get();
 							int* pY = bufferY.get();
@@ -268,6 +281,10 @@ namespace Test
 								int sampleX = *pX++;
 								int sampleY = *pY++;
 
+								if (pOffset != nullptr)
+								{
+									sampleY -= SampleConversion::SampleToInt32(*pOffset++);
+								}
 								Assert::IsTrue(std::abs(sampleX - sampleY) < tolerance, L"Sample difference between input and output is in accepted range");
 							}
 						}
