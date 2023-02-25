@@ -91,9 +91,9 @@ IHostClockPtr ObjectFactory::CreateHostClock(int sampleRate)
 	return new HostClock(std::max(8000, sampleRate));
 }
 
-ITakeSequencePtr ObjectFactory::CreateTakeSequence(IHostClockPtr hostClock)
+ITakeSequencePtr ObjectFactory::CreateTakeSequence(IHostClockPtr hostClock, ISampleContainerPtr targetContainer)
 {
-	return new TakeSequence(hostClock);
+	return new TakeSequence(hostClock, targetContainer);
 }
 
 IInputChannelPtr ObjectFactory::CreateInputChannel(int sampleType, int hwChannelId, void* pHwBufferA, void* pHwBufferB, int sampleCount)

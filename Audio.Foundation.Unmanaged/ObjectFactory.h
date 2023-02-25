@@ -51,7 +51,7 @@ namespace Audio
 
 				static IHostClockPtr CreateHostClock(int sampleRate = 0);
 
-				static ITakeSequencePtr CreateTakeSequence(IHostClockPtr hostClock);
+				static ITakeSequencePtr CreateTakeSequence(IHostClockPtr hostClock, ISampleContainerPtr targetContainer);
 
 				static IInputChannelPtr CreateInputChannel(int sampleType, int hwChannelId, void* pHwBufferA, void* pHwBufferB, int sampleCount);
 

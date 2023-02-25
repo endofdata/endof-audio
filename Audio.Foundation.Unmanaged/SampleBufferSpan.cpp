@@ -103,5 +103,5 @@ int SampleBufferSpan::CopyTo(ISampleBufferPtr other, int sampleOffset, int sampl
 
 int SampleBufferSpan::GetEffectiveCount(int requestedOffset, int requestedCount, int maxCount) const
 {
-	return std::max(0, std::min(requestedCount - requestedOffset, maxCount));
+	return std::max(0, std::min(requestedCount, maxCount - requestedOffset));
 }

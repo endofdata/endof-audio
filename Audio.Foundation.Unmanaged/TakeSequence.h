@@ -20,7 +20,7 @@ namespace Audio
 			class TakeSequence : public ITakeSequence, public ISampleProcessor
 			{
 			public:
-				TakeSequence(IHostClockPtr hostClock);
+				TakeSequence(IHostClockPtr hostClock, ISampleContainerPtr targetContainer);
 				virtual ~TakeSequence();
 
 				virtual int get_TakeCount();
@@ -59,6 +59,7 @@ namespace Audio
 				AudioTime m_scheduledTime;
 
 				ISampleProcessorPtr m_pNext;
+				ISampleContainerPtr m_pTargetContainer;
 			};
 		}
 	}
