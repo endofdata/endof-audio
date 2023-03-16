@@ -26,6 +26,23 @@ SampleContainerSpan::SampleContainerSpan(std::vector<ISampleBufferPtr> vecChanne
 	}
 }
 
+SampleContainerSpan::SampleContainerSpan(ISampleContainerPtr source) :
+	m_source(source),
+	m_sampleCount(0),
+	m_refCount(0)
+{
+	if (source != nullptr)
+	{
+		int channelCount = source->ChannelCount;
+
+		for (int c = 0; c < channelCount; c++)
+		{
+			m_vecChannels.push_back(m_source->Channels[c]);
+		}
+		m_sampleCount = m_source->SampleCount;
+	}
+}
+
 SampleContainerSpan::~SampleContainerSpan()
 {
 }

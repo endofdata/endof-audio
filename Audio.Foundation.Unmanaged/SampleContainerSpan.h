@@ -18,6 +18,7 @@ namespace Audio
 			{
 			public:
 				SampleContainerSpan(std::vector<ISampleBufferPtr> vecChannels, int sampleCount = 0);
+				SampleContainerSpan(ISampleContainerPtr source);
 				virtual ~SampleContainerSpan();
 
 				virtual int get_SampleCount() const;
@@ -41,9 +42,9 @@ namespace Audio
 
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
+				ISampleContainerPtr m_source;
 				std::vector<ISampleBufferPtr> m_vecChannels;
 				int m_sampleCount;
-				bool m_isActive;
 			};
 		}
 	}
