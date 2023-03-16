@@ -137,11 +137,13 @@
     <ClInclude Include="TakeSequence.h" />
     <ClInclude Include="AudioTime.h" />
     <ClInclude Include="UnknownBase.h" />
+    <ClInclude Include="ContainerReader.h" />
     <ClInclude Include="VectorWriter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioFoundationException.cpp" />
     <ClCompile Include="AudioTime.cpp" />
+    <ClCompile Include="ContainerReader.cpp" />
     <ClCompile Include="ContainerWriter.cpp" />
     <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="FileSource.cpp" />

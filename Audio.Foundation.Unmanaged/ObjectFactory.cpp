@@ -6,6 +6,7 @@
 #include "SampleJoiner.h"
 #include "SampleSharer.h"
 #include "FileWriter.h"
+#include "ContainerReader.h"
 #include "ContainerWriter.h"
 #include "VectorWriter.h"
 #include "FileSource.h"
@@ -75,6 +76,11 @@ ISampleProcessorPtr ObjectFactory::CreateToContainerProcessor(int channelCount, 
 ISampleSourcePtr ObjectFactory::CreateFileSource(int sampleCount, int channelCount, const std::string& filename)
 {
 	return new FileSource(filename, CreateSampleContainer(sampleCount, channelCount));
+}
+
+ISampleSourcePtr ObjectFactory::CreateContainerSource(ISampleContainerPtr source, int sampleCount)
+{
+	return new ContainerReader(source, sampleCount);
 }
 
 ITakePtr ObjectFactory::CreateTake(ISampleContainerPtr container, AudioTime position, IHostClockPtr hostClock)

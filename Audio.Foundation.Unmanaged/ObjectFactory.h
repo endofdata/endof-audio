@@ -47,6 +47,8 @@ namespace Audio
 
 				static ISampleSourcePtr CreateFileSource(int sampleCount, int channelCount, const std::string& filename);
 
+				static ISampleSourcePtr CreateContainerSource(ISampleContainerPtr source, int sampleCount);
+
 				static ITakePtr CreateTake(ISampleContainerPtr container, AudioTime position, IHostClockPtr hostClock);
 
 				static ITakePtr CreateTake(ISampleContainerPtr container, AudioTime position, AudioTime length);
