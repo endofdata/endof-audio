@@ -62,24 +62,26 @@ bool VectorWriter::get_HasNext()
 
 void VectorWriter::Process(ISampleContainerPtr container)
 {
+	int samples = container->SampleCount;
+	int maxSourceChannels = container->ChannelCount;
+	int channel = 0;
+
+	std::for_each(m_buffers.begin(), m_buffers.end(), [this, &channel, maxSourceChannels, samples, container](std::vector<Sample>& buffer)
+	{
+		const Sample* pSrc = container->Channels[channel]->SamplePtr;
+		channel = (channel + 1) % maxSourceChannels;
+
+		if (buffer.size() < m_inUse + samples)
+		{
+			buffer.reserve((div(m_inUse + samples, m_growth).quot + 1) * m_growth);
+		}
+		std::memcpy(&buffer.data()[m_inUse], pSrc, samples * sizeof(Sample));
+	});
+	m_inUse += samples;
+
 	if (HasNext)
 	{
-		int samples = container->SampleCount;
-		int maxSourceChannels = container->ChannelCount;
-		int channel = 0;
-
-		std::for_each(m_buffers.begin(), m_buffers.end(), [this, &channel, maxSourceChannels, samples, container](std::vector<Sample>& buffer)
-		{
-			const Sample* pSrc = container->Channels[channel]->SamplePtr;
-			channel = (channel + 1) % maxSourceChannels;
-
-			if (buffer.size() < m_inUse + samples)
-			{
-				buffer.reserve((div(m_inUse + samples, m_growth).quot + 1) * m_growth);
-			}
-			std::memcpy(&buffer.data()[m_inUse], pSrc, samples * sizeof(Sample));
-		});
-		m_inUse += samples;
+		m_pNext->Process(container);
 	}
 }
 
