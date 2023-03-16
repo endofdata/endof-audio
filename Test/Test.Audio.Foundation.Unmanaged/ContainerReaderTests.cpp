@@ -20,7 +20,7 @@ namespace Test
 				{
 				public:
 
-					TEST_METHOD(BasicInitialization)
+					TEST_METHOD(InMemoryTransfer)
 					{
 						ISampleContainerPtr pBufferContainer = HelperMethods::CreateTestContainer(Constants::SampleCount, Constants::ChannelCount);
 						ISampleProcessorPtr pWriter = ObjectFactory::CreateToContainerProcessor(Constants::ChannelCount, Constants::SampleCount * 10, Constants::SampleCount * 2);
@@ -52,6 +52,7 @@ namespace Test
 						pOutputWriter->QueryInterface<ISampleContainer>(&pResult);
 						Assert::IsNotNull(pResult.GetInterfacePtr(), L"Can access output data container from vector writer.");
 					}
+
 				};
 			}
 		}
