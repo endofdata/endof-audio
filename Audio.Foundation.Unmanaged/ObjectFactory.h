@@ -43,6 +43,8 @@ namespace Audio
 
 				static ISampleProcessorPtr CreateToContainerProcessor(ISampleContainerPtr target);
 
+				static ISampleProcessorPtr CreateToContainerProcessor(int channelCount, int initialSize, int growth);
+
 				static ISampleSourcePtr CreateFileSource(int sampleCount, int channelCount, const std::string& filename);
 
 				static ITakePtr CreateTake(ISampleContainerPtr container, AudioTime position, IHostClockPtr hostClock);

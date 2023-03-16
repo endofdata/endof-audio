@@ -137,6 +137,7 @@
     <ClInclude Include="TakeSequence.h" />
     <ClInclude Include="AudioTime.h" />
     <ClInclude Include="UnknownBase.h" />
+    <ClInclude Include="VectorWriter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioFoundationException.cpp" />
@@ -163,6 +164,7 @@
     <ClCompile Include="StreamWriter.cpp" />
     <ClCompile Include="Take.cpp" />
     <ClCompile Include="TakeSequence.cpp" />
+    <ClCompile Include="VectorWriter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

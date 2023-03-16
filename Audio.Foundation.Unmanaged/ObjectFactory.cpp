@@ -7,6 +7,7 @@
 #include "SampleSharer.h"
 #include "FileWriter.h"
 #include "ContainerWriter.h"
+#include "VectorWriter.h"
 #include "FileSource.h"
 #include "Take.h"
 #include "TakeSequence.h"
@@ -64,6 +65,11 @@ ISampleProcessorPtr ObjectFactory::CreateToStreamProcessor(std::ostream& output)
 ISampleProcessorPtr ObjectFactory::CreateToContainerProcessor(ISampleContainerPtr target)
 {
 	return new ContainerWriter(target);
+}
+
+ISampleProcessorPtr ObjectFactory::CreateToContainerProcessor(int channelCount, int initialSize, int growth)
+{
+	return new VectorWriter(channelCount, initialSize, growth);
 }
 
 ISampleSourcePtr ObjectFactory::CreateFileSource(int sampleCount, int channelCount, const std::string& filename)
