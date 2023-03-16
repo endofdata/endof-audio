@@ -175,6 +175,57 @@ namespace Test
 						hwBuffers.AssertBufferTransfers(writeSecondHalf, pContainer);
 					}
 
+
+					TEST_METHOD(ProcessingChainWithVectorWriter)
+					{
+						HardwareBuffers hwBuffers(Constants::SampleCount);
+
+						IInputChannelPtr pInput = hwBuffers.CreateInputChannel(0);
+
+						// Get sample source of input
+						ISampleSourcePtr pInputSource = nullptr;
+						pInput->QueryInterface<ISampleSource>(&pInputSource);
+						Assert::IsNotNull(pInputSource.GetInterfacePtr(), L"Can access ISampleSource from IInputChannel");
+
+						// Create VectorWriter and attach it to input sample source
+						int initialSize = Constants::SampleRate * 5;	// buffer for five seconds
+						int growth = Constants::SampleRate * 2;			// grow for two seconds
+						ISampleProcessorPtr pVectorWriter = ObjectFactory::CreateToContainerProcessor(2, initialSize, growth);
+						pInputSource->First = pVectorWriter;
+
+						
+						IOutputChannelPairPtr pOutputPair = hwBuffers.CreateOutputChannelPair(0, 1);
+
+						// Get sample processor of output pair and attach it to vector writer output
+						ISampleProcessorPtr pOutputPairProcessor = nullptr;
+						pOutputPair->QueryInterface<ISampleProcessor>(&pOutputPairProcessor);
+						Assert::IsNotNull(pOutputPairProcessor.GetInterfacePtr(), L"Can access ISampleProcessor from IOutputChannelPair");
+
+						pVectorWriter->Next = pOutputPairProcessor;
+
+						bool readSecondHalf = false;
+						bool writeSecondHalf = !readSecondHalf;
+
+						pInput->IsActive = true;
+
+						int loopsRequiredForTenSeconds = (Constants::SampleRate * 10 / Constants::SampleCount) + 1;
+						for (int loop = 0; loop < loopsRequiredForTenSeconds; loop++)
+						{
+							pOutputPair->OnNextBuffer(writeSecondHalf);
+							pInputSource->OnNextBuffer(readSecondHalf);
+							readSecondHalf = !readSecondHalf;
+							writeSecondHalf = !writeSecondHalf;
+						}
+
+						// Get sample container with output from vector writer
+						ISampleContainerPtr pOutputContainer = nullptr;
+						pVectorWriter->QueryInterface<ISampleContainer>(&pOutputContainer);
+						Assert::IsNotNull(pOutputContainer.GetInterfacePtr(), L"Can access ISampleContainer from ISampleProcessor (vector writer)");
+
+						Assert::AreEqual(2, pOutputContainer->ChannelCount, L"Has two channels of output data");
+						Assert::AreEqual(loopsRequiredForTenSeconds * Constants::SampleCount, pOutputContainer->SampleCount, L"Has expected size of output data");
+					}
+
 				private:
 					void InitSampleBuffers(ISampleContainerPtr pContainer, Sample valueChn0, Sample valueChn1)
 					{
