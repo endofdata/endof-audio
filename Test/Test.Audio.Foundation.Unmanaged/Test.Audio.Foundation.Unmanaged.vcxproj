@@ -97,6 +97,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ContainerReaderTests.cpp" />
     <ClCompile Include="HelperMethods.cpp" />
     <ClCompile Include="IteratorTests.cpp" />
     <ClCompile Include="MeterChannelTests.cpp" />
