@@ -15,6 +15,7 @@ SampleContainer::~SampleContainer()
 {
 }
 
+
 void SampleContainer::CreateChannels(int sampleCount, int channelCount)
 {
 	int currentSamples = get_SampleCount();

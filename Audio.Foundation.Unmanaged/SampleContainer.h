@@ -20,8 +20,8 @@ namespace Audio
 				SampleContainer(int sampleCount, int channelCount);
 				virtual ~SampleContainer();
 
-			private:
-				void CreateChannels(int sampleCount, int channelCount);
+			protected:
+				void CreateChannels(int sampleCount, int channelCount) override;
 			};
 		}
 	}

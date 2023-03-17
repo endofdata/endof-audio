@@ -17,8 +17,8 @@ namespace Audio
 			class SampleContainerSpan : public ISampleContainer
 			{
 			public:
-				SampleContainerSpan(std::vector<ISampleBufferPtr> vecChannels, int sampleCount = 0);
-				SampleContainerSpan(ISampleContainerPtr source);
+				SampleContainerSpan(const std::vector<ISampleBufferPtr>& vecChannels, int sampleCount = 0);
+				SampleContainerSpan(ISampleContainerPtr& source);
 				virtual ~SampleContainerSpan();
 
 				virtual int get_SampleCount() const;
@@ -29,9 +29,9 @@ namespace Audio
 
 				virtual ISampleBufferPtr get_Channel(int index);
 
-				virtual int AddTo(ISampleContainerPtr other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const;
+				virtual int AddTo(ISampleContainerPtr& other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const;
 
-				virtual int CopyTo(ISampleContainerPtr other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const;
+				virtual int CopyTo(ISampleContainerPtr& other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const;
 
 				virtual ISampleContainerPtr Span(int sampleOffset, int sampleCount, int channelOffset, int channelCount);
 
@@ -41,6 +41,8 @@ namespace Audio
 				SampleContainerSpan();
 
 				virtual bool GetInterface(REFIID riid, void** pResult);
+
+				virtual void CreateChannels(int sampleCount, int channelCount);
 
 				ISampleContainerPtr m_source;
 				std::vector<ISampleBufferPtr> m_vecChannels;

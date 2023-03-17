@@ -15,7 +15,7 @@ SampleContainerSpan::SampleContainerSpan() :
 {
 }
 
-SampleContainerSpan::SampleContainerSpan(std::vector<ISampleBufferPtr> vecChannels, int sampleCount) :
+SampleContainerSpan::SampleContainerSpan(const std::vector<ISampleBufferPtr>& vecChannels, int sampleCount) :
 	m_sampleCount(sampleCount),
 	m_refCount(0)
 {
@@ -26,7 +26,7 @@ SampleContainerSpan::SampleContainerSpan(std::vector<ISampleBufferPtr> vecChanne
 	}
 }
 
-SampleContainerSpan::SampleContainerSpan(ISampleContainerPtr source) :
+SampleContainerSpan::SampleContainerSpan(ISampleContainerPtr& source) :
 	m_source(source),
 	m_sampleCount(0),
 	m_refCount(0)
@@ -71,7 +71,7 @@ int SampleContainerSpan::get_SampleCount() const
 
 void SampleContainerSpan::put_SampleCount(int sampleCount)
 {
-	throw std::runtime_error("SampleContainerSpan cannot change sample count");
+	CreateChannels(sampleCount, get_ChannelCount());
 }
 
 int SampleContainerSpan::get_ChannelCount() const
@@ -81,7 +81,7 @@ int SampleContainerSpan::get_ChannelCount() const
 
 void SampleContainerSpan::put_ChannelCount(int channelCount)
 {
-	throw std::runtime_error("SampleContainerSpan cannot change channel count");
+	CreateChannels(get_SampleCount(), channelCount);
 }
 
 ISampleBufferPtr SampleContainerSpan::get_Channel(int index)
@@ -93,26 +93,28 @@ ISampleBufferPtr SampleContainerSpan::get_Channel(int index)
 	return m_vecChannels.at(index);
 }
 
-int SampleContainerSpan::AddTo(ISampleContainerPtr other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const
+int SampleContainerSpan::AddTo(ISampleContainerPtr& other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const
 {
 	int maxChannels = std::min(channelCount, std::min(other->ChannelCount - targetChannelOffset, ChannelCount - channelOffset));
 	int done = 0;
 
 	for (int c = 0; c < maxChannels; c++)
 	{
-		done = m_vecChannels[c + channelOffset]->AddTo(other->Channels[c + targetChannelOffset], sampleOffset, sampleCount, targetSampleOffset);
+		ISampleBufferPtr pChannel = other->Channels[c + targetChannelOffset];
+		done = m_vecChannels[c + channelOffset]->AddTo(pChannel, sampleOffset, sampleCount, targetSampleOffset);
 	}
 	return done;
 }
 
-int SampleContainerSpan::CopyTo(ISampleContainerPtr other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const
+int SampleContainerSpan::CopyTo(ISampleContainerPtr& other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const
 {
 	int maxChannels = std::min(channelCount, std::min(other->ChannelCount - targetChannelOffset, ChannelCount - channelOffset));
 	int done = 0;
 
 	for (int c = 0; c < maxChannels; c++)
 	{
-		done = m_vecChannels[c + channelOffset]->CopyTo(other->Channels[c + targetChannelOffset], sampleOffset, sampleCount, targetSampleOffset);
+		ISampleBufferPtr pChannel = other->Channels[c + targetChannelOffset];
+		done = m_vecChannels[c + channelOffset]->CopyTo(pChannel, sampleOffset, sampleCount, targetSampleOffset);
 	}
 	return done;
 }
@@ -134,3 +136,7 @@ ISampleContainerPtr SampleContainerSpan::Span(int sampleOffset, int sampleCount,
 	return new SampleContainerSpan(buffers);
 }
 
+void SampleContainerSpan::CreateChannels(int sampleCount, int channelCount)
+{
+	throw std::runtime_error("Change of sample count or channel count is not supported.");
+}
