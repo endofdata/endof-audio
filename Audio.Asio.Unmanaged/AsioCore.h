@@ -13,6 +13,7 @@
 #include <IInputChannel.h>
 #include <ISampleSource.h>
 #include <IOutputChannelPair.h>
+#include <memory>
 #include "AsioCoreCallbacks.h"
 
 //using namespace Audio::Foundation::Abstractions;
@@ -26,14 +27,20 @@ namespace Audio
 		{
 			typedef void (*BufferSwitchEventHandler)(bool writeSecondHalf);
 
+
 			class _AUDIO_ASIO_UNMANAGED_API AsioCore
 			{
 			public:
 				static const int UseMaximumSize = -1;
 				static const int UsePreferredSize = -2;
 
-				static AsioCore* CreateInstance(REFCLSID clsid);
+				static inline std::shared_ptr<AsioCore> CreateInstancePtr(REFCLSID clsid)
+				{
+					return std::shared_ptr<AsioCore>(CreateInstance(clsid), [](AsioCore* pDevice) { DeleteInstance(pDevice); });
+				}
 
+				static AsioCore* CreateInstance(REFCLSID clsid);
+				static void DeleteInstance(AsioCore* pDevice);
 
 				virtual ~AsioCore();
 
@@ -65,17 +72,17 @@ namespace Audio
 
 				int get_InputChannelCount();
 
-				_declspec(property(get = get_InputChannel)) IInputChannel* InputChannel[];
+				_declspec(property(get = get_InputChannel)) IInputChannelPtr InputChannel[];
 
-				IInputChannel* get_InputChannel(int iChannel);
+				IInputChannelPtr get_InputChannel(int iChannel);
 
 				_declspec(property(get = get_OutputChannelPairCount)) int OutputChannelPairCount;
 
 				int get_OutputChannelPairCount();
 
-				_declspec(property(get = get_OutputChannelPair)) IOutputChannelPair* OutputChannelPair[];
+				_declspec(property(get = get_OutputChannelPair)) IOutputChannelPairPtr OutputChannelPair[];
 
-				IOutputChannelPair* get_OutputChannelPair(int iChannel);
+				IOutputChannelPairPtr get_OutputChannelPair(int iChannel);
 
 				_declspec(property(get = get_SampleCount)) int SampleCount;
 
@@ -190,6 +197,8 @@ namespace Audio
 
 				friend class AsioCoreCallbacks;
 			};
+
+			typedef std::shared_ptr<AsioCore> AsioCorePtr;
 		}
 	}
 }

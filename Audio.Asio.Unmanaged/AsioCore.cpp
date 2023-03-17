@@ -7,6 +7,7 @@
 #include <ObjectFactory.h>
 #include <SampleType.h>
 #include <functional>
+#include <iostream>
 
 using namespace Audio::Asio::Unmanaged;
 using namespace Audio::Foundation::Unmanaged;
@@ -41,6 +42,19 @@ AsioCore* AsioCore::CreateInstance(REFCLSID clsid)
 	return pCore;
 }
 
+// static
+void AsioCore::DeleteInstance(AsioCore* pCore)
+{
+	if (pCore != nullptr)
+	{
+		delete pCore;
+	}
+}
+
+static const ASIOSampleRate InitialSampleRate
+{
+	{0, 0, 0, 0, 0, 0, 0, 0}
+};
 
 AsioCore::AsioCore() :
 	m_pDriver(nullptr),
@@ -56,9 +70,11 @@ AsioCore::AsioCore() :
 	m_bufferSwitchEventHandler(nullptr),
 	m_pCoreCallbacks(nullptr),
 	m_lastError(ASE_OK),
+	m_sampleRate(InitialSampleRate),
 	m_sampleType(-1)
 {
 	m_supportedBufferSize.Init();
+	//memset(&m_sampleRate.ieee, 0, sizeof(ASIOSampleRate::ieee));
 }
 
 // virtual
@@ -106,7 +122,7 @@ void AsioCore::Initialize(REFCLSID clsid)
 			msgBuffer[_countof(msgBuffer) - 1] = 0;
 			pDriver->Release();
 		}
-		catch(...)
+		catch (...)
 		{
 		}
 
@@ -145,7 +161,14 @@ void AsioCore::CleanUp()
 		Stop();
 		DisposeBuffers();
 
-		m_pDriver->Release();
+		try
+		{
+			m_pDriver->Release();
+		}
+		catch (...)
+		{
+			std::cerr << "Unhandled exception caused by IASIO::Release()" << std::endl;
+		}
 		m_pDriver = nullptr;
 	}
 	if (nullptr != m_pCoreCallbacks)
@@ -237,7 +260,7 @@ void AsioCore::CreateBuffers(const int inputChannelIds[], int numInputIds, const
 
 		int iIdx = 0;
 
-		for(int id = 0; id < numInputIds; id++)
+		for (int id = 0; id < numInputIds; id++)
 		{
 			int iInput = inputChannelIds[id];
 
@@ -248,7 +271,7 @@ void AsioCore::CreateBuffers(const int inputChannelIds[], int numInputIds, const
 			iIdx++;
 		}
 
-		for(int id = 0; id < numOutputIds; id++)
+		for (int id = 0; id < numOutputIds; id++)
 		{
 			int iOutput = outputChannelIds[id];
 
@@ -296,7 +319,7 @@ void AsioCore::CreateInputChannels(int offset, int count)
 			ISampleSourcePtr source = nullptr;
 			input->QueryInterface(&source);
 
-			if(nullptr == source)
+			if (nullptr == source)
 				throw AsioCoreException("AsioCore: Input channel does not implement ISampleSource.", E_OUTOFMEMORY);
 
 			m_inputChannels.push_back(input);
@@ -379,7 +402,8 @@ void AsioCore::SetInputMonitoring(int iInputChannel, int iOutputPair)
 {
 	if (m_iCurrentMonitorInput >= 0)
 	{
-		m_inputChannels[m_iCurrentMonitorInput]->DirectMonitor = nullptr;
+		IOutputChannelPairPtr empty;
+		m_inputChannels[m_iCurrentMonitorInput]->DirectMonitor = empty;
 		m_iCurrentMonitorInput = -1;
 	}
 	if (0 <= iInputChannel && iInputChannel < m_inputChannels.size())
@@ -400,23 +424,23 @@ void AsioCore::OnBufferSwitch(long doubleBufferIndex, ASIOBool directProcess) co
 	bool writeSecondHalf = doubleBufferIndex != 0;
 	bool readSecondHalf = doubleBufferIndex == 0;
 
-	std::for_each(m_outputChannelPairs.begin(), m_outputChannelPairs.end(), [writeSecondHalf](IOutputChannelPairPtr pChannelPair)
+	std::for_each(m_outputChannelPairs.begin(), m_outputChannelPairs.end(), [writeSecondHalf](const IOutputChannelPairPtr& pChannelPair)
 	{
 		pChannelPair->OnNextBuffer(writeSecondHalf);
 	});
 
-	std::for_each(m_sampleSources.begin(), m_sampleSources.end(), [readSecondHalf](ISampleSourcePtr pSource)
+	std::for_each(m_sampleSources.begin(), m_sampleSources.end(), [readSecondHalf](const ISampleSourcePtr& pSource)
 	{
 		pSource->OnNextBuffer(readSecondHalf);
 	});
 
-	//BufferSwitchEventHandler handler = m_bufferSwitchEventHandler;
+	BufferSwitchEventHandler handler = m_bufferSwitchEventHandler;
 
-	//if (nullptr != handler)
-	//{
-	//	handler(writeSecondHalf);
-	//}
-	
+	if (nullptr != handler)
+	{
+		handler(writeSecondHalf);
+	}
+
 	if (m_outputReadySupport)
 	{
 		m_pDriver->outputReady();
@@ -506,9 +530,9 @@ int AsioCore::get_InputChannelCount()
 	return (int)m_inputChannels.size();
 }
 
-IInputChannel* AsioCore::get_InputChannel(int iChannel)
+IInputChannelPtr AsioCore::get_InputChannel(int iChannel)
 {
-	IInputChannel* value = nullptr;
+	IInputChannelPtr value = nullptr;
 
 	if (0 <= iChannel && iChannel < m_inputChannels.size())
 	{
@@ -522,9 +546,9 @@ int AsioCore::get_OutputChannelPairCount()
 	return (int)m_outputChannelPairs.size();
 }
 
-IOutputChannelPair* AsioCore::get_OutputChannelPair(int iChannel)
+IOutputChannelPairPtr AsioCore::get_OutputChannelPair(int iChannel)
 {
-	IOutputChannelPair* value = nullptr;
+	IOutputChannelPairPtr value = nullptr;
 
 	if (0 <= iChannel && iChannel < m_outputChannelPairs.size())
 	{
