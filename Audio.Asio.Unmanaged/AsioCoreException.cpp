@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "AsioCoreException.h"
 
-using namespace Audio::Asio;
+using namespace Audio::Asio::Unmanaged;
 
 AsioCoreException::AsioCoreException() : AsioCoreException(nullptr, E_FAIL)
 {
@@ -15,24 +15,25 @@ AsioCoreException::AsioCoreException(const char* pcszMessage, int code)
 {
 	if (pcszMessage != nullptr)
 	{
-		m_pcszMessage = _strdup(pcszMessage);
+		m_message = pcszMessage;
 	}
 	else
 	{
-		m_pcszMessage = nullptr;
+		m_message = nullptr;
 	}
 	m_error = code;
 }
 
 AsioCoreException::~AsioCoreException()
 {
-	if (m_pcszMessage != nullptr)
-	{
-		free(m_pcszMessage);
-	}
 }
 
-int AsioCoreException::get_Error()
+int AsioCoreException::get_Error() const
 {
 	return m_error;
+}
+
+const char* AsioCoreException::get_Message() const
+{
+	return m_message.c_str();
 }
