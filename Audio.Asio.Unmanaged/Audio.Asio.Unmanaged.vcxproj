@@ -44,12 +44,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>D:\Gamer I5\Documents\Projects\Audio\Audio.Asio.Unmanaged;D:\Gamer I5\Documents\Projects\Audio\Audio.Foundation.Unmanaged;D:\Gamer I5\Documents\Projects\ASIOSDK2\common;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Audio.Asio.Unmanaged;$(SolutionDir)\Audio.Foundation.Unmanaged;$(SolutionDir)..\ASIOSDK2\common;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)int\$(Configuration)\$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>D:\Gamer I5\Documents\Projects\Audio\Audio.Asio.Unmanaged;D:\Gamer I5\Documents\Projects\Audio\Audio.Foundation.Unmanaged;D:\Gamer I5\Documents\Projects\ASIOSDK2\common;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Audio.Asio.Unmanaged;$(SolutionDir)\Audio.Foundation.Unmanaged;$(SolutionDir)..\ASIOSDK2\common;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)int\$(Configuration)\$(Platform)\</IntDir>
   </PropertyGroup>
@@ -61,6 +61,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -78,6 +79,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
