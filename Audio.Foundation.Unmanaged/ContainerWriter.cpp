@@ -4,7 +4,7 @@
 using namespace Audio::Foundation::Unmanaged;
 
 
-ContainerWriter::ContainerWriter(ISampleContainerPtr target) :
+ContainerWriter::ContainerWriter(ISampleContainerPtr& target) :
 	m_pTarget(target),
 	m_pNext(nullptr),
 	m_refCount(0)
@@ -49,7 +49,7 @@ bool ContainerWriter::get_HasNext()
 }
 
 
-void ContainerWriter::Process(ISampleContainerPtr container)
+void ContainerWriter::Process(ISampleContainerPtr& container)
 {
 	container->CopyTo(m_pTarget, 0, container->SampleCount, 0, container->ChannelCount, 0, 0);
 

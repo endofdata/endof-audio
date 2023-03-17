@@ -33,7 +33,7 @@ namespace Audio
 					_declspec(property(get = get_PlayPosition, put = put_PlayPosition)) AudioTime PlayPosition;
 
 
-					int AddTake(ITakePtr take) = 0;
+					int AddTake(ITakePtr& take) = 0;
 					bool RemoveTake(int takeId) = 0;
 					bool MoveTake(int takeId, AudioTime to) = 0;
 					ITakePtr FindTake(int takeId) = 0;

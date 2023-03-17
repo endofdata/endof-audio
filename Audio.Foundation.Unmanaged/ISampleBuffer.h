@@ -52,9 +52,9 @@ namespace Audio
 
 					int get_SampleCount() const = 0;
 
-					int AddTo(ISampleBufferPtr other, int sampleOffset, int sampleCount, int targetOffset) const = 0;
+					int AddTo(ISampleBufferPtr& other, int sampleOffset, int sampleCount, int targetOffset) const = 0;
 
-					int CopyTo(ISampleBufferPtr other, int sampleOffset, int sampleCount, int targetOffset) const = 0;
+					int CopyTo(ISampleBufferPtr& other, int sampleOffset, int sampleCount, int targetOffset) const = 0;
 				};
 			}
 		}

@@ -65,7 +65,7 @@ Sample* SampleBufferSpan::get_SamplePtr()
 	return m_pSamples;
 }
 
-int SampleBufferSpan::AddTo(ISampleBufferPtr other, int sampleOffset, int sampleCount, int targetOffset) const
+int SampleBufferSpan::AddTo(ISampleBufferPtr& other, int sampleOffset, int sampleCount, int targetOffset) const
 {
 	int sourceMax = GetEffectiveCount(sampleOffset, sampleCount, SampleCount);
 	int targetMax = GetEffectiveCount(targetOffset, sampleCount, other->SampleCount);
@@ -84,7 +84,7 @@ int SampleBufferSpan::AddTo(ISampleBufferPtr other, int sampleOffset, int sample
 	return count;
 }
 
-int SampleBufferSpan::CopyTo(ISampleBufferPtr other, int sampleOffset, int sampleCount, int targetOffset) const
+int SampleBufferSpan::CopyTo(ISampleBufferPtr& other, int sampleOffset, int sampleCount, int targetOffset) const
 {
 	int sourceMax = GetEffectiveCount(sampleOffset, sampleCount, SampleCount);
 	int targetMax = GetEffectiveCount(targetOffset, sampleCount, other->SampleCount);

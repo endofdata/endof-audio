@@ -63,7 +63,7 @@ ISampleProcessorPtr ObjectFactory::CreateToStreamProcessor(std::ostream& output)
 	return new StreamWriter(output);
 }
 
-ISampleProcessorPtr ObjectFactory::CreateToContainerProcessor(ISampleContainerPtr target)
+ISampleProcessorPtr ObjectFactory::CreateToContainerProcessor(ISampleContainerPtr& target)
 {
 	return new ContainerWriter(target);
 }
@@ -75,22 +75,23 @@ ISampleProcessorPtr ObjectFactory::CreateToContainerProcessor(int channelCount, 
 
 ISampleSourcePtr ObjectFactory::CreateFileSource(int sampleCount, int channelCount, const std::string& filename)
 {
-	return new FileSource(filename, CreateSampleContainer(sampleCount, channelCount));
+	ISampleContainerPtr container = CreateSampleContainer(sampleCount, channelCount);
+	return new FileSource(filename, container);
 }
 
-ISampleSourcePtr ObjectFactory::CreateContainerSource(ISampleContainerPtr source, int sampleCount)
+ISampleSourcePtr ObjectFactory::CreateContainerSource(ISampleContainerPtr& source, int sampleCount)
 {
 	return new ContainerReader(source, sampleCount);
 }
 
-ITakePtr ObjectFactory::CreateTake(ISampleContainerPtr container, AudioTime position, IHostClockPtr hostClock)
+ITakePtr ObjectFactory::CreateTake(ISampleContainerPtr& container, AudioTime position, IHostClockPtr& hostClock)
 {
 	AudioTime length = AudioTime::FromSeconds(container->SampleCount / hostClock->SampleRate);
 
 	return CreateTake(container, position, length);
 }
 
-ITakePtr ObjectFactory::CreateTake(ISampleContainerPtr container, AudioTime position, AudioTime length)
+ITakePtr ObjectFactory::CreateTake(ISampleContainerPtr& container, AudioTime position, AudioTime length)
 {
 	return new Take(NextTakeId(), container, position, length);
 }
@@ -103,7 +104,7 @@ IHostClockPtr ObjectFactory::CreateHostClock(int sampleRate)
 	return new HostClock(std::max(8000, sampleRate));
 }
 
-ITakeSequencePtr ObjectFactory::CreateTakeSequence(IHostClockPtr hostClock, ISampleContainerPtr targetContainer)
+ITakeSequencePtr ObjectFactory::CreateTakeSequence(IHostClockPtr& hostClock, ISampleContainerPtr& targetContainer)
 {
 	return new TakeSequence(hostClock, targetContainer);
 }

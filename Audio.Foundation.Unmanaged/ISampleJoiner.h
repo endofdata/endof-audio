@@ -33,13 +33,13 @@ namespace Audio
 					/// Adds a new item to the <see cref="Sources"/> collection
 					/// </summary>
 					/// <param name="source">Source to joint into output samples</param>
-					void AddSource(ISampleContainerPtr source) = 0;
+					void AddSource(ISampleContainerPtr& source) = 0;
 
 					/// <summary>
 					/// Removes an item from the <see cref="Sources"/> collection
 					/// </summary>
 					/// <param name="source">Source to remove</param>
-					void RemoveSource(ISampleContainerPtr source) = 0;
+					void RemoveSource(ISampleContainerPtr& source) = 0;
 
 					/// <summary>
 					/// Clears the <see cref="Sources"/> collection

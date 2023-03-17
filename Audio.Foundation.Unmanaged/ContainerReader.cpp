@@ -4,7 +4,7 @@
 
 using namespace Audio::Foundation::Unmanaged;
 
-ContainerReader::ContainerReader(ISampleContainerPtr source, int sampleCount) :
+ContainerReader::ContainerReader(ISampleContainerPtr& source, int sampleCount) :
 	m_pSource(source),
 	m_sampleCount(sampleCount),
 	m_sampleOffset(0),
@@ -39,7 +39,7 @@ ISampleProcessorPtr ContainerReader::get_First()
 	return m_pFirst;
 }
 
-void ContainerReader::put_First(ISampleProcessorPtr value)
+void ContainerReader::put_First(ISampleProcessorPtr& value)
 {
 	m_pFirst = value;
 }
@@ -51,16 +51,19 @@ bool ContainerReader::get_HasFirst()
 
 ISampleContainerPtr ContainerReader::get_Container()
 {
-	return m_span.Span(std::max(m_sampleOffset - m_sampleCount, 0), m_sampleCount, 0, m_pSource->ChannelCount);
+	return m_span.Span(m_sampleOffset, m_sampleCount, 0, m_pSource->ChannelCount);
 }
 
 void ContainerReader::OnNextBuffer(bool readSecondHalf)
 {
-	m_sampleOffset += m_sampleCount;
-
 	if (HasFirst)
 	{
-		m_pFirst->Process(Container);
+		ISampleContainerPtr container = get_Container();
+		m_pFirst->Process(container);
+	}
+	if (m_sampleOffset < m_pSource->SampleCount)
+	{
+		m_sampleOffset += m_sampleCount;
 	}
 }
 

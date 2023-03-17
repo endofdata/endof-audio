@@ -8,7 +8,7 @@ using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 
 
-TakeSequence::TakeSequence(IHostClockPtr hostClock, ISampleContainerPtr targetContainer) :
+TakeSequence::TakeSequence(IHostClockPtr& hostClock, ISampleContainerPtr& targetContainer) :
 	m_pHostClock(hostClock),
 	m_currentTime(0),
 	m_playPosition(m_takes.end()),
@@ -60,11 +60,11 @@ ITakePtr TakeSequence::get_Take(int index)
 	return m_takes[index];
 }
 
-int TakeSequence::AddTake(ITakePtr take)
+int TakeSequence::AddTake(ITakePtr& take)
 {
 	AudioTime position = take->Position;
 
-	m_takes.insert(std::find_if(m_takes.begin(), m_takes.end(), [position](ITakePtr t) { return t->Position >= position;  }), take);
+	m_takes.insert(std::find_if(m_takes.begin(), m_takes.end(), [position](ITakePtr& t) { return t->Position >= position;  }), take);
 	m_scheduledTake = m_takes.begin();
 	put_PlayPosition(m_pHostClock->CurrentTime);
 
@@ -156,7 +156,7 @@ bool TakeSequence::get_HasNext()
 	return m_pNext != nullptr;
 }
 
-void TakeSequence::Process(ISampleContainerPtr container)
+void TakeSequence::Process(ISampleContainerPtr& container)
 {	
 	bool hasTake = false;
 

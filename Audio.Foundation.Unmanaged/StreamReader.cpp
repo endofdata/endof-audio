@@ -3,7 +3,7 @@
 
 using namespace Audio::Foundation::Unmanaged;
 
-StreamReader::StreamReader(std::istream& input, ISampleContainerPtr container) :
+StreamReader::StreamReader(std::istream& input, ISampleContainerPtr& container) :
 	m_input(input),
 	m_pContainer(container),
 	m_refCount(0)
@@ -36,7 +36,7 @@ ISampleProcessorPtr StreamReader::get_First()
 	return m_pFirst;
 }
 
-void StreamReader::put_First(ISampleProcessorPtr value)
+void StreamReader::put_First(ISampleProcessorPtr& value)
 {
 	m_pFirst = value;
 }

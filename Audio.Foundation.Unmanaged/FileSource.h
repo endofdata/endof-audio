@@ -16,7 +16,7 @@ namespace Audio
 			class FileSource : public ISampleSource
 			{
 			public:
-				FileSource(const std::string& filename, ISampleContainerPtr container);
+				FileSource(const std::string& filename, ISampleContainerPtr& container);
 				virtual ~FileSource();
 
 				const std::string& get_Filename() const;
@@ -26,7 +26,7 @@ namespace Audio
 				int get_SampleType();
 
 				ISampleProcessorPtr get_First();
-				void put_First(ISampleProcessorPtr value);
+				void put_First(ISampleProcessorPtr& value);
 
 				bool get_HasFirst();
 

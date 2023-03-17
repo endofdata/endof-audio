@@ -23,7 +23,7 @@ namespace Audio
 
 				bool get_HasNext();
 
-				void Process(ISampleContainerPtr container);
+				void Process(ISampleContainerPtr& container);
 
 				DECLARE_IUNKNOWN
 

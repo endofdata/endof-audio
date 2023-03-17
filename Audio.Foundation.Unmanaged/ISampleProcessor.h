@@ -39,7 +39,7 @@ namespace Audio
 					/// Processes a sample container and forwards it to the next sample processor
 					/// </summary>
 					/// <param name="container">Sample container to process</param>
-					void Process(ISampleContainerPtr container) = 0;
+					void Process(ISampleContainerPtr& container) = 0;
 				};
 
 				//_COM_SMARTPTR_TYPEDEF(ISampleProcessor, __uuidof(ISampleProcessor));

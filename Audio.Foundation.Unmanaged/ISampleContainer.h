@@ -47,9 +47,9 @@ namespace Audio
 					/// </summary>
 					_declspec(property(get = get_Channel)) ISampleBufferPtr Channels[];
 
-					virtual int AddTo(ISampleContainerPtr other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const = 0;
+					virtual int AddTo(ISampleContainerPtr& other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const = 0;
 
-					virtual int CopyTo(ISampleContainerPtr other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const = 0;
+					virtual int CopyTo(ISampleContainerPtr& other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const = 0;
 
 					virtual ISampleContainerPtr Span(int fromSample, int toSample, int channelOffset, int channelCount) = 0;
 				};

@@ -29,9 +29,9 @@ namespace Audio
 
 				Sample* get_SamplePtr();
 
-				int AddTo(ISampleBufferPtr other, int sampleOffset, int sampleCount, int targetOffset) const;
+				int AddTo(ISampleBufferPtr& other, int sampleOffset, int sampleCount, int targetOffset) const;
 
-				int CopyTo(ISampleBufferPtr other, int sampleOffset, int sampleCount, int targetOffset) const;
+				int CopyTo(ISampleBufferPtr& other, int sampleOffset, int sampleCount, int targetOffset) const;
 
 				DECLARE_IUNKNOWN
 

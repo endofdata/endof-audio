@@ -110,7 +110,7 @@ namespace Audio
 						return m_pNext != nullptr;
 					}
 
-					virtual void Process(ISampleContainerPtr container)
+					virtual void Process(ISampleContainerPtr& container)
 					{
 						int inputChannels = container == nullptr ? 0 : container->ChannelCount;
 

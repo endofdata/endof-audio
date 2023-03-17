@@ -23,9 +23,9 @@ namespace Audio
 
 				ISampleContainerPtr get_Source(int index);
 
-				void AddSource(ISampleContainerPtr source);
+				void AddSource(ISampleContainerPtr& source);
 
-				void RemoveSource(ISampleContainerPtr source);
+				void RemoveSource(ISampleContainerPtr& source);
 
 				void RemoveAllSources();
 
@@ -34,7 +34,7 @@ namespace Audio
 
 				bool get_HasNext();
 
-				void Process(ISampleContainerPtr container);
+				void Process(ISampleContainerPtr& container);
 
 				DECLARE_IUNKNOWN
 

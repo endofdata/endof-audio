@@ -60,7 +60,7 @@ bool VectorWriter::get_HasNext()
 	return m_pNext != nullptr;
 }
 
-void VectorWriter::Process(ISampleContainerPtr container)
+void VectorWriter::Process(ISampleContainerPtr& container)
 {
 	int samples = container->SampleCount;
 	int maxSourceChannels = container->ChannelCount;

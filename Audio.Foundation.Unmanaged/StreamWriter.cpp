@@ -46,7 +46,7 @@ bool StreamWriter::get_HasNext()
 	return m_pNext != nullptr;
 }
 
-void StreamWriter::Process(ISampleContainerPtr container)
+void StreamWriter::Process(ISampleContainerPtr& container)
 {
 	if (HasNext)
 	{

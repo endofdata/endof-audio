@@ -3,7 +3,7 @@
 
 using namespace Audio::Foundation::Unmanaged;
 
-Take::Take(int id, ISampleContainerPtr container, AudioTime position, AudioTime length) :
+Take::Take(int id, ISampleContainerPtr& container, AudioTime position, AudioTime length) :
 	m_id(id),
 	m_pContainer(container),
 	m_position(position),
@@ -104,12 +104,12 @@ bool Take::SeekTo(AudioTime offset, AudioSeek kind)
 	return false;
 }
 
-int Take::AddTo(ISampleContainerPtr target, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const
+int Take::AddTo(ISampleContainerPtr& target, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const
 {
 	return m_pContainer->AddTo(target, sampleOffset, sampleCount, channelOffset, channelCount, targetSampleOffset, targetChannelOffset);
 }
 
-int Take::ReadSamplesTo(ISampleContainerPtr target, int channelOffset, int channelCount, int targetChannelOffset)
+int Take::ReadSamplesTo(ISampleContainerPtr& target, int channelOffset, int channelCount, int targetChannelOffset)
 {
 	int done = AddTo(target, m_readOffset, target->SampleCount, channelOffset, channelCount, 0, targetChannelOffset);
 

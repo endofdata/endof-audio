@@ -42,7 +42,7 @@ bool SampleSharer::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-void SampleSharer::AddTarget(ISampleProcessorPtr target)
+void SampleSharer::AddTarget(ISampleProcessorPtr& target)
 {
 	target.AddRef();
 
@@ -52,9 +52,9 @@ void SampleSharer::AddTarget(ISampleProcessorPtr target)
 	m_vecTargets.push_back(target);
 }
 
-void SampleSharer::RemoveTarget(ISampleProcessorPtr target)
+void SampleSharer::RemoveTarget(ISampleProcessorPtr& target)
 {
-	auto newEnd = remove_if(m_vecTargets.begin(), m_vecTargets.end(), [&target](ISampleProcessorPtr item)
+	auto newEnd = remove_if(m_vecTargets.begin(), m_vecTargets.end(), [&target](ISampleProcessorPtr& item)
 	{ 
 		if(item == target)
 		{
@@ -90,9 +90,9 @@ bool SampleSharer::get_HasNext()
 	return m_pNext != nullptr;
 }
 
-void SampleSharer::Process(ISampleContainerPtr container)
+void SampleSharer::Process(ISampleContainerPtr& container)
 {
-	std::for_each(m_vecTargets.begin(), m_vecTargets.end(), [&container](ISampleProcessorPtr item)
+	std::for_each(m_vecTargets.begin(), m_vecTargets.end(), [&container](ISampleProcessorPtr& item)
 	{
 		item->Process(container);
 	});

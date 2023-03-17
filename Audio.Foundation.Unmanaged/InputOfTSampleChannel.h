@@ -119,7 +119,7 @@ namespace Audio
 						return m_pFirst;
 					}
 
-					virtual void put_First(ISampleProcessorPtr value)
+					virtual void put_First(ISampleProcessorPtr& value)
 					{
 						m_pFirst = value;
 					}

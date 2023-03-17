@@ -17,7 +17,7 @@ namespace Audio
 			class ContainerWriter : public ISampleProcessor
 			{
 			public:
-				ContainerWriter(ISampleContainerPtr target);
+				ContainerWriter(ISampleContainerPtr& target);
 				virtual ~ContainerWriter();
 
 				ISampleProcessorPtr get_Next();
@@ -25,7 +25,7 @@ namespace Audio
 
 				bool get_HasNext();
 
-				void Process(ISampleContainerPtr container);
+				void Process(ISampleContainerPtr& container);
 
 				DECLARE_IUNKNOWN
 

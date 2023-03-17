@@ -39,7 +39,7 @@ bool SampleJoiner::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-void SampleJoiner::AddSource(ISampleContainerPtr Source)
+void SampleJoiner::AddSource(ISampleContainerPtr& Source)
 {
 	Source.AddRef();
 
@@ -49,10 +49,10 @@ void SampleJoiner::AddSource(ISampleContainerPtr Source)
 	m_vecSources.push_back(Source);
 }
 
-void SampleJoiner::RemoveSource(ISampleContainerPtr Source)
+void SampleJoiner::RemoveSource(ISampleContainerPtr& Source)
 {
 	std::vector<ISampleContainerPtr>::iterator newEnd =
-		remove_if(m_vecSources.begin(), m_vecSources.end(), [&Source](ISampleContainerPtr item)
+		remove_if(m_vecSources.begin(), m_vecSources.end(), [&Source](ISampleContainerPtr& item)
 	{
 		if (item == Source)
 		{
@@ -88,7 +88,7 @@ bool SampleJoiner::get_HasNext()
 	return m_pNext != nullptr;
 }
 
-void SampleJoiner::Process(ISampleContainerPtr container)
+void SampleJoiner::Process(ISampleContainerPtr& container)
 {
 	if (HasNext)
 	{
@@ -96,7 +96,7 @@ void SampleJoiner::Process(ISampleContainerPtr container)
 
 		if (targetChannelCount > 0)
 		{
-			std::for_each(m_vecSources.begin(), m_vecSources.end(), [this, &container](ISampleContainerPtr item)
+			std::for_each(m_vecSources.begin(), m_vecSources.end(), [this, &container](ISampleContainerPtr& item)
 			{
 				item->AddTo(container, 0, item->SampleCount, 0, item->ChannelCount, 0, 0);
 			});

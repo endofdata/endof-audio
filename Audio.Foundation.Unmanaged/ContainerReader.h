@@ -17,11 +17,11 @@ namespace Audio
 			class ContainerReader : public ISampleSource
 			{
 			public:
-				ContainerReader(ISampleContainerPtr source, int sampleCount);
+				ContainerReader(ISampleContainerPtr& source, int sampleCount);
 				virtual ~ContainerReader();
 
 				ISampleProcessorPtr get_First();
-				void put_First(ISampleProcessorPtr value);
+				void put_First(ISampleProcessorPtr& value);
 
 				bool get_HasFirst();
 

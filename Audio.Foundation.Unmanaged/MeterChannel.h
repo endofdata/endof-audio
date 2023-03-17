@@ -38,7 +38,7 @@ namespace Audio
 
 				virtual bool get_HasNext();
 
-				virtual void Process(ISampleContainerPtr inputBuffer);
+				virtual void Process(ISampleContainerPtr& inputBuffer);
 
 				DECLARE_IUNKNOWN
 

@@ -41,21 +41,21 @@ namespace Audio
 
 				static ISampleProcessorPtr CreateToStreamProcessor(std::ostream& output);
 
-				static ISampleProcessorPtr CreateToContainerProcessor(ISampleContainerPtr target);
+				static ISampleProcessorPtr CreateToContainerProcessor(ISampleContainerPtr& target);
 
 				static ISampleProcessorPtr CreateToContainerProcessor(int channelCount, int initialSize, int growth);
 
 				static ISampleSourcePtr CreateFileSource(int sampleCount, int channelCount, const std::string& filename);
 
-				static ISampleSourcePtr CreateContainerSource(ISampleContainerPtr source, int sampleCount);
+				static ISampleSourcePtr CreateContainerSource(ISampleContainerPtr& source, int sampleCount);
 
-				static ITakePtr CreateTake(ISampleContainerPtr container, AudioTime position, IHostClockPtr hostClock);
+				static ITakePtr CreateTake(ISampleContainerPtr& container, AudioTime position, IHostClockPtr& hostClock);
 
-				static ITakePtr CreateTake(ISampleContainerPtr container, AudioTime position, AudioTime length);
+				static ITakePtr CreateTake(ISampleContainerPtr& container, AudioTime position, AudioTime length);
 
 				static IHostClockPtr CreateHostClock(int sampleRate = 0);
 
-				static ITakeSequencePtr CreateTakeSequence(IHostClockPtr hostClock, ISampleContainerPtr targetContainer);
+				static ITakeSequencePtr CreateTakeSequence(IHostClockPtr& hostClock, ISampleContainerPtr& targetContainer);
 
 				static IInputChannelPtr CreateInputChannel(int sampleType, int hwChannelId, void* pHwBufferA, void* pHwBufferB, int sampleCount);
 

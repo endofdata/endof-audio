@@ -16,11 +16,11 @@ namespace Audio
 			class StreamReader : public ISampleSource
 			{
 			public:
-				StreamReader(std::istream& input, ISampleContainerPtr container);
+				StreamReader(std::istream& input, ISampleContainerPtr& container);
 				virtual ~StreamReader();
 
 				ISampleProcessorPtr get_First();
-				void put_First(ISampleProcessorPtr value);
+				void put_First(ISampleProcessorPtr& value);
 
 				bool get_HasFirst();
 

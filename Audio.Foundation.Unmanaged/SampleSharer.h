@@ -21,8 +21,8 @@ namespace Audio
 
 				virtual ISampleProcessorPtr get_Target(int iIdx);
 
-				virtual void AddTarget(ISampleProcessorPtr channel);
-				virtual void RemoveTarget(ISampleProcessorPtr channel);
+				virtual void AddTarget(ISampleProcessorPtr& channel);
+				virtual void RemoveTarget(ISampleProcessorPtr& channel);
 				virtual void RemoveAllTargets();
 
 				ISampleProcessorPtr get_Next();
@@ -30,7 +30,7 @@ namespace Audio
 
 				bool get_HasNext();
 
-				void Process(ISampleContainerPtr container);
+				void Process(ISampleContainerPtr& container);
 
 				DECLARE_IUNKNOWN
 

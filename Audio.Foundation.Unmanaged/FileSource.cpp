@@ -5,7 +5,7 @@
 using namespace Audio::Foundation::Unmanaged;
 
 
-FileSource::FileSource(const std::string& filename, ISampleContainerPtr container) :
+FileSource::FileSource(const std::string& filename, ISampleContainerPtr& container) :
 	m_reader(filename, container),
 	m_pFirst(nullptr),
 	m_refCount(0)
@@ -49,7 +49,7 @@ ISampleProcessorPtr FileSource::get_First()
 	return m_pFirst;
 }
 
-void FileSource::put_First(ISampleProcessorPtr value)
+void FileSource::put_First(ISampleProcessorPtr& value)
 {
 	m_pFirst = value;
 }
@@ -69,7 +69,8 @@ void FileSource::OnNextBuffer(bool readSecondHalf)
 	if (HasFirst)
 	{
 		m_reader.OnNextBuffer(readSecondHalf);
-		m_pFirst->Process(m_reader.Container);
+		ISampleContainerPtr container = get_Container();
+		m_pFirst->Process(container);
 	}
 }
 

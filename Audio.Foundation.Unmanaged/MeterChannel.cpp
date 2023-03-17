@@ -119,7 +119,7 @@ bool MeterChannel::get_HasNext()
 	return m_pNext != nullptr;
 }
 
-void MeterChannel::Process(ISampleContainerPtr input)
+void MeterChannel::Process(ISampleContainerPtr& input)
 {
 	if (get_HasNext())
 	{

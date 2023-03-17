@@ -20,14 +20,14 @@ namespace Audio
 			class TakeSequence : public ITakeSequence, public ISampleProcessor
 			{
 			public:
-				TakeSequence(IHostClockPtr hostClock, ISampleContainerPtr targetContainer);
+				TakeSequence(IHostClockPtr& hostClock, ISampleContainerPtr& targetContainer);
 				virtual ~TakeSequence();
 
 				virtual int get_TakeCount();
 
 				virtual ITakePtr get_Take(int index);
 
-				virtual int AddTake(ITakePtr item);
+				virtual int AddTake(ITakePtr& item);
 				virtual bool RemoveTake(int takeId);
 				virtual bool MoveTake(int takeId, AudioTime to);
 				virtual ITakePtr FindTake(int takeId);
@@ -40,7 +40,7 @@ namespace Audio
 
 				bool get_HasNext();
 
-				void Process(ISampleContainerPtr container);
+				void Process(ISampleContainerPtr& container);
 
 				DECLARE_IUNKNOWN
 

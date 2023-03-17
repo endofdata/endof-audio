@@ -17,7 +17,7 @@ namespace Audio
 
 				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(IMeterChannel, __uuidof(IMeterChannel));
 
-				typedef int(__stdcall* MeterChannelCallback)(IMeterChannelPtr pSender);
+				typedef int(__stdcall* MeterChannelCallback)(const IMeterChannelPtr& pSender);
 
 
 				__interface IMeterChannel : public IUnknown

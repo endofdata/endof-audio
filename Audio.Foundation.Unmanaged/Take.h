@@ -18,7 +18,7 @@ namespace Audio
 			class Take : public ITake
 			{
 			public:
-				Take(int id, ISampleContainerPtr container, AudioTime position, AudioTime length);
+				Take(int id, ISampleContainerPtr& container, AudioTime position, AudioTime length);
 				virtual ~Take();
 
 				virtual int get_Id() const;
@@ -37,9 +37,9 @@ namespace Audio
 
 				bool SeekTo(AudioTime offset, AudioSeek kind);
 
-				int AddTo(ISampleContainerPtr target, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const;
+				int AddTo(ISampleContainerPtr& target, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const;
 
-				int ReadSamplesTo(ISampleContainerPtr target, int channelOffset, int channelCount, int targetChannelOffset);
+				int ReadSamplesTo(ISampleContainerPtr& target, int channelOffset, int channelCount, int targetChannelOffset);
 
 				DECLARE_IUNKNOWN
 

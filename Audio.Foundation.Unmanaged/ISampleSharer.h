@@ -35,13 +35,13 @@ namespace Audio
 					/// Adds a new item to the <see cref="Targets"/> collection
 					/// </summary>
 					/// <param name="target">Target for output samples</param>
-					void AddTarget(ISampleProcessorPtr target) = 0;
+					void AddTarget(ISampleProcessorPtr& target) = 0;
 
 					/// <summary>
 					/// Removes an item from the <see cref="Targets"/> collection
 					/// </summary>
 					/// <param name="target">Target to remove</param>
-					void RemoveTarget(ISampleProcessorPtr target) = 0;
+					void RemoveTarget(ISampleProcessorPtr& target) = 0;
 
 					/// <summary>
 					/// Clears the <see cref="Targets"/> collection
