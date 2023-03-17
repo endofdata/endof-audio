@@ -31,12 +31,12 @@ bool StreamWriter::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-ISampleProcessorPtr StreamWriter::get_Next()
+ISampleProcessorPtr& StreamWriter::get_next()
 {
 	return m_pNext;
 }
 
-void StreamWriter::put_Next(ISampleProcessorPtr value)
+void StreamWriter::put_Next(ISampleProcessorPtr &value)
 {
 	m_pNext = value;
 }

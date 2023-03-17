@@ -94,12 +94,12 @@ namespace Audio
 						return true;
 					}
 
-					virtual IOutputChannelPairPtr get_DirectMonitor()
+					virtual IOutputChannelPairPtr& get_DirectMonitor()
 					{
 						return m_pDirectMonitor;
 					}
 
-					virtual void put_DirectMonitor(IOutputChannelPairPtr value)
+					virtual void put_DirectMonitor(IOutputChannelPairPtr& value)
 					{
 						m_pDirectMonitor = value;
 					}
@@ -114,7 +114,7 @@ namespace Audio
 						return SAMPLE_TYPE;
 					}
 
-					virtual ISampleProcessorPtr get_First()
+					virtual ISampleProcessorPtr& get_First()
 					{
 						return m_pFirst;
 					}

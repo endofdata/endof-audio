@@ -34,7 +34,7 @@ bool ContainerReader::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-ISampleProcessorPtr ContainerReader::get_First()
+ISampleProcessorPtr& ContainerReader::get_First()
 {
 	return m_pFirst;
 }

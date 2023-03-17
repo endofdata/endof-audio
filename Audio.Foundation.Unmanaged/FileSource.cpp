@@ -44,7 +44,7 @@ int FileSource::get_SampleType()
 	return 0;
 }
 
-ISampleProcessorPtr FileSource::get_First()
+ISampleProcessorPtr& FileSource::get_First()
 {
 	return m_pFirst;
 }

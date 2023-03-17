@@ -73,12 +73,12 @@ ISampleContainerPtr SampleJoiner::get_Source(int index)
 	return m_vecSources.at(index);
 }
 
-ISampleProcessorPtr SampleJoiner::get_Next()
+ISampleProcessorPtr& SampleJoiner::get_next()
 {
 	return m_pNext;
 }
 
-void SampleJoiner::put_Next(ISampleProcessorPtr value)
+void SampleJoiner::put_Next(ISampleProcessorPtr &value)
 {
 	m_pNext = value;
 }

@@ -141,12 +141,12 @@ void TakeSequence::put_PlayPosition(AudioTime currentTime)
 	m_currentTime = currentTime;
 }
 
-ISampleProcessorPtr TakeSequence::get_Next()
+ISampleProcessorPtr& TakeSequence::get_next()
 {
 	return m_pNext;
 }
 
-void TakeSequence::put_Next(ISampleProcessorPtr value)
+void TakeSequence::put_Next(ISampleProcessorPtr &value)
 {
 	m_pNext = value;
 }

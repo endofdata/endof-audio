@@ -38,8 +38,8 @@ namespace Audio
 					/// </summary>
 					_declspec(property(get = get_SupportsDirectMonitor)) bool SupportsDirectMonitor;
 
-					IOutputChannelPairPtr get_DirectMonitor() = 0;
-					void put_DirectMonitor(IOutputChannelPairPtr value) = 0;
+					IOutputChannelPairPtr& get_DirectMonitor() = 0;
+					void put_DirectMonitor(IOutputChannelPairPtr& value) = 0;
 
 					/// <summary>
 					/// Gets or sets the optional <see cref="IOutputChannelPair"/> that is used as direct-input monitoring device.

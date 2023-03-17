@@ -33,8 +33,8 @@ namespace Audio
 
 				virtual void Reset();
 
-				virtual ISampleProcessorPtr get_Next();
-				virtual void put_Next(ISampleProcessorPtr value);
+				virtual ISampleProcessorPtr& get_next();
+				virtual void put_Next(ISampleProcessorPtr &value);
 
 				virtual bool get_HasNext();
 

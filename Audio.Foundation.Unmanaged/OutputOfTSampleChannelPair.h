@@ -95,12 +95,12 @@ namespace Audio
 						m_isActive = value;
 					}
 
-					virtual ISampleProcessorPtr get_Next()
+					virtual ISampleProcessorPtr& get_next()
 					{
 						return m_pNext;
 					}
 
-					virtual void put_Next(ISampleProcessorPtr value)
+					virtual void put_Next(ISampleProcessorPtr &value)
 					{
 						m_pNext = value;
 					}

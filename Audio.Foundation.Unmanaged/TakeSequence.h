@@ -35,8 +35,8 @@ namespace Audio
 				virtual AudioTime get_PlayPosition();
 				virtual void put_PlayPosition(AudioTime value);
 
-				ISampleProcessorPtr get_Next();
-				void put_Next(ISampleProcessorPtr value);
+				ISampleProcessorPtr& get_next();
+				void put_Next(ISampleProcessorPtr &value);
 
 				bool get_HasNext();
 

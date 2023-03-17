@@ -20,7 +20,7 @@ namespace Audio
 				ContainerReader(ISampleContainerPtr& source, int sampleCount);
 				virtual ~ContainerReader();
 
-				ISampleProcessorPtr get_First();
+				ISampleProcessorPtr& get_First();
 				void put_First(ISampleProcessorPtr& value);
 
 				bool get_HasFirst();

@@ -104,12 +104,12 @@ void MeterChannel::OnMeterUpdate()
 		handler(this);
 }
 
-ISampleProcessorPtr MeterChannel::get_Next()
+ISampleProcessorPtr& MeterChannel::get_next()
 {
 	return m_pNext;
 }
 
-void MeterChannel::put_Next(ISampleProcessorPtr value)
+void MeterChannel::put_Next(ISampleProcessorPtr &value)
 {
 	m_pNext = value;
 }

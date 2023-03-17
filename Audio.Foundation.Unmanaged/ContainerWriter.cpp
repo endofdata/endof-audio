@@ -32,12 +32,12 @@ bool ContainerWriter::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-ISampleProcessorPtr ContainerWriter::get_Next()
+ISampleProcessorPtr& ContainerWriter::get_next()
 {
 	return m_pNext;
 }
 
-void ContainerWriter::put_Next(ISampleProcessorPtr value)
+void ContainerWriter::put_Next(ISampleProcessorPtr &value)
 {
 	m_pNext = value;
 }

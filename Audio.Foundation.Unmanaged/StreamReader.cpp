@@ -31,7 +31,7 @@ bool StreamReader::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-ISampleProcessorPtr StreamReader::get_First()
+ISampleProcessorPtr& StreamReader::get_First()
 {
 	return m_pFirst;
 }

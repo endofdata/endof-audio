@@ -19,7 +19,7 @@ namespace Audio
 				StreamReader(std::istream& input, ISampleContainerPtr& container);
 				virtual ~StreamReader();
 
-				ISampleProcessorPtr get_First();
+				ISampleProcessorPtr& get_First();
 				void put_First(ISampleProcessorPtr& value);
 
 				bool get_HasFirst();

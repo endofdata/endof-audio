@@ -75,12 +75,12 @@ ISampleProcessorPtr SampleSharer::get_Target(int index)
 	return m_vecTargets.at(index);
 }
 
-ISampleProcessorPtr SampleSharer::get_Next()
+ISampleProcessorPtr& SampleSharer::get_next()
 {
 	return m_pNext;
 }
 
-void SampleSharer::put_Next(ISampleProcessorPtr value)
+void SampleSharer::put_Next(ISampleProcessorPtr &value)
 {
 	m_pNext = value;
 }

@@ -25,7 +25,7 @@ namespace Audio
 
 				int get_SampleType();
 
-				ISampleProcessorPtr get_First();
+				ISampleProcessorPtr& get_First();
 				void put_First(ISampleProcessorPtr& value);
 
 				bool get_HasFirst();

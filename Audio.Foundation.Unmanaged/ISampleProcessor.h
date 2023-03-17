@@ -20,8 +20,8 @@ namespace Audio
 
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("c69caa40-5cd1-4ae1-9101-e84a503a79ec")) ISampleProcessor : public IUnknown
 				{
-					ISampleProcessorPtr get_Next() = 0;
-					void put_Next(ISampleProcessorPtr value) = 0;
+					ISampleProcessorPtr& get_next() = 0;
+					void put_Next(ISampleProcessorPtr &value) = 0;
 
 					/// <summary>
 					/// Gets or sets the next sample processor in the processing chain

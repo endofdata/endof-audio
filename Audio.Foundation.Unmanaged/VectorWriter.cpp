@@ -45,12 +45,12 @@ bool VectorWriter::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-ISampleProcessorPtr VectorWriter::get_Next()
+ISampleProcessorPtr& VectorWriter::get_next()
 {
 	return m_pNext;
 }
 
-void VectorWriter::put_Next(ISampleProcessorPtr value)
+void VectorWriter::put_Next(ISampleProcessorPtr &value)
 {
 	m_pNext = value;
 }
