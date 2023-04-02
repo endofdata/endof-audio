@@ -31,60 +31,42 @@ bool StreamWriter::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-ISampleProcessorPtr& StreamWriter::get_next()
-{
-	return m_pNext;
-}
-
-void StreamWriter::put_Next(ISampleProcessorPtr &value)
-{
-	m_pNext = value;
-}
-
-bool StreamWriter::get_HasNext()
-{
-	return m_pNext != nullptr;
-}
-
 void StreamWriter::Process(ISampleContainerPtr& container)
 {
-	if (HasNext)
+	int samples = container->SampleCount;
+	int channels = container->ChannelCount;
+
+	if (channels == 1)
 	{
-		int samples = container->SampleCount;
-		int channels = container->ChannelCount;
+		const Sample* pSrc = container->Channels[0]->SamplePtr;
+		std::streamsize size = samples * sizeof(Sample);
 
-		if (channels == 1)
+		m_output.write((const char*)pSrc, size);
+	}
+	else
+	{
+		// HACK: This limits the maximum number of input channels to 16. But usually, we will only have one or two anyway.
+		const Sample* arSrc[16];
+
+		if (channels > 16)
 		{
-			const Sample* pSrc = container->Channels[0]->SamplePtr;
-			std::streamsize size = samples * sizeof(Sample);
-
-			m_output.write((const char*)pSrc, size);
+			channels = 16;
 		}
-		else
+
+		for (int c = 0; c < channels; c++)
 		{
-			// HACK: This limits the maximum number of input channels to 16. But usually, we will only have one or two anyway.
-			const Sample* arSrc[16];
+			arSrc[c] = container->Channels[c]->SamplePtr;
+		}
 
-			if (channels > 16)
-			{
-				channels = 16;
-			}
-
+		for (int s = 0; s < samples; s++)
+		{
 			for (int c = 0; c < channels; c++)
 			{
-				arSrc[c] = container->Channels[c]->SamplePtr;
-			}
+				const Sample** ppSrc = &arSrc[c];
 
-			for (int s = 0; s < samples; s++)
-			{
-				for (int c = 0; c < channels; c++)
-				{
-					const Sample** ppSrc = &arSrc[c];
+				m_output.write((const char*)*ppSrc, sizeof(Sample));
 
-					m_output.write((const char*)*ppSrc, sizeof(Sample));
-
-					(*ppSrc)++;
-				}
+				(*ppSrc)++;
 			}
 		}
 	}

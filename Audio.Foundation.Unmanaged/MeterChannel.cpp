@@ -14,7 +14,6 @@ MeterChannel::MeterChannel(int sampleRate, int channelCount) :
 	m_sampleRate(sampleRate),
 	m_iSamplesPerRMSFrame(880), // ~20 ms @ 44.1 kHz
 	m_meterUpdate(nullptr),
-	m_pNext(nullptr),
 	m_refCount(0)
 {
 	m_vecSumUp.resize(channelCount, 0.0);
@@ -104,28 +103,8 @@ void MeterChannel::OnMeterUpdate()
 		handler(this);
 }
 
-ISampleProcessorPtr& MeterChannel::get_next()
-{
-	return m_pNext;
-}
-
-void MeterChannel::put_Next(ISampleProcessorPtr &value)
-{
-	m_pNext = value;
-}
-
-bool MeterChannel::get_HasNext()
-{
-	return m_pNext != nullptr;
-}
-
 void MeterChannel::Process(ISampleContainerPtr& input)
 {
-	if (get_HasNext())
-	{
-		m_pNext->Process(input);
-	}
-
 	int maxChannels = std::min(input->ChannelCount, (int)m_vecSumUp.size());
 
 	if (maxChannels > 0)

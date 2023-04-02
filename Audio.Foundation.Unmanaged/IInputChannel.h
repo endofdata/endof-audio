@@ -23,6 +23,17 @@ namespace Audio
 				/// </remarks>
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("8a41766a-92ae-4f1d-b996-f8d4b98105ad")) IInputChannel : public IUnknown
 				{
+					int get_Id() = 0;
+
+					/// <summary>
+					/// Gets the unique channel identifier
+					/// </summary>
+					/// <remarks>
+					/// Value must be greater than or equal to zero
+					/// </remarks>
+					/// <returns></returns>
+					_declspec(property(get = get_Id)) int Id;
+
 					int get_SampleType() = 0;
 
 					/// <summary>
@@ -65,6 +76,9 @@ namespace Audio
 					/// Gets or sets a value indicating whether this channel is active
 					/// </summary>
 					_declspec(property(get = get_IsActive, put = put_IsActive)) bool IsActive;
+
+
+					void OnNextBuffer(ISampleContainerPtr& sampleContainer, bool readSecondHalf, int channel) = 0;
 				};
 
 				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(IInputChannel, __uuidof(IInputChannel));

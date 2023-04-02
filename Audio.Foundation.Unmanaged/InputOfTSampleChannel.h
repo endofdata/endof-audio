@@ -1,10 +1,7 @@
 #pragma once
 #include "pch.h"
-#include "OutputOfTSampleChannelPair.h"
 #include "SampleContainer.h"
 #include "IInputChannel.h"
-#include "ISampleSource.h"
-#include "ObjectFactory.h"
 
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -18,27 +15,22 @@ namespace Audio
 			namespace Templates
 			{
 				template<typename TSample, int SAMPLE_TYPE>
-				class InputOfTSampleChannel : public IInputChannel, public ISampleSource
+				class InputOfTSampleChannel : public IInputChannel
 				{
 				public:
 					/*! \brief Constructor
 
 					*/
 					InputOfTSampleChannel(int iAsioChannel, TSample* pBufferA, TSample* pBufferB, int sampleCount) :
-						m_iAsioChannel(iAsioChannel),
+						m_asioChannelId(iAsioChannel),
 						m_pBufferA(pBufferA),
 						m_pBufferB(pBufferB),
 						m_pDirectMonitor(nullptr),
-						m_pContainer(nullptr),
-						m_readSecondHalf(false),
 						m_isActive(false),
-						m_pFirst(nullptr),
 						m_refCount(0)
 					{
 						if (nullptr == m_pBufferA || nullptr == m_pBufferB)
 							throw std::invalid_argument("InputChannel: Buffer pointers must not be nullptr.");
-
-						m_pContainer = ObjectFactory::CreateSampleContainer(sampleCount, 1);
 					}
 
 					/*! \brief Destructor
@@ -47,36 +39,28 @@ namespace Audio
 					{
 					}
 
-					virtual void OnNextBuffer(bool readSecondHalf)
+					virtual void OnNextBuffer(ISampleContainerPtr& container, bool readSecondHalf, int channel)
 					{
-						m_readSecondHalf = readSecondHalf;
-
-						if (IsActive && HasFirst)
+						if (IsActive)
 						{
 							TSample* pSource;
-							SelectBufferPointer(pSource);
+							SelectBufferPointer(readSecondHalf, pSource);
 
 							// if monitor is attached, send to both monitor channels
 							if (nullptr != m_pDirectMonitor)
 							{
-								m_pDirectMonitor->DirectOut(pSource, true, true);
+								m_pDirectMonitor->DirectOut(!readSecondHalf, pSource, true, true);
 							}
 
 							// Convert the incoming samples to internal and write them to the container
-							int sampleCount = m_pContainer->SampleCount;
-							Sample* pDest = m_pContainer->Channels[0]->SamplePtr;
+							int sampleCount = container->SampleCount;
+							Sample* pDest = container->Channels[channel]->SamplePtr;
 
 							for (int i = 0; i < sampleCount; i++)
 							{
 								*pDest++ = ReadSample(pSource);
 							}
-							m_pFirst->Process(m_pContainer);
 						}
-					}
-
-					virtual ISampleContainerPtr get_Container()
-					{
-						return m_pContainer;
 					}
 
 					virtual bool get_IsActive()
@@ -114,19 +98,9 @@ namespace Audio
 						return SAMPLE_TYPE;
 					}
 
-					virtual ISampleProcessorPtr& get_First()
+					virtual int get_Id()
 					{
-						return m_pFirst;
-					}
-
-					virtual void put_First(ISampleProcessorPtr& value)
-					{
-						m_pFirst = value;
-					}
-
-					virtual bool get_HasFirst()
-					{
-						return m_pFirst != nullptr;
+						return m_asioChannelId;
 					}
 
 					TEMPLATED_IUNKNOWN
@@ -144,32 +118,24 @@ namespace Audio
 							*pResult = dynamic_cast<IInputChannel*>(this);
 							return true;
 						}
-						if (riid == _uuidof(ISampleSource))
-						{
-							*pResult = dynamic_cast<ISampleSource*>(this);
-							return true;
-						}
 						*pResult = nullptr;
 						return false;
 					}
 
 				private:
-					void SelectBufferPointer(TSample*& pSource)
+					void SelectBufferPointer(bool readSecondHalf, TSample*& pSource)
 					{
-						pSource = m_readSecondHalf ? m_pBufferB : m_pBufferA;
+						pSource = readSecondHalf ? m_pBufferB : m_pBufferA;
 					}
 
 					virtual Sample ReadSample(TSample*& pSource) = 0;
 
-					int m_iAsioChannel;
+					int m_asioChannelId;
 					TSample* m_pBufferA;
 					TSample* m_pBufferB;
-					bool m_readSecondHalf;
 
 					bool m_isActive;
 					IOutputChannelPairPtr m_pDirectMonitor;
-					ISampleContainerPtr m_pContainer;
-					ISampleProcessorPtr m_pFirst;
 
 					unsigned long m_refCount;
 				};

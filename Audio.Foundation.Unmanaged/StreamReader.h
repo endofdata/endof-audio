@@ -16,17 +16,10 @@ namespace Audio
 			class StreamReader : public ISampleSource
 			{
 			public:
-				StreamReader(std::istream& input, ISampleContainerPtr& container);
+				StreamReader(std::istream& input);
 				virtual ~StreamReader();
 
-				ISampleProcessorPtr& get_First();
-				void put_First(ISampleProcessorPtr& value);
-
-				bool get_HasFirst();
-
-				void OnNextBuffer(bool readSecondHalf);
-
-				ISampleContainerPtr get_Container();
+				int ReadSamples(ISampleContainerPtr& container);
 
 				DECLARE_IUNKNOWN
 
@@ -34,8 +27,6 @@ namespace Audio
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
-				ISampleProcessorPtr m_pFirst;
-				ISampleContainerPtr m_pContainer;
 				std::istream& m_input;
 			};
 		}

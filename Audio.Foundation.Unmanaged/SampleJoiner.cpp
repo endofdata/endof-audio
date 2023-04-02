@@ -8,7 +8,6 @@ using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 SampleJoiner::SampleJoiner() :
-	m_pNext(nullptr),
 	m_refCount(0)
 {
 }
@@ -68,39 +67,20 @@ void SampleJoiner::RemoveAllSources()
 	m_vecSources.clear();
 }
 
-ISampleContainerPtr SampleJoiner::get_Source(int index)
+ISampleContainerPtr& SampleJoiner::get_Source(int index)
 {
 	return m_vecSources.at(index);
 }
 
-ISampleProcessorPtr& SampleJoiner::get_next()
-{
-	return m_pNext;
-}
-
-void SampleJoiner::put_Next(ISampleProcessorPtr &value)
-{
-	m_pNext = value;
-}
-
-bool SampleJoiner::get_HasNext()
-{
-	return m_pNext != nullptr;
-}
-
 void SampleJoiner::Process(ISampleContainerPtr& container)
 {
-	if (HasNext)
-	{
-		int targetChannelCount = container->ChannelCount;
+	int targetChannelCount = container->ChannelCount;
 
-		if (targetChannelCount > 0)
+	if (targetChannelCount > 0)
+	{
+		std::for_each(m_vecSources.begin(), m_vecSources.end(), [this, &container](ISampleContainerPtr& item)
 		{
-			std::for_each(m_vecSources.begin(), m_vecSources.end(), [this, &container](ISampleContainerPtr& item)
-			{
-				item->AddTo(container, 0, item->SampleCount, 0, item->ChannelCount, 0, 0);
-			});
-		}
-		m_pNext->Process(container);
+			item->AddTo(container, 0, item->SampleCount, 0, item->ChannelCount, 0, 0);
+		});
 	}
 }

@@ -35,11 +35,6 @@ namespace Audio
 				virtual AudioTime get_PlayPosition();
 				virtual void put_PlayPosition(AudioTime value);
 
-				ISampleProcessorPtr& get_next();
-				void put_Next(ISampleProcessorPtr &value);
-
-				bool get_HasNext();
-
 				void Process(ISampleContainerPtr& container);
 
 				DECLARE_IUNKNOWN
@@ -58,7 +53,6 @@ namespace Audio
 				std::vector<ITakePtr>::iterator m_scheduledTake;
 				AudioTime m_scheduledTime;
 
-				ISampleProcessorPtr m_pNext;
 				ISampleContainerPtr m_pTargetContainer;
 			};
 		}

@@ -102,9 +102,6 @@
     <ClInclude Include="ISampleProcessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FileSource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SampleType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -156,6 +153,15 @@
     <ClInclude Include="ContainerReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IProcessingChain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessingChain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -200,9 +206,6 @@
     <ClCompile Include="FileReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FileSource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AudioFoundationException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -225,6 +228,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ContainerReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessingChain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

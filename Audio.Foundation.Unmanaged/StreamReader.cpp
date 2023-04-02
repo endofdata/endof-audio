@@ -3,9 +3,8 @@
 
 using namespace Audio::Foundation::Unmanaged;
 
-StreamReader::StreamReader(std::istream& input, ISampleContainerPtr& container) :
+StreamReader::StreamReader(std::istream& input) :
 	m_input(input),
-	m_pContainer(container),
 	m_refCount(0)
 {
 }
@@ -31,34 +30,15 @@ bool StreamReader::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-ISampleProcessorPtr& StreamReader::get_First()
-{
-	return m_pFirst;
-}
 
-void StreamReader::put_First(ISampleProcessorPtr& value)
+int StreamReader::ReadSamples(ISampleContainerPtr& container)
 {
-	m_pFirst = value;
-}
-
-bool StreamReader::get_HasFirst()
-{
-	return m_pFirst != nullptr;
-}
-
-ISampleContainerPtr StreamReader::get_Container()
-{
-	return m_pContainer;
-}
-
-void StreamReader::OnNextBuffer(bool readSecondHalf)
-{
-	int samples = m_pContainer->SampleCount;
-	int channels = m_pContainer->ChannelCount;
+	int samples = container->SampleCount;
+	int channels = container->ChannelCount;
 
 	if (channels == 1)
 	{
-		Sample* pDst = m_pContainer->Channels[0]->SamplePtr;
+		Sample* pDst = container->Channels[0]->SamplePtr;
 		std::streamsize size = samples * sizeof(Sample);
 
 		m_input.read((char*)pDst, size);
@@ -75,7 +55,7 @@ void StreamReader::OnNextBuffer(bool readSecondHalf)
 
 		for (int c = 0; c < channels; c++)
 		{
-			arDst[c] = m_pContainer->Channels[c]->SamplePtr;
+			arDst[c] = container->Channels[c]->SamplePtr;
 		}
 
 		for (int s = 0; s < samples; s++)
@@ -90,5 +70,6 @@ void StreamReader::OnNextBuffer(bool readSecondHalf)
 			}
 		}
 	}
+	return samples;
 }
 

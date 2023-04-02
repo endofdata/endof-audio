@@ -10,8 +10,7 @@ using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 SampleSharer::SampleSharer() : 
-	m_refCount(0), 
-	m_pNext(nullptr)
+	m_refCount(0)
 {
 }
 
@@ -70,24 +69,9 @@ void SampleSharer::RemoveAllTargets()
 	m_vecTargets.clear();
 }
 
-ISampleProcessorPtr SampleSharer::get_Target(int index)
+ISampleProcessorPtr& SampleSharer::get_Target(int index)
 {
 	return m_vecTargets.at(index);
-}
-
-ISampleProcessorPtr& SampleSharer::get_next()
-{
-	return m_pNext;
-}
-
-void SampleSharer::put_Next(ISampleProcessorPtr &value)
-{
-	m_pNext = value;
-}
-
-bool SampleSharer::get_HasNext()
-{
-	return m_pNext != nullptr;
 }
 
 void SampleSharer::Process(ISampleContainerPtr& container)
@@ -96,9 +80,4 @@ void SampleSharer::Process(ISampleContainerPtr& container)
 	{
 		item->Process(container);
 	});
-
-	if (HasNext)
-	{
-		m_pNext->Process(container);
-	}
 }

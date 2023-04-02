@@ -22,7 +22,7 @@ namespace Audio
 					/// </summary>
 					/// <param name="index">Index of the requested item</param>
 					/// <returns>The <see cref="ISampleContainer"/> or <see langword="null"/> if <paramref name="index"/> is out of range.</returns>
-					ISampleContainerPtr get_Source(int index) = 0;
+					ISampleContainerPtr& get_Source(int index) = 0;
 
 					/// <summary>
 					/// Gets sources as defined by previous calls to <see cref="AddSource"/>

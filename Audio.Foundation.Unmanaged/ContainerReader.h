@@ -17,17 +17,10 @@ namespace Audio
 			class ContainerReader : public ISampleSource
 			{
 			public:
-				ContainerReader(ISampleContainerPtr& source, int sampleCount);
+				ContainerReader(ISampleContainerPtr& source);
 				virtual ~ContainerReader();
 
-				ISampleProcessorPtr& get_First();
-				void put_First(ISampleProcessorPtr& value);
-
-				bool get_HasFirst();
-
-				void OnNextBuffer(bool readSecondHalf);
-
-				ISampleContainerPtr get_Container();
+				int ReadSamples(ISampleContainerPtr& container);
 
 				DECLARE_IUNKNOWN
 
@@ -35,7 +28,6 @@ namespace Audio
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
-				ISampleProcessorPtr m_pFirst;
 				ISampleContainerPtr m_pSource;
 				int m_sampleCount;
 				int m_sampleOffset;

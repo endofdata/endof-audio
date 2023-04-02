@@ -18,11 +18,6 @@ namespace Audio
 				VectorWriter(int channelCount, int initialSize, int growth);
 				virtual ~VectorWriter();
 
-				ISampleProcessorPtr& get_next();
-				void put_Next(ISampleProcessorPtr &value);
-
-				bool get_HasNext();
-
 				void Process(ISampleContainerPtr& container);
 
 				DECLARE_IUNKNOWN
@@ -33,7 +28,6 @@ namespace Audio
 			private:
 				ISampleContainerPtr CreateSampleContainer();
 
-				ISampleProcessorPtr m_pNext;
 				int m_growth;
 				int m_inUse;
 				std::vector<std::vector<Sample>> m_buffers;

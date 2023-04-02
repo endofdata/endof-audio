@@ -14,7 +14,7 @@ namespace Audio
 			class FileReader : public StreamReader
 			{
 			public:
-				FileReader(const std::string& filename, ISampleContainerPtr& container);
+				FileReader(const std::string& filename);
 				virtual ~FileReader();
 
 				const std::string& get_Filename() const;

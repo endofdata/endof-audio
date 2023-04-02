@@ -16,6 +16,17 @@ namespace Audio
 			{
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("5d96f162-5569-40b6-9cc1-529800d1eaa2")) IOutputChannelPair : public IUnknown
 				{
+					int get_Id() = 0;
+
+					/// <summary>
+					/// Gets the unique channel identifier
+					/// </summary>
+					/// <remarks>
+					/// Value must be greater than or equal to zero
+					/// </remarks>
+					/// <returns></returns>
+					_declspec(property(get = get_Id)) int Id;
+
 					int get_SampleType() = 0;
 
 					/// <summary>
@@ -37,7 +48,7 @@ namespace Audio
 					/// Processes the next audio buffer
 					/// </summary>
 					/// <param name="readSecondHalf">ASIO specific: is this the second half-buffer?</param>
-					void OnNextBuffer(bool writeSecondHalf) = 0;
+					void OnNextBuffer(ISampleContainerPtr& container, bool writeSecondHalf, int firstChannel) = 0;
 
 					/// <summary>
 					/// Processed native sample buffers for direct monitoring
@@ -45,7 +56,7 @@ namespace Audio
 					/// <param name="pBuffer">Native sample buffer</param>
 					/// <param name="fLeft">Level for left channel</param>
 					/// <param name="fRight">Level for right channel</param>
-					void DirectOut(void* pBuffer, bool fLeft, bool fRight) = 0;
+					void DirectOut(bool writeSecondHalf, void* pBuffer, bool fLeft, bool fRight) = 0;
 				};
 
 				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(IOutputChannelPair, __uuidof(IOutputChannelPair));

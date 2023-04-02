@@ -45,21 +45,6 @@ bool VectorWriter::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-ISampleProcessorPtr& VectorWriter::get_next()
-{
-	return m_pNext;
-}
-
-void VectorWriter::put_Next(ISampleProcessorPtr &value)
-{
-	m_pNext = value;
-}
-
-bool VectorWriter::get_HasNext()
-{
-	return m_pNext != nullptr;
-}
-
 void VectorWriter::Process(ISampleContainerPtr& container)
 {
 	int samples = container->SampleCount;
@@ -78,14 +63,9 @@ void VectorWriter::Process(ISampleContainerPtr& container)
 		std::memcpy(&buffer.data()[m_inUse], pSrc, samples * sizeof(Sample));
 	});
 	m_inUse += samples;
-
-	if (HasNext)
-	{
-		m_pNext->Process(container);
-	}
 }
 
 ISampleContainerPtr VectorWriter::CreateSampleContainer()
 {
-	return ObjectFactory::CreateSampleContainer(m_inUse, m_buffers.size());
+	return ObjectFactory::CreateSampleContainer(m_inUse, (int)m_buffers.size());
 }

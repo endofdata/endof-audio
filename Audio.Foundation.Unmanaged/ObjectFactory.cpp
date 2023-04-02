@@ -6,10 +6,10 @@
 #include "SampleJoiner.h"
 #include "SampleSharer.h"
 #include "FileWriter.h"
+#include "FileReader.h"
 #include "ContainerReader.h"
 #include "ContainerWriter.h"
 #include "VectorWriter.h"
-#include "FileSource.h"
 #include "Take.h"
 #include "TakeSequence.h"
 #include "InputInt32Channel.h"
@@ -19,6 +19,8 @@
 #include "OutputInt24ChannelPair.h"
 #include "OutputFloat32ChannelPair.h"
 #include "AudioFoundationException.h"
+#include "ProcessingChain.h"
+#include "SourceProcessor.h"
 #include "HostClock.h"
 
 #include <stdexcept>
@@ -73,15 +75,19 @@ ISampleProcessorPtr ObjectFactory::CreateToContainerProcessor(int channelCount, 
 	return new VectorWriter(channelCount, initialSize, growth);
 }
 
-ISampleSourcePtr ObjectFactory::CreateFileSource(int sampleCount, int channelCount, const std::string& filename)
+ISampleSourcePtr ObjectFactory::CreateFileSource(const std::string& filename)
 {
-	ISampleContainerPtr container = CreateSampleContainer(sampleCount, channelCount);
-	return new FileSource(filename, container);
+	return new FileReader(filename);
 }
 
-ISampleSourcePtr ObjectFactory::CreateContainerSource(ISampleContainerPtr& source, int sampleCount)
+ISampleSourcePtr ObjectFactory::CreateContainerSource(ISampleContainerPtr& source)
 {
-	return new ContainerReader(source, sampleCount);
+	return new ContainerReader(source);
+}
+
+ISampleProcessorPtr ObjectFactory::CreateFromSourceProcessor(ISampleSourcePtr& source)
+{
+	return new SourceProcessor(source);
 }
 
 ITakePtr ObjectFactory::CreateTake(ISampleContainerPtr& container, AudioTime position, IHostClockPtr& hostClock)
@@ -147,6 +153,11 @@ IOutputChannelPairPtr ObjectFactory::CreateOutputChannelPair(int sampleType, int
 		throw AudioFoundationException("Not enough memory for OutputChannelPair instance.", E_OUTOFMEMORY);
 
 	return outputPair;
+}
+
+IProcessingChainPtr ObjectFactory::CreateProcessingChain(ISampleContainerPtr& container)
+{
+	return new ProcessingChain(container);
 }
 
 int ObjectFactory::NextTakeId()

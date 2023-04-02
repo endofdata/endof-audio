@@ -24,7 +24,7 @@ namespace Audio
 					/// </summary>
 					/// <param name="index">Index of the requested item</param>
 					/// <returns>The <see cref="ISampleProcessor"/> or <see langword="null"/> if <paramref name="index"/> is out of range.</returns>
-					ISampleProcessorPtr get_Target(int index) = 0;
+					ISampleProcessorPtr& get_Target(int index) = 0;
 
 					/// <summary>
 					/// Gets targets as defined by previous calls to <see cref="AddTarget"/>

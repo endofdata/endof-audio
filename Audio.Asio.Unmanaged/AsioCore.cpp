@@ -5,9 +5,11 @@
 #include "AsioDebugDriver.h"
 #include "AsioDebugDriverGuid.h"
 #include <ObjectFactory.h>
+#include <IProcessingChain.h>
 #include <SampleType.h>
 #include <functional>
 #include <iostream>
+#include <algorithm>
 
 using namespace Audio::Asio::Unmanaged;
 using namespace Audio::Foundation::Unmanaged;
@@ -290,6 +292,9 @@ void AsioCore::CreateBuffers(const int inputChannelIds[], int numInputIds, const
 
 		try
 		{
+			auto container = ObjectFactory::CreateSampleContainer(m_iSampleCount, std::max<int>(numInputIds, numOutputIds));
+			m_processingChain = ObjectFactory::CreateProcessingChain(container);
+
 			CreateInputChannels(0, numInputIds);
 			CreateOutputChannels(numInputIds, numOutputIds);
 		}
@@ -316,14 +321,7 @@ void AsioCore::CreateInputChannels(int offset, int count)
 			if (nullptr == input)
 				throw AsioCoreException("AsioCore: Not enough memory for InputChannel instance.", E_OUTOFMEMORY);
 
-			ISampleSourcePtr source = nullptr;
-			input->QueryInterface(&source);
-
-			if (nullptr == source)
-				throw AsioCoreException("AsioCore: Input channel does not implement ISampleSource.", E_OUTOFMEMORY);
-
-			m_inputChannels.push_back(input);
-			m_sampleSources.push_back(source);
+			m_processingChain->AddInput(input);
 		}
 	}
 }
@@ -365,7 +363,7 @@ void AsioCore::CreateOutputChannels(int offset, int count)
 			if (outputPair == nullptr)
 				throw AsioCoreException("AsioCore: Not enough memory for OutputChannelPair instance.", E_OUTOFMEMORY);
 
-			m_outputChannelPairs.push_back(outputPair);
+			m_processingChain->AddOutputPair(outputPair);
 		}
 	}
 }
@@ -373,9 +371,11 @@ void AsioCore::CreateOutputChannels(int offset, int count)
 
 void AsioCore::DisposeBuffers()
 {
-	DisposeOutputChannels();
-
-	DisposeInputChannels();
+	if (nullptr != m_processingChain)
+	{
+		m_processingChain->RemoveAllOutputChannels();
+		m_processingChain->RemoveAllInputChannels();
+	}
 
 	if (nullptr != m_pHwBufferInfo)
 	{
@@ -388,33 +388,6 @@ void AsioCore::DisposeBuffers()
 	}
 }
 
-void AsioCore::DisposeInputChannels()
-{
-	m_inputChannels.clear();
-}
-
-void AsioCore::DisposeOutputChannels()
-{
-	m_outputChannelPairs.clear();
-}
-
-void AsioCore::SetInputMonitoring(int iInputChannel, int iOutputPair)
-{
-	if (m_iCurrentMonitorInput >= 0)
-	{
-		IOutputChannelPairPtr empty;
-		m_inputChannels[m_iCurrentMonitorInput]->DirectMonitor = empty;
-		m_iCurrentMonitorInput = -1;
-	}
-	if (0 <= iInputChannel && iInputChannel < m_inputChannels.size())
-	{
-		if (0 <= iOutputPair && iOutputPair < m_outputChannelPairs.size())
-		{
-			m_inputChannels[iInputChannel]->DirectMonitor = m_outputChannelPairs[iOutputPair];
-			m_iCurrentMonitorInput = iInputChannel;
-		}
-	}
-}
 
 void AsioCore::OnBufferSwitch(long doubleBufferIndex, ASIOBool directProcess) const
 {
@@ -424,15 +397,7 @@ void AsioCore::OnBufferSwitch(long doubleBufferIndex, ASIOBool directProcess) co
 	bool writeSecondHalf = doubleBufferIndex != 0;
 	bool readSecondHalf = doubleBufferIndex == 0;
 
-	std::for_each(m_outputChannelPairs.begin(), m_outputChannelPairs.end(), [writeSecondHalf](const IOutputChannelPairPtr& pChannelPair)
-	{
-		pChannelPair->OnNextBuffer(writeSecondHalf);
-	});
-
-	std::for_each(m_sampleSources.begin(), m_sampleSources.end(), [readSecondHalf](const ISampleSourcePtr& pSource)
-	{
-		pSource->OnNextBuffer(readSecondHalf);
-	});
+	m_processingChain->OnNextBuffer(writeSecondHalf);
 
 	BufferSwitchEventHandler handler = m_bufferSwitchEventHandler;
 
@@ -525,38 +490,6 @@ int AsioCore::get_HardwareOutputCount()
 	return m_iHwOutputCount;
 }
 
-int AsioCore::get_InputChannelCount()
-{
-	return (int)m_inputChannels.size();
-}
-
-IInputChannelPtr AsioCore::get_InputChannel(int iChannel)
-{
-	IInputChannelPtr value = nullptr;
-
-	if (0 <= iChannel && iChannel < m_inputChannels.size())
-	{
-		value = m_inputChannels[iChannel];
-	}
-	return value;
-}
-
-int AsioCore::get_OutputChannelPairCount()
-{
-	return (int)m_outputChannelPairs.size();
-}
-
-IOutputChannelPairPtr AsioCore::get_OutputChannelPair(int iChannel)
-{
-	IOutputChannelPairPtr value = nullptr;
-
-	if (0 <= iChannel && iChannel < m_outputChannelPairs.size())
-	{
-		value = m_outputChannelPairs[iChannel];
-	}
-	return value;
-}
-
 int AsioCore::get_SampleCount()
 {
 	return m_iSampleCount;
@@ -600,6 +533,11 @@ BufferSwitchEventHandler AsioCore::get_BufferSwitchEventHandler()
 void AsioCore::put_BufferSwitchEventHandler(BufferSwitchEventHandler value)
 {
 	m_bufferSwitchEventHandler = value;
+}
+
+IProcessingChainPtr& AsioCore::get_ProcessingChain()
+{
+	return m_processingChain;
 }
 
 int AsioCore::GetHardwareChannelName(ASIOBool isInput, int index, char* pcBuffer, int max)

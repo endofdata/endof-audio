@@ -63,6 +63,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>D:\Gamer I5\Documents\Projects\Audio\Audio.Foundation.Unmanaged;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>Default</LanguageStandard>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -82,6 +83,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>D:\Gamer I5\Documents\Projects\Audio\Audio.Foundation.Unmanaged;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>Default</LanguageStandard>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -96,7 +98,6 @@
     <ClInclude Include="AudioFoundationException.h" />
     <ClInclude Include="ContainerWriter.h" />
     <ClInclude Include="FileReader.h" />
-    <ClInclude Include="FileSource.h" />
     <ClInclude Include="FileWriter.h" />
     <ClInclude Include="HostClock.h" />
     <ClInclude Include="IHostClock.h" />
@@ -107,6 +108,7 @@
     <ClInclude Include="InputInt32Channel.h" />
     <ClInclude Include="InputOfTSampleChannel.h" />
     <ClInclude Include="IOutputChannelPair.h" />
+    <ClInclude Include="IProcessingChain.h" />
     <ClInclude Include="ISampleBuffer.h" />
     <ClInclude Include="ISampleContainer.h" />
     <ClInclude Include="ISampleJoiner.h" />
@@ -121,6 +123,7 @@
     <ClInclude Include="OutputInt24ChannelPair.h" />
     <ClInclude Include="OutputInt32ChannelPair.h" />
     <ClInclude Include="OutputOfTSampleChannelPair.h" />
+    <ClInclude Include="ProcessingChain.h" />
     <ClInclude Include="SampleBuffer.h" />
     <ClInclude Include="SampleBufferSpan.h" />
     <ClInclude Include="SampleContainer.h" />
@@ -131,6 +134,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="SampleType.h" />
+    <ClInclude Include="SourceProcessor.h" />
     <ClInclude Include="StreamReader.h" />
     <ClInclude Include="StreamWriter.h" />
     <ClInclude Include="Take.h" />
@@ -146,11 +150,11 @@
     <ClCompile Include="ContainerReader.cpp" />
     <ClCompile Include="ContainerWriter.cpp" />
     <ClCompile Include="FileReader.cpp" />
-    <ClCompile Include="FileSource.cpp" />
     <ClCompile Include="FileWriter.cpp" />
     <ClCompile Include="HostClock.cpp" />
     <ClCompile Include="MeterChannel.cpp" />
     <ClCompile Include="ObjectFactory.cpp" />
+    <ClCompile Include="ProcessingChain.cpp" />
     <ClCompile Include="SampleBuffer.cpp" />
     <ClCompile Include="SampleBufferSpan.cpp" />
     <ClCompile Include="SampleContainer.cpp" />
@@ -162,6 +166,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SourceProcessor.cpp" />
     <ClCompile Include="StreamReader.cpp" />
     <ClCompile Include="StreamWriter.cpp" />
     <ClCompile Include="Take.cpp" />

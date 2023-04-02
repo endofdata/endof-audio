@@ -11,8 +11,8 @@
 #include <iasiodrv.h>
 #include <vector>
 #include <IInputChannel.h>
-#include <ISampleSource.h>
 #include <IOutputChannelPair.h>
+#include <IProcessingChain.h>
 #include <memory>
 #include "AsioCoreCallbacks.h"
 
@@ -68,21 +68,9 @@ namespace Audio
 
 				int get_HardwareOutputCount();
 
-				_declspec(property(get = get_InputChannelCount)) int InputChannelCount;
+				_declspec(property(get = get_ProcessingChain)) IProcessingChainPtr ProcessingChain;
 
-				int get_InputChannelCount();
-
-				_declspec(property(get = get_InputChannel)) IInputChannelPtr InputChannel[];
-
-				IInputChannelPtr get_InputChannel(int iChannel);
-
-				_declspec(property(get = get_OutputChannelPairCount)) int OutputChannelPairCount;
-
-				int get_OutputChannelPairCount();
-
-				_declspec(property(get = get_OutputChannelPair)) IOutputChannelPairPtr OutputChannelPair[];
-
-				IOutputChannelPairPtr get_OutputChannelPair(int iChannel);
+				IProcessingChainPtr& get_ProcessingChain();
 
 				_declspec(property(get = get_SampleCount)) int SampleCount;
 
@@ -150,10 +138,6 @@ namespace Audio
 
 				void DisposeBuffers();
 
-				void DisposeInputChannels();
-
-				void DisposeOutputChannels();
-
 				void OnBufferSwitch(long doubleBufferIndex, ASIOBool directProcess) const;
 
 				ASIOTime* OnBufferSwitchTimeInfo(ASIOTime* params, long doubleBufferIndex, ASIOBool directProcess);
@@ -179,10 +163,7 @@ namespace Audio
 				int m_iHwPinCount;
 				ASIOBufferInfo* m_pHwBufferInfo;
 
-				std::vector<IInputChannelPtr> m_inputChannels;			
-				std::vector<ISampleSourcePtr> m_sampleSources;
-
-				std::vector<IOutputChannelPairPtr> m_outputChannelPairs;
+				IProcessingChainPtr m_processingChain;
 
 				int m_iCurrentMonitorInput;
 

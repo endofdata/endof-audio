@@ -14,6 +14,7 @@
 #include <ITakeSequence.h>
 #include <IHostClock.h>
 #include <IInputChannel.h>
+#include <IProcessingChain.h>
 #include <string>
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -45,9 +46,11 @@ namespace Audio
 
 				static ISampleProcessorPtr CreateToContainerProcessor(int channelCount, int initialSize, int growth);
 
-				static ISampleSourcePtr CreateFileSource(int sampleCount, int channelCount, const std::string& filename);
+				static ISampleSourcePtr CreateFileSource(const std::string& filename);
 
-				static ISampleSourcePtr CreateContainerSource(ISampleContainerPtr& source, int sampleCount);
+				static ISampleSourcePtr CreateContainerSource(ISampleContainerPtr& source);
+
+				static ISampleProcessorPtr CreateFromSourceProcessor(ISampleSourcePtr& source);
 
 				static ITakePtr CreateTake(ISampleContainerPtr& container, AudioTime position, IHostClockPtr& hostClock);
 
@@ -61,6 +64,8 @@ namespace Audio
 
 				static IOutputChannelPairPtr CreateOutputChannelPair(int sampleTpe,
 					int hwChannelId1, void* pBufferA1, void* pBufferB1, int hwChannelId2, void* pBufferA2, void* pBufferB2, int sampleCount);
+
+				static IProcessingChainPtr CreateProcessingChain(ISampleContainerPtr& container);
 
 			private:
 				ObjectFactory();

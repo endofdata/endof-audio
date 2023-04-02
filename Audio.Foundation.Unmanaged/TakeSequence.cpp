@@ -141,21 +141,6 @@ void TakeSequence::put_PlayPosition(AudioTime currentTime)
 	m_currentTime = currentTime;
 }
 
-ISampleProcessorPtr& TakeSequence::get_next()
-{
-	return m_pNext;
-}
-
-void TakeSequence::put_Next(ISampleProcessorPtr &value)
-{
-	m_pNext = value;
-}
-
-bool TakeSequence::get_HasNext()
-{
-	return m_pNext != nullptr;
-}
-
 void TakeSequence::Process(ISampleContainerPtr& container)
 {	
 	bool hasTake = false;
@@ -193,9 +178,5 @@ void TakeSequence::Process(ISampleContainerPtr& container)
 			}
 			m_playPosition = m_takes.end();
 		}
-	}
-	if (HasNext)
-	{
-		m_pNext->Process(m_pTargetContainer);
 	}
 }

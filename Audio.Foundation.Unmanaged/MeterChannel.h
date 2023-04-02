@@ -33,11 +33,6 @@ namespace Audio
 
 				virtual void Reset();
 
-				virtual ISampleProcessorPtr& get_next();
-				virtual void put_Next(ISampleProcessorPtr &value);
-
-				virtual bool get_HasNext();
-
 				virtual void Process(ISampleContainerPtr& inputBuffer);
 
 				DECLARE_IUNKNOWN
@@ -51,7 +46,6 @@ namespace Audio
 				static const float DbFSMin;
 
 				MeterChannelCallback m_meterUpdate;
-				ISampleProcessorPtr m_pNext;
 
 				int m_sampleRate;
 				int m_iSamplesPerRMSFrame;

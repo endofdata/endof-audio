@@ -17,7 +17,7 @@ namespace Audio
 			namespace Templates
 			{
 				template <typename TSample, int SAMPLE_TYPE, size_t SAMPLE_SIZE>
-				class OutputOfTSampleChannelPair : public IOutputChannelPair, public ISampleProcessor
+				class OutputOfTSampleChannelPair : public IOutputChannelPair
 				{
 				public:
 					/*! \brief Constructor
@@ -27,12 +27,12 @@ namespace Audio
 						\param[in] pBuffer		Output buffer for TSample samples
 						\param[in] iSamples		Size of buffer in samples
 					*/
-					OutputOfTSampleChannelPair(int iAsioChannelLeft, TSample* pBufferLeftA, TSample* pBufferLeftB,
-						int iAsioChannelRight, TSample* pBufferRightA, TSample* pBufferRightB, int sampleCount) :
-						m_iAsioChannelLeft(iAsioChannelLeft),
+					OutputOfTSampleChannelPair(int idAsioChannelLeft, TSample* pBufferLeftA, TSample* pBufferLeftB,
+						int idAsioChannelRight, TSample* pBufferRightA, TSample* pBufferRightB, int sampleCount) :
+						m_asioChannelIdLeft(idAsioChannelLeft),
 						m_pOutputLeftA(pBufferLeftA),
 						m_pOutputLeftB(pBufferLeftB),
-						m_iAsioChannelRight(iAsioChannelRight),
+						m_asioChannelIdRight(idAsioChannelRight),
 						m_pOutputRightA(pBufferRightA),
 						m_pOutputRightB(pBufferRightB),
 						m_sampleCount(sampleCount),
@@ -58,17 +58,38 @@ namespace Audio
 
 						\param[in] writeSecondHalf	If true, the second buffer half gets activated.
 					*/
-					virtual void OnNextBuffer(bool writeSecondHalf)
+					virtual void OnNextBuffer(ISampleContainerPtr& container,  bool writeSecondHalf, int firstChannel)
 					{
-						m_writeSecondHalf = writeSecondHalf;
+						if (IsActive)
+						{
+							int sampleChannels = container == nullptr ? 0 : container->ChannelCount;
+
+							if (sampleChannels > firstChannel)
+							{
+								int secondChannel = std::min(sampleChannels - 1, firstChannel + 1);
+								const Sample* pSourceLeft = container->Channels[firstChannel]->SamplePtr;
+								const Sample* pSourceRight = container->Channels[secondChannel]->SamplePtr;
+
+								TSample* pTargetLeft;
+								TSample* pTargetRight;
+
+								SelectBufferPointer(writeSecondHalf, pTargetLeft, pTargetRight);
+
+								for (int i = 0; i < m_sampleCount; i++)
+								{
+									WriteSample(*pSourceLeft++, pTargetLeft);
+									WriteSample(*pSourceRight++, pTargetRight);
+								}
+							}
+						}
 					}
 
-					virtual void DirectOut(void* pBuffer, bool fLeft, bool fRight)
+					virtual void DirectOut(bool writeSecondHalf, void* pBuffer, bool fLeft, bool fRight)
 					{
 						TSample* pTargetLeft;
 						TSample* pTargetRight;
 
-						SelectBufferPointer(pTargetLeft, pTargetRight);
+						SelectBufferPointer(writeSecondHalf, pTargetLeft, pTargetRight);
 
 						if (fLeft)
 						{
@@ -95,42 +116,9 @@ namespace Audio
 						m_isActive = value;
 					}
 
-					virtual ISampleProcessorPtr& get_next()
+					virtual int get_Id()
 					{
-						return m_pNext;
-					}
-
-					virtual void put_Next(ISampleProcessorPtr &value)
-					{
-						m_pNext = value;
-					}
-
-					virtual bool get_HasNext()
-					{
-						return m_pNext != nullptr;
-					}
-
-					virtual void Process(ISampleContainerPtr& container)
-					{
-						int inputChannels = container == nullptr ? 0 : container->ChannelCount;
-
-						if (inputChannels > 0)
-						{
-							int rightChannel = inputChannels == 1 ? 0 : 1;
-							const Sample* pSourceLeft = container->Channels[0]->SamplePtr;
-							const Sample* pSourceRight = container->Channels[rightChannel]->SamplePtr;
-
-							TSample* pTargetLeft;
-							TSample* pTargetRight;
-
-							SelectBufferPointer(pTargetLeft, pTargetRight);
-
-							for (int i = 0; i < m_sampleCount; i++)
-							{
-								WriteSample(*pSourceLeft++, pTargetLeft);
-								WriteSample(*pSourceRight++, pTargetRight);
-							}
-						}
+						return m_asioChannelIdLeft << 16 | m_asioChannelIdRight;
 					}
 
 					TEMPLATED_IUNKNOWN
@@ -158,9 +146,9 @@ namespace Audio
 					}
 
 				private:
-					void SelectBufferPointer(TSample*& pLeft, TSample*& pRight)
+					void SelectBufferPointer(bool writeSecondHalf, TSample*& pLeft, TSample*& pRight)
 					{
-						if (m_writeSecondHalf)
+						if (writeSecondHalf)
 						{
 							pLeft = m_pOutputLeftB;
 							pRight = m_pOutputRightB;
@@ -174,10 +162,10 @@ namespace Audio
 
 					virtual void WriteSample(Sample value, TSample*& pTarget) = 0;
 
-					int m_iAsioChannelLeft;
+					int m_asioChannelIdLeft;
 					TSample* m_pOutputLeftA;
 					TSample* m_pOutputLeftB;
-					int m_iAsioChannelRight;
+					int m_asioChannelIdRight;
 					TSample* m_pOutputRightA;
 					TSample* m_pOutputRightB;
 					int m_sampleCount;
