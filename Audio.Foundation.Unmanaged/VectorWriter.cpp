@@ -3,6 +3,8 @@
 #include "ObjectFactory.h"
 #include <algorithm>
 #include <functional>
+#include "SampleContainerSpan.h"
+#include "SampleBufferSpan.h"
 
 using namespace Audio::Foundation::Unmanaged;
 
@@ -67,5 +69,14 @@ void VectorWriter::Process(ISampleContainerPtr& container)
 
 ISampleContainerPtr VectorWriter::CreateSampleContainer()
 {
-	return ObjectFactory::CreateSampleContainer(m_inUse, (int)m_buffers.size());
+	int channel = 0;
+	std::vector<ISampleBufferPtr> bufferPointers;
+
+	std::for_each(m_buffers.begin(), m_buffers.end(), [this, &bufferPointers](std::vector<Sample>& buffer)
+	{
+		ISampleBufferPtr sampleBuffer = new SampleBufferSpan(buffer.data(), m_inUse);
+
+		bufferPointers.push_back(sampleBuffer);
+	});
+	return new SampleContainerSpan(bufferPointers, m_inUse);
 }
