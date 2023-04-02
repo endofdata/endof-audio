@@ -22,6 +22,7 @@ namespace Test
 
 					TEST_METHOD(InMemoryTransfer)
 					{
+						// create a test container and write it repeatedly to a dynamic container
 						ISampleContainerPtr pBufferContainer = HelperMethods::CreateTestContainer(Constants::SampleCount, Constants::ChannelCount);
 						ISampleProcessorPtr pWriter = ObjectFactory::CreateToContainerProcessor(Constants::ChannelCount, Constants::SampleCount * 10, Constants::SampleCount * 2);
 
@@ -31,21 +32,22 @@ namespace Test
 							pWriter->Process(pBufferContainer);
 						}
 
+						// get the resulting full-data container
 						ISampleContainerPtr pFullDataContainer = nullptr;
 						pWriter->QueryInterface<ISampleContainer>(&pFullDataContainer);
 						Assert::IsNotNull(pFullDataContainer.GetInterfacePtr(), L"Can access full data container from vector writer.");
 						
-						ISampleSourcePtr pSampleSource = ObjectFactory::CreateContainerSource(pFullDataContainer, Constants::SampleCount);
+						// create a source processor from the full-data container 
+						ISampleSourcePtr pSampleSource = ObjectFactory::CreateContainerSource(pFullDataContainer);
+						ISampleProcessorPtr pSourceProcessor = ObjectFactory::CreateFromSourceProcessor(pSampleSource);
+
+						// create a new target container writer
 						ISampleProcessorPtr pOutputWriter = ObjectFactory::CreateToContainerProcessor(Constants::ChannelCount, Constants::SampleCount * 3, Constants::SampleCount * 1);
-
-						pSampleSource->First = pOutputWriter;
-
-						bool readSecondHalf = false;
 
 						for (int i = 0; i < loopsForTenSeconds; i++)
 						{
-							pSampleSource->OnNextBuffer(readSecondHalf);
-							readSecondHalf = !readSecondHalf;
+							pSourceProcessor->Process(pBufferContainer);
+							pOutputWriter->Process(pBufferContainer);
 						}
 
 						ISampleContainerPtr pResult = nullptr;

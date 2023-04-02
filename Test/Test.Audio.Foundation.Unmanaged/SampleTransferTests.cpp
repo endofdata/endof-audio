@@ -71,53 +71,27 @@ namespace Test
 					TEST_METHOD(ProcessingChain)
 					{
 						HardwareBuffers hwBuffers(Constants::SampleCount);
+						IProcessingChainPtr pProcessingChain = CreateProcessingChain(hwBuffers);
 
-						IInputChannelPtr pInput = hwBuffers.CreateInputChannel(0);
+						bool writeSecondHalf = true;
 
-						ISampleSourcePtr pInputSource = nullptr;
-						pInput->QueryInterface<ISampleSource>(&pInputSource);
-						Assert::IsNotNull(pInputSource.GetInterfacePtr(), L"Can access ISampleSource from IInputChannel");
-
-						IOutputChannelPairPtr pOutputPair = hwBuffers.CreateOutputChannelPair(0, 1);
-
-						ISampleProcessorPtr pOutputPairProcessor = nullptr;
-						pOutputPair->QueryInterface<ISampleProcessor>(&pOutputPairProcessor);
-						Assert::IsNotNull(pOutputPairProcessor.GetInterfacePtr(), L"Can access ISampleProcessor from IOutputChannelPair");
-
-						pInputSource->First = pOutputPairProcessor;
-
-						bool readSecondHalf = false;
-						bool writeSecondHalf = !readSecondHalf;
-
-						pInput->IsActive = true;
-
-						pOutputPair->OnNextBuffer(writeSecondHalf);
-						pInputSource->OnNextBuffer(readSecondHalf);
+						pProcessingChain->OnNextBuffer(writeSecondHalf);
 
 						hwBuffers.AssertBufferTransfers(writeSecondHalf);
 
 						hwBuffers.ResetBuffers();
 
-						readSecondHalf = !readSecondHalf;
 						writeSecondHalf = !writeSecondHalf;
 
-						pOutputPair->OnNextBuffer(writeSecondHalf);
-						pInputSource->OnNextBuffer(readSecondHalf);
+						pProcessingChain->OnNextBuffer(writeSecondHalf);
 
 						hwBuffers.AssertBufferTransfers(writeSecondHalf);
 					}
 
 					TEST_METHOD(ProcessingChainWithSequence)
 					{
-						// Create hardware buffers, input channel, output channel pair
 						HardwareBuffers hwBuffers(Constants::SampleCount);
-						IInputChannelPtr pInput = hwBuffers.CreateInputChannel(0);
-						IOutputChannelPairPtr pOutputPair = hwBuffers.CreateOutputChannelPair(0, 1);
-
-						// Get sample source for input
-						ISampleSourcePtr pInputSource = nullptr;
-						pInput->QueryInterface<ISampleSource>(&pInputSource);
-						Assert::IsNotNull(pInputSource.GetInterfacePtr(), L"Can access ISampleSource from IInputChannel");
+						IProcessingChainPtr pProcessingChain = CreateProcessingChain(hwBuffers);
 
 						// Create take sequence with target container for sample mix
 						ISampleContainerPtr pTargetContainer = ObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
@@ -125,18 +99,13 @@ namespace Test
 						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pHostClock, pTargetContainer);
 						Assert::IsNotNull(pTakeSequence.GetInterfacePtr(), L"Can create take sequence");
 
-						// Take sequence processes output of input channel
+						// Add take sequence as sample processor
 						ISampleProcessorPtr pTakeSequenceProcessor = nullptr;
 						pTakeSequence->QueryInterface<ISampleProcessor>(&pTakeSequenceProcessor);
 						Assert::IsNotNull(pTakeSequenceProcessor.GetInterfacePtr(), L"Can access ISampleProcessor from ITakeSequence");
-						pInputSource->First = pTakeSequenceProcessor;
+						pProcessingChain->AddProcessor(pTakeSequenceProcessor);
 
-						// Output channel pair processes output of take sequence
-						ISampleProcessorPtr pOutputPairProcessor = nullptr;
-						pOutputPair->QueryInterface<ISampleProcessor>(&pOutputPairProcessor);
-						Assert::IsNotNull(pOutputPairProcessor.GetInterfacePtr(), L"Can access ISampleProcessor from IOutputChannelPair");
-						pTakeSequenceProcessor->Next = pOutputPairProcessor;
-
+						// Create some dummy audio take and add it to sequence
 						int sampleRate = Constants::SampleRate;
 						double seconds = 1.0;
 						int channelCount = 2;
@@ -153,24 +122,19 @@ namespace Test
 
 						int takeId = pTakeSequence->AddTake(pTake);
 
-						bool readSecondHalf = false;
-						bool writeSecondHalf = !readSecondHalf;
+						bool writeSecondHalf = true;
 
-						pInput->IsActive = true;
 						pHostClock->Start();
 
-						pOutputPair->OnNextBuffer(writeSecondHalf);
-						pInputSource->OnNextBuffer(readSecondHalf);
+						pProcessingChain->OnNextBuffer(writeSecondHalf);
 
 						hwBuffers.AssertBufferTransfers(writeSecondHalf, pContainer);
 
 						hwBuffers.ResetBuffers();
 
-						readSecondHalf = !readSecondHalf;
 						writeSecondHalf = !writeSecondHalf;
 
-						pOutputPair->OnNextBuffer(writeSecondHalf);
-						pInputSource->OnNextBuffer(readSecondHalf);
+						pProcessingChain->OnNextBuffer(writeSecondHalf);
 
 						hwBuffers.AssertBufferTransfers(writeSecondHalf, pContainer);
 					}
@@ -179,41 +143,21 @@ namespace Test
 					TEST_METHOD(ProcessingChainWithVectorWriter)
 					{
 						HardwareBuffers hwBuffers(Constants::SampleCount);
-
-						IInputChannelPtr pInput = hwBuffers.CreateInputChannel(0);
-
-						// Get sample source of input
-						ISampleSourcePtr pInputSource = nullptr;
-						pInput->QueryInterface<ISampleSource>(&pInputSource);
-						Assert::IsNotNull(pInputSource.GetInterfacePtr(), L"Can access ISampleSource from IInputChannel");
+						IProcessingChainPtr pProcessingChain = CreateProcessingChain(hwBuffers);
 
 						// Create VectorWriter and attach it to input sample source
 						int initialSize = Constants::SampleRate * 5;	// buffer for five seconds
 						int growth = Constants::SampleRate * 2;			// grow for two seconds
 						ISampleProcessorPtr pVectorWriter = ObjectFactory::CreateToContainerProcessor(2, initialSize, growth);
-						pInputSource->First = pVectorWriter;
 
+						pProcessingChain->AddProcessor(pVectorWriter);
 						
-						IOutputChannelPairPtr pOutputPair = hwBuffers.CreateOutputChannelPair(0, 1);
-
-						// Get sample processor of output pair and attach it to vector writer output
-						ISampleProcessorPtr pOutputPairProcessor = nullptr;
-						pOutputPair->QueryInterface<ISampleProcessor>(&pOutputPairProcessor);
-						Assert::IsNotNull(pOutputPairProcessor.GetInterfacePtr(), L"Can access ISampleProcessor from IOutputChannelPair");
-
-						pVectorWriter->Next = pOutputPairProcessor;
-
-						bool readSecondHalf = false;
-						bool writeSecondHalf = !readSecondHalf;
-
-						pInput->IsActive = true;
+						bool writeSecondHalf = true;
 
 						int loopsRequiredForTenSeconds = (Constants::SampleRate * 10 / Constants::SampleCount) + 1;
 						for (int loop = 0; loop < loopsRequiredForTenSeconds; loop++)
 						{
-							pOutputPair->OnNextBuffer(writeSecondHalf);
-							pInputSource->OnNextBuffer(readSecondHalf);
-							readSecondHalf = !readSecondHalf;
+							pProcessingChain->OnNextBuffer(writeSecondHalf);
 							writeSecondHalf = !writeSecondHalf;
 						}
 
@@ -227,19 +171,6 @@ namespace Test
 					}
 
 				private:
-					void InitSampleBuffers(ISampleContainerPtr pContainer, Sample valueChn0, Sample valueChn1)
-					{
-						Sample* pSamplesChn0 = pContainer->Channels[0]->SamplePtr;
-						Sample* pSamplesChn1 = pContainer->Channels[1]->SamplePtr;
-						int sampleCount = pContainer->SampleCount;
-
-						for (int i = 0; i < sampleCount; i++)
-						{
-							*pSamplesChn0++ = valueChn0;
-							*pSamplesChn1++ = valueChn1;
-						}
-					}
-
 					class HardwareBuffers
 					{
 					public:
@@ -300,18 +231,20 @@ namespace Test
 							
 							if (writeSecondHalf)
 							{								
-								// Input buffer A copied to output buffers B1 and B2
+								// Input buffer A copied to output buffers B1
 								AssertBufferEquals(_inBufferA, _outBufferB1, ioTolerance, pMixedInLeft);
-								AssertBufferEquals(_inBufferA, _outBufferB2, ioTolerance, pMixedInRight);
+								// output buffer B2 is cleared
+								AssertBufferValue(_outBufferB2, 0.0);
 								// Output buffers A1 and A2 are not modified
 								AssertBufferValue(_outBufferA1, 0.04);
 								AssertBufferValue(_outBufferA2, 0.16);
 							}
 							else
 							{
-								// Input buffer B copied to output buffers A1 and A2
+								// Input buffer B copied to output buffers A1
 								AssertBufferEquals(_inBufferB, _outBufferA1, ioTolerance, pMixedInLeft);
-								AssertBufferEquals(_inBufferB, _outBufferA2, ioTolerance, pMixedInRight);
+								// output buffer A2 is cleared
+								AssertBufferValue(_outBufferA2, 0.0);
 								// Output buffers B1 and B2 are not modified
 								AssertBufferValue(_outBufferB1, 0.08);
 								AssertBufferValue(_outBufferB2, 0.32);
@@ -378,6 +311,36 @@ namespace Test
 						std::unique_ptr<int> _outBufferB2;
 					};
 
+					void InitSampleBuffers(ISampleContainerPtr pContainer, Sample valueChn0, Sample valueChn1)
+					{
+						Sample* pSamplesChn0 = pContainer->Channels[0]->SamplePtr;
+						Sample* pSamplesChn1 = pContainer->Channels[1]->SamplePtr;
+						int sampleCount = pContainer->SampleCount;
+
+						for (int i = 0; i < sampleCount; i++)
+						{
+							*pSamplesChn0++ = valueChn0;
+							*pSamplesChn1++ = valueChn1;
+						}
+					}
+
+					IProcessingChainPtr CreateProcessingChain(HardwareBuffers& hwBuffers)
+					{
+						// Create hardware buffers, input channel, output channel pair
+						IInputChannelPtr pInput = hwBuffers.CreateInputChannel(0);
+						IOutputChannelPairPtr pOutputPair = hwBuffers.CreateOutputChannelPair(0, 1);
+
+						// Create processing chain for the input and output channels
+						ISampleContainerPtr pContainer = ObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
+						IProcessingChainPtr pProcessingChain = ObjectFactory::CreateProcessingChain(pContainer);
+
+						pProcessingChain->AddInput(pInput);
+						pProcessingChain->AddOutputPair(pOutputPair);
+						pInput->IsActive = true;
+						pOutputPair->IsActive = true;
+
+						return pProcessingChain;
+					}
 				};
 			}
 		}

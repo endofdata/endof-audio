@@ -46,10 +46,8 @@ namespace Test
 						ISampleProcessorPtr pMeterProcessor = nullptr;
 						Assert::AreEqual(S_OK, pMeterChannel->QueryInterface(&pMeterProcessor), L"Can get ISampleProcessor from IMeterChannel");
 
-						pMeterProcessor->Next = pTarget;
 						pMeterProcessor->Process(pTestBuffers);
-
-						bool debugHelper = false;
+						pTarget->Process(pTestBuffers);
 
 						for (int c = 0; c < Constants::ChannelCount; c++)
 						{

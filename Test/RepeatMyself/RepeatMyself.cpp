@@ -1,5 +1,8 @@
 #include <iostream>
 #include <conio.h>
+#include <fstream>
+#include <strstream>
+#include <ios>
 #include <AsioCore.h>
 #include <ObjectFactory.h>
 #include <AsioCoreException.h>
@@ -8,6 +11,23 @@
 using namespace Audio::Asio;
 using namespace Audio::Asio::Unmanaged;
 using namespace Audio::Foundation::Unmanaged;
+
+void writeContents(ISampleContainerPtr& container)
+{
+	for (int c = 0; c < container->ChannelCount; c++)
+	{
+		std::ostrstream builder;
+		builder << "fred_" << c << ".dat" << std::ends;
+
+		auto filename = builder.str();
+
+		std::ofstream out(filename, std::ios_base::out + std::ios_base::binary + std::ios_base::trunc);
+		auto data = reinterpret_cast<const char*>(container->Channels[c]->SamplePtr);
+
+		out.write(data, container->SampleCount * sizeof(Sample));
+		out.flush();
+	}
+}
 
 int main()
 {
@@ -41,39 +61,36 @@ int main()
 
 		float samplesPerTenSecs = device->SampleRate * 60.0f;
 
+		// create processor chain input -> recorder -> output
 		ISampleProcessorPtr recorder = ObjectFactory::CreateToContainerProcessor(_countof(selectedInputs), samplesPerTenSecs, samplesPerTenSecs);
 
-		IInputChannelPtr input0 = device->InputChannel[0];
+		IProcessingChainPtr processingChain = device->ProcessingChain;
 
-		ISampleSourcePtr inputSource = nullptr;
-		input0->QueryInterface<ISampleSource>(&inputSource);
-		inputSource->First = recorder;
+		int recorderId = processingChain->AddProcessor(recorder);
+		processingChain->InputChannel[0]->IsActive = true;
+		processingChain->OutputChannelPair[0]->IsActive = true;
 
-		IOutputChannelPairPtr outputPair = device->OutputChannelPair[0];
-		ISampleProcessorPtr outputProcessor = nullptr;
-		outputPair->QueryInterface<ISampleProcessor>(&outputProcessor);
-
-		recorder->Next = outputProcessor;
-
+		// begin recording until a key is pressed
 		device->Start();
-		input0->IsActive = true;
 
 		std::cout << "Recording is going on..." << std::endl;
 		char key = _getch();
 
+		// deactivate input
 		std::cout << "Switching to replay..." << std::endl;
-		ISampleProcessorPtr noProcessor;
 
-		input0->IsActive = false;
-		inputSource->First = noProcessor;
-		recorder->Next = noProcessor;
+		processingChain->InputChannel[0]->IsActive = false;
 
 		ISampleContainerPtr take = nullptr;
 		recorder->QueryInterface<ISampleContainer>(&take);
 
-		ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take, sampleCount);
+		writeContents(take);
 
-		takeSource->First = outputProcessor;
+		ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take);
+		ISampleProcessorPtr takeProcessor = ObjectFactory::CreateFromSourceProcessor(takeSource);
+
+		processingChain->RemoveProcessor(recorderId);
+		int playerId = processingChain->AddProcessor(takeProcessor);
 
 		std::cout << "Now listen..." << std::endl;
 
