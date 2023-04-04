@@ -14,5 +14,9 @@
 #include <ostream>
 #include <istream>
 #include <fstream>
+#include <vector>
+#include <functional>
+#include <algorithm>
+#include <memory>
 
 #endif //PCH_H

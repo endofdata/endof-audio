@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma once
-
 #include <Audio.Foundation.Unmanaged.h>
 #include <ISampleProcessor.h>
 #include <ISampleSource.h>
@@ -15,6 +13,8 @@
 #include <IHostClock.h>
 #include <IInputChannel.h>
 #include <IProcessingChain.h>
+#include <IMidiInput.h>
+#include <IMidiEvents.h>
 #include <string>
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -66,6 +66,10 @@ namespace Audio
 					int hwChannelId1, void* pBufferA1, void* pBufferB1, int hwChannelId2, void* pBufferA2, void* pBufferB2, int sampleCount);
 
 				static IProcessingChainPtr CreateProcessingChain(ISampleContainerPtr& container);
+
+				static IMidiInputPtr CreateMidiInput();
+
+				static int SelectMidiInputDevice(MidiInCapsHandler handler);
 
 			private:
 				ObjectFactory();

@@ -4,3 +4,4 @@
 #define NOMINMAX						// Exclude min() and max() definitions to use std::min/max without errors
 // Windows Header Files
 #include <windows.h>
+#include <mmeapi.h>

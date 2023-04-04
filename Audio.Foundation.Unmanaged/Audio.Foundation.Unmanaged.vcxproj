@@ -69,6 +69,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -91,6 +92,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -103,6 +105,8 @@
     <ClInclude Include="IHostClock.h" />
     <ClInclude Include="IInputChannel.h" />
     <ClInclude Include="IMeterChannel.h" />
+    <ClInclude Include="IMidiEvents.h" />
+    <ClInclude Include="IMidiInput.h" />
     <ClInclude Include="InputFloat32Channel.h" />
     <ClInclude Include="InputInt24Channel.h" />
     <ClInclude Include="InputInt32Channel.h" />
@@ -118,6 +122,9 @@
     <ClInclude Include="ITake.h" />
     <ClInclude Include="ITakeSequence.h" />
     <ClInclude Include="MeterChannel.h" />
+    <ClInclude Include="MidiEvents.h" />
+    <ClInclude Include="MidiInput.h" />
+    <ClInclude Include="MidiMessage.h" />
     <ClInclude Include="ObjectFactory.h" />
     <ClInclude Include="OutputFloat32ChannelPair.h" />
     <ClInclude Include="OutputInt24ChannelPair.h" />
@@ -153,6 +160,9 @@
     <ClCompile Include="FileWriter.cpp" />
     <ClCompile Include="HostClock.cpp" />
     <ClCompile Include="MeterChannel.cpp" />
+    <ClCompile Include="MidiEvents.cpp" />
+    <ClCompile Include="MidiInput.cpp" />
+    <ClCompile Include="MidiMessage.cpp" />
     <ClCompile Include="ObjectFactory.cpp" />
     <ClCompile Include="ProcessingChain.cpp" />
     <ClCompile Include="SampleBuffer.cpp" />

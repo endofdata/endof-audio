@@ -22,6 +22,8 @@
 #include "ProcessingChain.h"
 #include "SourceProcessor.h"
 #include "HostClock.h"
+#include "MidiInput.h"
+#include "MidiEvents.h"
 
 #include <stdexcept>
 
@@ -158,6 +160,17 @@ IOutputChannelPairPtr ObjectFactory::CreateOutputChannelPair(int sampleType, int
 IProcessingChainPtr ObjectFactory::CreateProcessingChain(ISampleContainerPtr& container)
 {
 	return new ProcessingChain(container);
+}
+
+int ObjectFactory::SelectMidiInputDevice(MidiInCapsHandler handler)
+{
+	return MidiInput::ListDevices(handler);
+}
+
+IMidiInputPtr ObjectFactory::CreateMidiInput()
+{
+	IMidiEventsPtr events = new MidiEvents();
+	return new MidiInput(events);
 }
 
 int ObjectFactory::NextTakeId()
