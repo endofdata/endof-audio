@@ -21,7 +21,7 @@ namespace Audio
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("c69caa40-5cd1-4ae1-9101-e84a503a79ec")) ISampleProcessor : public IUnknown
 				{
 					/// <summary>
-					/// Processes a sample container and forwards it to the next sample processor
+					/// Processes a sample container
 					/// </summary>
 					/// <param name="container">Sample container to process</param>
 					void Process(ISampleContainerPtr& container) = 0;
