@@ -33,7 +33,8 @@ namespace Audio
 
 				int m_growth;
 				int m_inUse;
-				std::vector<std::vector<Sample>> m_buffers;
+				int m_avail;
+				std::vector<Sample*> m_buffers;
 				bool m_isBypassed;
 			};
 		}

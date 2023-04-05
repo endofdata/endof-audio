@@ -14,6 +14,15 @@ SampleBuffer::SampleBuffer(int sampleCount)
 	Clear();
 }
 
+SampleBuffer::SampleBuffer(Sample* pSamples, int sampleCount)
+{
+	m_pSamples = pSamples;
+	if (nullptr == m_pSamples)
+		throw new std::invalid_argument("SampleBuffer: Data buffer cannot be null.");
+
+	m_iSamples = sampleCount;
+}
+
 SampleBuffer::~SampleBuffer()
 {
 	delete[] m_pSamples;

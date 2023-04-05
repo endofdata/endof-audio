@@ -20,6 +20,8 @@ namespace Audio
 				SampleContainer(int sampleCount, int channelCount);
 				virtual ~SampleContainer();
 
+				SampleContainer(std::vector<Sample*>& buffers, int sampleCount);
+
 			protected:
 				void CreateChannels(int sampleCount, int channelCount) override;
 			};

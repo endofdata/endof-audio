@@ -19,9 +19,11 @@ namespace Audio
 
 					Creates the buffers for the internal sample data
 
-					\param[in] iSamples		Number of samples to buffer.
+					\param[in] sampleCount		Number of samples to buffer.
 				*/
-				SampleBuffer(int iSamples);
+				SampleBuffer(int sampleCount);
+
+				SampleBuffer(Sample* pSamples, int count);
 
 				/*! \brief Destructor
 

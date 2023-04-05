@@ -2,6 +2,7 @@
 #include "SampleContainer.h"
 #include "ObjectFactory.h"
 #include "SampleContainerSpan.h"
+#include "SampleBuffer.h"
 
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -9,6 +10,17 @@ using namespace Audio::Foundation::Unmanaged::Abstractions;
 SampleContainer::SampleContainer(int sampleCount, int channelCount)
 {
 	CreateChannels(sampleCount, channelCount);
+}
+
+SampleContainer::SampleContainer(std::vector<Sample*>& buffers, int sampleCount)
+{
+	std::for_each(buffers.begin(), buffers.end(), [this, sampleCount](Sample* buffer)
+	{
+		ISampleBufferPtr sampleBuffer = new SampleBuffer(buffer, sampleCount);
+		m_vecChannels.push_back(sampleBuffer);
+	});
+	m_sampleCount = sampleCount;
+	buffers.clear();
 }
 
 SampleContainer::~SampleContainer()
