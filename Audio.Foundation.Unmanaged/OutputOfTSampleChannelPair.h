@@ -136,11 +136,6 @@ namespace Audio
 							*pResult = dynamic_cast<IOutputChannelPair*>(this);
 							return true;
 						}
-						if (riid == _uuidof(ISampleProcessor))
-						{
-							*pResult = dynamic_cast<ISampleProcessor*>(this);
-							return true;
-						}
 						*pResult = nullptr;
 						return false;
 					}

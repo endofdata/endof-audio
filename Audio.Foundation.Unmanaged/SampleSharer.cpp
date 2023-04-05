@@ -10,6 +10,7 @@ using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 SampleSharer::SampleSharer() : 
+	m_isBypassed(false),
 	m_refCount(0)
 {
 }
@@ -76,8 +77,21 @@ ISampleProcessorPtr& SampleSharer::get_Target(int index)
 
 void SampleSharer::Process(ISampleContainerPtr& container)
 {
-	std::for_each(m_vecTargets.begin(), m_vecTargets.end(), [&container](ISampleProcessorPtr& item)
+	if (!m_isBypassed)
 	{
-		item->Process(container);
-	});
+		std::for_each(m_vecTargets.begin(), m_vecTargets.end(), [&container](ISampleProcessorPtr& item)
+		{
+			item->Process(container);
+		});
+	}
+}
+
+bool SampleSharer::get_IsBypassed()
+{
+	return m_isBypassed;
+}
+
+void SampleSharer::put_IsBypassed(bool value)
+{
+	m_isBypassed = value;
 }

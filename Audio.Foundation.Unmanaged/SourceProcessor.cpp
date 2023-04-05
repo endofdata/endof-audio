@@ -9,6 +9,7 @@ using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 SourceProcessor::SourceProcessor(ISampleSourcePtr& source) :
 	m_pSource(source),
+	m_isBypassed(false),
 	m_refCount(0)
 {
 }
@@ -36,5 +37,18 @@ bool SourceProcessor::GetInterface(REFIID iid, void** ppvResult)
 
 void SourceProcessor::Process(ISampleContainerPtr& container)
 {
-	m_pSource->ReadSamples(container);
+	if (!m_isBypassed)
+	{
+		m_pSource->ReadSamples(container);
+	}
+}
+
+bool SourceProcessor::get_IsBypassed()
+{
+	return m_isBypassed;
+}
+
+void SourceProcessor::put_IsBypassed(bool value)
+{
+	m_isBypassed = value;
 }

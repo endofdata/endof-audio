@@ -15,6 +15,7 @@ TakeSequence::TakeSequence(IHostClockPtr& hostClock, ISampleContainerPtr& target
 	m_scheduledTake(m_takes.end()),
 	m_scheduledTime(0),
 	m_pTargetContainer(targetContainer),
+	m_isBypassed(false),
 	m_refCount(0)
 {
 }
@@ -143,40 +144,53 @@ void TakeSequence::put_PlayPosition(AudioTime currentTime)
 
 void TakeSequence::Process(ISampleContainerPtr& container)
 {	
-	bool hasTake = false;
-
-	for (int channelOffset = 0; channelOffset < m_pTargetContainer->ChannelCount; channelOffset += container->ChannelCount)
+	if (!m_isBypassed)
 	{
-		container->CopyTo(m_pTargetContainer, 0, container->SampleCount, 0, container->ChannelCount, 0, channelOffset);
-	}
+		bool hasTake = false;
 
-	if (m_scheduledTake != m_takes.end())
-	{
-		m_currentTime = m_pHostClock->CurrentTime;
-
-		if (m_currentTime >= m_scheduledTime)
+		for (int channelOffset = 0; channelOffset < m_pTargetContainer->ChannelCount; channelOffset += container->ChannelCount)
 		{
-			m_playPosition = m_scheduledTake;
-			m_scheduledTake = m_takes.end();
-			hasTake = true;
+			container->CopyTo(m_pTargetContainer, 0, container->SampleCount, 0, container->ChannelCount, 0, channelOffset);
 		}
-	}
-	else
-	{
-		hasTake = m_playPosition != m_takes.end();
-	}
-	if (hasTake)
-	{
-		int done = (*m_playPosition)->ReadSamplesTo(m_pTargetContainer, 0, m_pTargetContainer->ChannelCount, 0);
 
-		if (!done)
+		if (m_scheduledTake != m_takes.end())
 		{
-			m_scheduledTake = m_playPosition + 1;
-			if (m_scheduledTake != m_takes.end())
+			m_currentTime = m_pHostClock->CurrentTime;
+
+			if (m_currentTime >= m_scheduledTime)
 			{
-				m_scheduledTime = (*m_scheduledTake)->Position;
+				m_playPosition = m_scheduledTake;
+				m_scheduledTake = m_takes.end();
+				hasTake = true;
 			}
-			m_playPosition = m_takes.end();
+		}
+		else
+		{
+			hasTake = m_playPosition != m_takes.end();
+		}
+		if (hasTake)
+		{
+			int done = (*m_playPosition)->ReadSamplesTo(m_pTargetContainer, 0, m_pTargetContainer->ChannelCount, 0);
+
+			if (!done)
+			{
+				m_scheduledTake = m_playPosition + 1;
+				if (m_scheduledTake != m_takes.end())
+				{
+					m_scheduledTime = (*m_scheduledTake)->Position;
+				}
+				m_playPosition = m_takes.end();
+			}
 		}
 	}
+}
+
+bool TakeSequence::get_IsBypassed()
+{
+	return m_isBypassed;
+}
+
+void TakeSequence::put_IsBypassed(bool value)
+{
+	m_isBypassed = value;
 }

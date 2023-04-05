@@ -14,6 +14,7 @@ MeterChannel::MeterChannel(int sampleRate, int channelCount) :
 	m_sampleRate(sampleRate),
 	m_iSamplesPerRMSFrame(880), // ~20 ms @ 44.1 kHz
 	m_meterUpdate(nullptr),
+	m_isBypassed(false),
 	m_refCount(0)
 {
 	m_vecSumUp.resize(channelCount, 0.0);
@@ -132,4 +133,14 @@ void MeterChannel::Process(ISampleContainerPtr& input)
 			OnMeterUpdate();
 		}
 	}
+}
+
+bool MeterChannel::get_IsBypassed()
+{
+	return m_isBypassed;
+}
+
+void MeterChannel::put_IsBypassed(bool value)
+{
+	m_isBypassed = value;
 }

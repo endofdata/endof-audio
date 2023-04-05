@@ -20,6 +20,14 @@ namespace Audio
 
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("c69caa40-5cd1-4ae1-9101-e84a503a79ec")) ISampleProcessor : public IUnknown
 				{
+					bool get_IsBypassed() = 0;
+					void put_IsBypassed(bool value) = 0;
+
+					/// <summary>
+					/// Gets or sets a value indicating whether processor is suspended
+					/// </summary>
+					_declspec(property(get = get_IsBypassed, put = put_IsBypassed)) bool IsBypassed;
+
 					/// <summary>
 					/// Processes a sample container
 					/// </summary>

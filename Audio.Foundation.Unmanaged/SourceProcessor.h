@@ -20,6 +20,9 @@ namespace Audio
 				SourceProcessor(ISampleSourcePtr& source);
 				virtual ~SourceProcessor();
 
+				bool get_IsBypassed();
+				void put_IsBypassed(bool value);
+
 				void Process(ISampleContainerPtr& container);
 
 				DECLARE_IUNKNOWN
@@ -29,6 +32,7 @@ namespace Audio
 
 			private:
 				ISampleSourcePtr m_pSource;
+				bool m_isBypassed;
 			};
 		}
 	}

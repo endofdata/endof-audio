@@ -8,6 +8,7 @@ using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 SampleJoiner::SampleJoiner() :
+	m_isBypassed(false),
 	m_refCount(0)
 {
 }
@@ -74,13 +75,26 @@ ISampleContainerPtr& SampleJoiner::get_Source(int index)
 
 void SampleJoiner::Process(ISampleContainerPtr& container)
 {
-	int targetChannelCount = container->ChannelCount;
-
-	if (targetChannelCount > 0)
+	if (!m_isBypassed)
 	{
-		std::for_each(m_vecSources.begin(), m_vecSources.end(), [this, &container](ISampleContainerPtr& item)
+		int targetChannelCount = container->ChannelCount;
+
+		if (targetChannelCount > 0)
 		{
-			item->AddTo(container, 0, item->SampleCount, 0, item->ChannelCount, 0, 0);
-		});
+			std::for_each(m_vecSources.begin(), m_vecSources.end(), [this, &container](ISampleContainerPtr& item)
+			{
+				item->AddTo(container, 0, item->SampleCount, 0, item->ChannelCount, 0, 0);
+			});
+		}
 	}
+}
+
+bool SampleJoiner::get_IsBypassed()
+{
+	return m_isBypassed;
+}
+
+void SampleJoiner::put_IsBypassed(bool value)
+{
+	m_isBypassed = value;
 }

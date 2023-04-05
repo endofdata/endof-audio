@@ -11,6 +11,7 @@ using namespace Audio::Foundation::Unmanaged;
 VectorWriter::VectorWriter(int channelCount, int initialSize, int growth) :
 	m_growth(growth),
 	m_inUse(0),
+	m_isBypassed(false),
 	m_refCount(0)
 {
 	m_buffers.reserve(channelCount);
@@ -49,22 +50,25 @@ bool VectorWriter::GetInterface(REFIID iid, void** ppvResult)
 
 void VectorWriter::Process(ISampleContainerPtr& container)
 {
-	int samples = container->SampleCount;
-	int maxSourceChannels = container->ChannelCount;
-	int channel = 0;
-
-	std::for_each(m_buffers.begin(), m_buffers.end(), [this, &channel, maxSourceChannels, samples, container](std::vector<Sample>& buffer)
+	if (!m_isBypassed)
 	{
-		const Sample* pSrc = container->Channels[channel]->SamplePtr;
-		channel = (channel + 1) % maxSourceChannels;
+		int samples = container->SampleCount;
+		int maxSourceChannels = container->ChannelCount;
+		int channel = 0;
 
-		if (buffer.size() < m_inUse + samples)
+		std::for_each(m_buffers.begin(), m_buffers.end(), [this, &channel, maxSourceChannels, samples, container](std::vector<Sample>& buffer)
 		{
-			buffer.reserve((div(m_inUse + samples, m_growth).quot + 1) * m_growth);
-		}
-		std::memcpy(&buffer.data()[m_inUse], pSrc, samples * sizeof(Sample));
-	});
-	m_inUse += samples;
+			const Sample* pSrc = container->Channels[channel]->SamplePtr;
+			channel = (channel + 1) % maxSourceChannels;
+
+			if (buffer.size() < m_inUse + samples)
+			{
+				buffer.reserve((div(m_inUse + samples, m_growth).quot + 1) * m_growth);
+			}
+			std::memcpy(&buffer.data()[m_inUse], pSrc, samples * sizeof(Sample));
+		});
+		m_inUse += samples;
+	}
 }
 
 ISampleContainerPtr VectorWriter::CreateSampleContainer()
@@ -79,4 +83,14 @@ ISampleContainerPtr VectorWriter::CreateSampleContainer()
 		bufferPointers.push_back(sampleBuffer);
 	});
 	return new SampleContainerSpan(bufferPointers, m_inUse);
+}
+
+bool VectorWriter::get_IsBypassed()
+{
+	return m_isBypassed;
+}
+
+void VectorWriter::put_IsBypassed(bool value)
+{
+	m_isBypassed = value;
 }

@@ -22,6 +22,9 @@ namespace Audio
 
 				void Process(ISampleContainerPtr& container);
 
+				bool get_IsBypassed();
+				void put_IsBypassed(bool value);
+
 				DECLARE_IUNKNOWN
 
 			protected:
@@ -29,6 +32,7 @@ namespace Audio
 
 			private:
 				ISampleContainerPtr m_pTarget;
+				bool m_isBypassed;
 			};
 		}
 	}

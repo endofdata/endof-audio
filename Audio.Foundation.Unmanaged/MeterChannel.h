@@ -21,19 +21,22 @@ namespace Audio
 				MeterChannel(int sampleRate, int channelCount);
 				virtual ~MeterChannel();
 
-				virtual int get_ChannelCount();
+				int get_ChannelCount();
 
-				virtual int get_RMSTime();
-				virtual void put_RMSTime(int value);
+				int get_RMSTime();
+				void put_RMSTime(int value);
 
-				virtual float get_DbFS(int index);
+				float get_DbFS(int index);
 
-				virtual MeterChannelCallback get_MeterUpdate();
-				virtual void put_MeterUpdate(MeterChannelCallback value);
+				MeterChannelCallback get_MeterUpdate();
+				void put_MeterUpdate(MeterChannelCallback value);
 
-				virtual void Reset();
+				void Reset();
 
-				virtual void Process(ISampleContainerPtr& inputBuffer);
+				bool get_IsBypassed();
+				void put_IsBypassed(bool value);
+
+				void Process(ISampleContainerPtr& inputBuffer);
 
 				DECLARE_IUNKNOWN
 
@@ -52,6 +55,7 @@ namespace Audio
 				int m_iSumUpSamples;
 				std::vector<double> m_vecSumUp;
 				std::vector<float> m_vecDbFS;
+				bool m_isBypassed;
 			};
 		}
 	}

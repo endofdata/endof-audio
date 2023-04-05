@@ -18,6 +18,9 @@ namespace Audio
 				StreamWriter(std::ostream& output);
 				virtual ~StreamWriter();
 
+				bool get_IsBypassed();
+				void put_IsBypassed(bool value);
+
 				void Process(ISampleContainerPtr& container);
 
 				DECLARE_IUNKNOWN
@@ -27,6 +30,7 @@ namespace Audio
 
 			private:
 				std::ostream& m_output;
+				bool m_isBypassed;
 			};
 		}
 	}

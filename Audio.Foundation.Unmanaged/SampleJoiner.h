@@ -29,6 +29,9 @@ namespace Audio
 
 				void RemoveAllSources();
 
+				bool get_IsBypassed();
+				void put_IsBypassed(bool value);
+
 				void Process(ISampleContainerPtr& container);
 
 				DECLARE_IUNKNOWN
@@ -38,6 +41,7 @@ namespace Audio
 
 			private:
 				std::vector<ISampleContainerPtr> m_vecSources;
+				bool m_isBypassed;
 			};
 		}
 	}

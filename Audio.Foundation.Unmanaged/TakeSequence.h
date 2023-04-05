@@ -23,17 +23,20 @@ namespace Audio
 				TakeSequence(IHostClockPtr& hostClock, ISampleContainerPtr& targetContainer);
 				virtual ~TakeSequence();
 
-				virtual int get_TakeCount();
+				int get_TakeCount();
 
-				virtual ITakePtr get_Take(int index);
+				ITakePtr get_Take(int index);
 
-				virtual int AddTake(ITakePtr& item);
-				virtual bool RemoveTake(int takeId);
-				virtual bool MoveTake(int takeId, AudioTime to);
-				virtual ITakePtr FindTake(int takeId);
+				int AddTake(ITakePtr& item);
+				bool RemoveTake(int takeId);
+				bool MoveTake(int takeId, AudioTime to);
+				ITakePtr FindTake(int takeId);
 
-				virtual AudioTime get_PlayPosition();
-				virtual void put_PlayPosition(AudioTime value);
+				AudioTime get_PlayPosition();
+				void put_PlayPosition(AudioTime value);
+
+				bool get_IsBypassed();
+				void put_IsBypassed(bool value);
 
 				void Process(ISampleContainerPtr& container);
 
@@ -54,6 +57,7 @@ namespace Audio
 				AudioTime m_scheduledTime;
 
 				ISampleContainerPtr m_pTargetContainer;
+				bool m_isBypassed;
 			};
 		}
 	}

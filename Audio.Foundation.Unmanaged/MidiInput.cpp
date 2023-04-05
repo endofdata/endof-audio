@@ -96,13 +96,13 @@ void CALLBACK MidiInput::OnMidiInMsg(HMIDIIN hMidiIn, UINT wMsg, DWORD_PTR dwIns
 		self->m_events->Close();
 		break;
 	case MIM_DATA:
-		self->m_events->Data(MidiMessage(dwParam1), (unsigned int)dwParam2);
+		self->m_events->Data(MidiMessage(static_cast<unsigned int>(dwParam1)), static_cast<unsigned int>(dwParam2));
 		break;
 	case MIM_ERROR:
-		self->m_events->Error(MidiMessage(dwParam1), (unsigned int)dwParam2);
+		self->m_events->Error(MidiMessage(static_cast<unsigned int>(dwParam1)), static_cast<unsigned int>(dwParam2));
 		break;
 	case MIM_MOREDATA:
-		self->m_events->Overflow(MidiMessage(dwParam1), (unsigned int)dwParam2);
+		self->m_events->Overflow(MidiMessage(static_cast<unsigned int>(dwParam1)), static_cast<unsigned int>(dwParam2));
 		break;
 		// TODO: Add SysEx support
 	case MIM_LONGDATA:

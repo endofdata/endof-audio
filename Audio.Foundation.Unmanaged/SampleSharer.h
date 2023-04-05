@@ -19,11 +19,14 @@ namespace Audio
 				SampleSharer();
 				virtual ~SampleSharer();
 
-				virtual ISampleProcessorPtr& get_Target(int iIdx);
+				ISampleProcessorPtr& get_Target(int iIdx);
 
-				virtual void AddTarget(ISampleProcessorPtr& channel);
-				virtual void RemoveTarget(ISampleProcessorPtr& channel);
-				virtual void RemoveAllTargets();
+				void AddTarget(ISampleProcessorPtr& channel);
+				void RemoveTarget(ISampleProcessorPtr& channel);
+				void RemoveAllTargets();
+
+				bool get_IsBypassed();
+				void put_IsBypassed(bool value);
 
 				void Process(ISampleContainerPtr& container);
 
@@ -34,6 +37,7 @@ namespace Audio
 
 			private:
 				std::vector<ISampleProcessorPtr> m_vecTargets;
+				bool m_isBypassed;
 			};
 		}
 	}

@@ -6,6 +6,7 @@ using namespace Audio::Foundation::Unmanaged;
 
 ContainerWriter::ContainerWriter(ISampleContainerPtr& target) :
 	m_pTarget(target),
+	m_isBypassed(false),
 	m_refCount(0)
 {
 }
@@ -33,5 +34,18 @@ bool ContainerWriter::GetInterface(REFIID iid, void** ppvResult)
 
 void ContainerWriter::Process(ISampleContainerPtr& container)
 {
-	container->CopyTo(m_pTarget, 0, container->SampleCount, 0, container->ChannelCount, 0, 0);
+	if (!m_isBypassed)
+	{
+		container->CopyTo(m_pTarget, 0, container->SampleCount, 0, container->ChannelCount, 0, 0);
+	}
+}
+
+bool ContainerWriter::get_IsBypassed()
+{
+	return m_isBypassed;
+}
+
+void ContainerWriter::put_IsBypassed(bool value)
+{
+	m_isBypassed = value;
 }

@@ -20,6 +20,9 @@ namespace Audio
 
 				void Process(ISampleContainerPtr& container);
 
+				bool get_IsBypassed();
+				void put_IsBypassed(bool value);
+
 				DECLARE_IUNKNOWN
 
 			protected:
@@ -31,6 +34,7 @@ namespace Audio
 				int m_growth;
 				int m_inUse;
 				std::vector<std::vector<Sample>> m_buffers;
+				bool m_isBypassed;
 			};
 		}
 	}
