@@ -12,3 +12,6 @@ Audio.Asio/TestResults/
 /Audio.Asio.Unmanaged/int/Debug/x64
 /Test/RepeatMyself/x64/Debug
 /Test/RepeatMyself/fred_0.dat
+/Audio.Asio.Unmanaged/int/Release/x64
+/Test/RepeatMyself/x64/Release
+/x64/Release
