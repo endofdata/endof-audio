@@ -5,6 +5,7 @@
 #include "IProcessingChain.h"
 #include "IInputChannel.h"
 #include <vector>
+#include <mutex>
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
@@ -61,6 +62,7 @@ namespace Audio
 			private:
 				int GetNextProcessorId();
 				std::vector<std::pair<int, ISampleProcessorPtr>>::iterator GetProcessorsById(int processorId);
+				std::mutex m_processing_mutex;
 
 				std::vector<std::pair<int, ISampleProcessorPtr>> m_processors;
 				ISampleContainerPtr m_container;

@@ -7,6 +7,7 @@ using namespace Audio::Foundation::Unmanaged;
 
 ProcessingChain::ProcessingChain(ISampleContainerPtr& sampleContainer) :
 	m_container(sampleContainer),
+	m_currentMonitorInputId(-1),
 	m_refCount(0)
 {
 }
@@ -40,6 +41,8 @@ void ProcessingChain::OnNextBuffer(bool writeSecondHalf)
 	int channel = 0;
 	bool readSecondHalf = !writeSecondHalf;
 
+	const std::lock_guard<std::mutex> lock(m_processing_mutex);
+
 	std::for_each(m_inputChannels.begin(), m_inputChannels.end(), [this, readSecondHalf, &channel]
 	(IInputChannelPtr& input)
 	{
@@ -69,17 +72,23 @@ void ProcessingChain::OnNextBuffer(bool writeSecondHalf)
 
 void ProcessingChain::AddInput(IInputChannelPtr& input)
 {
+	const std::lock_guard<std::mutex> lock(m_processing_mutex);
+
 	m_inputChannels.push_back(input);
 }
 
 void ProcessingChain::AddOutputPair(IOutputChannelPairPtr& output)
 {
+	const std::lock_guard<std::mutex> lock(m_processing_mutex);
+
 	m_outputChannelPairs.push_back(output);
 }
 
 
 int ProcessingChain::AddProcessor(ISampleProcessorPtr& processor)
 {
+	const std::lock_guard<std::mutex> lock(m_processing_mutex);
+
 	int nextId = GetNextProcessorId();
 	m_processors.push_back(std::pair<int, ISampleProcessorPtr>(nextId, processor));
 
@@ -88,6 +97,8 @@ int ProcessingChain::AddProcessor(ISampleProcessorPtr& processor)
 
 int ProcessingChain::InsertProcessorBefore(ISampleProcessorPtr& processor, int processorId)
 {
+	const std::lock_guard<std::mutex> lock(m_processing_mutex);
+
 	int nextId = GetNextProcessorId();
 	m_processors.insert(GetProcessorsById(processorId), std::pair<int, ISampleProcessorPtr>(nextId, processor));
 
@@ -96,6 +107,8 @@ int ProcessingChain::InsertProcessorBefore(ISampleProcessorPtr& processor, int p
 
 bool ProcessingChain::RemoveProcessor(int processorId)
 {
+	const std::lock_guard<std::mutex> lock(m_processing_mutex);
+
 	auto iter = GetProcessorsById(processorId);
 
 	if (iter != m_processors.end())
@@ -154,11 +167,15 @@ IOutputChannelPairPtr ProcessingChain::FindOutput(int outputId)
 
 void ProcessingChain::RemoveAllInputChannels()
 {
+	const std::lock_guard<std::mutex> lock(m_processing_mutex);
+
 	m_inputChannels.clear();
 }
 
 void ProcessingChain::RemoveAllOutputChannels()
 {
+	const std::lock_guard<std::mutex> lock(m_processing_mutex);
+
 	m_outputChannelPairs.clear();
 }
 
