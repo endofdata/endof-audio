@@ -1,4 +1,7 @@
 #include "pch.h"
+#include <initguid.h>
+#include <AsioDebugDriverGuid.h>
+
 #include <AsioCore.h>
 #include <ObjectFactory.h>
 #include <AsioCoreException.h>
@@ -56,6 +59,7 @@ int main()
 			try
 			{
 				device = AsioCore::CreateInstancePtr(IID_STEINBERG_UR_RT2);
+				//device = AsioCore::CreateInstancePtr(CLSID_AsioDebugDriver);
 			}
 			catch (const AsioCoreException& acx)
 			{
@@ -101,14 +105,14 @@ int main()
 							std::cout << "Switching to replay..." << std::endl;
 							processingChain->InputChannel[0]->IsActive = false;
 
+							processingChain->RemoveProcessor(recorderId);
+
 							ISampleContainerPtr take = nullptr;
 							recorder->QueryInterface<ISampleContainer>(&take);
 
 							//writeContents(take);
 							ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take);
 							ISampleProcessorPtr takeProcessor = ObjectFactory::CreateFromSourceProcessor(takeSource);
-
-							// processingChain->RemoveProcessor(recorderId);
 
 							int playerId = processingChain->AddProcessor(takeProcessor);
 							std::cout << "Now listen..." << std::endl;
