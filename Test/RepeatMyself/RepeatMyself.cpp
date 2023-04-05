@@ -73,6 +73,7 @@ int main()
 
 			// create processor chain input -> recorder -> output
 			ISampleProcessorPtr recorder = ObjectFactory::CreateToContainerProcessor(_countof(selectedInputs), (int)samplesPerTenSecs, (int)samplesPerTenSecs);
+			recorder->IsBypassed = true;
 
 			IProcessingChainPtr processingChain = device->ProcessingChain;
 
@@ -98,14 +99,14 @@ int main()
 						if (processingChain->InputChannel[0]->IsActive == false)
 						{
 							processingChain->InputChannel[0]->IsActive = true;
+							recorder->IsBypassed = false;
 							std::cout << "Recording..." << std::endl;
 						}
 						else
 						{
 							std::cout << "Switching to replay..." << std::endl;
+							recorder->IsBypassed = true;
 							processingChain->InputChannel[0]->IsActive = false;
-
-							processingChain->RemoveProcessor(recorderId);
 
 							ISampleContainerPtr take = nullptr;
 							recorder->QueryInterface<ISampleContainer>(&take);
