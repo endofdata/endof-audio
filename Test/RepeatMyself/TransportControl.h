@@ -1,28 +1,19 @@
 #pragma once
 #include <IMidiInput.h>
+#include <ITransport.h>
 #include <memory>
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 namespace RepeatMyself
 {
-	enum class TransportCode
-	{
-		None,
-		Stop,
-		Play,
-		Record,
-		ToStart,
-		ToEnd
-	};
-
 	typedef std::shared_ptr<class TransportControl> TransportControlPtr;
 
 	class TransportControl
 	{
 	public:
 
-		TransportControl(IMidiInputPtr& midiInput);
+		TransportControl(IMidiInputPtr& midiInput, ITransportPtr& transport);
 		virtual ~TransportControl();
 
 		bool get_IsActive() const;
@@ -31,12 +22,14 @@ namespace RepeatMyself
 
 		bool GetNext(unsigned int timeout, TransportCode& code);
 
-		static TransportControlPtr Create();
+		static TransportControlPtr Create(ITransportPtr& transport);
 
 	private:
 		static void OnData(void* pContext, const MidiMessage& msg, unsigned int timeStamp);
+		static void OnTransport(void* pContext, TransportCode code);
 
 		IMidiInputPtr m_input;
+		ITransportPtr m_transport;
 		HANDLE m_eventHandle;
 		TransportCode m_code;
 		bool m_isActive;

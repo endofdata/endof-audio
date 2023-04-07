@@ -46,7 +46,41 @@ int main()
 
 	try
 	{
-		TransportControlPtr transportControl = TransportControl::Create();
+		AsioCorePtr device = nullptr;
+
+		try
+		{
+			device = AsioCore::CreateInstancePtr(IID_STEINBERG_UR_RT2);
+			//device = AsioCore::CreateInstancePtr(CLSID_AsioDebugDriver);
+		}
+		catch (const AsioCoreException& acx)
+		{
+			std::wcerr << L"Failed to create device. " << acx.Message << L" Error code: 0x" << std::hex << acx.Error << std::dec << std::endl;
+			exit(-1);
+		}
+
+		device->CreateBuffers(selectedInputs, _countof(selectedInputs), selectedOutputs, _countof(selectedOutputs), sampleCount);
+
+		float samplesPerTenSecs = device->SampleRate * 60.0f;
+
+		// create processor chain input -> recorder -> output
+		IRecorderPtr recorder = ObjectFactory::CreateRecorder(_countof(selectedInputs), (int)samplesPerTenSecs, (int)samplesPerTenSecs);
+		ISampleProcessorPtr recordingProcessor = nullptr;
+		recorder->QueryInterface<ISampleProcessor>(&recordingProcessor);
+		recordingProcessor->IsBypassed = true;
+
+		IProcessingChainPtr processingChain = device->ProcessingChain;
+		ITransportPtr transport = processingChain->Transport;
+		int recorderId = processingChain->AddProcessor(recordingProcessor);
+
+		ISourceJoinerPtr joiner = ObjectFactory::CreateSourceJoiner();
+		ISampleProcessorPtr joiningProcessor = nullptr;
+		joiner->QueryInterface<ISampleProcessor>(&joiningProcessor);
+		int joinerId = processingChain->AddProcessor(joiningProcessor);
+
+		processingChain->OutputChannelPair[0]->IsActive = true;
+
+		TransportControlPtr transportControl = TransportControl::Create(transport);
 
 		if (transportControl == nullptr)
 		{
@@ -54,35 +88,7 @@ int main()
 		}
 		else
 		{
-			AsioCorePtr device = nullptr;
-
-			try
-			{
-				device = AsioCore::CreateInstancePtr(IID_STEINBERG_UR_RT2);
-				//device = AsioCore::CreateInstancePtr(CLSID_AsioDebugDriver);
-			}
-			catch (const AsioCoreException& acx)
-			{
-				std::wcerr << L"Failed to create device. " << acx.Message << L" Error code: 0x" << std::hex << acx.Error << std::dec << std::endl;
-				exit(-1);
-			}
-
-			device->CreateBuffers(selectedInputs, _countof(selectedInputs), selectedOutputs, _countof(selectedOutputs), sampleCount);
-
-			float samplesPerTenSecs = device->SampleRate * 60.0f;
-
-			// create processor chain input -> recorder -> output
-			IRecorderPtr recorder = ObjectFactory::CreateRecorder(_countof(selectedInputs), (int)samplesPerTenSecs, (int)samplesPerTenSecs);
-			ISampleProcessorPtr recordingProcessor = nullptr;
-			recorder->QueryInterface<ISampleProcessor>(&recordingProcessor);
-			recordingProcessor->IsBypassed = true;
-
-			IProcessingChainPtr processingChain = device->ProcessingChain;
-			ITransportPtr transport = processingChain->Transport;
-
-			int recorderId = processingChain->AddProcessor(recordingProcessor);
-			processingChain->OutputChannelPair[0]->IsActive = true;
-
+			bool isRecordPressed = false;
 
 			// start audio device
 			device->Start();
@@ -104,45 +110,69 @@ int main()
 					switch (transportStatus)
 					{
 					case TransportCode::Record:
-						if (processingChain->InputChannel[0]->IsActive == false)
+						if (!transport->IsLooping)
 						{
-							// activate in-memory recording
-							processingChain->InputChannel[0]->IsActive = true;
-							recordingProcessor->IsBypassed = false;
-							transport->Start();
-							std::wcout << std::endl << L"Recording...";
-						}
-						else
-						{
-							// get current play position
-							AudioTime switchTime = transport->HostClock->CurrentTime;
-
-							// stop recording
-							std::wcout << std::endl << L"Switching to replay...";
-							processingChain->InputChannel[0]->IsActive = false;
-
-							// create audio take from current recording and start next in-memory recording
-							ISampleContainerPtr take = recorder->CreateSampleContainer(true);
-
-							//writeContents(take);
-							ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take);
-							takeSource->IsLooping = true;
-
-							ISampleProcessorPtr takeProcessor = ObjectFactory::CreateFromSourceProcessor(takeSource);
-
-							// add take for replay
-							int playerId = processingChain->AddProcessor(takeProcessor);
-
-							// init looping
-							if (!transport->IsLooping)
+							// Initial loop recording
+							if (recordingProcessor->IsBypassed)
 							{
-								std::wcout << std::endl << L"Setting up loop at " << switchTime.ToString();
+								// Step 1: press record to start
+								processingChain->InputChannel[0]->IsActive = true;
+								recordingProcessor->IsBypassed = false;
+								transport->Start();
+								std::wcout << std::endl << L"Recording main loop...";
+							}
+							else
+							{
+								// Step 2: press record again to stop recording and begin loop
+								AudioTime switchTime = transport->HostClock->CurrentTime;
+
+								ISampleContainerPtr take = recorder->CreateSampleContainer(false);
+								ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take);
+								takeSource->IsLooping = true;
+								joiner->AddSource(takeSource);
+
+								std::wcout << std::endl << L"Setting up loop end at " << switchTime.ToString();
 								transport->LoopEnd = switchTime;
 								transport->IsLooping = true;
 							}
-							std::wcout << std::endl << L"Now listen...";
+						}
+						else
+						{
+							// Toggle recording start / end with next loop wrap
+							isRecordPressed = !isRecordPressed;
 						}
 						break;
+					case TransportCode::Locate:
+						// Triggered by master loop wrap: delayed handling of 'Record' commands
+						if (isRecordPressed)
+						{
+							isRecordPressed = false;
+
+							if (recordingProcessor->IsBypassed)
+							{
+								// Step n: start overdub
+								processingChain->InputChannel[0]->IsActive = true;
+								recordingProcessor->IsBypassed = false;
+								transport->Start();
+								std::wcout << std::endl << L"Recording next loop...";
+							}
+							else
+							{
+								// Step n + 1: stop overdub and add loop
+								AudioTime switchTime = transport->HostClock->CurrentTime;
+
+								ISampleContainerPtr take = recorder->CreateSampleContainer(false);
+								ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take);
+								takeSource->IsLooping = true;
+								joiner->AddSource(takeSource);
+							}
+						}
+						break;
+					case TransportCode::Start:
+						// Drop current recording, continue looping
+						recorder->DropRecording(false);
+						break;
+
 					case TransportCode::Stop:
 						transport->Stop();
 						std::wcout << std::endl << L"Transport stopped.";
