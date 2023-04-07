@@ -26,6 +26,7 @@ namespace Audio
 				void put_IsBypassed(bool value);
 
 				ISampleContainerPtr CreateSampleContainer(bool continueRecording);
+				void DropRecording(bool continueRecording);
 
 				DECLARE_IUNKNOWN
 

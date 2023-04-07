@@ -19,7 +19,14 @@ namespace Audio
 					/// <summary>
 					/// Creates an audio take from current recording data.
 					/// </summary>
+					/// <param name="continueRecording">Controls whether recorder should go on with next recording</param>
 					ISampleContainerPtr CreateSampleContainer(bool continueRecording) = 0;
+
+					/// <summary>
+					/// Drops any recording data.
+					/// </summary>
+					/// <param name="continueRecording">Controls whether recorder should go on with next recording</param>
+					void DropRecording(bool continueRecording) = 0;
 				};
 
 				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(IRecorder, __uuidof(IRecorder));

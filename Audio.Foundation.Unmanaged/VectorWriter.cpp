@@ -128,6 +128,23 @@ ISampleContainerPtr VectorWriter::CreateSampleContainer(bool continueRecording)
 	return nullptr;
 }
 
+void VectorWriter::DropRecording(bool continueRecording)
+{
+	if (m_inUse > 0)
+	{
+		IsBypassed = true;
+
+		const std::lock_guard<std::recursive_mutex> lock(m_buffers_mutex);
+
+		m_buffers.clear();
+
+		if (continueRecording)
+		{
+			IsBypassed = false;
+		}
+	}
+}
+
 void VectorWriter::InitializeBuffers()
 {
 	m_buffers.reserve(m_channelCount);
