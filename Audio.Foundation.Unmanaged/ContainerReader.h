@@ -20,7 +20,7 @@ namespace Audio
 				ContainerReader(ISampleContainerPtr& source);
 				virtual ~ContainerReader();
 
-				int ReadSamples(ISampleContainerPtr& container);
+				int ReadSamples(ISampleContainerPtr& container, bool overdub);
 
 				bool get_IsLooping();
 				void put_IsLooping(bool value);

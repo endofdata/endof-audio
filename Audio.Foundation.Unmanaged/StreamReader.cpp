@@ -32,12 +32,12 @@ bool StreamReader::GetInterface(REFIID iid, void** ppvResult)
 }
 
 
-int StreamReader::ReadSamples(ISampleContainerPtr& container)
+int StreamReader::ReadSamples(ISampleContainerPtr& container, bool overdub)
 {
 	int samples = container->SampleCount;
 	int channels = container->ChannelCount;
 
-	if (channels == 1)
+	if (channels == 1 && !overdub)
 	{
 		Sample* pDst = container->Channels[0]->SamplePtr;
 		std::streamsize size = samples * sizeof(Sample);
@@ -59,15 +59,32 @@ int StreamReader::ReadSamples(ISampleContainerPtr& container)
 			arDst[c] = container->Channels[c]->SamplePtr;
 		}
 
-		for (int s = 0; s < samples; s++)
+		if (overdub)
 		{
-			for (int c = 0; c < channels; c++)
+			for (int s = 0; s < samples; s++)
 			{
-				Sample** ppDst = &arDst[c];
+				for (int c = 0; c < channels; c++)
+				{
+					Sample** ppDst = &arDst[c];
+					Sample value = 0.0;
 
-				m_input.read((char*)*ppDst, sizeof(Sample));
+					m_input.read((char*)&value, sizeof(Sample));
+					**ppDst += value;
+					(*ppDst)++;
+				}
+			}
+		}
+		else
+		{
+			for (int s = 0; s < samples; s++)
+			{
+				for (int c = 0; c < channels; c++)
+				{
+					Sample** ppDst = &arDst[c];
 
-				(*ppDst)++;
+					m_input.read((char*)*ppDst, sizeof(Sample));
+					(*ppDst)++;
+				}
 			}
 		}
 	}

@@ -34,7 +34,7 @@ bool ContainerReader::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-int ContainerReader::ReadSamples(ISampleContainerPtr& container)
+int ContainerReader::ReadSamples(ISampleContainerPtr& container, bool overdub)
 {
 	if (m_sampleOffset < m_pSource->SampleCount)
 	{
@@ -45,7 +45,14 @@ int ContainerReader::ReadSamples(ISampleContainerPtr& container)
 		do
 		{
 			int sliceCount = std::min(m_pSource->SampleCount - m_sampleOffset, required - sampleCount);
-			m_pSource->CopyTo(container, m_sampleOffset, sliceCount, 0, channelCount, 0, 0);
+			if (overdub)
+			{
+				m_pSource->AddTo(container, m_sampleOffset, sliceCount, 0, channelCount, 0, 0);
+			}
+			else
+			{
+				m_pSource->CopyTo(container, m_sampleOffset, sliceCount, 0, channelCount, 0, 0);
+			}
 			sampleCount += sliceCount;
 			m_sampleOffset += sliceCount;
 

@@ -39,7 +39,7 @@ int SourceProcessor::Process(ISampleContainerPtr& container)
 {
 	if (!m_isBypassed)
 	{
-		return m_pSource->ReadSamples(container);
+		return m_pSource->ReadSamples(container, false);
 	}
 	return 0;
 }

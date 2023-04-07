@@ -83,7 +83,8 @@ int SourceJoiner::Process(ISampleContainerPtr& container)
 		{
 			std::for_each(m_vecSources.begin(), m_vecSources.end(), [this, &container](ISampleSourcePtr& item)
 			{
-				item->ReadSamples(container);
+				// Read in 'overub' mode to add sample values
+				item->ReadSamples(container, true);
 			});
 		}
 		return container->SampleCount;

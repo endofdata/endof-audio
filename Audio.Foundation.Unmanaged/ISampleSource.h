@@ -17,7 +17,7 @@ namespace Audio
 				/// </summary>
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("f897a276-8567-40c9-91e6-cfd6205f4205")) ISampleSource : public IUnknown
 				{
-					int ReadSamples(ISampleContainerPtr& container) = 0;
+					int ReadSamples(ISampleContainerPtr& container, bool overdub) = 0;
 
 					bool get_IsLooping() = 0;
 					void put_IsLooping(bool value) = 0;
