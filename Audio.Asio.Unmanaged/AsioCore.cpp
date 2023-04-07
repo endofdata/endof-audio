@@ -292,8 +292,10 @@ void AsioCore::CreateBuffers(const int inputChannelIds[], int numInputIds, const
 
 		try
 		{
+			auto hostClock = ObjectFactory::CreateHostClock(SampleRate);
+			auto transport = ObjectFactory::CreateTransport(hostClock);
 			auto container = ObjectFactory::CreateSampleContainer(m_iSampleCount, std::max<int>(numInputIds, numOutputIds));
-			m_processingChain = ObjectFactory::CreateProcessingChain(container);
+			m_processingChain = ObjectFactory::CreateProcessingChain(transport, container);
 
 			CreateInputChannels(0, numInputIds);
 			CreateOutputChannels(numInputIds, numOutputIds);
@@ -421,6 +423,10 @@ ASIOTime* AsioCore::OnBufferSwitchTimeInfo(ASIOTime* params, long doubleBufferIn
 void AsioCore::OnSampleRateDidChange(ASIOSampleRate rate)
 {
 	m_sampleRate = rate;
+	if (m_processingChain != nullptr)
+	{
+		m_processingChain->Transport->HostClock->SampleRate = SampleRate;
+	}
 }
 
 long AsioCore::OnAsioMessage(long selector, long value, void* message, double* opt)
@@ -511,6 +517,10 @@ void AsioCore::put_SampleRate(double rate)
 	if (SampleRate != rate)
 	{
 		throw AsioCoreException("Failed to set sample rate");
+	}
+	if (m_processingChain != nullptr)
+	{
+		m_processingChain->Transport->HostClock->SampleRate = SampleRate;
 	}
 }
 
