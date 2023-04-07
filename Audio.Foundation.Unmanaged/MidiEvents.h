@@ -27,20 +27,20 @@ namespace Audio
 				void* get_Context();
 				void put_Context(void* value);
 
-				EventHandler get_OnOpen();
-				void put_OnOpen(EventHandler value);
+				MidiEventHandler get_OnOpen();
+				void put_OnOpen(MidiEventHandler value);
 
-				EventHandler get_OnClose();
-				void put_OnClose(EventHandler value);
+				MidiEventHandler get_OnClose();
+				void put_OnClose(MidiEventHandler value);
 
-				MessageHandler get_OnError();
-				void put_OnError(MessageHandler value);
+				MidiMessageHandler get_OnError();
+				void put_OnError(MidiMessageHandler value);
 
-				MessageHandler get_OnOverflow();
-				void put_OnOverflow(MessageHandler value);
+				MidiMessageHandler get_OnOverflow();
+				void put_OnOverflow(MidiMessageHandler value);
 
-				MessageHandler get_OnData();
-				void put_OnData(MessageHandler value);
+				MidiMessageHandler get_OnData();
+				void put_OnData(MidiMessageHandler value);
 
 				DECLARE_IUNKNOWN
 
@@ -48,16 +48,16 @@ namespace Audio
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
-				void Invoke(EventHandler handler);
-				void Invoke(MessageHandler handler, const MidiMessage& msg, unsigned int timeStamp);
+				void Invoke(MidiEventHandler handler);
+				void Invoke(MidiMessageHandler handler, const MidiMessage& msg, unsigned int timeStamp);
 
 				void* m_pContext;
 
-				EventHandler m_onOpen;
-				EventHandler m_onClose;
-				MessageHandler m_onError;
-				MessageHandler m_onOverflow;
-				MessageHandler m_onData;
+				MidiEventHandler m_onOpen;
+				MidiEventHandler m_onClose;
+				MidiMessageHandler m_onError;
+				MidiMessageHandler m_onOverflow;
+				MidiMessageHandler m_onData;
 
 			};
 		}

@@ -4,8 +4,10 @@
 #include <AudioTime.h>
 #include <comdef.h>
 #include <IHostClock.h>
+#include <ITransportEvents.h>
 
 using namespace Audio::Foundation::Unmanaged;
+using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 namespace Audio
 {
@@ -42,8 +44,10 @@ namespace Audio
 
 					IHostClockPtr& get_HostClock() = 0;
 					_declspec(property(get = get_HostClock)) IHostClockPtr HostClock;
-				};
 
+					ITransportEventsPtr& get_Events() = 0;
+					_declspec(property(get = get_Events)) ITransportEventsPtr& Events;
+				};
 
 				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ITransport, __uuidof(ITransport));
 			}

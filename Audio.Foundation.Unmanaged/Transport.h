@@ -16,7 +16,7 @@ namespace Audio
 			class Transport : public ITransport
 			{
 			public:
-				Transport(IHostClockPtr& hostClock);
+				Transport(IHostClockPtr& hostClock, ITransportEventsPtr& events);
 				virtual ~Transport();
 
 				void Start();
@@ -37,6 +37,8 @@ namespace Audio
 
 				IHostClockPtr& get_HostClock();
 
+				ITransportEventsPtr& get_Events();
+
 				DECLARE_IUNKNOWN
 
 			protected:
@@ -44,6 +46,7 @@ namespace Audio
 
 			private:
 				IHostClockPtr m_hostClock;
+				ITransportEventsPtr m_events;
 				AudioTime m_loopStart;
 				AudioTime m_loopEnd;
 				bool m_isLooping;

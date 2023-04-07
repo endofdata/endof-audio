@@ -4,8 +4,9 @@
 using namespace Audio::Foundation::Unmanaged;
 
 
-Transport::Transport(IHostClockPtr& hostClock) :
+Transport::Transport(IHostClockPtr& hostClock, ITransportEventsPtr& events) :
 	m_hostClock(hostClock),
+	m_events(events),
 	m_isLooping(false),
 	m_isSkipping(false),
 	m_refCount(0)
@@ -37,11 +38,13 @@ bool Transport::GetInterface(REFIID iid, void** ppvResult)
 void Transport::Start()
 {
 	m_hostClock->Start();
+	m_events->Transport(TransportCode::Start);
 }
 
 void Transport::Stop()
 {
 	m_hostClock->Stop();
+	m_events->Transport(TransportCode::Stop);
 }
 
 void Transport::Pulse()
@@ -54,6 +57,7 @@ void Transport::Pulse()
 		{
 			m_hostClock->CurrentTime = m_loopStart;
 			m_isSkipping = true;
+			m_events->Transport(TransportCode::Locate);
 		}
 	}
 }
@@ -112,4 +116,9 @@ void Transport::put_LoopEnd(AudioTime value)
 IHostClockPtr& Transport::get_HostClock()
 {
 	return m_hostClock;
+}
+
+ITransportEventsPtr& Transport::get_Events()
+{
+	return m_events;
 }

@@ -49,47 +49,47 @@ void MidiEvents::put_Context(void* value)
 	m_pContext = value;
 }
 
-EventHandler MidiEvents::get_OnOpen()
+MidiEventHandler MidiEvents::get_OnOpen()
 {
 	return m_onOpen;
 }
-void MidiEvents::put_OnOpen(EventHandler value)
+void MidiEvents::put_OnOpen(MidiEventHandler value)
 {
 	m_onOpen = value;
 }
 
-EventHandler MidiEvents::get_OnClose()
+MidiEventHandler MidiEvents::get_OnClose()
 {
 	return m_onClose;
 }
-void MidiEvents::put_OnClose(EventHandler value)
+void MidiEvents::put_OnClose(MidiEventHandler value)
 {
 	m_onClose = value;
 }
 
-MessageHandler MidiEvents::get_OnError()
+MidiMessageHandler MidiEvents::get_OnError()
 {
 	return m_onError;
 }
-void MidiEvents::put_OnError(MessageHandler value)
+void MidiEvents::put_OnError(MidiMessageHandler value)
 {
 	m_onError = value;
 }
 
-MessageHandler MidiEvents::get_OnOverflow()
+MidiMessageHandler MidiEvents::get_OnOverflow()
 {
 	return m_onOverflow;
 }
-void MidiEvents::put_OnOverflow(MessageHandler value)
+void MidiEvents::put_OnOverflow(MidiMessageHandler value)
 {
 	m_onOverflow = value;
 }
 
-MessageHandler MidiEvents::get_OnData()
+MidiMessageHandler MidiEvents::get_OnData()
 {
 	return m_onData;
 }
-void MidiEvents::put_OnData(MessageHandler value)
+void MidiEvents::put_OnData(MidiMessageHandler value)
 {
 	m_onData = value;
 }
@@ -119,7 +119,7 @@ void MidiEvents::Data(const MidiMessage& msg, unsigned int timeStamp)
 	Invoke(m_onData, msg, timeStamp);
 }
 
-void MidiEvents::Invoke(EventHandler handler)
+void MidiEvents::Invoke(MidiEventHandler handler)
 {
 	void* pContext = m_pContext;
 
@@ -129,7 +129,7 @@ void MidiEvents::Invoke(EventHandler handler)
 	}
 }
 
-void MidiEvents::Invoke(MessageHandler handler, const MidiMessage& msg, unsigned int timeStamp)
+void MidiEvents::Invoke(MidiMessageHandler handler, const MidiMessage& msg, unsigned int timeStamp)
 {
 	void* pContext = m_pContext;
 

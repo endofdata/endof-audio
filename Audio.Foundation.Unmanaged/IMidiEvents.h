@@ -15,8 +15,8 @@ namespace Audio
 		{
 			namespace Abstractions
 			{
-				typedef void (*EventHandler)(void* pContext);
-				typedef void (*MessageHandler)(void* pContext, const MidiMessage& msg, unsigned int timeStamp);
+				typedef void (*MidiEventHandler)(void* pContext);
+				typedef void (*MidiMessageHandler)(void* pContext, const MidiMessage& msg, unsigned int timeStamp);
 
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("b35a45ad-4bce-4892-944d-fbe77f3a4a02")) IMidiEvents : public IUnknown
 				{
@@ -28,33 +28,27 @@ namespace Audio
 
 					void* get_Context() = 0;
 					void put_Context(void* value) = 0;
-
 					_declspec(property(get = get_Context, put = put_Context)) void* Context;
 
-					EventHandler get_OnOpen() = 0;
-					void put_OnOpen(EventHandler value) = 0;
+					MidiEventHandler get_OnOpen() = 0;
+					void put_OnOpen(MidiEventHandler value) = 0;
+					_declspec(property(get = get_OnOpen, put = put_OnOpen)) MidiEventHandler OnOpen;
 
-					_declspec(property(get = get_OnOpen, put = put_OnOpen)) EventHandler OnOpen;
+					MidiEventHandler get_OnClose() = 0;
+					void put_OnClose(MidiEventHandler value) = 0;
+					_declspec(property(get = get_OnClose, put = put_OnClose)) MidiEventHandler OnClose;
 
-					EventHandler get_OnClose() = 0;
-					void put_OnClose(EventHandler value) = 0;
+					MidiMessageHandler get_OnError() = 0;
+					void put_OnError(MidiMessageHandler value) = 0;
+					_declspec(property(get = get_OnError, put = put_OnError)) MidiMessageHandler OnError;
 
-					_declspec(property(get = get_OnClose, put = put_OnClose)) EventHandler OnClose;
+					MidiMessageHandler get_OnOverflow() = 0;
+					void put_OnOverflow(MidiMessageHandler value) = 0;
+					_declspec(property(get = get_OnOverflow, put = put_OnOverflow)) MidiMessageHandler OnOverflow;
 
-					MessageHandler get_OnError() = 0;
-					void put_OnError(MessageHandler value) = 0;
-
-					_declspec(property(get = get_OnError, put = put_OnError)) MessageHandler OnError;
-
-					MessageHandler get_OnOverflow() = 0;
-					void put_OnOverflow(MessageHandler value) = 0;
-
-					_declspec(property(get = get_OnOverflow, put = put_OnOverflow)) MessageHandler OnOverflow;
-
-					MessageHandler get_OnData() = 0;
-					void put_OnData(MessageHandler value) = 0;
-
-					_declspec(property(get = get_OnData, put = put_OnData)) MessageHandler OnData;
+					MidiMessageHandler get_OnData() = 0;
+					void put_OnData(MidiMessageHandler value) = 0;
+					_declspec(property(get = get_OnData, put = put_OnData)) MidiMessageHandler OnData;
 				};
 
 				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(IMidiEvents, __uuidof(IMidiEvents));
