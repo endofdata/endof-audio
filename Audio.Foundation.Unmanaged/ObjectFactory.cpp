@@ -3,7 +3,7 @@
 #include "MeterChannel.h"
 #include "SampleBuffer.h"
 #include "SampleContainer.h"
-#include "SampleJoiner.h"
+#include "SourceJoiner.h"
 #include "SampleSharer.h"
 #include "FileWriter.h"
 #include "FileReader.h"
@@ -25,6 +25,7 @@
 #include "MidiInput.h"
 #include "MidiEvents.h"
 #include "Transport.h"
+#include "TransportEvents.h"
 #include <stdexcept>
 
 int ObjectFactory::LastTakeId = 0;
@@ -47,9 +48,9 @@ ISampleSharerPtr ObjectFactory::CreateSampleSharer()
 	return new SampleSharer();
 }
 
-ISampleJoinerPtr ObjectFactory::CreateSampleJoiner()
+ISourceJoinerPtr ObjectFactory::CreateSourceJoiner()
 {
-	return new SampleJoiner();
+	return new SourceJoiner();
 }
 
 IMeterChannelPtr ObjectFactory::CreateMeterChannel(int sampleRate, int channelCount)
@@ -116,7 +117,8 @@ IHostClockPtr ObjectFactory::CreateHostClock(double sampleRate)
 
 ITransportPtr ObjectFactory::CreateTransport(IHostClockPtr& hostClock)
 {
-	return new Transport(hostClock);
+	ITransportEventsPtr events = new TransportEvents();
+	return new Transport(hostClock, events);
 }
 
 ITakeSequencePtr ObjectFactory::CreateTakeSequence(ITransportPtr& transport)

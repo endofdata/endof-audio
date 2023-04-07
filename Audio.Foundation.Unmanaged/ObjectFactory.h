@@ -5,7 +5,7 @@
 #include <ISampleSource.h>
 #include <ISampleBuffer.h>
 #include <ISampleContainer.h>
-#include <ISampleJoiner.h>
+#include <ISourceJoiner.h>
 #include <ISampleSharer.h>
 #include <IMeterChannel.h>
 #include <ITake.h>
@@ -36,7 +36,7 @@ namespace Audio
 
 				static ISampleSharerPtr CreateSampleSharer();
 
-				static ISampleJoinerPtr CreateSampleJoiner();
+				static ISourceJoinerPtr CreateSourceJoiner();
 
 				static IMeterChannelPtr CreateMeterChannel(int sampleRate, int channelCount);
 

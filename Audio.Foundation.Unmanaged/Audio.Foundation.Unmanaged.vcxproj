@@ -116,13 +116,14 @@
     <ClInclude Include="IRecorder.h" />
     <ClInclude Include="ISampleBuffer.h" />
     <ClInclude Include="ISampleContainer.h" />
-    <ClInclude Include="ISampleJoiner.h" />
+    <ClInclude Include="ISourceJoiner.h" />
     <ClInclude Include="ISampleSharer.h" />
     <ClInclude Include="ISampleProcessor.h" />
     <ClInclude Include="ISampleSource.h" />
     <ClInclude Include="ITake.h" />
     <ClInclude Include="ITakeSequence.h" />
     <ClInclude Include="ITransport.h" />
+    <ClInclude Include="ITransportEvents.h" />
     <ClInclude Include="MeterChannel.h" />
     <ClInclude Include="MidiEvents.h" />
     <ClInclude Include="MidiInput.h" />
@@ -138,7 +139,7 @@
     <ClInclude Include="SampleContainer.h" />
     <ClInclude Include="SampleContainerSpan.h" />
     <ClInclude Include="SampleConversionUnmanaged.h" />
-    <ClInclude Include="SampleJoiner.h" />
+    <ClInclude Include="SourceJoiner.h" />
     <ClInclude Include="SampleSharer.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
@@ -150,6 +151,7 @@
     <ClInclude Include="TakeSequence.h" />
     <ClInclude Include="AudioTime.h" />
     <ClInclude Include="Transport.h" />
+    <ClInclude Include="TransportEvents.h" />
     <ClInclude Include="UnknownBase.h" />
     <ClInclude Include="ContainerReader.h" />
     <ClInclude Include="VectorWriter.h" />
@@ -172,7 +174,7 @@
     <ClCompile Include="SampleBufferSpan.cpp" />
     <ClCompile Include="SampleContainer.cpp" />
     <ClCompile Include="SampleContainerSpan.cpp" />
-    <ClCompile Include="SampleJoiner.cpp" />
+    <ClCompile Include="SourceJoiner.cpp" />
     <ClCompile Include="SampleSharer.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp">
@@ -185,6 +187,7 @@
     <ClCompile Include="Take.cpp" />
     <ClCompile Include="TakeSequence.cpp" />
     <ClCompile Include="Transport.cpp" />
+    <ClCompile Include="TransportEvents.cpp" />
     <ClCompile Include="VectorWriter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

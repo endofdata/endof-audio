@@ -3,8 +3,8 @@
 #include "Audio.Foundation.Unmanaged.h"
 #include "UnknownBase.h"
 #include "ISampleProcessor.h"
-#include "ISampleJoiner.h"
-#include "ISampleContainer.h"
+#include "ISourceJoiner.h"
+#include "ISampleSource.h"
 #include <vector>
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -15,17 +15,17 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class SampleJoiner : public ISampleJoiner, public ISampleProcessor
+			class SourceJoiner : public ISourceJoiner, public ISampleProcessor
 			{
 			public:
-				SampleJoiner();
-				virtual ~SampleJoiner();
+				SourceJoiner();
+				virtual ~SourceJoiner();
 
-				ISampleContainerPtr& get_Source(int index);
+				ISampleSourcePtr& get_Source(int index);
 
-				void AddSource(ISampleContainerPtr& source);
+				void AddSource(ISampleSourcePtr& source);
 
-				void RemoveSource(ISampleContainerPtr& source);
+				void RemoveSource(ISampleSourcePtr& source);
 
 				void RemoveAllSources();
 
@@ -40,7 +40,7 @@ namespace Audio
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
-				std::vector<ISampleContainerPtr> m_vecSources;
+				std::vector<ISampleSourcePtr> m_vecSources;
 				bool m_isBypassed;
 			};
 		}

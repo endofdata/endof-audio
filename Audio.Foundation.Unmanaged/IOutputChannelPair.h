@@ -4,7 +4,6 @@
 #include <Windows.h>
 #include <Audio.Foundation.Unmanaged.h>
 #include <comdef.h>
-#include <ISampleJoiner.h>
 
 namespace Audio
 {
