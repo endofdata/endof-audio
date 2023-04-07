@@ -17,8 +17,8 @@ void writeContents(ISampleContainerPtr& container)
 {
 	for (int c = 0; c < container->ChannelCount; c++)
 	{
-		std::ostrstream builder;
-		builder << "fred_" << c << ".dat" << std::ends;
+		std::wostringstream builder;
+		builder << L"fred_" << c << L".dat" << std::ends;
 
 		auto filename = builder.str();
 
@@ -40,17 +40,17 @@ int main()
 
 	if (hr != S_OK)
 	{
-		std::cerr << "COM initialization failed." << std::endl;
+		std::wcerr << L"COM initialization failed." << std::endl;
 		exit(-1);
 	}
 
 	try
 	{
-		TransportControlPtr transport = TransportControl::Create();
+		TransportControlPtr transportControl = TransportControl::Create();
 
-		if (transport == nullptr)
+		if (transportControl == nullptr)
 		{
-			std::cerr << "TransportControl initialization failed." << std::endl;
+			std::wcerr << L"TransportControl initialization failed." << std::endl;
 		}
 		else
 		{
@@ -63,7 +63,7 @@ int main()
 			}
 			catch (const AsioCoreException& acx)
 			{
-				std::cerr << "Failed to create device. " << acx.Message << " Error code: " << std::hex << acx.Error << std::endl;
+				std::wcerr << L"Failed to create device. " << acx.Message << L" Error code: 0x" << std::hex << acx.Error << std::dec << std::endl;
 				exit(-1);
 			}
 
@@ -78,6 +78,7 @@ int main()
 			recordingProcessor->IsBypassed = true;
 
 			IProcessingChainPtr processingChain = device->ProcessingChain;
+			ITransportPtr transport = processingChain->Transport;
 
 			int recorderId = processingChain->AddProcessor(recordingProcessor);
 			processingChain->OutputChannelPair[0]->IsActive = true;
@@ -87,16 +88,18 @@ int main()
 			device->Start();
 
 			// activate processing
-			transport->IsActive = true;
+			transportControl->IsActive = true;
 
 			TransportCode transportStatus = TransportCode::None;
 
 			while (transportStatus != TransportCode::Stop)
 			{
+				std::wcout << transport->HostClock->CurrentTime.ToString() << "\r";
+
 				// check for control input (MIDI)
-				if (transport->GetNext(1000, transportStatus))
+				if (transportControl->GetNext(1000, transportStatus))
 				{
-					std::cout << "Received transport code: " << (int)transportStatus << std::endl;
+					std::wcout << std::endl << L"Received transport code: " << (int)transportStatus;
 
 					switch (transportStatus)
 					{
@@ -106,12 +109,16 @@ int main()
 							// activate in-memory recording
 							processingChain->InputChannel[0]->IsActive = true;
 							recordingProcessor->IsBypassed = false;
-							std::cout << "Recording..." << std::endl;
+							transport->Start();
+							std::wcout << std::endl << L"Recording...";
 						}
 						else
 						{
+							// get current play position
+							AudioTime switchTime = transport->HostClock->CurrentTime;
+
 							// stop recording
-							std::cout << "Switching to replay..." << std::endl;
+							std::wcout << std::endl << L"Switching to replay...";
 							processingChain->InputChannel[0]->IsActive = false;
 
 							// create audio take from current recording and start next in-memory recording
@@ -119,27 +126,42 @@ int main()
 
 							//writeContents(take);
 							ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take);
+							takeSource->IsLooping = true;
+
 							ISampleProcessorPtr takeProcessor = ObjectFactory::CreateFromSourceProcessor(takeSource);
 
 							// add take for replay
 							int playerId = processingChain->AddProcessor(takeProcessor);
-							std::cout << "Now listen..." << std::endl;
+
+							// init looping
+							if (!transport->IsLooping)
+							{
+								std::wcout << std::endl << L"Setting up loop at " << switchTime.ToString();
+								transport->LoopEnd = switchTime;
+								transport->IsLooping = true;
+							}
+							std::wcout << std::endl << L"Now listen...";
 						}
+						break;
+					case TransportCode::Stop:
+						transport->Stop();
+						std::wcout << std::endl << L"Transport stopped.";
 						break;
 					default:
 						break;
 					}
+					std::wcout << std::endl;
 				}
 			}
 
-			std::cout << "Shutting down everything. Bye!" << std::endl;
+			std::wcout << L"Shutting down everything. Bye!" << std::endl;
 
 			device->Stop();
 		}
 	}
 	catch (const std::exception& error)
 	{
-		std::cerr << "Unhandled exception: " << error.what() << std::endl;
+		std::wcerr << L"Unhandled exception: " << error.what() << std::endl;
 	}
 	CoUninitialize();
 }
