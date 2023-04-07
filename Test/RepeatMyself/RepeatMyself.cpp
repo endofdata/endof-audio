@@ -72,23 +72,28 @@ int main()
 			float samplesPerTenSecs = device->SampleRate * 60.0f;
 
 			// create processor chain input -> recorder -> output
-			ISampleProcessorPtr recorder = ObjectFactory::CreateToContainerProcessor(_countof(selectedInputs), (int)samplesPerTenSecs, (int)samplesPerTenSecs);
-			recorder->IsBypassed = true;
+			IRecorderPtr recorder = ObjectFactory::CreateRecorder(_countof(selectedInputs), (int)samplesPerTenSecs, (int)samplesPerTenSecs);
+			ISampleProcessorPtr recordingProcessor = nullptr;
+			recorder->QueryInterface<ISampleProcessor>(&recordingProcessor);
+			recordingProcessor->IsBypassed = true;
 
 			IProcessingChainPtr processingChain = device->ProcessingChain;
 
-			int recorderId = processingChain->AddProcessor(recorder);
+			int recorderId = processingChain->AddProcessor(recordingProcessor);
 			processingChain->OutputChannelPair[0]->IsActive = true;
 
 
-			// begin recording until a key is pressed
+			// start audio device
 			device->Start();
 
-			TransportCode transportStatus = TransportCode::None;
+			// activate processing
 			transport->IsActive = true;
+
+			TransportCode transportStatus = TransportCode::None;
 
 			while (transportStatus != TransportCode::Stop)
 			{
+				// check for control input (MIDI)
 				if (transport->GetNext(1000, transportStatus))
 				{
 					std::cout << "Received transport code: " << (int)transportStatus << std::endl;
@@ -98,23 +103,25 @@ int main()
 					case TransportCode::Record:
 						if (processingChain->InputChannel[0]->IsActive == false)
 						{
+							// activate in-memory recording
 							processingChain->InputChannel[0]->IsActive = true;
-							recorder->IsBypassed = false;
+							recordingProcessor->IsBypassed = false;
 							std::cout << "Recording..." << std::endl;
 						}
 						else
 						{
+							// stop recording
 							std::cout << "Switching to replay..." << std::endl;
-							recorder->IsBypassed = true;
 							processingChain->InputChannel[0]->IsActive = false;
 
-							ISampleContainerPtr take = nullptr;
-							recorder->QueryInterface<ISampleContainer>(&take);
+							// create audio take from current recording and start next in-memory recording
+							ISampleContainerPtr take = recorder->CreateSampleContainer(true);
 
 							//writeContents(take);
 							ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take);
 							ISampleProcessorPtr takeProcessor = ObjectFactory::CreateFromSourceProcessor(takeSource);
 
+							// add take for replay
 							int playerId = processingChain->AddProcessor(takeProcessor);
 							std::cout << "Now listen..." << std::endl;
 						}
