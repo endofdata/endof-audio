@@ -35,12 +35,13 @@ bool SourceProcessor::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-void SourceProcessor::Process(ISampleContainerPtr& container)
+int SourceProcessor::Process(ISampleContainerPtr& container)
 {
 	if (!m_isBypassed)
 	{
-		m_pSource->ReadSamples(container);
+		return m_pSource->ReadSamples(container);
 	}
+	return 0;
 }
 
 bool SourceProcessor::get_IsBypassed()

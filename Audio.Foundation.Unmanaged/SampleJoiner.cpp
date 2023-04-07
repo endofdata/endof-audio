@@ -73,7 +73,7 @@ ISampleContainerPtr& SampleJoiner::get_Source(int index)
 	return m_vecSources.at(index);
 }
 
-void SampleJoiner::Process(ISampleContainerPtr& container)
+int SampleJoiner::Process(ISampleContainerPtr& container)
 {
 	if (!m_isBypassed)
 	{
@@ -86,7 +86,9 @@ void SampleJoiner::Process(ISampleContainerPtr& container)
 				item->AddTo(container, 0, item->SampleCount, 0, item->ChannelCount, 0, 0);
 			});
 		}
+		return container->SampleCount;
 	}
+	return 0;
 }
 
 bool SampleJoiner::get_IsBypassed()

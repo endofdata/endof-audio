@@ -36,7 +36,7 @@ namespace Audio
 				bool get_IsBypassed();
 				void put_IsBypassed(bool value);
 
-				void Process(ISampleContainerPtr& inputBuffer);
+				int Process(ISampleContainerPtr& inputBuffer);
 
 				DECLARE_IUNKNOWN
 

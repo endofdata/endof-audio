@@ -75,7 +75,7 @@ ISampleProcessorPtr& SampleSharer::get_Target(int index)
 	return m_vecTargets.at(index);
 }
 
-void SampleSharer::Process(ISampleContainerPtr& container)
+int SampleSharer::Process(ISampleContainerPtr& container)
 {
 	if (!m_isBypassed)
 	{
@@ -83,7 +83,9 @@ void SampleSharer::Process(ISampleContainerPtr& container)
 		{
 			item->Process(container);
 		});
+		return container->SampleCount;
 	}
+	return 0;
 }
 
 bool SampleSharer::get_IsBypassed()

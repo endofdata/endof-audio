@@ -141,8 +141,10 @@ void TakeSequence::put_PlayPosition(AudioTime currentTime)
 	m_currentTime = currentTime;
 }
 
-void TakeSequence::Process(ISampleContainerPtr& container)
+int TakeSequence::Process(ISampleContainerPtr& container)
 {	
+	int done = 0;
+
 	if (!m_isBypassed)
 	{
 		bool hasTake = false;
@@ -164,7 +166,7 @@ void TakeSequence::Process(ISampleContainerPtr& container)
 		}
 		if (hasTake)
 		{
-			int done = (*m_playPosition)->ReadSamplesTo(container, 0, container->ChannelCount, 0);
+			done = (*m_playPosition)->ReadSamplesTo(container, 0, container->ChannelCount, 0);
 
 			if (!done)
 			{
@@ -177,6 +179,7 @@ void TakeSequence::Process(ISampleContainerPtr& container)
 			}
 		}
 	}
+	return done;
 }
 
 bool TakeSequence::get_IsBypassed()

@@ -32,12 +32,13 @@ bool ContainerWriter::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-void ContainerWriter::Process(ISampleContainerPtr& container)
+int ContainerWriter::Process(ISampleContainerPtr& container)
 {
 	if (!m_isBypassed)
 	{
-		container->CopyTo(m_pTarget, 0, container->SampleCount, 0, container->ChannelCount, 0, 0);
+		return container->CopyTo(m_pTarget, 0, container->SampleCount, 0, container->ChannelCount, 0, 0);
 	}
+	return 0;
 }
 
 bool ContainerWriter::get_IsBypassed()

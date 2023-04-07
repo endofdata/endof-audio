@@ -32,7 +32,8 @@ namespace Audio
 					/// Processes a sample container
 					/// </summary>
 					/// <param name="container">Sample container to process</param>
-					void Process(ISampleContainerPtr& container) = 0;
+					/// <returns>Number of processed sample frames</returns>
+					int Process(ISampleContainerPtr& container) = 0;
 				};
 
 				//_COM_SMARTPTR_TYPEDEF(ISampleProcessor, __uuidof(ISampleProcessor));

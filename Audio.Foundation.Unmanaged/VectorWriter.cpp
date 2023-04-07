@@ -58,7 +58,7 @@ bool VectorWriter::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-void VectorWriter::Process(ISampleContainerPtr& container)
+int VectorWriter::Process(ISampleContainerPtr& container)
 {
 	if (!m_isBypassed)
 	{
@@ -101,7 +101,10 @@ void VectorWriter::Process(ISampleContainerPtr& container)
 			m_avail = newSize;
 		}
 		m_inUse += samples;
+
+		return samples;
 	}
+	return 0;
 }
 
 ISampleContainerPtr VectorWriter::CreateSampleContainer(bool continueRecording)

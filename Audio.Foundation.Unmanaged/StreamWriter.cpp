@@ -32,7 +32,7 @@ bool StreamWriter::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-void StreamWriter::Process(ISampleContainerPtr& container)
+int StreamWriter::Process(ISampleContainerPtr& container)
 {
 	if (!m_isBypassed)
 	{
@@ -73,7 +73,9 @@ void StreamWriter::Process(ISampleContainerPtr& container)
 				}
 			}
 		}
+		return samples;
 	}
+	return 0;
 }
 
 bool StreamWriter::get_IsBypassed()

@@ -20,7 +20,7 @@ namespace Audio
 				ContainerWriter(ISampleContainerPtr& target);
 				virtual ~ContainerWriter();
 
-				void Process(ISampleContainerPtr& container);
+				int Process(ISampleContainerPtr& container);
 
 				bool get_IsBypassed();
 				void put_IsBypassed(bool value);
