@@ -9,27 +9,27 @@
 using namespace Audio::Foundation::Unmanaged;
 
 VectorWriter::VectorWriter(int channelCount, int initialSize, int growth) :
+	m_channelCount(channelCount),
+	m_initial(initialSize),
 	m_growth(growth),
 	m_inUse(0),
 	m_avail(0),
 	m_isBypassed(false),
 	m_refCount(0)
 {
-	if (initialSize == 0)
+	if (channelCount == 0)
 	{
-		initialSize = 48000 * 60;
+		channelCount = 1;
+	}
+	if (m_initial == 0)
+	{
+		m_initial = 48000 * 60;
 	}
 	if (m_growth == 0)
 	{
-		m_growth = initialSize;
+		m_growth = m_initial;
 	}
-	m_buffers.reserve(channelCount);
-
-	for (int i = 0; i < channelCount; i++)
-	{
-		m_buffers.push_back(reinterpret_cast<Sample*>(std::malloc(sizeof(Sample) * initialSize)));
-	}
-	m_avail = initialSize;
+	InitializeBuffers();
 }
 
 VectorWriter::~VectorWriter()
@@ -42,17 +42,17 @@ bool VectorWriter::GetInterface(REFIID iid, void** ppvResult)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(this);
+		*ppvResult = dynamic_cast<IUnknown*>(dynamic_cast<IRecorder*>(this));
+		return true;
+	}
+	if (iid == __uuidof(IRecorder))
+	{
+		*ppvResult = dynamic_cast<IRecorder*>(this);
 		return true;
 	}
 	if (iid == __uuidof(ISampleProcessor))
 	{
 		*ppvResult = dynamic_cast<ISampleProcessor*>(this);
-		return true;
-	}
-	if (iid == __uuidof(ISampleContainer))
-	{
-		*ppvResult = CreateSampleContainer().Detach();
 		return true;
 	}
 	return false;
@@ -65,15 +65,22 @@ void VectorWriter::Process(ISampleContainerPtr& container)
 		int samples = container->SampleCount;
 		int maxSourceChannels = container->ChannelCount;
 		int channel = 0;
+		int newSize = 0;
+		
+		if (m_avail < m_inUse + samples)
+		{
+			newSize = (div(m_inUse + samples, m_growth).quot + 1) * m_growth;
+		}
 
-		std::for_each(m_buffers.begin(), m_buffers.end(), [this, &channel, maxSourceChannels, &samples, container](Sample*& buffer)
+		const std::lock_guard<std::mutex> lock(m_buffers_mutex);
+
+		std::for_each(m_buffers.begin(), m_buffers.end(), [this, &channel, maxSourceChannels, &samples, newSize, container](Sample*& buffer)
 		{
 			const Sample* pSrc = container->Channels[channel]->SamplePtr;
 			channel = (channel + 1) % maxSourceChannels;
 
-			if (m_avail < m_inUse + samples)
+			if (newSize > 0)
 			{
-				int newSize = (div(m_inUse + samples, m_growth).quot + 1) * m_growth;
 				Sample* newBuffer = reinterpret_cast<Sample*>(std::realloc(buffer, newSize * sizeof(Sample)));
 
 				if (newBuffer == nullptr)
@@ -84,24 +91,50 @@ void VectorWriter::Process(ISampleContainerPtr& container)
 				else
 				{
 					buffer = newBuffer;
-					m_avail = newSize;
 				}
 			}
 			std::memcpy(&buffer[m_inUse], pSrc, samples * sizeof(Sample));
 		});
+
+		if (newSize > 0)
+		{
+			m_avail = newSize;
+		}
 		m_inUse += samples;
 	}
 }
 
-ISampleContainerPtr VectorWriter::CreateSampleContainer()
+ISampleContainerPtr VectorWriter::CreateSampleContainer(bool continueRecording)
 {
-	m_isBypassed = true;
+	if (m_inUse > 0)
+	{
+		IsBypassed = true;
 
-	auto container = new SampleContainer(m_buffers, m_inUse);
+		const std::lock_guard<std::mutex> lock(m_buffers_mutex);
 
-	m_inUse = m_avail = 0;
+		auto container = new SampleContainer(m_buffers, m_inUse);
+		m_buffers.clear();
 
-	return container;
+		if (continueRecording)
+		{
+			IsBypassed = false;
+		}
+
+		return container;
+	}
+	return nullptr;
+}
+
+void VectorWriter::InitializeBuffers()
+{
+	m_buffers.reserve(m_channelCount);
+
+	for (int i = 0; i < m_channelCount; i++)
+	{
+		m_buffers.push_back(reinterpret_cast<Sample*>(std::malloc(sizeof(Sample) * m_initial)));
+	}
+	m_avail = m_initial;
+	m_inUse = 0;
 }
 
 bool VectorWriter::get_IsBypassed()
@@ -111,5 +144,14 @@ bool VectorWriter::get_IsBypassed()
 
 void VectorWriter::put_IsBypassed(bool value)
 {
-	m_isBypassed = value && (m_buffers.size() > 0);
+	if (value != m_isBypassed)
+	{
+		if (value == false && m_buffers.size() == 0)
+		{
+			const std::lock_guard<std::mutex> lock(m_buffers_mutex);
+
+			InitializeBuffers();
+		}
+		m_isBypassed = value;
+	}
 }
