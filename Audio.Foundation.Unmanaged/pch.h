@@ -13,6 +13,9 @@
 #include <string>
 #include <ostream>
 #include <istream>
+#include <sstream>
+#include <iomanip>
+#include <ios>
 #include <fstream>
 #include <vector>
 #include <functional>

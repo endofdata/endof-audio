@@ -22,6 +22,9 @@ namespace Audio
 
 				int ReadSamples(ISampleContainerPtr& container);
 
+				bool get_IsLooping();
+				void put_IsLooping(bool value);
+
 				DECLARE_IUNKNOWN
 
 			protected:
@@ -29,9 +32,9 @@ namespace Audio
 
 			private:
 				ISampleContainerPtr m_pSource;
-				int m_sampleCount;
 				int m_sampleOffset;
 				SampleContainerSpan m_span;
+				bool m_isLooping;
 			};
 		}
 	}

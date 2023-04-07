@@ -5,6 +5,7 @@ using namespace Audio::Foundation::Unmanaged;
 
 StreamReader::StreamReader(std::istream& input) :
 	m_input(input),
+	m_isLooping(false),
 	m_refCount(0)
 {
 }
@@ -70,6 +71,23 @@ int StreamReader::ReadSamples(ISampleContainerPtr& container)
 			}
 		}
 	}
+	if (m_isLooping)
+	{
+		if (m_input.rdstate() & std::istream::eofbit)
+		{
+			m_input.setstate(m_input.rdstate() & ~(std::istream::failbit | std::istream::eofbit));
+			m_input.seekg(0, std::ios::beg);
+		}
+	}
 	return samples;
 }
 
+bool StreamReader::get_IsLooping()
+{
+	return m_isLooping;
+}
+
+void StreamReader::put_IsLooping(bool value)
+{
+	m_isLooping = value;
+}

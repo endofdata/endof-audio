@@ -21,6 +21,9 @@ namespace Audio
 
 				int ReadSamples(ISampleContainerPtr& container);
 
+				bool get_IsLooping();
+				void put_IsLooping(bool value);
+
 				DECLARE_IUNKNOWN
 
 			protected:
@@ -28,6 +31,7 @@ namespace Audio
 
 			private:
 				std::istream& m_input;
+				bool m_isLooping;
 			};
 		}
 	}
