@@ -40,7 +40,7 @@ namespace Audio
 				int m_inUse;
 				int m_avail;
 				std::vector<Sample*> m_buffers;
-				std::mutex m_buffers_mutex;
+				std::recursive_mutex m_buffers_mutex;
 				bool m_isBypassed;
 			};
 		}

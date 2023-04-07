@@ -72,7 +72,7 @@ int VectorWriter::Process(ISampleContainerPtr& container)
 			newSize = (div(m_inUse + samples, m_growth).quot + 1) * m_growth;
 		}
 
-		const std::lock_guard<std::mutex> lock(m_buffers_mutex);
+		const std::lock_guard<std::recursive_mutex> lock(m_buffers_mutex);
 
 		std::for_each(m_buffers.begin(), m_buffers.end(), [this, &channel, maxSourceChannels, &samples, newSize, container](Sample*& buffer)
 		{
@@ -113,7 +113,7 @@ ISampleContainerPtr VectorWriter::CreateSampleContainer(bool continueRecording)
 	{
 		IsBypassed = true;
 
-		const std::lock_guard<std::mutex> lock(m_buffers_mutex);
+		const std::lock_guard<std::recursive_mutex> lock(m_buffers_mutex);
 
 		auto container = new SampleContainer(m_buffers, m_inUse);
 		m_buffers.clear();
@@ -151,7 +151,7 @@ void VectorWriter::put_IsBypassed(bool value)
 	{
 		if (value == false && m_buffers.size() == 0)
 		{
-			const std::lock_guard<std::mutex> lock(m_buffers_mutex);
+			const std::lock_guard<std::recursive_mutex> lock(m_buffers_mutex);
 
 			InitializeBuffers();
 		}
