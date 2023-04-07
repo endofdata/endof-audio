@@ -16,6 +16,7 @@
 #include <IMidiInput.h>
 #include <IMidiEvents.h>
 #include <IRecorder.h>
+#include <ITransport.h>
 #include <string>
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -57,16 +58,18 @@ namespace Audio
 
 				static ITakePtr CreateTake(ISampleContainerPtr& container, AudioTime position, AudioTime length);
 
-				static IHostClockPtr CreateHostClock(int sampleRate = 0);
+				static IHostClockPtr CreateHostClock(double sampleRate = 0.0);
 
-				static ITakeSequencePtr CreateTakeSequence(IHostClockPtr& hostClock);
+				static ITransportPtr CreateTransport(IHostClockPtr& hostClock);
+
+				static ITakeSequencePtr CreateTakeSequence(ITransportPtr& transport);
 
 				static IInputChannelPtr CreateInputChannel(int sampleType, int hwChannelId, void* pHwBufferA, void* pHwBufferB, int sampleCount);
 
 				static IOutputChannelPairPtr CreateOutputChannelPair(int sampleTpe,
 					int hwChannelId1, void* pBufferA1, void* pBufferB1, int hwChannelId2, void* pBufferA2, void* pBufferB2, int sampleCount);
 
-				static IProcessingChainPtr CreateProcessingChain(ISampleContainerPtr& container);
+				static IProcessingChainPtr CreateProcessingChain(ITransportPtr& transport, ISampleContainerPtr& container);
 
 				static IMidiInputPtr CreateMidiInput();
 

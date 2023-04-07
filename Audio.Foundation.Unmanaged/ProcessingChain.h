@@ -4,6 +4,7 @@
 #include "UnknownBase.h"
 #include "IProcessingChain.h"
 #include "IInputChannel.h"
+#include "ITransport.h"
 #include <vector>
 #include <mutex>
 
@@ -18,31 +19,31 @@ namespace Audio
 			class ProcessingChain : public IProcessingChain
 			{
 			public:
-				ProcessingChain(ISampleContainerPtr& sampleContainer);
+				ProcessingChain(ITransportPtr& transport, ISampleContainerPtr& sampleContainer);
 
 				virtual ~ProcessingChain();
 
-				virtual void AddInput(IInputChannelPtr& input);
+				void AddInput(IInputChannelPtr& input);
 
-				virtual void AddOutputPair(IOutputChannelPairPtr& output);
+				void AddOutputPair(IOutputChannelPairPtr& output);
 
-				virtual void SetInputMonitoring(int inputId, int outputId);
+				void SetInputMonitoring(int inputId, int outputId);
 
-				virtual IInputChannelPtr FindInput(int inputId);
+				IInputChannelPtr FindInput(int inputId);
 
-				virtual IOutputChannelPairPtr FindOutput(int outputId);
+				IOutputChannelPairPtr FindOutput(int outputId);
 
-				virtual void RemoveAllInputChannels();
+				void RemoveAllInputChannels();
 
-				virtual void RemoveAllOutputChannels();
+				void RemoveAllOutputChannels();
 
-				virtual void OnNextBuffer(bool writeSecondHalf);
+				void OnNextBuffer(bool writeSecondHalf);
 
-				virtual int AddProcessor(ISampleProcessorPtr& processor);
+				int AddProcessor(ISampleProcessorPtr& processor);
 
-				virtual int InsertProcessorBefore(ISampleProcessorPtr& processor, int processorId);
+				int InsertProcessorBefore(ISampleProcessorPtr& processor, int processorId);
 
-				virtual bool RemoveProcessor(int processorId);
+				bool RemoveProcessor(int processorId);
 
 				ISampleProcessorPtr get_Processor(int processorId);
 
@@ -53,6 +54,8 @@ namespace Audio
 				int get_OutputChannelPairCount();
 
 				IOutputChannelPairPtr get_OutputChannelPair(int outputChannelId);
+
+				ITransportPtr& get_Transport();
 
 				DECLARE_IUNKNOWN
 
@@ -66,6 +69,7 @@ namespace Audio
 
 				std::vector<std::pair<int, ISampleProcessorPtr>> m_processors;
 				ISampleContainerPtr m_container;
+				ITransportPtr m_transport;
 				std::vector<IInputChannelPtr> m_inputChannels;
 				std::vector<IOutputChannelPairPtr> m_outputChannelPairs;
 				int m_currentMonitorInputId;

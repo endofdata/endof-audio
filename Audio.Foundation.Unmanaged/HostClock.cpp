@@ -4,7 +4,7 @@
 using namespace Audio::Foundation::Unmanaged;
 
 
-HostClock::HostClock(int sampleRate) :
+HostClock::HostClock(double sampleRate) :
 	m_sampleRate(sampleRate),
 	m_refCount(0)
 {
@@ -46,7 +46,20 @@ AudioTime HostClock::get_CurrentTime() const
 	return static_cast<AudioTime>((std::chrono::steady_clock::now() - m_offset).count());
 }
 
-int HostClock::get_SampleRate() const
+void HostClock::put_CurrentTime(const AudioTime& position)
+{
+	AudioTime currentTime = CurrentTime;
+	auto delta = position - currentTime;
+	m_offset += std::chrono::steady_clock::duration(std::chrono::milliseconds(delta));
+}
+
+double HostClock::get_SampleRate() const
 {
 	return m_sampleRate;
 }
+
+void HostClock::put_SampleRate(double value)
+{
+	m_sampleRate = value;
+}
+

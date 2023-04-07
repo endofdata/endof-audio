@@ -180,6 +180,12 @@
     <ClInclude Include="IRecorder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ITransport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Transport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -261,6 +267,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MidiEvents.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Transport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

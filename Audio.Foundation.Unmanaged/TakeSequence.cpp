@@ -8,8 +8,8 @@ using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 
 
-TakeSequence::TakeSequence(IHostClockPtr& hostClock) :
-	m_pHostClock(hostClock),
+TakeSequence::TakeSequence(ITransportPtr& transport) :
+	m_transport(transport),
 	m_currentTime(0),
 	m_playPosition(m_takes.end()),
 	m_scheduledTake(m_takes.end()),
@@ -66,7 +66,7 @@ int TakeSequence::AddTake(ITakePtr& take)
 
 	m_takes.insert(std::find_if(m_takes.begin(), m_takes.end(), [position](ITakePtr& t) { return t->Position >= position;  }), take);
 	m_scheduledTake = m_takes.begin();
-	put_PlayPosition(m_pHostClock->CurrentTime);
+	put_PlayPosition(m_transport->HostClock->CurrentTime);
 
 	return take->Id;
 }
@@ -80,7 +80,7 @@ bool TakeSequence::RemoveTake(int takeId)
 		auto result = std::remove(m_takes.begin(), m_takes.end(), takeToRemove);
 		m_takes.erase(result, m_takes.end());
 		m_scheduledTake = m_takes.begin();
-		put_PlayPosition(m_pHostClock->CurrentTime);
+		put_PlayPosition(m_transport->HostClock->CurrentTime);
 
 		return true;
 	}
@@ -149,9 +149,14 @@ int TakeSequence::Process(ISampleContainerPtr& container)
 	{
 		bool hasTake = false;
 
-		if (m_scheduledTake != m_takes.end())
+		if (m_transport->IsSkipping)
 		{
-			m_currentTime = m_pHostClock->CurrentTime;
+			PlayPosition = m_transport->HostClock->CurrentTime;
+			hasTake = m_playPosition != m_takes.end();
+		}
+		else if (m_scheduledTake != m_takes.end())
+		{
+			m_currentTime = m_transport->HostClock->CurrentTime;
 
 			if (m_currentTime >= m_scheduledTime)
 			{
@@ -191,3 +196,4 @@ void TakeSequence::put_IsBypassed(bool value)
 {
 	m_isBypassed = value;
 }
+

@@ -7,6 +7,7 @@
 #include <ISampleProcessor.h>
 #include <IInputChannel.h>
 #include <IOutputChannelPair.h>
+#include <ITransport.h>
 
 namespace Audio
 {
@@ -42,24 +43,22 @@ namespace Audio
 					bool RemoveProcessor(int processorId) = 0;
 
 					ISampleProcessorPtr get_Processor(int processorId) = 0;
-
 					_declspec(property(get = get_Processor)) ISampleProcessorPtr Processor[];
 
 					int get_InputChannelCount() = 0;
-
 					_declspec(property(get = get_InputChannelCount)) int InputChannelCount;
 
 					IInputChannelPtr get_InputChannel(int index) = 0;
-
 					_declspec(property(get = get_InputChannel)) IInputChannelPtr InputChannel[];
 
 					int get_OutputChannelPairCount() = 0;
-
 					_declspec(property(get = get_OutputChannelPairCount)) int OutputChannelPairCount;
 
 					IOutputChannelPairPtr get_OutputChannelPair(int index) = 0;
-
 					_declspec(property(get = get_OutputChannelPair)) IOutputChannelPairPtr OutputChannelPair[];
+
+					ITransportPtr& get_Transport() = 0;
+					_declspec(property(get = get_Transport)) ITransportPtr Transport;
 				};
 
 				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(IProcessingChain, __uuidof(IProcessingChain));

@@ -15,15 +15,18 @@ namespace Audio
 			class HostClock : public IHostClock
 			{
 			public:
-				HostClock(int sampleRate);
+				HostClock(double sampleRate);
 				virtual ~HostClock();
 
 				void Start();
 				void Stop();
 
-				AudioTime get_CurrentTime() const;
 
-				int get_SampleRate() const;
+				AudioTime get_CurrentTime() const;
+				void put_CurrentTime(const AudioTime& position);
+
+				double get_SampleRate() const;
+				void put_SampleRate(double value);
 
 				DECLARE_IUNKNOWN
 
@@ -31,8 +34,9 @@ namespace Audio
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
+
 				std::chrono::steady_clock::time_point m_offset;
-				int m_sampleRate;
+				double m_sampleRate;
 			};
 		}
 	}

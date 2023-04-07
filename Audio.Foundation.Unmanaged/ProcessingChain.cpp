@@ -5,7 +5,8 @@
 
 using namespace Audio::Foundation::Unmanaged;
 
-ProcessingChain::ProcessingChain(ISampleContainerPtr& sampleContainer) :
+ProcessingChain::ProcessingChain(ITransportPtr& transport, ISampleContainerPtr& sampleContainer) :
+	m_transport(transport),
 	m_container(sampleContainer),
 	m_currentMonitorInputId(-1),
 	m_refCount(0)
@@ -40,6 +41,8 @@ void ProcessingChain::OnNextBuffer(bool writeSecondHalf)
 {
 	int channel = 0;
 	bool readSecondHalf = !writeSecondHalf;
+
+	m_transport->Pulse();
 
 	const std::lock_guard<std::mutex> lock(m_processing_mutex);
 
@@ -230,4 +233,9 @@ IOutputChannelPairPtr ProcessingChain::get_OutputChannelPair(int index)
 		return nullptr;
 	}
 	return m_outputChannelPairs[index];
+}
+
+ITransportPtr& ProcessingChain::get_Transport()
+{
+	return m_transport;
 }

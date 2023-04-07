@@ -24,7 +24,7 @@
 #include "HostClock.h"
 #include "MidiInput.h"
 #include "MidiEvents.h"
-
+#include "Transport.h"
 #include <stdexcept>
 
 int ObjectFactory::LastTakeId = 0;
@@ -104,17 +104,24 @@ ITakePtr ObjectFactory::CreateTake(ISampleContainerPtr& container, AudioTime pos
 	return new Take(NextTakeId(), container, position, length);
 }
 
-IHostClockPtr ObjectFactory::CreateHostClock(int sampleRate)
+IHostClockPtr ObjectFactory::CreateHostClock(double sampleRate)
 {	
-	// If no samplerate is specified, use 48,000. Otherwise check lower limit of 8,000
-	sampleRate = sampleRate == 0 ? 48000 : sampleRate < 8000 ? 8000 : sampleRate;
+	if (sampleRate == 0.0)
+	{
+		sampleRate = 48000.0;
+	}
 
-	return new HostClock(std::max(8000, sampleRate));
+	return new HostClock(std::max(8000.0, sampleRate));
 }
 
-ITakeSequencePtr ObjectFactory::CreateTakeSequence(IHostClockPtr& hostClock)
+ITransportPtr ObjectFactory::CreateTransport(IHostClockPtr& hostClock)
 {
-	return new TakeSequence(hostClock);
+	return new Transport(hostClock);
+}
+
+ITakeSequencePtr ObjectFactory::CreateTakeSequence(ITransportPtr& transport)
+{
+	return new TakeSequence(transport);
 }
 
 IInputChannelPtr ObjectFactory::CreateInputChannel(int sampleType, int hwChannelId, void* pHwBufferA, void* pHwBufferB, int sampleCount)
@@ -157,9 +164,9 @@ IOutputChannelPairPtr ObjectFactory::CreateOutputChannelPair(int sampleType, int
 	return outputPair;
 }
 
-IProcessingChainPtr ObjectFactory::CreateProcessingChain(ISampleContainerPtr& container)
+IProcessingChainPtr ObjectFactory::CreateProcessingChain(ITransportPtr& transport, ISampleContainerPtr& container)
 {
-	return new ProcessingChain(container);
+	return new ProcessingChain(transport, container);
 }
 
 int ObjectFactory::SelectMidiInputDevice(MidiInCapsHandler handler)
