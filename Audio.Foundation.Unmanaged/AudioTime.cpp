@@ -8,106 +8,108 @@ using namespace Audio::Foundation::Unmanaged;
 
 AudioTime AudioTime::FromSeconds(double seconds)
 {
-	return AudioTime(static_cast<long long>(seconds * 1000.0));
+	return AudioTime(static_cast<long long>(seconds * 1000000.0));
 }
 
 AudioTime::AudioTime()
 {
-	value = 0;
+	m_micros = 0;
 }
 
 AudioTime::AudioTime(long long value)
 {
-	this->value = value;
+	m_micros = value;
 }
 
 AudioTime::operator long long() const
 {
-	return value;
+	return m_micros;
 }
 
 AudioTime& AudioTime::operator + (const AudioTime& other)
 {
-	value += other.value;
+	m_micros += other.m_micros;
 	return *this;
 }
 
 AudioTime& AudioTime::operator - (const AudioTime& other)
 {
-	value += other.value;
+	m_micros += other.m_micros;
 	return *this;
 }
 
 AudioTime& AudioTime::operator += (const AudioTime& other)
 {
-	value += other.value;
+	m_micros += other.m_micros;
 	return *this;
 }
 
 AudioTime& AudioTime::operator -= (const AudioTime& other)
 {
-	value -= other.value;
+	m_micros -= other.m_micros;
 	return *this;
 }
 
 bool AudioTime::operator == (const AudioTime& other) const
 {
-	return value == other.value;
+	return m_micros == other.m_micros;
 }
 
 bool AudioTime::operator != (const AudioTime& other) const
 {
-	return value != other.value;
+	return m_micros != other.m_micros;
 }
 
 bool AudioTime::operator > (const AudioTime& other) const
 {
-	return value > other.value;
+	return m_micros > other.m_micros;
 }
 
 bool AudioTime::operator < (const AudioTime& other) const
 {
-	return value < other.value;
+	return m_micros < other.m_micros;
 }
 
 bool AudioTime::operator >= (const AudioTime& other) const
 {
-	return value >= other.value;
+	return m_micros >= other.m_micros;
 }
 
 bool AudioTime::operator <= (const AudioTime& other) const
 {
-	return value <= other.value;
+	return m_micros <= other.m_micros;
 }
 
 std::wstring AudioTime::ToString() const
 {
-	auto minutes = std::lldiv(value, 60000);
-	auto seconds = std::lldiv(minutes.rem, 1000);
+	auto minutes = std::lldiv(m_micros, 60000000);
+	auto seconds = std::lldiv(minutes.rem, 1000000);
 	std::wostringstream oss;
-	oss << minutes.quot << L':' << seconds.quot << L',' << seconds.rem;
+	oss << std::setfill(L'0') << std::setw(2)
+		<< minutes.quot << L':' << seconds.quot << L',' << std::setw(3) << seconds.rem
+		<< std::setfill(L' ') << std::setw(0) << std::ends;
 
 	return oss.str();
 }
 
 int AudioTime::get_Minutes() const
 {
-	return static_cast<int>(std::lldiv(value, 60000).quot);
+	return static_cast<int>(std::lldiv(m_micros, 60000000).quot);
 }
 
 int AudioTime::get_Seconds() const
 {
-	return static_cast<int>(std::lldiv(std::lldiv(value, 60000).rem, 1000).quot);
+	return static_cast<int>(std::lldiv(std::lldiv(m_micros, 60000000).rem, 1000).quot);
 }
 
 int AudioTime::get_Milliseconds() const
 {
-	return static_cast<int>(std::lldiv(std::lldiv(value, 60000).rem, 1000).rem);
+	return static_cast<int>(std::lldiv(std::lldiv(m_micros, 60000000).rem, 1000).rem);
 }
 
 long long AudioTime::get_Value() const
 {
-	return value;
+	return m_micros;
 }
 
 

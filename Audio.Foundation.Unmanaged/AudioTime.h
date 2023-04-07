@@ -18,8 +18,13 @@ namespace Audio
 				AudioTime(long long value);
 
 				int get_Minutes() const;
+				_declspec(property(get = get_Minutes)) int Minutes;
+
 				int get_Seconds() const;
+				_declspec(property(get = get_Seconds)) int Seconds;
+
 				int get_Milliseconds() const;
+				_declspec(property(get = get_Milliseconds)) int Milliseconds;
 
 				long long get_Value() const;
 
@@ -40,7 +45,7 @@ namespace Audio
 				bool operator <= (const AudioTime& other) const;
 
 			private:
-				long long value;
+				long long m_micros;
 			};
 
 		}
