@@ -20,7 +20,7 @@ namespace Audio
 			class TakeSequence : public ITakeSequence, public ISampleProcessor
 			{
 			public:
-				TakeSequence(IHostClockPtr& hostClock, ISampleContainerPtr& targetContainer);
+				TakeSequence(IHostClockPtr& hostClock);
 				virtual ~TakeSequence();
 
 				int get_TakeCount();
@@ -56,7 +56,6 @@ namespace Audio
 				std::vector<ITakePtr>::iterator m_scheduledTake;
 				AudioTime m_scheduledTime;
 
-				ISampleContainerPtr m_pTargetContainer;
 				bool m_isBypassed;
 			};
 		}

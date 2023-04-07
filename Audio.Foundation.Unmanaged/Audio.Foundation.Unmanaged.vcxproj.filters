@@ -177,6 +177,9 @@
     <ClInclude Include="IMidiInput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IRecorder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

@@ -113,6 +113,7 @@
     <ClInclude Include="InputOfTSampleChannel.h" />
     <ClInclude Include="IOutputChannelPair.h" />
     <ClInclude Include="IProcessingChain.h" />
+    <ClInclude Include="IRecorder.h" />
     <ClInclude Include="ISampleBuffer.h" />
     <ClInclude Include="ISampleContainer.h" />
     <ClInclude Include="ISampleJoiner.h" />

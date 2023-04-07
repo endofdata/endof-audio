@@ -72,7 +72,7 @@ ISampleProcessorPtr ObjectFactory::CreateToContainerProcessor(ISampleContainerPt
 	return new ContainerWriter(target);
 }
 
-ISampleProcessorPtr ObjectFactory::CreateToContainerProcessor(int channelCount, int initialSize, int growth)
+IRecorderPtr ObjectFactory::CreateRecorder(int channelCount, int initialSize, int growth)
 {
 	return new VectorWriter(channelCount, initialSize, growth);
 }
@@ -112,9 +112,9 @@ IHostClockPtr ObjectFactory::CreateHostClock(int sampleRate)
 	return new HostClock(std::max(8000, sampleRate));
 }
 
-ITakeSequencePtr ObjectFactory::CreateTakeSequence(IHostClockPtr& hostClock, ISampleContainerPtr& targetContainer)
+ITakeSequencePtr ObjectFactory::CreateTakeSequence(IHostClockPtr& hostClock)
 {
-	return new TakeSequence(hostClock, targetContainer);
+	return new TakeSequence(hostClock);
 }
 
 IInputChannelPtr ObjectFactory::CreateInputChannel(int sampleType, int hwChannelId, void* pHwBufferA, void* pHwBufferB, int sampleCount)

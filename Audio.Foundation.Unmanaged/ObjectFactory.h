@@ -15,6 +15,7 @@
 #include <IProcessingChain.h>
 #include <IMidiInput.h>
 #include <IMidiEvents.h>
+#include <IRecorder.h>
 #include <string>
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -44,7 +45,7 @@ namespace Audio
 
 				static ISampleProcessorPtr CreateToContainerProcessor(ISampleContainerPtr& target);
 
-				static ISampleProcessorPtr CreateToContainerProcessor(int channelCount, int initialSize, int growth);
+				static IRecorderPtr CreateRecorder(int channelCount, int initialSize, int growth);
 
 				static ISampleSourcePtr CreateFileSource(const std::string& filename);
 
@@ -58,7 +59,7 @@ namespace Audio
 
 				static IHostClockPtr CreateHostClock(int sampleRate = 0);
 
-				static ITakeSequencePtr CreateTakeSequence(IHostClockPtr& hostClock, ISampleContainerPtr& targetContainer);
+				static ITakeSequencePtr CreateTakeSequence(IHostClockPtr& hostClock);
 
 				static IInputChannelPtr CreateInputChannel(int sampleType, int hwChannelId, void* pHwBufferA, void* pHwBufferB, int sampleCount);
 

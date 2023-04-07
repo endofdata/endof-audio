@@ -8,13 +8,12 @@ using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 
 
-TakeSequence::TakeSequence(IHostClockPtr& hostClock, ISampleContainerPtr& targetContainer) :
+TakeSequence::TakeSequence(IHostClockPtr& hostClock) :
 	m_pHostClock(hostClock),
 	m_currentTime(0),
 	m_playPosition(m_takes.end()),
 	m_scheduledTake(m_takes.end()),
 	m_scheduledTime(0),
-	m_pTargetContainer(targetContainer),
 	m_isBypassed(false),
 	m_refCount(0)
 {
@@ -148,11 +147,6 @@ void TakeSequence::Process(ISampleContainerPtr& container)
 	{
 		bool hasTake = false;
 
-		for (int channelOffset = 0; channelOffset < m_pTargetContainer->ChannelCount; channelOffset += container->ChannelCount)
-		{
-			container->CopyTo(m_pTargetContainer, 0, container->SampleCount, 0, container->ChannelCount, 0, channelOffset);
-		}
-
 		if (m_scheduledTake != m_takes.end())
 		{
 			m_currentTime = m_pHostClock->CurrentTime;
@@ -170,7 +164,7 @@ void TakeSequence::Process(ISampleContainerPtr& container)
 		}
 		if (hasTake)
 		{
-			int done = (*m_playPosition)->ReadSamplesTo(m_pTargetContainer, 0, m_pTargetContainer->ChannelCount, 0);
+			int done = (*m_playPosition)->ReadSamplesTo(container, 0, container->ChannelCount, 0);
 
 			if (!done)
 			{
