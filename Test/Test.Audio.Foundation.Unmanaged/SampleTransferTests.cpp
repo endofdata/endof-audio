@@ -32,7 +32,8 @@ namespace Test
 					TEST_METHOD(BasicInitialization)
 					{
 						IHostClockPtr pHostClock = ObjectFactory::CreateHostClock();
-						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pHostClock);
+						ITransportPtr pTransport = ObjectFactory::CreateTransport(pHostClock);
+						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pTransport);
 
 						Assert::AreEqual(0, pTakeSequence->get_TakeCount(), L"New takeSequence has no takes");
 						int sampleRate = Constants::SampleRate;
@@ -94,7 +95,8 @@ namespace Test
 
 						// Create take sequence
 						IHostClockPtr pHostClock = ObjectFactory::CreateHostClock();
-						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pHostClock);
+						ITransportPtr pTransport = ObjectFactory::CreateTransport(pHostClock);
+						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pTransport);
 						Assert::IsNotNull(pTakeSequence.GetInterfacePtr(), L"Can create take sequence");
 
 						// Add take sequence as sample processor
@@ -336,8 +338,10 @@ namespace Test
 						IOutputChannelPairPtr pOutputPair = hwBuffers.CreateOutputChannelPair(0, 1);
 
 						// Create processing chain for the input and output channels
+						IHostClockPtr pHostClock = ObjectFactory::CreateHostClock(Constants::SampleRate);
+						ITransportPtr pTransport = ObjectFactory::CreateTransport(pHostClock);
 						ISampleContainerPtr pContainer = ObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
-						IProcessingChainPtr pProcessingChain = ObjectFactory::CreateProcessingChain(pContainer);
+						IProcessingChainPtr pProcessingChain = ObjectFactory::CreateProcessingChain(pTransport, pContainer);
 
 						pProcessingChain->AddInput(pInput);
 						pProcessingChain->AddOutputPair(pOutputPair);
