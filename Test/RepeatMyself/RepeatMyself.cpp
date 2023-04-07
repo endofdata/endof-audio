@@ -89,6 +89,7 @@ int main()
 		else
 		{
 			bool isRecordPressed = false;
+			int dubCount = 1;
 
 			// start audio device
 			device->Start();
@@ -100,13 +101,11 @@ int main()
 
 			while (transportStatus != TransportCode::Stop)
 			{
-				std::wcout << transport->HostClock->CurrentTime.ToString() << "\r";
+				std::wcout << transport->HostClock->CurrentTime.ToString() << '\r';
 
 				// check for control input (MIDI)
 				if (transportControl->GetNext(1000, transportStatus))
 				{
-					std::wcout << std::endl << L"Received transport code: " << (int)transportStatus;
-
 					switch (transportStatus)
 					{
 					case TransportCode::Record:
@@ -119,7 +118,7 @@ int main()
 								processingChain->InputChannel[0]->IsActive = true;
 								recordingProcessor->IsBypassed = false;
 								transport->Start();
-								std::wcout << std::endl << L"Recording main loop...";
+								std::wcout << L"Record" << std::endl;
 							}
 							else
 							{
@@ -131,7 +130,7 @@ int main()
 								takeSource->IsLooping = true;
 								joiner->AddSource(takeSource);
 
-								std::wcout << std::endl << L"Setting up loop end at " << switchTime.ToString();
+								std::wcout << L"Loop length " << switchTime.ToString() << std::endl;
 								transport->LoopEnd = switchTime;
 								transport->IsLooping = true;
 							}
@@ -140,6 +139,7 @@ int main()
 						{
 							// Toggle recording start / end with next loop wrap
 							isRecordPressed = !isRecordPressed;
+							std::wcout << (isRecordPressed? L"Standby" : L"Rehearse") << std::endl;
 						}
 						break;
 					case TransportCode::Locate:
@@ -151,10 +151,8 @@ int main()
 							if (recordingProcessor->IsBypassed)
 							{
 								// Step n: start overdub
-								processingChain->InputChannel[0]->IsActive = true;
 								recordingProcessor->IsBypassed = false;
-								transport->Start();
-								std::wcout << std::endl << L"Recording next loop...";
+								std::wcout << L"Start overdub " << ++dubCount << std::endl;
 							}
 							else
 							{
@@ -165,22 +163,37 @@ int main()
 								ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take);
 								takeSource->IsLooping = true;
 								joiner->AddSource(takeSource);
+
+								std::wcout << L"Accept overdub " << dubCount;
+								if (switchTime > transport->LoopEnd)
+								{
+									std::wcout << L", loop length adjusted to " << switchTime.ToString();
+									transport->LoopEnd = switchTime;
+								}
+								std::wcout << std::endl;
 							}
 						}
 						break;
 					case TransportCode::Start:
 						// Drop current recording, continue looping
 						recorder->DropRecording(false);
+						std::wcout << L"Drop overdub " << dubCount << std::endl;
+						dubCount--;
 						break;
 
 					case TransportCode::Stop:
 						transport->Stop();
-						std::wcout << std::endl << L"Transport stopped.";
+						if (!recordingProcessor->IsBypassed)
+						{
+							recorder->DropRecording(false);
+							std::wcout << L"Drop overdub " << dubCount << std::endl;
+							dubCount--;
+						}
+						std::wcout << L"Transport stopped." << std::endl;
 						break;
 					default:
 						break;
 					}
-					std::wcout << std::endl;
 				}
 			}
 
