@@ -31,9 +31,8 @@ namespace Test
 
 					TEST_METHOD(BasicInitialization)
 					{
-						ISampleContainerPtr pTargetContainer = ObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
 						IHostClockPtr pHostClock = ObjectFactory::CreateHostClock();
-						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pHostClock, pTargetContainer);
+						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pHostClock);
 
 						Assert::AreEqual(0, pTakeSequence->get_TakeCount(), L"New takeSequence has no takes");
 						int sampleRate = Constants::SampleRate;
@@ -93,10 +92,9 @@ namespace Test
 						HardwareBuffers hwBuffers(Constants::SampleCount);
 						IProcessingChainPtr pProcessingChain = CreateProcessingChain(hwBuffers);
 
-						// Create take sequence with target container for sample mix
-						ISampleContainerPtr pTargetContainer = ObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
+						// Create take sequence
 						IHostClockPtr pHostClock = ObjectFactory::CreateHostClock();
-						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pHostClock, pTargetContainer);
+						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pHostClock);
 						Assert::IsNotNull(pTakeSequence.GetInterfacePtr(), L"Can create take sequence");
 
 						// Add take sequence as sample processor
@@ -148,7 +146,7 @@ namespace Test
 						// Create VectorWriter and attach it to input sample source
 						int initialSize = Constants::SampleRate * 5;	// buffer for five seconds
 						int growth = Constants::SampleRate * 2;			// grow for two seconds
-						ISampleProcessorPtr pVectorWriter = ObjectFactory::CreateToContainerProcessor(2, initialSize, growth);
+						ISampleProcessorPtr pVectorWriter = ObjectFactory::CreateRecorder(2, initialSize, growth);
 
 						pProcessingChain->AddProcessor(pVectorWriter);
 						
@@ -162,10 +160,12 @@ namespace Test
 						}
 
 						// Get sample container with output from vector writer
-						ISampleContainerPtr pOutputContainer = nullptr;
-						pVectorWriter->QueryInterface<ISampleContainer>(&pOutputContainer);
-						Assert::IsNotNull(pOutputContainer.GetInterfacePtr(), L"Can access ISampleContainer from ISampleProcessor (vector writer)");
+						IRecorderPtr pRecorder = nullptr;
+						pVectorWriter->QueryInterface<IRecorder>(&pRecorder);
+						Assert::IsNotNull(pRecorder.GetInterfacePtr(), L"Can access IRecorder from ISampleProcessor (vector writer)");
 
+						ISampleContainerPtr pOutputContainer = pRecorder->CreateSampleContainer(false);						
+						Assert::IsNotNull(pOutputContainer.GetInterfacePtr(), L"Can create ISampleContainer from IRecorder (vector writer)");
 						Assert::AreEqual(2, pOutputContainer->ChannelCount, L"Has two channels of output data");
 						Assert::AreEqual(loopsRequiredForTenSeconds * Constants::SampleCount, pOutputContainer->SampleCount, L"Has expected size of output data");
 					}
@@ -231,20 +231,20 @@ namespace Test
 							
 							if (writeSecondHalf)
 							{								
-								// Input buffer A copied to output buffers B1
+								// input buffer A + pMixedInLeft -> output buffers B1
 								AssertBufferEquals(_inBufferA, _outBufferB1, ioTolerance, pMixedInLeft);
-								// output buffer B2 is cleared
-								AssertBufferValue(_outBufferB2, 0.0);
-								// Output buffers A1 and A2 are not modified
+								// (input buffer B or cleared) + pMixedInRight -> output buffer B2 
+								AssertBufferValue(_outBufferB2, pMixedInRight != nullptr? *pMixedInRight : 0.0);
+								// output buffers A1 and A2 are not modified
 								AssertBufferValue(_outBufferA1, 0.04);
 								AssertBufferValue(_outBufferA2, 0.16);
 							}
 							else
 							{
-								// Input buffer B copied to output buffers A1
+								// input buffer B + pMixedInLeft -> output buffers A1
 								AssertBufferEquals(_inBufferB, _outBufferA1, ioTolerance, pMixedInLeft);
-								// output buffer A2 is cleared
-								AssertBufferValue(_outBufferA2, 0.0);
+								// (input bufer A or cleared) + pMixedInRight -> output buffer A2
+								AssertBufferValue(_outBufferA2, pMixedInRight != nullptr ? *pMixedInRight : 0.0);
 								// Output buffers B1 and B2 are not modified
 								AssertBufferValue(_outBufferB1, 0.08);
 								AssertBufferValue(_outBufferB2, 0.32);
@@ -259,16 +259,21 @@ namespace Test
 						{
 							int* pX = bufferX.get();
 							int* pY = bufferY.get();
+							Sample internTolerance = SampleConversion::Int32ToSample(tolerance);
 
 							for (int i = 0; i < _sampleCount; i++)
 							{
 								int sampleX = *pX++;
 								int sampleY = *pY++;
+								Sample internX = SampleConversion::Int32ToSample(sampleX);
+								Sample internY = SampleConversion::Int32ToSample(sampleY);
 
 								if (pOffset != nullptr)
 								{
+									internY -= *pOffset;
 									sampleY -= SampleConversion::SampleToInt32(*pOffset++);
 								}
+								Assert::IsTrue(std::abs(internX - internY) < internTolerance, L"Sample difference (internal) between input and output is in accepted range");
 								Assert::IsTrue(std::abs(sampleX - sampleY) < tolerance, L"Sample difference between input and output is in accepted range");
 							}
 						}
