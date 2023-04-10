@@ -3,8 +3,10 @@
 
 using namespace Audio::Foundation::Unmanaged;
 
-StreamReader::StreamReader(std::istream& input) :
+StreamReader::StreamReader(std::istream& input, int channelCount) :
 	m_input(input),
+	m_initialPos(input.tellg()),
+	m_channelCount(channelCount),
 	m_isLooping(false),
 	m_refCount(0)
 {
@@ -35,7 +37,7 @@ bool StreamReader::GetInterface(REFIID iid, void** ppvResult)
 int StreamReader::ReadSamples(ISampleContainerPtr& container, bool overdub)
 {
 	int samples = container->SampleCount;
-	int channels = container->ChannelCount;
+	int channels = std::min(container->ChannelCount, m_channelCount);
 
 	if (channels == 1 && !overdub)
 	{
@@ -46,17 +48,12 @@ int StreamReader::ReadSamples(ISampleContainerPtr& container, bool overdub)
 	}
 	else
 	{
-		// HACK: This limits the maximum number of input channels to 16. But usually, we will only have one or two anyway.
-		Sample* arDst[16];
+		std::vector<Sample*> arDst;
+		arDst.reserve(channels);
 
-		if (channels > 16)
+		for (int c = 0; c < channels && c < m_channelCount; c++)
 		{
-			channels = 16;
-		}
-
-		for (int c = 0; c < channels; c++)
-		{
-			arDst[c] = container->Channels[c]->SamplePtr;
+			arDst.push_back(container->Channels[c]->SamplePtr);
 		}
 
 		if (overdub)
@@ -71,6 +68,19 @@ int StreamReader::ReadSamples(ISampleContainerPtr& container, bool overdub)
 					m_input.read((char*)&value, sizeof(Sample));
 					**ppDst += value;
 					(*ppDst)++;
+
+					if (m_input.rdstate() & std::istream::eofbit)
+					{
+						if (m_isLooping)
+						{
+							m_input.setstate(m_input.rdstate() & ~(std::istream::failbit | std::istream::eofbit));
+							SamplePosition = 0;
+						}
+						else
+						{
+							return s;
+						}
+					}
 				}
 			}
 		}
@@ -84,6 +94,19 @@ int StreamReader::ReadSamples(ISampleContainerPtr& container, bool overdub)
 
 					m_input.read((char*)*ppDst, sizeof(Sample));
 					(*ppDst)++;
+
+					if (m_input.rdstate() & std::istream::eofbit)
+					{
+						if (m_isLooping)
+						{
+							m_input.setstate(m_input.rdstate() & ~(std::istream::failbit | std::istream::eofbit));
+							SamplePosition = 0;
+						}
+						else
+						{
+							return s;
+						}
+					}
 				}
 			}
 		}
@@ -93,7 +116,7 @@ int StreamReader::ReadSamples(ISampleContainerPtr& container, bool overdub)
 		if (m_input.rdstate() & std::istream::eofbit)
 		{
 			m_input.setstate(m_input.rdstate() & ~(std::istream::failbit | std::istream::eofbit));
-			m_input.seekg(0, std::ios::beg);
+			SamplePosition = 0;
 		}
 	}
 	return samples;
@@ -108,3 +131,28 @@ void StreamReader::put_IsLooping(bool value)
 {
 	m_isLooping = value;
 }
+
+int StreamReader::get_ChannelCount() const
+{
+	return m_channelCount;
+}
+
+void StreamReader::put_ChannelCount(int value)
+{
+	m_channelCount = value;
+}
+
+int StreamReader::get_SamplePosition() const
+{
+	std::streampos pos = m_input.tellg() - m_initialPos;
+
+	return (int)(pos / sizeof(Sample) / m_channelCount);
+}
+
+void StreamReader::put_SamplePosition(int value)
+{
+	std::streampos pos = value * sizeof(Sample) * m_channelCount;
+
+	m_input.seekg(m_initialPos + pos, std::ios::beg);
+}
+

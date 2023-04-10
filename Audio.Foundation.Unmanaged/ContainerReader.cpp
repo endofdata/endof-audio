@@ -5,8 +5,8 @@
 using namespace Audio::Foundation::Unmanaged;
 
 ContainerReader::ContainerReader(ISampleContainerPtr& source) :
-	m_pSource(source),
-	m_sampleOffset(0),
+	m_container(source),
+	m_samplePosition(0),
 	m_isLooping(false),
 	m_refCount(0),
 	m_span(source)
@@ -36,29 +36,29 @@ bool ContainerReader::GetInterface(REFIID iid, void** ppvResult)
 
 int ContainerReader::ReadSamples(ISampleContainerPtr& container, bool overdub)
 {
-	if (m_sampleOffset < m_pSource->SampleCount)
+	if (m_samplePosition < m_container->SampleCount)
 	{
-		int channelCount = std::min(m_pSource->ChannelCount, container->ChannelCount);
+		int channelCount = std::min(m_container->ChannelCount, container->ChannelCount);
 		int sampleCount = 0;
 		int required = container->SampleCount;
 
 		do
 		{
-			int sliceCount = std::min(m_pSource->SampleCount - m_sampleOffset, required - sampleCount);
+			int sliceCount = std::min(m_container->SampleCount - m_samplePosition, required - sampleCount);
 			if (overdub)
 			{
-				m_pSource->AddTo(container, m_sampleOffset, sliceCount, 0, channelCount, 0, 0);
+				m_container->AddTo(container, m_samplePosition, sliceCount, 0, channelCount, 0, 0);
 			}
 			else
 			{
-				m_pSource->CopyTo(container, m_sampleOffset, sliceCount, 0, channelCount, 0, 0);
+				m_container->CopyTo(container, m_samplePosition, sliceCount, 0, channelCount, 0, 0);
 			}
 			sampleCount += sliceCount;
-			m_sampleOffset += sliceCount;
+			m_samplePosition += sliceCount;
 
-			if (m_isLooping && m_sampleOffset >= m_pSource->SampleCount)
+			if (m_isLooping && m_samplePosition >= m_container->SampleCount)
 			{
-				m_sampleOffset = 0;
+				m_samplePosition = 0;
 			}
 
 		} while (m_isLooping && sampleCount < container->SampleCount);
@@ -77,3 +77,24 @@ void ContainerReader::put_IsLooping(bool value)
 {
 	m_isLooping = value;
 }
+
+int ContainerReader::get_SamplePosition() const
+{
+	return m_samplePosition;
+}
+
+void ContainerReader::put_SamplePosition(int value)
+{
+	m_samplePosition = value;
+}
+
+int ContainerReader::get_ChannelCount() const
+{
+	return m_container->ChannelCount;
+}
+
+void ContainerReader::put_ChannelCount(int value)
+{
+	m_container->ChannelCount = value;
+}
+

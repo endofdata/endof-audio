@@ -33,18 +33,9 @@ bool HostClock::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-void HostClock::Start()
-{
-	m_offset = std::chrono::steady_clock::now();
-}
-
-void HostClock::Stop()
-{
-}
-
 AudioTime HostClock::get_CurrentTime() const
 {
-	return static_cast<AudioTime>((std::chrono::steady_clock::now() - m_offset).count() / 1000);
+	return AudioTime(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - m_offset));
 }
 
 void HostClock::put_CurrentTime(const AudioTime& position)
@@ -52,6 +43,15 @@ void HostClock::put_CurrentTime(const AudioTime& position)
 	AudioTime currentTime = CurrentTime;
 	auto delta = std::chrono::microseconds(currentTime - position);
 	m_offset += std::chrono::steady_clock::duration(delta);
+}
+
+void HostClock::Start()
+{
+	m_offset = std::chrono::steady_clock::now();
+}
+
+void HostClock::Stop()
+{
 }
 
 double HostClock::get_SampleRate() const
@@ -63,4 +63,3 @@ void HostClock::put_SampleRate(double value)
 {
 	m_sampleRate = value;
 }
-

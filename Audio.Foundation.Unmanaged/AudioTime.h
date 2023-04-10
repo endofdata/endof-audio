@@ -2,6 +2,7 @@
 
 #include <Audio.Foundation.Unmanaged.h>
 #include <string>
+#include <chrono>
 
 namespace Audio
 {
@@ -13,9 +14,10 @@ namespace Audio
 			{
 			public:
 				static AudioTime FromSeconds(double seconds);
-
+				
 				AudioTime();
-				AudioTime(long long value);
+				AudioTime(const std::chrono::microseconds& micros);
+				AudioTime(const long long value);
 
 				int get_Minutes() const;
 				_declspec(property(get = get_Minutes)) int Minutes;
@@ -27,6 +29,8 @@ namespace Audio
 				_declspec(property(get = get_Milliseconds)) int Milliseconds;
 
 				long long get_Value() const;
+				void put_Value(long long value);
+				_declspec(property(get = get_Value, put = put_Value)) long long Value;
 
 				operator long long() const;
 

@@ -104,7 +104,7 @@ void MeterChannel::OnMeterUpdate()
 		handler(this);
 }
 
-int MeterChannel::Process(ISampleContainerPtr& input)
+int MeterChannel::Process(ISampleContainerPtr& input, const ProcessingContext& context)
 {
 	int maxChannels = std::min(input->ChannelCount, (int)m_vecSumUp.size());
 

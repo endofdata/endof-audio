@@ -78,9 +78,9 @@ IRecorderPtr ObjectFactory::CreateRecorder(int channelCount, int initialSize, in
 	return new VectorWriter(channelCount, initialSize, growth);
 }
 
-ISampleSourcePtr ObjectFactory::CreateFileSource(const std::string& filename)
+ISampleSourcePtr ObjectFactory::CreateRawFileSource(const std::string& filename, int channelCount)
 {
-	return new FileReader(filename);
+	return new FileReader(filename, channelCount);
 }
 
 ISampleSourcePtr ObjectFactory::CreateContainerSource(ISampleContainerPtr& source)

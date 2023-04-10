@@ -134,6 +134,7 @@
     <ClInclude Include="OutputInt32ChannelPair.h" />
     <ClInclude Include="OutputOfTSampleChannelPair.h" />
     <ClInclude Include="ProcessingChain.h" />
+    <ClInclude Include="ProcessingContext.h" />
     <ClInclude Include="SampleBuffer.h" />
     <ClInclude Include="SampleBufferSpan.h" />
     <ClInclude Include="SampleContainer.h" />
@@ -170,6 +171,7 @@
     <ClCompile Include="MidiMessage.cpp" />
     <ClCompile Include="ObjectFactory.cpp" />
     <ClCompile Include="ProcessingChain.cpp" />
+    <ClCompile Include="ProcessingContext.cpp" />
     <ClCompile Include="SampleBuffer.cpp" />
     <ClCompile Include="SampleBufferSpan.cpp" />
     <ClCompile Include="SampleContainer.cpp" />

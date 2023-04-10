@@ -75,13 +75,13 @@ ISampleProcessorPtr& SampleSharer::get_Target(int index)
 	return m_vecTargets.at(index);
 }
 
-int SampleSharer::Process(ISampleContainerPtr& container)
+int SampleSharer::Process(ISampleContainerPtr& container, const ProcessingContext& context)
 {
 	if (!m_isBypassed)
 	{
-		std::for_each(m_vecTargets.begin(), m_vecTargets.end(), [&container](ISampleProcessorPtr& item)
+		std::for_each(m_vecTargets.begin(), m_vecTargets.end(), [&container, context](ISampleProcessorPtr& item)
 		{
-			item->Process(container);
+			item->Process(container, context);
 		});
 		return container->SampleCount;
 	}

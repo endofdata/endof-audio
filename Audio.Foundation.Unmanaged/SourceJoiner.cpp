@@ -73,7 +73,7 @@ ISampleSourcePtr& SourceJoiner::get_Source(int index)
 	return m_vecSources.at(index);
 }
 
-int SourceJoiner::Process(ISampleContainerPtr& container)
+int SourceJoiner::Process(ISampleContainerPtr& container, const ProcessingContext& context)
 {
 	if (!m_isBypassed)
 	{

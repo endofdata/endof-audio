@@ -58,7 +58,7 @@ bool VectorWriter::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-int VectorWriter::Process(ISampleContainerPtr& container)
+int VectorWriter::Process(ISampleContainerPtr& container, const ProcessingContext& context)
 {
 	if (!m_isBypassed)
 	{

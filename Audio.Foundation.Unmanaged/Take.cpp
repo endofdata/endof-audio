@@ -5,7 +5,7 @@ using namespace Audio::Foundation::Unmanaged;
 
 Take::Take(int id, ISampleContainerPtr& container, AudioTime position, AudioTime length) :
 	m_id(id),
-	m_pContainer(container),
+	m_container(container),
 	m_position(position),
 	m_length(length),
 	m_refCount(0)
@@ -66,7 +66,7 @@ AudioTime Take::get_EndPosition() const
 
 ISampleContainerPtr Take::get_Container()
 {
-	return m_pContainer;
+	return m_container;
 }
 
 bool Take::HasDataAt(AudioTime position) const
@@ -106,11 +106,12 @@ bool Take::SeekTo(AudioTime offset, AudioSeek kind)
 
 int Take::AddTo(ISampleContainerPtr& target, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const
 {
-	return m_pContainer->AddTo(target, sampleOffset, sampleCount, channelOffset, channelCount, targetSampleOffset, targetChannelOffset);
+	return m_container->AddTo(target, sampleOffset, sampleCount, channelOffset, channelCount, targetSampleOffset, targetChannelOffset);
 }
 
 int Take::ReadSamplesTo(ISampleContainerPtr& target, int channelOffset, int channelCount, int targetChannelOffset)
 {
+	// TODO: Take should operate with sample position instead of AudioTime
 	int done = AddTo(target, m_readOffset, target->SampleCount, channelOffset, channelCount, 0, targetChannelOffset);
 
 	m_readOffset += done;

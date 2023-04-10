@@ -20,7 +20,7 @@ namespace Audio
 				VectorWriter(int channelCount = 0, int initialSize = 0, int growth = 0);
 				virtual ~VectorWriter();
 
-				int Process(ISampleContainerPtr& container);
+				int Process(ISampleContainerPtr& container, const ProcessingContext& context);
 
 				bool get_IsBypassed();
 				void put_IsBypassed(bool value);

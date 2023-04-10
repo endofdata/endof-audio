@@ -25,14 +25,20 @@ namespace Audio
 				bool get_IsLooping();
 				void put_IsLooping(bool value);
 
+				int get_SamplePosition() const;
+				void put_SamplePosition(int value);
+
+				int get_ChannelCount() const;
+				void put_ChannelCount(int value);
+
 				DECLARE_IUNKNOWN
 
 			protected:
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
-				ISampleContainerPtr m_pSource;
-				int m_sampleOffset;
+				ISampleContainerPtr m_container;
+				int m_samplePosition;
 				SampleContainerSpan m_span;
 				bool m_isLooping;
 			};

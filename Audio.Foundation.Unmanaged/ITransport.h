@@ -25,7 +25,11 @@ namespace Audio
 					void Start() = 0;
 					void Stop() = 0;
 
-					void Pulse() = 0;
+					void Pulse(int sampleCount) = 0;
+
+					int get_CurrentSamplePosition() const = 0;
+					void put_CurrentSamplePosition(int value) = 0;
+					_declspec(property(get = get_CurrentSamplePosition, put = put_CurrentSamplePosition)) int CurrentSamplePosition;
 
 					bool get_IsSkipping() = 0;
 					_declspec(property(get = get_IsSkipping)) bool IsSkipping;
@@ -47,6 +51,9 @@ namespace Audio
 
 					ITransportEventsPtr& get_Events() = 0;
 					_declspec(property(get = get_Events)) ITransportEventsPtr& Events;
+
+					int AudioTimeToSamplePosition(const AudioTime& value) const = 0;
+					AudioTime SamplePositionToAudioTime(int value) const = 0;
 				};
 
 				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ITransport, __uuidof(ITransport));

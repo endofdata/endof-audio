@@ -5,8 +5,8 @@
 
 using namespace Audio::Foundation::Unmanaged;
 
-FileReader::FileReader(const std::string& filename) :
-	StreamReader((std::ifstream&)std::ifstream(filename, std::ios::binary)),
+FileReader::FileReader(const std::string& filename, int channelCount) :
+	StreamReader((std::ifstream&)std::ifstream(filename, std::ios::binary), channelCount),
 	m_filename(filename)
 {
 }

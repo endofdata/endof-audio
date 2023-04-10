@@ -141,7 +141,7 @@ void TakeSequence::put_PlayPosition(AudioTime currentTime)
 	m_currentTime = currentTime;
 }
 
-int TakeSequence::Process(ISampleContainerPtr& container)
+int TakeSequence::Process(ISampleContainerPtr& container, const ProcessingContext& context)
 {	
 	int done = 0;
 

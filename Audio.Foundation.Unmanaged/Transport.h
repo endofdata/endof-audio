@@ -22,7 +22,10 @@ namespace Audio
 				void Start();
 				void Stop();
 
-				void Pulse();
+				void Pulse(int sampleCount);
+
+				int get_CurrentSamplePosition() const;
+				void put_CurrentSamplePosition(int value);
 
 				bool get_IsSkipping();
 
@@ -39,6 +42,9 @@ namespace Audio
 
 				ITransportEventsPtr& get_Events();
 
+				int AudioTimeToSamplePosition(const AudioTime& value) const;
+				AudioTime SamplePositionToAudioTime(int value) const;
+
 				DECLARE_IUNKNOWN
 
 			protected:
@@ -47,8 +53,9 @@ namespace Audio
 			private:
 				IHostClockPtr m_hostClock;
 				ITransportEventsPtr m_events;
-				AudioTime m_loopStart;
-				AudioTime m_loopEnd;
+				int m_currentSamplePosition;
+				int m_loopStartPosition;
+				int m_loopEndPosition;
 				bool m_isLooping;
 				bool m_isSkipping;
 			};

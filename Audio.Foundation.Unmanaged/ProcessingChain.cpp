@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "ProcessingChain.h"
+#include "ProcessingContext.h"
 #include <functional>
 #include <algorithm>
 
@@ -42,7 +43,10 @@ void ProcessingChain::OnNextBuffer(bool writeSecondHalf)
 	int channel = 0;
 	bool readSecondHalf = !writeSecondHalf;
 
-	m_transport->Pulse();
+	m_transport->Pulse(m_container->SampleCount);
+	IHostClockPtr clock = m_transport->HostClock;
+
+	ProcessingContext context(m_transport->CurrentSamplePosition, clock->CurrentTime, m_transport->IsSkipping);
 
 	const std::lock_guard<std::mutex> lock(m_processing_mutex);
 
@@ -57,10 +61,10 @@ void ProcessingChain::OnNextBuffer(bool writeSecondHalf)
 		m_container->Channels[unusedChannel]->Clear();
 	}
 
-	std::for_each(m_processors.begin(), m_processors.end(), [this]
+	std::for_each(m_processors.begin(), m_processors.end(), [this, context]
 	(std::pair<int, ISampleProcessorPtr>& item)
 	{
-		item.second->Process(m_container);
+		item.second->Process(m_container, context);
 	});
 
 	int firstOut = 0;

@@ -32,7 +32,7 @@ bool ContainerWriter::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-int ContainerWriter::Process(ISampleContainerPtr& container)
+int ContainerWriter::Process(ISampleContainerPtr& container, const ProcessingContext& context)
 {
 	if (!m_isBypassed)
 	{

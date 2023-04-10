@@ -192,6 +192,9 @@
     <ClInclude Include="TransportEvents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ProcessingContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -279,6 +282,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TransportEvents.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessingContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -48,7 +48,7 @@ namespace Audio
 
 				static IRecorderPtr CreateRecorder(int channelCount, int initialSize, int growth);
 
-				static ISampleSourcePtr CreateFileSource(const std::string& filename);
+				static ISampleSourcePtr CreateRawFileSource(const std::string& filename, int channelCount);
 
 				static ISampleSourcePtr CreateContainerSource(ISampleContainerPtr& source);
 

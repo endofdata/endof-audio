@@ -5,6 +5,7 @@
 #include <Audio.Foundation.Unmanaged.h>
 #include <comdef.h>
 #include <ISampleContainer.h>
+#include <ProcessingContext.h>
 
 namespace Audio
 {
@@ -33,7 +34,7 @@ namespace Audio
 					/// </summary>
 					/// <param name="container">Sample container to process</param>
 					/// <returns>Number of processed sample frames</returns>
-					int Process(ISampleContainerPtr& container) = 0;
+					int Process(ISampleContainerPtr& container, const ProcessingContext& context) = 0;
 				};
 
 				//_COM_SMARTPTR_TYPEDEF(ISampleProcessor, __uuidof(ISampleProcessor));

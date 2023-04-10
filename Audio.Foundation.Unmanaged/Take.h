@@ -48,7 +48,7 @@ namespace Audio
 
 			private:
 				int m_id;
-				ISampleContainerPtr m_pContainer;
+				ISampleContainerPtr m_container;
 				AudioTime m_position;
 				AudioTime m_length;
 				AudioTime m_readOffset;

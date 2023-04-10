@@ -22,6 +22,14 @@ namespace Audio
 					bool get_IsLooping() = 0;
 					void put_IsLooping(bool value) = 0;
 					_declspec(property(get = get_IsLooping, put = put_IsLooping)) bool IsLooping;
+
+					int get_SamplePosition() const = 0;
+					void put_SamplePosition(int value) = 0;
+					_declspec(property(get = get_SamplePosition, put = put_SamplePosition)) int SamplePosition;
+
+					int get_ChannelCount() const = 0;
+					void put_ChannelCount(int value) = 0;
+					_declspec(property(get = get_ChannelCount, put = put_ChannelCount)) int ChannelCount;
 				};
 
 				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ISampleSource, __uuidof(ISampleSource));

@@ -18,15 +18,17 @@ namespace Audio
 				HostClock(double sampleRate);
 				virtual ~HostClock();
 
-				void Start();
-				void Stop();
-
-
 				AudioTime get_CurrentTime() const;
 				void put_CurrentTime(const AudioTime& position);
 
+				void Start();
+				void Stop();
+
 				double get_SampleRate() const;
 				void put_SampleRate(double value);
+
+				int AudioTimeToSamplePosition(const AudioTime& time) const;
+				AudioTime SamplePositonToAudioTime(int samplePosition) const;
 
 				DECLARE_IUNKNOWN
 

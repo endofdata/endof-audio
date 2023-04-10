@@ -35,10 +35,14 @@ bool SourceProcessor::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-int SourceProcessor::Process(ISampleContainerPtr& container)
+int SourceProcessor::Process(ISampleContainerPtr& container, const ProcessingContext& context)
 {
 	if (!m_isBypassed)
 	{
+		if (context.IsSkipping)
+		{
+			m_pSource->SamplePosition = context.SamplePosition;
+		}
 		return m_pSource->ReadSamples(container, false);
 	}
 	return 0;

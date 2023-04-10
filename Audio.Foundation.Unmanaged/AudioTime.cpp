@@ -16,7 +16,12 @@ AudioTime::AudioTime()
 	m_micros = 0;
 }
 
-AudioTime::AudioTime(long long value)
+AudioTime::AudioTime(const std::chrono::microseconds& micros)
+{
+	m_micros = micros.count();
+}
+
+AudioTime::AudioTime(const long long value)
 {
 	m_micros = value;
 }
@@ -110,6 +115,11 @@ int AudioTime::get_Milliseconds() const
 long long AudioTime::get_Value() const
 {
 	return m_micros;
+}
+
+void AudioTime::put_Value(long long value)
+{
+	m_micros = value;
 }
 
 
