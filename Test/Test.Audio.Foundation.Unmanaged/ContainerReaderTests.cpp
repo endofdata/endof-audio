@@ -4,6 +4,7 @@
 #include "Constants.h"
 #include <ISampleBuffer.h>
 #include <ObjectFactory.h>
+#include <ProcessingContext.h>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Audio::Foundation::Unmanaged;
@@ -26,10 +27,12 @@ namespace Test
 						ISampleContainerPtr pBufferContainer = HelperMethods::CreateTestContainer(Constants::SampleCount, Constants::ChannelCount);
 						ISampleProcessorPtr pWriter = ObjectFactory::CreateRecorder(Constants::ChannelCount, Constants::SampleCount * 10, Constants::SampleCount * 2);
 
+						ProcessingContext context;
+
 						int loopsForTenSeconds = (Constants::SampleRate * 10 / Constants::SampleCount) + 1;
 						for (int i = 0; i < loopsForTenSeconds; i++)
 						{
-							pWriter->Process(pBufferContainer);
+							pWriter->Process(pBufferContainer, context);
 						}
 
 						// get the resulting full-data container
@@ -49,8 +52,8 @@ namespace Test
 
 						for (int i = 0; i < loopsForTenSeconds; i++)
 						{
-							pSourceProcessor->Process(pBufferContainer);
-							pOutputWriter->Process(pBufferContainer);
+							pSourceProcessor->Process(pBufferContainer, context);
+							pOutputWriter->Process(pBufferContainer, context);
 						}
 
 						IRecorderPtr pOutputRecorder = nullptr;
