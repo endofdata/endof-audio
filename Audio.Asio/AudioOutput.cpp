@@ -32,10 +32,11 @@ AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPairPtr 
 	m_pOutputMeter->MeterUpdate = static_cast<MeterChannelCallback>(Marshal::GetFunctionPointerForDelegate(meterUpdateDelegate).ToPointer());
 
 	// Chain the output-channel receiver to the write-through of the meter channel
-	m_pOutputMeter->WriteThrough = m_pOutputChannelPair;
+	ISampleProcessorPtr meterProcessor = nullptr;
+	m_pOutputMeter->QueryInterface<ISampleProcessor>(&meterProcessor);
 
-	// Chain the meter-channel receiver to the master mix
-	m_pOutputChannelPair->SampleJoiner->Target = m_pOutputMeter;
+	ISampleProcessorPtr outputProcessor = nullptr;
+	m_pOutputChannelPair->QueryInterface<ISampleProcessor>(&outputProcessor);
 }
 
 AudioOutput::~AudioOutput()
@@ -81,8 +82,8 @@ IOutputChannelPairPtr AudioOutput::OutputChannelPair::get()
 
 void AudioOutput::Send()
 {
-	ISampleReceiverPtr pReceiver = m_pOutputChannelPair->SampleJoiner;
-	pReceiver->Flush();
+	//ISampleReceiverPtr pReceiver = m_pOutputChannelPair->SampleJoiner;
+	//pReceiver->Flush();
 }
 
 void AudioOutput::OutputMeter_MeterUpdate(IntPtr sender)

@@ -51,6 +51,7 @@
     <OutDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Configuration)\$(Platform)\</IntDir>
     <ExternalIncludePath>D:\Gamer I5\Documents\Projects\ASIOSDK2\common;D:\Gamer I5\Documents\Projects\Audio\Audio.Asio.Unmanaged;$(ExternalIncludePath)</ExternalIncludePath>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
@@ -58,6 +59,7 @@
     <OutDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Configuration)\$(Platform)\</IntDir>
     <ExternalIncludePath>D:\Gamer I5\Documents\Projects\ASIOSDK2\common;D:\Gamer I5\Documents\Projects\Audio\Audio.Asio.Unmanaged;$(ExternalIncludePath)</ExternalIncludePath>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -68,6 +70,7 @@
       <ShowIncludes>false</ShowIncludes>
       <AdditionalUsingDirectories>$(ProjectDir)..\Audio.Foundation\bin\$(Configuration)\$(Platform)</AdditionalUsingDirectories>
       <AdditionalIncludeDirectories>$(ProjectDir)..\Audio.Foundation.Unmanaged\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ole32.lib</AdditionalDependencies>
@@ -85,6 +88,7 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ShowIncludes>false</ShowIncludes>
       <AdditionalUsingDirectories>$(ProjectDir)..\Audio.Foundation\bin\$(Configuration)\$(Platform)</AdditionalUsingDirectories>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ole32.lib</AdditionalDependencies>

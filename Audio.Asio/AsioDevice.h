@@ -159,8 +159,8 @@ namespace Audio
 					void set(int value);
 				}
 
-				IInputChannelPtr GetInputChannel(int index);
-				IOutputChannelPairPtr GetOutputChannelPair(int index);
+				IInputChannelPtr GetInputChannel(int channelId);
+				IOutputChannelPairPtr GetOutputChannelPair(int channelPairId);
 
 			private:
 				void CleanUp(bool fIsDisposing);

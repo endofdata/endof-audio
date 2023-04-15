@@ -16,10 +16,10 @@
 	<Target Name="CopyDependencies" AfterTargets="Build" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 		<Message Text="Copy dependencies to $(OutDir)" Importance="high" />
 		<ItemGroup>
-			<Dependencies Include="..\..\Audio.Asio.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Asio.Unmanaged.dll" />
-			<Dependencies Include="..\..\Audio.Asio.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Asio.Unmanaged.pdb" />
-			<Dependencies Include="..\..\Audio.Foundation.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Foundation.Unmanaged.dll" />
-			<Dependencies Include="..\..\Audio.Foundation.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Foundation.Unmanaged.pdb" />
+			<Dependencies Include="..\..\bin\$(Configuration)\$(PlatformTarget)\Audio.Asio.Unmanaged.dll" />
+			<Dependencies Include="..\..\bin\$(Configuration)\$(PlatformTarget)\Audio.Asio.Unmanaged.pdb" />
+			<Dependencies Include="..\..\bin\$(Configuration)\$(PlatformTarget)\Audio.Foundation.Unmanaged.dll" />
+			<Dependencies Include="..\..\bin\$(Configuration)\$(PlatformTarget)\Audio.Foundation.Unmanaged.pdb" />
 		</ItemGroup>
 		<Copy SourceFiles="@(Dependencies)" DestinationFolder="$(OutputPath)" />
 	</Target>

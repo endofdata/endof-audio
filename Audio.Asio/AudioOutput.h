@@ -1,7 +1,6 @@
 #pragma once
 
 #include <IMeterChannel.h>
-#include <ISampleJoiner.h>
 #include <IOutputChannelPair.h>
 
 using namespace Audio::Foundation;

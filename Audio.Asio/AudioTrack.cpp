@@ -409,7 +409,7 @@ bool AudioTrack::NextFrame()
 			//{
 			//	Source->WriteTo(m_recordingTake);
 			//}
-			//return true;
+			return true;
 		}
 		else
 		{

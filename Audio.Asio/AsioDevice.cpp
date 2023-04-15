@@ -98,14 +98,14 @@ void AsioDevice::ShowControlPanel()
 	m_pCore->ShowControlPanel();
 }
 
-IInputChannelPtr AsioDevice::GetInputChannel(int index)
+IInputChannelPtr AsioDevice::GetInputChannel(int channelId)
 {
-	return m_pCore->InputChannel[index];	
+	return m_pCore->ProcessingChain->InputChannel[channelId];	
 }
 
-IOutputChannelPairPtr AsioDevice::GetOutputChannelPair(int index)
+IOutputChannelPairPtr AsioDevice::GetOutputChannelPair(int channelPairId)
 {
-	return m_pCore->OutputChannelPair[index];
+	return m_pCore->ProcessingChain->OutputChannelPair[channelPairId];
 }
 
 void AsioDevice::OnPropertyChanged(System::String^ propertyName)
@@ -128,12 +128,12 @@ int AsioDevice::DriverVersion::get()
 
 int AsioDevice::InputChannelCount::get()
 {
-	return m_pCore->InputChannelCount;
+	return m_pCore->ProcessingChain->InputChannelCount;
 }
 
 int AsioDevice::OutputChannelPairCount::get()
 {
-	return m_pCore->OutputChannelPairCount;
+	return m_pCore->ProcessingChain->OutputChannelPairCount;
 }
 
 int AsioDevice::SampleCount::get()

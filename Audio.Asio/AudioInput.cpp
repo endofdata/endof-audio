@@ -26,17 +26,11 @@ AudioInput::AudioInput(int sampleRate, IInputChannelPtr pHwChannel, int id) :
 
 	m_pInputChannel = pHwChannel.Detach();
 
-	ISampleSharerPtr sampleSharer = ((ISampleSourcePtr)m_pInputChannel)->SampleSharer;
-
-	int inputChannels = sampleSharer->Source->ChannelCount;
-
-	m_pInputMeter = Audio::Foundation::Unmanaged::ObjectFactory::CreateMeterChannel(sampleRate, inputChannels).Detach();
+	m_pInputMeter = Audio::Foundation::Unmanaged::ObjectFactory::CreateMeterChannel(sampleRate, 1).Detach();
 	m_pInputMeter->RMSTime = 100;
 	MeterUpdateDelegate^ meterUpdateDelegate = gcnew MeterUpdateDelegate(this, &AudioInput::InputMeter_MeterUpdate);
 	m_meterUpdateDelegateHandle = GCHandle::Alloc(meterUpdateDelegate);
 	m_pInputMeter->MeterUpdate = static_cast<MeterChannelCallback>(Marshal::GetFunctionPointerForDelegate(meterUpdateDelegate).ToPointer());
-
-	sampleSharer->AddTarget(m_pInputMeter);
 }
 
 AudioInput::~AudioInput()
@@ -82,13 +76,15 @@ Level AudioInput::DbFS::get()
 
 bool AudioInput::OnSetMonitor(IAudioOutput^ value)
 {
+	IOutputChannelPairPtr noMonitor;
+
 	if (nullptr != value)
 	{
 		AudioOutput^ output = safe_cast<AudioOutput^>(value);
 
 		if (output == nullptr)
 		{
-			m_pInputChannel->DirectMonitor = nullptr;
+			m_pInputChannel->DirectMonitor = noMonitor;
 			return false;
 		}
 		else
@@ -98,7 +94,7 @@ bool AudioInput::OnSetMonitor(IAudioOutput^ value)
 	}
 	else
 	{
-		m_pInputChannel->DirectMonitor = nullptr;
+		m_pInputChannel->DirectMonitor = noMonitor;
 	}
 	AudioInputBase::Monitor = value;
 
@@ -109,11 +105,11 @@ bool AudioInput::OnAddTarget(IAudioTarget^ target)
 {
 	AudioOutput^ output = safe_cast<AudioOutput^>(target);
 
-	if (output != nullptr)
-	{
-		((ISampleSourcePtr)m_pInputChannel)->SampleSharer->AddTarget(output->OutputChannelPair->SampleJoiner);
-		return true;
-	}
+	//if (output != nullptr)
+	//{
+	//	((ISampleProcessorPtr)m_pInputChannel)->SampleSharer->AddTarget(output->OutputChannelPair->SampleJoiner);
+	//	return true;
+	//}
 	return false;
 }
 
@@ -121,7 +117,7 @@ void AudioInput::OnRemoveTarget(IAudioTarget^ target)
 {
 	AudioOutput^ output = safe_cast<AudioOutput^>(target);
 
-	((ISampleSourcePtr)m_pInputChannel)->SampleSharer->RemoveTarget(output->OutputChannelPair->SampleJoiner);
+	//((ISampleProcessorPtr)m_pInputChannel)->SampleSharer->RemoveTarget(output->OutputChannelPair->SampleJoiner);
 }
 
 void AudioInput::InputMeter_MeterUpdate(IntPtr sender)
