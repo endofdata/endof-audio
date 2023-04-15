@@ -47,11 +47,13 @@
     <IncludePath>$(SolutionDir)..\ASIOSDK2\common;$(SolutionDir)Audio.Foundation.Unmanaged;$(SolutionDir)Audio.Asio.Unmanaged;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Configuration)\$(Platform)\</IntDir>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)..\ASIOSDK2\common;$(SolutionDir)Audio.Foundation.Unmanaged;$(SolutionDir)Audio.Asio.Unmanaged;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Configuration)\$(Platform)\</IntDir>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -65,15 +67,16 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Audio.Foundation.Unmanaged\bin\$(Configuration)\$(PlatformTarget);$(SolutionDir)Audio.Asio.Unmanaged\bin\$(Configuration)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin\$(Configuration)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Audio.Asio.Unmanaged.lib;Audio.Foundation.Unmanaged.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(SolutionDir)Audio.Foundation.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Foundation.Unmanaged.dll" "$(OutDir)"
-copy "$(SolutionDir)Audio.Asio.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Asio.Unmanaged.dll" "$(OutDir)"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Copy dependencies to output folder</Message>
+      <Message>
+      </Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -92,15 +95,16 @@ copy "$(SolutionDir)Audio.Asio.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Audio.Foundation.Unmanaged\bin\$(Configuration)\$(PlatformTarget);$(SolutionDir)Audio.Asio.Unmanaged\bin\$(Configuration)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin\$(Configuration)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Audio.Asio.Unmanaged.lib;Audio.Foundation.Unmanaged.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(SolutionDir)Audio.Foundation.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Foundation.Unmanaged.dll" "$(OutDir)"
-copy "$(SolutionDir)Audio.Asio.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Asio.Unmanaged.dll" "$(OutDir)"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Copy dependencies to output folder</Message>
+      <Message>
+      </Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
