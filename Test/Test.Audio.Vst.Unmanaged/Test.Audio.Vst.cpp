@@ -14,7 +14,7 @@ namespace TestAudioVst
 	TEST_CLASS(TestAudioVst)
 	{
 	public:		
-		TEST_METHOD(TestMethod1)
+		TEST_METHOD(CreateAudioProcessor)
 		{
 			const wchar_t* pwcszLibName = L"C:\\Program Files\\Common Files\\VST3\\Unfiltered Audio Indent.vst3";
 
