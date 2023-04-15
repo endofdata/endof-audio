@@ -7,7 +7,8 @@ using namespace Steinberg;
 using namespace Steinberg::Vst;
 
 VstHostApplication::VstHostApplication(const std::wstring& name) :
-	m_name(name)
+	m_name(name),
+	m_refCount(0)
 {
 }
 

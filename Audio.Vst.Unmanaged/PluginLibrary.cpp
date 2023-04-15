@@ -23,7 +23,7 @@ bool PluginLibrary::get_IsValid() const
 
 void PluginLibrary::Initialize()
 {
-	if (m_handle != nullptr)
+	if (IsValid)
 	{
 		auto initDll = GetProcAddress(m_handle, "InitDll");
 
@@ -34,107 +34,125 @@ void PluginLibrary::Initialize()
 	}
 }
 
-void PluginLibrary::CreateFactory()
+bool PluginLibrary::CreateFactory()
 {
-	if (m_handle != nullptr)
+	if (IsValid)
 	{
 		auto getPluginFactory = GetProcAddress(m_handle, "GetPluginFactory");
 
 		if (getPluginFactory != nullptr)
 		{
-			m_factory = reinterpret_cast<IPluginFactory*>(getPluginFactory());
+			m_factory = OPtr<IPluginFactory>(reinterpret_cast<IPluginFactory*>(getPluginFactory()));
 
-			IPluginFactory2* pFuck2 = nullptr;
-			m_factory->queryInterface(IPluginFactory2_iid, reinterpret_cast<void**>(&pFuck2));
-			m_factory2 = pFuck2;
-			IPluginFactory3* pFuck3 = nullptr;
-			m_factory->queryInterface(IPluginFactory3_iid, reinterpret_cast<void**>(&pFuck3));
-			m_factory3 = pFuck3;
+			if (m_factory == nullptr)
+			{
+				Uninitialize();
+			}
+			else
+			{
+				IPluginFactory2* pFuck2 = nullptr;
+				m_factory->queryInterface(IPluginFactory2_iid, reinterpret_cast<void**>(&pFuck2));
+				m_factory2 = OPtr<IPluginFactory2>(pFuck2);
+				IPluginFactory3* pFuck3 = nullptr;
+				m_factory->queryInterface(IPluginFactory3_iid, reinterpret_cast<void**>(&pFuck3));
+				m_factory3 = OPtr<IPluginFactory3>(pFuck3);
+
+				return true;
+			}
 		}
 	}
+	return false;
 }
 
-IAudioProcessorPtr PluginLibrary::CreateAudioProcessor(IHostApplicationPtr context)
+IAudioProcessorPtr PluginLibrary::CreateAudioProcessor(IHostApplicationPtr& context)
 {
 	std::string audioModuleCategory = "Audio Module Class";
 	PClassInfoW classInfo;
 
 	if (FindClassInfo(audioModuleCategory.c_str(), classInfo))
 	{
-		IComponentPtr pComponent = nullptr;
-		IComponent* pFuckC = pComponent.get();
+		IComponent* pCompRaw = nullptr;
 		
-		m_factory->createInstance(classInfo.cid, reinterpret_cast<FIDString>(IComponent_iid), reinterpret_cast<void**>(&pFuckC));
+		if (kResultOk == m_factory->createInstance(classInfo.cid, reinterpret_cast<FIDString>(IComponent_iid), reinterpret_cast<void**>(&pCompRaw)))
+		{
+			IComponentPtr component(pCompRaw, false);
+			IPluginBase* pBaseRaw = nullptr;
 
-		IPluginBasePtr pPluginBase = pComponent;
-		pPluginBase->initialize(context);
+			if (kResultOk == component->queryInterface(IPluginBase_iid, reinterpret_cast<void**>(&pBaseRaw)))
+			{
+				IPluginBasePtr pluginBase(pBaseRaw, false);
+				pluginBase->initialize(context);
 
-		IAudioProcessorPtr pAudioProcessor = nullptr;
-		IAudioProcessor* pProc = pAudioProcessor.get();
+				IAudioProcessor* pProcRaw = nullptr;
 
-		pComponent->queryInterface(reinterpret_cast<FIDString>(IAudioProcessor_iid), reinterpret_cast<void**>(&pProc));
-
-		return pAudioProcessor;
+				if (kResultOk == component->queryInterface(reinterpret_cast<FIDString>(IAudioProcessor_iid), reinterpret_cast<void**>(&pProcRaw)))
+				{					
+					return IAudioProcessorPtr(pProcRaw, false);
+				}
+			}
+		}
 	}
 	return nullptr;
 }
 
 bool PluginLibrary::FindClassInfo(const char* pcszCategory, PClassInfoW& classInfo)
 {
-	if (m_factory3 != nullptr)
+	if (IsValid && m_factory == nullptr)
 	{
-		int classCount = m_factory3->countClasses();
-		PClassInfoW classInfoW;
+		CreateFactory();
+	}
 
-		for (int c = 0; c < classCount; c++)
+	if (IsValid)
+	{
+		if (m_factory3 != nullptr)
 		{
-			int result = m_factory3->getClassInfoUnicode(c, &classInfo);
+			int classCount = m_factory3->countClasses();
+			PClassInfoW classInfoW;
 
-			if (pcszCategory == classInfo.category)
+			for (int c = 0; c < classCount; c++)
 			{
-				return true;
+				if(!m_factory3->getClassInfoUnicode(c, &classInfo) && !std::strcmp(pcszCategory, classInfo.category))
+				{
+					return true;
+				}
 			}
 		}
-	}
-	else if (m_factory2 != nullptr)
-	{
-		int classCount = m_factory2->countClasses();
-		PClassInfo2 classInfo2;
-		std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> utf16conv;
-
-		for (int c = 0; c < classCount; c++)
+		else if (m_factory2 != nullptr)
 		{
-			int result = m_factory2->getClassInfo2(c, &classInfo2);
+			int classCount = m_factory2->countClasses();
+			PClassInfo2 classInfo2;
+			std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> utf16conv;
 
-			if (pcszCategory == classInfo2.category)
+			for (int c = 0; c < classCount; c++)
 			{
-				std::wstring name = utf16conv.from_bytes(classInfo2.name);
-				std::wstring vendor = utf16conv.from_bytes(classInfo2.vendor);
-				std::wstring version = utf16conv.from_bytes(classInfo2.version);
-				std::wstring sdkVersion = utf16conv.from_bytes(classInfo2.sdkVersion);
+				if (!m_factory2->getClassInfo2(c, &classInfo2) && !std::strcmp(pcszCategory, classInfo2.category))
+				{
+					std::wstring name = utf16conv.from_bytes(classInfo2.name);
+					std::wstring vendor = utf16conv.from_bytes(classInfo2.vendor);
+					std::wstring version = utf16conv.from_bytes(classInfo2.version);
+					std::wstring sdkVersion = utf16conv.from_bytes(classInfo2.sdkVersion);
 
-				classInfo = PClassInfoW(classInfo2.cid, classInfo2.cardinality, classInfo2.category, name.c_str(),
-					classInfo2.classFlags, classInfo2.subCategories, vendor.c_str(), version.c_str(), sdkVersion.c_str());
-				return true;
+					classInfo = PClassInfoW(classInfo2.cid, classInfo2.cardinality, classInfo2.category, name.c_str(),
+						classInfo2.classFlags, classInfo2.subCategories, vendor.c_str(), version.c_str(), sdkVersion.c_str());
+					return true;
+				}
 			}
 		}
-	}
-	else if (m_factory != nullptr)
-	{
-		int classCount = m_factory->countClasses();
-		PClassInfo classInfo1;
-		std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> utf16conv;
-
-		for (int c = 0; c < classCount; c++)
+		else if (m_factory != nullptr)
 		{
-			int result = m_factory->getClassInfo(c, &classInfo1);
+			int classCount = m_factory->countClasses();
+			PClassInfo classInfo1;
+			std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> utf16conv;
 
-			if (pcszCategory == classInfo1.category)
+			for (int c = 0; c < classCount; c++)
 			{
-				std::wstring name = utf16conv.from_bytes(classInfo1.name);
+				if (!m_factory->getClassInfo(c, &classInfo1) && !std::strcmp(pcszCategory, classInfo1.category))
+				{
+					std::wstring name = utf16conv.from_bytes(classInfo1.name);
 
-				classInfo = PClassInfoW(classInfo.cid, classInfo.cardinality, classInfo.category, name.c_str(), 0, "", L"", L"", L"");
-				return true;
+					classInfo = PClassInfoW(classInfo.cid, classInfo.cardinality, classInfo.category, name.c_str(), 0, "", L"", L"", L"");
+					return true;
+				}
 			}
 		}
 	}
@@ -143,14 +161,20 @@ bool PluginLibrary::FindClassInfo(const char* pcszCategory, PClassInfoW& classIn
 
 void PluginLibrary::Uninitialize()
 {
-	if (m_handle != nullptr)
+	if (IsValid)
 	{
+		m_factory3.reset();
+		m_factory2.reset();
+		m_factory.reset();
+
 		auto exitDll = GetProcAddress(m_handle, "ExitDll");
 
 		if (exitDll != nullptr)
 		{
 			exitDll();
 		}
+		FreeLibrary(m_handle);
+		m_handle = nullptr;
 	}
 }
 
@@ -160,7 +184,7 @@ PluginLibrary PluginLibrary::LoadFrom(const wchar_t* pwcszPath)
 
 	PluginLibrary result = PluginLibrary(hLibrary);
 
-	if (hLibrary != nullptr)
+	if (result.IsValid)
 	{
 		result.Initialize();
 	}

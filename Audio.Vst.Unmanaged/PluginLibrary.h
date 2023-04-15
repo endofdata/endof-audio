@@ -15,12 +15,12 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class PluginLibrary
+			class _AUDIO_VST_UNMANAGED_API PluginLibrary
 			{
 			public:
 				virtual ~PluginLibrary();
 
-				IAudioProcessorPtr CreateAudioProcessor(IHostApplicationPtr context);
+				IAudioProcessorPtr CreateAudioProcessor(IHostApplicationPtr& context);
 
 				bool get_IsValid() const;
 				_declspec(property(get = get_IsValid)) bool IsValid;
@@ -31,7 +31,7 @@ namespace Audio
 				PluginLibrary(HMODULE hLibrary);
 				void Initialize();
 				void Uninitialize();
-				void CreateFactory();
+				bool CreateFactory();
 				bool FindClassInfo(const char* pcszCategory, PClassInfoW& classInfo);
 
 				HMODULE m_handle;
