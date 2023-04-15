@@ -4,6 +4,7 @@ Param(
 	[Parameter(Mandatory=$False)][Int] $RecordingSeconds = 5,
 	[Parameter(Mandatory=$False)][Int] $LoopTimes = 2,
 	[Parameter(Mandatory=$False)][String] $MsgRecord = '644AB0',
+	[Parameter(Mandatory=$False)][String] $MsgStart = '6449B0',
 	[Parameter(Mandatory=$False)][String] $MsgStop = '6447B0',
 	[Parameter(Mandatory=$False)][Switch] $StopNow = $False
 )
