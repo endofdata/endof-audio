@@ -1,6 +1,7 @@
 *.VC.db
 *.user
 *.htm
+*.drawio.bkp
 .vs/
 obj/
 bin/
