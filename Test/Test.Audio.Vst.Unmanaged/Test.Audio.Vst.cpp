@@ -3,11 +3,13 @@
 #include <PluginLibrary.h>
 #include <VstHostApplication.h>
 #include <VstCom.h>
+#include "Constants.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Audio::Vst::Unmanaged;
 using namespace Steinberg;
 using namespace Steinberg::Vst;
+using namespace Test::Audio::Vst::Unmanaged;
 
 namespace TestAudioVst
 {
@@ -24,9 +26,9 @@ namespace TestAudioVst
 
 			IHostApplicationPtr application = new VstHostApplication(L"Ludger");
 
-			IAudioProcessorPtr audioProcessor = library.CreateAudioProcessor(application);
+			ISampleProcessorPtr audioProcessor = library.CreateAudioProcessor(application, Constants::SampleCount, Constants::SampleRate);
 
-			Assert::IsNotNull(audioProcessor.get(), L"Can create IAudioProcessor.");
+			Assert::IsNotNull(audioProcessor.GetInterfacePtr(), L"Can create ISampleProcessor.");
 		}
 	};
 }

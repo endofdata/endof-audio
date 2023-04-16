@@ -181,6 +181,7 @@
     <ClCompile Include="Test.Audio.Vst.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Constants.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
