@@ -27,14 +27,15 @@ namespace Audio
 
 					void SetInputMonitoring(int inputId, int outputId) = 0;
 
-					virtual IInputChannelPtr FindInput(int inputId) = 0;
+					IInputChannelPtr FindInput(int inputId) = 0;
 
-					virtual IOutputChannelPairPtr FindOutput(int outputId) = 0;
+					IOutputChannelPairPtr FindOutput(int outputId) = 0;
 
-					virtual void RemoveAllInputChannels() = 0;
+					void RemoveAllInputChannels() = 0;
 
-					virtual void RemoveAllOutputChannels() = 0;
+					void RemoveAllOutputChannels() = 0;
 
+					void RemoveAllProcessors() = 0;
 
 					int AddProcessor(ISampleProcessorPtr& processor) = 0;
 

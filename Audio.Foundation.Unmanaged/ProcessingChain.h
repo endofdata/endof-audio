@@ -37,6 +37,8 @@ namespace Audio
 
 				void RemoveAllOutputChannels();
 
+				void RemoveAllProcessors();
+
 				void OnNextBuffer(bool writeSecondHalf);
 
 				int AddProcessor(ISampleProcessorPtr& processor);

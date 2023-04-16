@@ -126,6 +126,11 @@ bool ProcessingChain::RemoveProcessor(int processorId)
 	return false;
 }
 
+void ProcessingChain::RemoveAllProcessors()
+{
+	m_processors.clear();
+}
+
 ISampleProcessorPtr ProcessingChain::get_Processor(int processorId)
 {
 	auto iter = GetProcessorsById(processorId);
