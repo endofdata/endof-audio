@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "TransportControl.h"
 #include <ObjectFactory.h>
+#include <StrConv.h>
 
+using namespace Audio::Vst::Unmanaged;
 using namespace RepeatMyself;
 
 TransportControl::TransportControl(IMidiInputPtr& midiInput, ITransportPtr& transport) :
@@ -100,8 +102,7 @@ void TransportControl::OnTransport(void* pContext, TransportCode code)
 
 bool onDeviceCaps(unsigned int id, const MIDIINCAPS& devcaps)
 {
-	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> utf16conv;
-	auto name = utf16conv.to_bytes(devcaps.szPname);
+	auto name = StrConv::ToUtf8(devcaps.szPname);
 
 	std::cout << "Input ID " << id << " '" << name.c_str() << "'" << std::endl;
 

@@ -5,11 +5,15 @@
 #include <AsioCore.h>
 #include <ObjectFactory.h>
 #include <AsioCoreException.h>
+#include <VstObjectFactory.h>
+#include <VstCom.h>
+
 #include "SteinbergUrRt2.h"
 #include "TransportControl.h"
 
 using namespace RepeatMyself;
 using namespace Audio::Asio;
+using namespace Audio::Vst::Unmanaged;
 using namespace Audio::Asio::Unmanaged;
 using namespace Audio::Foundation::Unmanaged;
 
@@ -63,7 +67,13 @@ int main()
 
 		float samplesPerTenSecs = device->SampleRate * 60.0f;
 
-		// create processor chain input -> recorder -> output
+		// create processor chain input -> vst -> recorder -> output
+		const wchar_t* pwcszLibName = L"C:\\Program Files\\Common Files\\VST3\\Unfiltered Audio Indent.vst3";
+		IVstHostPtr host = VstObjectFactory::CreateVstHost(L"RepeatMyself", device->SampleCount, device->SampleRate);
+		std::wstring pluginId = host->AddLibrary(pwcszLibName);
+		ISampleProcessorPtr vstProcessor = host->CreateSampleProcessor(pluginId.c_str());
+		vstProcessor->IsBypassed = false;
+
 		IRecorderPtr recorder = ObjectFactory::CreateRecorder(_countof(selectedInputs), (int)samplesPerTenSecs, (int)samplesPerTenSecs);
 		ISampleProcessorPtr recordingProcessor = nullptr;
 		recorder->QueryInterface<ISampleProcessor>(&recordingProcessor);
@@ -71,6 +81,7 @@ int main()
 
 		IProcessingChainPtr processingChain = device->ProcessingChain;
 		ITransportPtr transport = processingChain->Transport;
+		int vstId = processingChain->AddProcessor(vstProcessor);
 		int recorderId = processingChain->AddProcessor(recordingProcessor);
 
 		ISourceJoinerPtr joiner = ObjectFactory::CreateSourceJoiner();
@@ -200,6 +211,9 @@ int main()
 			std::wcout << L"Shutting down everything. Bye!" << std::endl;
 
 			device->Stop();
+
+			// Ensure that processors can be released before the VST plugin libraries are unloaded
+			processingChain->RemoveAllProcessors();
 		}
 	}
 	catch (const std::exception& error)

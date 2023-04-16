@@ -44,13 +44,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)..\ASIOSDK2\common;$(SolutionDir)Audio.Foundation.Unmanaged;$(SolutionDir)Audio.Asio.Unmanaged;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\ASIOSDK2\common;$(SolutionDir)..\vst3sdk;$(SolutionDir)..\vst3sdk\pluginterfaces\base;$(SolutionDir)..\vst3sdk\pluginterfaces\vst;$(SolutionDir)Audio.Foundation.Unmanaged;$(SolutionDir)Audio.Vst.Unmanaged;$(SolutionDir)Audio.Asio.Unmanaged;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Configuration)\$(Platform)\</IntDir>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)..\ASIOSDK2\common;$(SolutionDir)Audio.Foundation.Unmanaged;$(SolutionDir)Audio.Asio.Unmanaged;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\ASIOSDK2\common;$(SolutionDir)..\vst3sdk;$(SolutionDir)..\vst3sdk\pluginterfaces\base;$(SolutionDir)..\vst3sdk\pluginterfaces\vst;$(SolutionDir)Audio.Foundation.Unmanaged;$(SolutionDir)Audio.Vst.Unmanaged;$(SolutionDir)Audio.Asio.Unmanaged;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Configuration)\$(Platform)\</IntDir>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
@@ -127,6 +127,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\Audio.Foundation.Unmanaged\Audio.Foundation.Unmanaged.vcxproj">
       <Project>{c4d38b7d-afa0-4138-bc06-ecb238fe579b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Audio.Vst.Unmanaged\Audio.Vst.Unmanaged.vcxproj">
+      <Project>{5eb4dd08-a21e-48ff-9063-307842e14935}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
