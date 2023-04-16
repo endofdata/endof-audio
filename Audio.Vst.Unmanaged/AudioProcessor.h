@@ -14,7 +14,7 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class _AUDIO_VST_UNMANAGED_API AudioProcessor : public ISampleProcessor
+			class AudioProcessor : public ISampleProcessor
 			{
 			public:
 				AudioProcessor(IAudioProcessorPtr& processor, IParameterChangesPtr& parameterChanges, int sampleCount, int sampleRate);

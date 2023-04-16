@@ -12,7 +12,7 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class _AUDIO_VST_UNMANAGED_API ParameterChanges : public IParameterChanges
+			class ParameterChanges : public IParameterChanges
 			{
 			public:
 				ParameterChanges();

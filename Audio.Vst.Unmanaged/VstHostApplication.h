@@ -1,6 +1,9 @@
 #pragma once
 #include <Audio.Vst.Unmanaged.h>
 #include <ivsthostapplication.h>
+#include <memory>
+#include <vector>
+#include "PluginLibrary.h"
 
 using namespace Steinberg;
 using namespace Steinberg::Vst;
@@ -11,7 +14,7 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class _AUDIO_VST_UNMANAGED_API VstHostApplication : public IHostApplication
+			class VstHostApplication : public IHostApplication
 			{
 			public:
 				VstHostApplication(const std::wstring& name);
@@ -26,7 +29,6 @@ namespace Audio
 				tresult getName(String128 name);
 
 				tresult createInstance(TUID cid, TUID _iid, void** obj);
-
 
 			private:
 				unsigned int m_refCount;

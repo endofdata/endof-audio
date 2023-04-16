@@ -60,6 +60,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)..\vst3sdk;$(SolutionDir)..\vst3sdk\pluginterfaces\base;$(SolutionDir)..\vst3sdk\pluginterfaces\vst;$(SolutionDir)Audio.Foundation.Unmanaged;$(SolutionDir)Audio.Vst.Unmanaged;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -79,6 +80,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)..\vst3sdk;$(SolutionDir)..\vst3sdk\pluginterfaces\base;$(SolutionDir)..\vst3sdk\pluginterfaces\vst;$(SolutionDir)Audio.Foundation.Unmanaged;$(SolutionDir)Audio.Vst.Unmanaged;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -93,17 +95,23 @@
     <ClInclude Include="Audio.Vst.Unmanaged.h" />
     <ClInclude Include="AudioProcessor.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="IVstHost.h" />
+    <ClInclude Include="StrConv.h" />
+    <ClInclude Include="VstHost.h" />
+    <ClInclude Include="VstObjectFactory.h" />
     <ClInclude Include="ParameterChanges.h" />
     <ClInclude Include="ParamValueQueue.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PluginLibrary.h" />
     <ClInclude Include="VstCom.h" />
-    <ClInclude Include="VstHost.h" />
     <ClInclude Include="VstHostApplication.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioProcessor.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="StrConv.cpp" />
+    <ClCompile Include="VstHost.cpp" />
+    <ClCompile Include="VstObjectFactory.cpp" />
     <ClCompile Include="ParameterChanges.cpp" />
     <ClCompile Include="ParamValueQueue.cpp" />
     <ClCompile Include="pch.cpp">
@@ -111,7 +119,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PluginLibrary.cpp" />
-    <ClCompile Include="VstHost.cpp" />
     <ClCompile Include="VstHostApplication.cpp" />
   </ItemGroup>
   <ItemGroup>

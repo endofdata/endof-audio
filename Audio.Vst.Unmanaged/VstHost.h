@@ -1,5 +1,12 @@
 #pragma once
 #include <Audio.Vst.Unmanaged.h>
+#include "IVstHost.h"
+#include "PluginLibrary.h"
+#include <UnknownBase.h>
+#include <vector>
+
+using namespace Audio::Vst::Unmanaged::Abstractions;
+using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 namespace Audio
 {
@@ -7,14 +14,28 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class _AUDIO_VST_UNMANAGED_API VstHost
+			class VstHost : public IVstHost
 			{
 			public:
-				VstHost();
+				VstHost(IHostApplicationPtr& application, int sampleCount, double sampleRate);
 				virtual ~VstHost();
 
-				void AddLibrary(const wchar_t* pwcszPath);
+				const wchar_t* AddLibrary(const wchar_t* pwcszPath);
 
+				ISampleProcessorPtr CreateSampleProcessor(const wchar_t* pwcszPluginId);
+
+				DECLARE_IUNKNOWN
+
+			protected:
+				virtual bool GetInterface(REFIID riid, void** pResult);
+
+			private:
+				PluginLibraryPtr FindPlugin(const wchar_t* pwcszPluginId);
+
+				std::vector<PluginLibraryPtr> m_libraries;
+				IHostApplicationPtr m_application;
+				int m_sampleCount;
+				double m_sampleRate;
 			};
 		}
 	}

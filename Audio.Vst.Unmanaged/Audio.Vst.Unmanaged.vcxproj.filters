@@ -33,9 +33,6 @@
     <ClInclude Include="VstHostApplication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VstHost.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AudioProcessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -43,6 +40,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ParameterChanges.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VstObjectFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StrConv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IVstHost.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VstHost.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -59,9 +68,6 @@
     <ClCompile Include="VstHostApplication.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VstHost.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AudioProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -69,6 +75,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ParameterChanges.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VstObjectFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StrConv.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VstHost.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

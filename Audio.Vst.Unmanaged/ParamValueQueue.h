@@ -12,7 +12,7 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class _AUDIO_VST_UNMANAGED_API ParamValueQueue : public IParamValueQueue
+			class ParamValueQueue : public IParamValueQueue
 			{
 			public:
 				ParamValueQueue(const ParamID& id);
