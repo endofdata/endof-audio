@@ -1,14 +1,10 @@
 #include "pch.h"
 #include "CppUnitTest.h"
-#include <PluginLibrary.h>
-#include <VstHostApplication.h>
-#include <VstCom.h>
 #include "Constants.h"
+#include <VstObjectFactory.h>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Audio::Vst::Unmanaged;
-using namespace Steinberg;
-using namespace Steinberg::Vst;
 using namespace Test::Audio::Vst::Unmanaged;
 
 namespace TestAudioVst
@@ -20,13 +16,13 @@ namespace TestAudioVst
 		{
 			const wchar_t* pwcszLibName = L"C:\\Program Files\\Common Files\\VST3\\Unfiltered Audio Indent.vst3";
 
-			PluginLibrary library = PluginLibrary::LoadFrom(pwcszLibName);
+			IVstHostPtr host = VstObjectFactory::CreateVstHost(L"Ludger", Constants::SampleCount, Constants::SampleRate);
 
-			Assert::IsTrue(library.IsValid, L"Can load plugin library.");
+			std::wstring pluginId = host->AddLibrary(pwcszLibName);
 
-			IHostApplicationPtr application = new VstHostApplication(L"Ludger");
+			Assert::IsNotNull(pluginId.c_str(), L"Can load plugin library.");
 
-			ISampleProcessorPtr audioProcessor = library.CreateAudioProcessor(application, Constants::SampleCount, Constants::SampleRate);
+			ISampleProcessorPtr audioProcessor = host->CreateSampleProcessor(pluginId.c_str());
 
 			Assert::IsNotNull(audioProcessor.GetInterfacePtr(), L"Can create ISampleProcessor.");
 		}
