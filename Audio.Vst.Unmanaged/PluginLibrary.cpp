@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "PluginLibrary.h"
+#include "ParameterChanges.h"
 
 using namespace Audio::Vst::Unmanaged;
 
@@ -64,7 +65,7 @@ bool PluginLibrary::CreateFactory()
 	return false;
 }
 
-IAudioProcessorPtr PluginLibrary::CreateAudioProcessor(IHostApplicationPtr& context)
+ISampleProcessorPtr PluginLibrary::CreateAudioProcessor(IHostApplicationPtr& context, int sampleCount, int sampleRate)
 {
 	std::string audioModuleCategory = "Audio Module Class";
 	PClassInfoW classInfo;
@@ -87,7 +88,14 @@ IAudioProcessorPtr PluginLibrary::CreateAudioProcessor(IHostApplicationPtr& cont
 
 				if (kResultOk == component->queryInterface(reinterpret_cast<FIDString>(IAudioProcessor_iid), reinterpret_cast<void**>(&pProcRaw)))
 				{					
-					return IAudioProcessorPtr(pProcRaw, false);
+					IParameterChangesPtr paramChanges(new ParameterChanges());
+					IAudioProcessorPtr processor(pProcRaw, false);
+
+					auto processorWrapper = new AudioProcessor(processor, paramChanges, sampleCount, sampleRate);
+					ISampleProcessor* pSmpProcRaw = nullptr;
+					processorWrapper->QueryInterface(__uuidof(ISampleProcessor), reinterpret_cast<void**>(&pSmpProcRaw));
+
+					return ISampleProcessorPtr(pSmpProcRaw, false);
 				}
 			}
 		}

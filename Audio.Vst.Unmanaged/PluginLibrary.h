@@ -2,6 +2,7 @@
 #include <Audio.Vst.Unmanaged.h>
 #include <string>
 #include <VstCom.h>
+#include <AudioProcessor.h>
 #define WINDOWS_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
@@ -20,7 +21,7 @@ namespace Audio
 			public:
 				virtual ~PluginLibrary();
 
-				IAudioProcessorPtr CreateAudioProcessor(IHostApplicationPtr& context);
+				ISampleProcessorPtr CreateAudioProcessor(IHostApplicationPtr& context, int sampleCount, int sampleRate);
 
 				bool get_IsValid() const;
 				_declspec(property(get = get_IsValid)) bool IsValid;
