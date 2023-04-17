@@ -24,10 +24,6 @@ namespace Audio
 				void put_IsActive(bool value);
 				_declspec(property(get = get_IsActive, put = put_IsActive)) bool IsActive;
 
-				bool get_IsProcessing() const;
-				void put_IsProcessing(bool value);
-				_declspec(property(get = get_IsProcessing, put = put_IsProcessing)) bool IsProcessing;
-
 				bool get_IsBypassed();
 				void put_IsBypassed(bool value);
 
@@ -52,8 +48,10 @@ namespace Audio
 				Sample* m_pSamplePtr[2];
 
 				void InitProcessData(int sampleCount, int sampleRate);
+				bool ConfigureBusArrangements();
 				void UpdateProcessData(ISampleContainerPtr& container);
 
+				bool m_canProcess64Bit;
 				bool m_isBypassed;
 				bool m_isActive;
 			};

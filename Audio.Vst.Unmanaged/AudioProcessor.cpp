@@ -9,7 +9,8 @@ using namespace Steinberg;
 AudioProcessor::AudioProcessor(IAudioProcessorPtr& processor, IParameterChangesPtr& parameterChanges, int sampleCount, int sampleRate) :
 	m_processor(processor),
 	m_isActive(false),
-	m_isBypassed(true)
+	m_isBypassed(true),
+	m_canProcess64Bit(false)
 {
 	IComponent* pComponent = nullptr;
 	m_processor->queryInterface(IComponent_iid, reinterpret_cast<void**>(&pComponent));
@@ -85,12 +86,16 @@ void AudioProcessor::Initialize(int sampleCount, int sampleRate)
 	m_processor->setProcessing(false);
 	m_component->setActive(false);
 
+	m_canProcess64Bit = m_processor->canProcessSampleSize(kSample64) == kResultOk;
+
+	bool acceptBusArrangment = ConfigureBusArrangements();
+
 	InitProcessData(sampleCount, sampleRate);
 
 	ProcessSetup defaultSetup
 	{
 		kRealtime,
-		kSample64,
+		m_canProcess64Bit ? kSample64 : kSample32,
 		sampleCount,
 		sampleRate
 	};
@@ -98,6 +103,31 @@ void AudioProcessor::Initialize(int sampleCount, int sampleRate)
 	m_processor->setupProcessing(defaultSetup);
 
 	IsActive = true;
+}
+
+bool AudioProcessor::ConfigureBusArrangements()
+{
+	int componentInputBusCount = m_component->getBusCount(kAudio, kInput);
+	int componentOutputBusCount = m_component->getBusCount(kAudio, kOutput);
+
+	if (componentInputBusCount >= 1 && componentOutputBusCount >= 1)
+	{
+		SpeakerArrangement inputArrangement;
+		m_processor->getBusArrangement(kInput, 0, inputArrangement);
+		int inputChannels = SpeakerArr::getChannelCount(inputArrangement);
+
+		SpeakerArrangement outputArrangement;
+		m_processor->getBusArrangement(kOutput, 0, outputArrangement);
+		int outputChannels = SpeakerArr::getChannelCount(outputArrangement);
+
+		tresult acceptBusArrangement = m_processor->setBusArrangements(&inputArrangement, 1, &outputArrangement, 1);
+
+		if (acceptBusArrangement == kResultOk)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 int AudioProcessor::Process(ISampleContainerPtr& container, const ProcessingContext& context) 
@@ -114,8 +144,8 @@ void AudioProcessor::InitProcessData(int sampleCount, int sampleRate)
 	int componentOutputBusCount = m_component->getBusCount(kAudio, kOutput);
 
 	m_processData.numSamples = sampleCount;
-	m_inputBusBuffers.channelBuffers64 = m_pSamplePtr;
-	m_outputBusBuffers.channelBuffers64 = m_pSamplePtr;
+	m_inputBusBuffers.channelBuffers32 = m_pSamplePtr;
+	m_outputBusBuffers.channelBuffers32 = m_pSamplePtr;
 
 	m_processData.numInputs = std::min(componentInputBusCount, 1);
 	m_processData.numOutputs = std::min(componentOutputBusCount, 1);
