@@ -196,7 +196,7 @@ namespace Test.Audio.Asio
 					using WaveFile takeData = new(takeDataPath, format);
 
 					int done = 0;
-					var buffer = new double[512];
+					var buffer = new float[512];
 
 					foreach (var take in track.Takes)
 					{

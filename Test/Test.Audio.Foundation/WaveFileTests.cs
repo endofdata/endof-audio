@@ -24,14 +24,14 @@ namespace Test.Audio.Foundation
 				};
 
 				var file = new WaveFile(name, format);
-				var data = new double[1024];
+				var data = new float[1024];
 
 				try
 				{
-					var sampleMin = -1.0;
-					var sampleMax = 1.0;
+					var sampleMin = -1.0f;
+					var sampleMax = 1.0f;
 
-					var step = (double)(sampleMax - sampleMin) / data.Length;
+					var step = (float)(sampleMax - sampleMin) / data.Length;
 					var sample = sampleMin;
 
 					for (int i = 0; i < data.Length; i++)
@@ -61,7 +61,7 @@ namespace Test.Audio.Foundation
 
 					resultFile.MoveToSamples();
 
-					var resultData = new double[resultFormat.SampleCount];
+					var resultData = new float[resultFormat.SampleCount];
 
 					resultFile.ReadSamples(resultData, 0, resultData.Length);
 
