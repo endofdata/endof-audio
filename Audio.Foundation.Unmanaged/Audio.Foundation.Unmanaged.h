@@ -14,7 +14,7 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			typedef double Sample;
+			typedef float Sample;
 		}
 	}
 }
