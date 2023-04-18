@@ -34,7 +34,7 @@ void writeContents(ISampleContainerPtr& container)
 	}
 }
 
-static void runVstHost(AsioCorePtr& device, int countSelectedInputs)
+static void runVstHost(AsioCorePtr& device, int countSelectedInputs, double gain, double pan)
 {
 	// create processor chain input -> vst -> recorder -> output
 	IVstHostPtr host = VstObjectFactory::CreateVstHost(L"RepeatMyself", device->SampleCount, device->SampleRate);
@@ -60,14 +60,19 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs)
 		recorder->QueryInterface<ISampleProcessor>(&recordingProcessor);
 		recordingProcessor->IsBypassed = true;
 
-		IProcessingChainPtr processingChain = device->ProcessingChain;
-		//int vstId = processingChain->AddProcessor(vstProcessor);
-		int recorderId = processingChain->AddProcessor(recordingProcessor);
-
 		ISourceJoinerPtr joiner = ObjectFactory::CreateSourceJoiner();
 		ISampleProcessorPtr joiningProcessor = nullptr;
 		joiner->QueryInterface<ISampleProcessor>(&joiningProcessor);
+
+		ISpatialPtr spatial = ObjectFactory::CreateSpatial(gain, pan);
+		ISampleProcessorPtr spatialProcessor = nullptr;
+		spatial->QueryInterface<ISampleProcessor>(&spatialProcessor);
+
+		IProcessingChainPtr processingChain = device->ProcessingChain;
+		//int vstId = processingChain->AddProcessor(vstProcessor);
+		int recorderId = processingChain->AddProcessor(recordingProcessor);
 		int joinerId = processingChain->AddProcessor(joiningProcessor);
+		int spatialId = processingChain->AddProcessor(spatialProcessor);
 
 		processingChain->OutputChannelPair[0]->IsActive = true;
 
@@ -197,6 +202,9 @@ int main()
 	int selectedInputs[] = { 0 };
 	int selectedOutputs[] = { 0, 1 };
 	int sampleCount = 512;
+	float outputSaturation = 0.5f;
+	double gain = 0.75;
+	double pan = 0.5;
 
 	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 
@@ -215,9 +223,9 @@ int main()
 			device = AsioCore::CreateInstancePtr(IID_STEINBERG_UR_RT2);
 			//device = AsioCore::CreateInstancePtr(CLSID_AsioDebugDriver);
 
-			device->CreateBuffers(selectedInputs, _countof(selectedInputs), selectedOutputs, _countof(selectedOutputs), sampleCount);
+			device->CreateBuffers(selectedInputs, _countof(selectedInputs), selectedOutputs, _countof(selectedOutputs), sampleCount, outputSaturation);
 
-			runVstHost(device, _countof(selectedInputs));
+			runVstHost(device, _countof(selectedInputs), gain, pan);
 
 			std::wcout << L"Shutting down everything. Bye!" << std::endl;
 
