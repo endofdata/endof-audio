@@ -34,6 +34,164 @@ void writeContents(ISampleContainerPtr& container)
 	}
 }
 
+static void runVstHost(AsioCorePtr& device, int countSelectedInputs)
+{
+	// create processor chain input -> vst -> recorder -> output
+	IVstHostPtr host = VstObjectFactory::CreateVstHost(L"RepeatMyself", device->SampleCount, device->SampleRate);
+
+	// const wchar_t* pwcszLibName = L"C:\\Program Files\\Common Files\\VST3\\Unfiltered Audio Indent.vst3";
+	// const wchar_t* pwcszLibName = L"D:\\Gamer I5\\Documents\\Projects\\vst3sdk\\out\\build\\x64-Debug\\VST3\\Debug\\adelay.vst3\\Contents\\x86_64-win\\adelay.vst3";
+	const wchar_t* pwcszLibName = L"D:\\Gamer I5\\Documents\\Projects\\vst3sdk\\out\\build\\x64-Debug\\VST3\\Debug\\panner.vst3\\Contents\\x86_64-win\\panner.vst3";
+	const wchar_t* pluginIdRaw = host->AddLibrary(pwcszLibName);
+
+	if (pluginIdRaw == nullptr)
+	{
+		std::wcerr << L"Failed to load plugin '" << pwcszLibName << L"'." << std::endl;
+	}
+	else
+	{
+		std::wstring pluginId(pluginIdRaw);
+		ISampleProcessorPtr vstProcessor = host->CreateSampleProcessor(pluginId.c_str());
+		vstProcessor->IsBypassed = false;
+
+		float samplesPerTenSecs = device->SampleRate * 60.0f;
+		IRecorderPtr recorder = ObjectFactory::CreateRecorder(countSelectedInputs, (int)samplesPerTenSecs, (int)samplesPerTenSecs);
+		ISampleProcessorPtr recordingProcessor = nullptr;
+		recorder->QueryInterface<ISampleProcessor>(&recordingProcessor);
+		recordingProcessor->IsBypassed = true;
+
+		IProcessingChainPtr processingChain = device->ProcessingChain;
+		//int vstId = processingChain->AddProcessor(vstProcessor);
+		int recorderId = processingChain->AddProcessor(recordingProcessor);
+
+		ISourceJoinerPtr joiner = ObjectFactory::CreateSourceJoiner();
+		ISampleProcessorPtr joiningProcessor = nullptr;
+		joiner->QueryInterface<ISampleProcessor>(&joiningProcessor);
+		int joinerId = processingChain->AddProcessor(joiningProcessor);
+
+		processingChain->OutputChannelPair[0]->IsActive = true;
+
+		ITransportPtr transport = processingChain->Transport;
+		TransportControlPtr transportControl = TransportControl::Create(transport);
+
+		if (transportControl == nullptr)
+		{
+			std::wcerr << L"TransportControl initialization failed." << std::endl;
+		}
+		else
+		{
+			bool isRecordPressed = false;
+			int dubCount = 1;
+
+			// start audio device
+			device->Start();
+
+			// activate processing
+			transportControl->IsActive = true;
+
+			TransportCode transportStatus = TransportCode::None;
+
+			while (transportStatus != TransportCode::Stop)
+			{
+				std::wcout << transport->HostClock->CurrentTime.ToString() << '\r';
+
+				// check for control input (MIDI)
+				if (transportControl->GetNext(1000, transportStatus))
+				{
+					switch (transportStatus)
+					{
+					case TransportCode::Record:
+						if (!transport->IsLooping)
+						{
+							// Initial loop recording
+							if (recordingProcessor->IsBypassed)
+							{
+								// Step 1: press record to start
+								processingChain->InputChannel[0]->IsActive = true;
+								recordingProcessor->IsBypassed = false;
+								transport->Start();
+								std::wcout << L"Record" << std::endl;
+							}
+							else
+							{
+								// Step 2: press record again to stop recording and begin loop
+								AudioTime switchTime = transport->HostClock->CurrentTime;
+
+								ISampleContainerPtr take = recorder->CreateSampleContainer(false);
+								ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take);
+								takeSource->IsLooping = true;
+								joiner->AddSource(takeSource);
+
+								std::wcout << L"Loop length " << switchTime.ToString() << std::endl;
+								transport->LoopEnd = switchTime;
+								transport->IsLooping = true;
+							}
+						}
+						else
+						{
+							// Toggle recording start / end with next loop wrap
+							isRecordPressed = !isRecordPressed;
+							std::wcout << (isRecordPressed ? L"Standby" : L"Rehearse") << std::endl;
+						}
+						break;
+					case TransportCode::Locate:
+						// Triggered by master loop wrap: delayed handling of 'Record' commands
+						if (isRecordPressed)
+						{
+							isRecordPressed = false;
+
+							if (recordingProcessor->IsBypassed)
+							{
+								// Step n: start overdub
+								recordingProcessor->IsBypassed = false;
+								std::wcout << L"Start overdub " << ++dubCount << std::endl;
+							}
+							else
+							{
+								// Step n + 1: stop overdub and add loop
+								AudioTime switchTime = transport->HostClock->CurrentTime;
+
+								ISampleContainerPtr take = recorder->CreateSampleContainer(false);
+								ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take);
+								takeSource->IsLooping = true;
+								joiner->AddSource(takeSource);
+
+								std::wcout << L"Accept overdub " << dubCount;
+								if (switchTime > transport->LoopEnd)
+								{
+									std::wcout << L", loop length adjusted to " << switchTime.ToString();
+									transport->LoopEnd = switchTime;
+								}
+								std::wcout << std::endl;
+							}
+						}
+						break;
+					case TransportCode::Start:
+						// Drop current recording, continue looping
+						recorder->DropRecording(false);
+						std::wcout << L"Drop overdub " << dubCount << std::endl;
+						dubCount--;
+						break;
+
+					case TransportCode::Stop:
+						transport->Stop();
+						if (!recordingProcessor->IsBypassed)
+						{
+							recorder->DropRecording(false);
+							std::wcout << L"Drop overdub " << dubCount << std::endl;
+							dubCount--;
+						}
+						std::wcout << L"Transport stopped." << std::endl;
+						break;
+					default:
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
 int main()
 {
 	int selectedInputs[] = { 0 };
@@ -59,167 +217,15 @@ int main()
 
 			device->CreateBuffers(selectedInputs, _countof(selectedInputs), selectedOutputs, _countof(selectedOutputs), sampleCount);
 
-			float samplesPerTenSecs = device->SampleRate * 60.0f;
+			runVstHost(device, _countof(selectedInputs));
 
-			// create processor chain input -> vst -> recorder -> output
-			IVstHostPtr host = VstObjectFactory::CreateVstHost(L"RepeatMyself", device->SampleCount, device->SampleRate);
+			std::wcout << L"Shutting down everything. Bye!" << std::endl;
 
-			// const wchar_t* pwcszLibName = L"C:\\Program Files\\Common Files\\VST3\\Unfiltered Audio Indent.vst3";
-			const wchar_t* pwcszLibName = L"D:\\Gamer I5\\Documents\\Projects\\vst3sdk\\out\\build\\x64-Debug\\VST3\\Debug\\adelay.vst3\\Contents\\x86_64-win\\adelay.vst3";
-			const wchar_t* pluginIdRaw = host->AddLibrary(pwcszLibName);
+			device->Stop();
 
-			if (pluginIdRaw == nullptr)
-			{
-				std::wcerr << L"Failed to load plugin '" << pwcszLibName << L"'." << std::endl;
-			}
-			else
-			{
-				std::wstring pluginId(pluginIdRaw);
-				ISampleProcessorPtr vstProcessor = host->CreateSampleProcessor(pluginId.c_str());
-				vstProcessor->IsBypassed = false;
-
-				IRecorderPtr recorder = ObjectFactory::CreateRecorder(_countof(selectedInputs), (int)samplesPerTenSecs, (int)samplesPerTenSecs);
-				ISampleProcessorPtr recordingProcessor = nullptr;
-				recorder->QueryInterface<ISampleProcessor>(&recordingProcessor);
-				recordingProcessor->IsBypassed = true;
-
-				IProcessingChainPtr processingChain = device->ProcessingChain;
-				ITransportPtr transport = processingChain->Transport;
-				int vstId = processingChain->AddProcessor(vstProcessor);
-				int recorderId = processingChain->AddProcessor(recordingProcessor);
-
-				ISourceJoinerPtr joiner = ObjectFactory::CreateSourceJoiner();
-				ISampleProcessorPtr joiningProcessor = nullptr;
-				joiner->QueryInterface<ISampleProcessor>(&joiningProcessor);
-				int joinerId = processingChain->AddProcessor(joiningProcessor);
-
-				processingChain->OutputChannelPair[0]->IsActive = true;
-
-				TransportControlPtr transportControl = TransportControl::Create(transport);
-
-				if (transportControl == nullptr)
-				{
-					std::wcerr << L"TransportControl initialization failed." << std::endl;
-				}
-				else
-				{
-					bool isRecordPressed = false;
-					int dubCount = 1;
-
-					// start audio device
-					device->Start();
-
-					// activate processing
-					transportControl->IsActive = true;
-
-					TransportCode transportStatus = TransportCode::None;
-
-					while (transportStatus != TransportCode::Stop)
-					{
-						std::wcout << transport->HostClock->CurrentTime.ToString() << '\r';
-
-						// check for control input (MIDI)
-						if (transportControl->GetNext(1000, transportStatus))
-						{
-							switch (transportStatus)
-							{
-							case TransportCode::Record:
-								if (!transport->IsLooping)
-								{
-									// Initial loop recording
-									if (recordingProcessor->IsBypassed)
-									{
-										// Step 1: press record to start
-										processingChain->InputChannel[0]->IsActive = true;
-										recordingProcessor->IsBypassed = false;
-										transport->Start();
-										std::wcout << L"Record" << std::endl;
-									}
-									else
-									{
-										// Step 2: press record again to stop recording and begin loop
-										AudioTime switchTime = transport->HostClock->CurrentTime;
-
-										ISampleContainerPtr take = recorder->CreateSampleContainer(false);
-										ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take);
-										takeSource->IsLooping = true;
-										joiner->AddSource(takeSource);
-
-										std::wcout << L"Loop length " << switchTime.ToString() << std::endl;
-										transport->LoopEnd = switchTime;
-										transport->IsLooping = true;
-									}
-								}
-								else
-								{
-									// Toggle recording start / end with next loop wrap
-									isRecordPressed = !isRecordPressed;
-									std::wcout << (isRecordPressed ? L"Standby" : L"Rehearse") << std::endl;
-								}
-								break;
-							case TransportCode::Locate:
-								// Triggered by master loop wrap: delayed handling of 'Record' commands
-								if (isRecordPressed)
-								{
-									isRecordPressed = false;
-
-									if (recordingProcessor->IsBypassed)
-									{
-										// Step n: start overdub
-										recordingProcessor->IsBypassed = false;
-										std::wcout << L"Start overdub " << ++dubCount << std::endl;
-									}
-									else
-									{
-										// Step n + 1: stop overdub and add loop
-										AudioTime switchTime = transport->HostClock->CurrentTime;
-
-										ISampleContainerPtr take = recorder->CreateSampleContainer(false);
-										ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take);
-										takeSource->IsLooping = true;
-										joiner->AddSource(takeSource);
-
-										std::wcout << L"Accept overdub " << dubCount;
-										if (switchTime > transport->LoopEnd)
-										{
-											std::wcout << L", loop length adjusted to " << switchTime.ToString();
-											transport->LoopEnd = switchTime;
-										}
-										std::wcout << std::endl;
-									}
-								}
-								break;
-							case TransportCode::Start:
-								// Drop current recording, continue looping
-								recorder->DropRecording(false);
-								std::wcout << L"Drop overdub " << dubCount << std::endl;
-								dubCount--;
-								break;
-
-							case TransportCode::Stop:
-								transport->Stop();
-								if (!recordingProcessor->IsBypassed)
-								{
-									recorder->DropRecording(false);
-									std::wcout << L"Drop overdub " << dubCount << std::endl;
-									dubCount--;
-								}
-								std::wcout << L"Transport stopped." << std::endl;
-								break;
-							default:
-								break;
-							}
-						}
-					}
-
-					std::wcout << L"Shutting down everything. Bye!" << std::endl;
-
-					device->Stop();
-
-					// Ensure that processors can be released before the VST plugin libraries are unloaded
-					processingChain->RemoveAllProcessors();
-				}
-			}
+			// Ensure that processors can be released before the VST plugin libraries are unloaded
+			//processingChain->RemoveAllProcessors();
+			//host->RemoveAllLibraries();
 		}
 		catch (const AsioCoreException& acx)
 		{

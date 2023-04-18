@@ -102,7 +102,7 @@ void TransportControl::OnTransport(void* pContext, TransportCode code)
 
 bool onDeviceCaps(unsigned int id, const MIDIINCAPS& devcaps)
 {
-	auto name = StrConv::ToUtf8(devcaps.szPname);
+	std::string name = StrConv::ToUtf8(devcaps.szPname);
 
 	std::cout << "Input ID " << id << " '" << name.c_str() << "'" << std::endl;
 
@@ -113,6 +113,7 @@ bool onDeviceCaps(unsigned int id, const MIDIINCAPS& devcaps)
 	{
 		std::cout << "Selected MIDI input device ID '" << id  << "'" << std::endl;
 	}
+	
 	return isSelected;
 }
 
