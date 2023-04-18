@@ -41,8 +41,6 @@ bool SourceJoiner::GetInterface(REFIID iid, void** ppvResult)
 
 void SourceJoiner::AddSource(ISampleSourcePtr& Source)
 {
-	Source.AddRef();
-
 	// do not allow two sends to the same destination
 	RemoveSource(Source);
 
