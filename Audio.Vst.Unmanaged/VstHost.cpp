@@ -43,6 +43,11 @@ const wchar_t* VstHost::AddLibrary(const wchar_t* pwcszPath)
 	return nullptr;
 }
 
+void VstHost::RemoveAllLibraries()
+{
+	m_libraries.clear();
+}
+
 ISampleProcessorPtr VstHost::CreateSampleProcessor(const wchar_t* pwcszPluginId)
 {
 	PluginLibraryPtr plugin = FindPlugin(pwcszPluginId);

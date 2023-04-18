@@ -320,8 +320,8 @@ void AsioCore::CreateInputChannels(int offset, int count)
 				m_pHwBufferInfo[iIdx].buffers[1],
 				SampleCount);
 
-			if (nullptr == input)
-				throw AsioCoreException("AsioCore: Not enough memory for InputChannel instance.", E_OUTOFMEMORY);
+			if (nullptr == input.GetInterfacePtr())
+				throw AsioCoreException("AsioCore: Failed to create InputChannel instance.", E_OUTOFMEMORY);
 
 			m_processingChain->AddInput(input);
 		}
@@ -362,8 +362,8 @@ void AsioCore::CreateOutputChannels(int offset, int count)
 				m_pHwBufferInfo[iIdx + 1].buffers[1],
 				SampleCount);
 
-			if (outputPair == nullptr)
-				throw AsioCoreException("AsioCore: Not enough memory for OutputChannelPair instance.", E_OUTOFMEMORY);
+			if (outputPair.GetInterfacePtr() == nullptr)
+				throw AsioCoreException("AsioCore: Failed to create OutputChannelPair instance.", E_OUTOFMEMORY);
 
 			m_processingChain->AddOutputPair(outputPair);
 		}

@@ -3,13 +3,13 @@
 
 using namespace Audio::Vst::Unmanaged;
 
-std::wstring StrConv::ToUtf16(const char* pcszValue)
+wchar_t* StrConv::AllocAsUtf16(const char* pcszValue)
 {
 	int sizeRequired = MultiByteToWideChar(CP_UTF8, 0, pcszValue, -1, NULL, 0);
 
 	if (sizeRequired <= 0)
 	{
-		return std::wstring();
+		return nullptr;
 	}
 
 	wchar_t* pwcszValue = reinterpret_cast<wchar_t*>(std::calloc(sizeRequired, sizeof(wchar_t)));
@@ -20,19 +20,17 @@ std::wstring StrConv::ToUtf16(const char* pcszValue)
 	}
 	MultiByteToWideChar(CP_UTF8, 0, pcszValue, -1, pwcszValue, sizeRequired);
 
-	return std::wstring(pwcszValue);
+	return pwcszValue;
 }
 
-
-
-std::string StrConv::ToUtf8(const wchar_t* pwcszValue)
+char* StrConv::AllocAsUtf8(const wchar_t* pwcszValue)
 {
 	BOOL usedDefaultChar = FALSE;
 	int sizeRequired = WideCharToMultiByte(CP_UTF8, 0, pwcszValue, -1, NULL, 0, 0, &usedDefaultChar);
 
 	if (sizeRequired <= 0)
 	{
-		return std::string();
+		return nullptr;
 	}
 
 	char* pcszValue = reinterpret_cast<char*>(std::calloc(sizeRequired, sizeof(char)));
@@ -43,7 +41,7 @@ std::string StrConv::ToUtf8(const wchar_t* pwcszValue)
 	}
 	WideCharToMultiByte(CP_UTF8, 0, pwcszValue, -1, pcszValue, sizeRequired, 0, &usedDefaultChar);
 
-	return std::string(pcszValue);
+	return pcszValue;
 }
 
 

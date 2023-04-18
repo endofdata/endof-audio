@@ -79,16 +79,22 @@ void ProcessingChain::OnNextBuffer(bool writeSecondHalf)
 
 void ProcessingChain::AddInput(IInputChannelPtr& input)
 {
-	const std::lock_guard<std::mutex> lock(m_processing_mutex);
+	if (input.GetInterfacePtr() != nullptr)
+	{
+		const std::lock_guard<std::mutex> lock(m_processing_mutex);
 
-	m_inputChannels.push_back(input);
+		m_inputChannels.push_back(input);
+	}
 }
 
 void ProcessingChain::AddOutputPair(IOutputChannelPairPtr& output)
 {
-	const std::lock_guard<std::mutex> lock(m_processing_mutex);
+	if (output.GetInterfacePtr() != nullptr)
+	{
+		const std::lock_guard<std::mutex> lock(m_processing_mutex);
 
-	m_outputChannelPairs.push_back(output);
+		m_outputChannelPairs.push_back(output);
+	}
 }
 
 

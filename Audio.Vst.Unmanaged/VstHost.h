@@ -22,6 +22,8 @@ namespace Audio
 
 				const wchar_t* AddLibrary(const wchar_t* pwcszPath);
 
+				void RemoveAllLibraries();
+
 				ISampleProcessorPtr CreateSampleProcessor(const wchar_t* pwcszPluginId);
 
 				DECLARE_IUNKNOWN

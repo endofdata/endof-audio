@@ -11,18 +11,36 @@ namespace Audio
 			class _AUDIO_VST_UNMANAGED_API StrConv
 			{
 			public:
-				static std::wstring ToUtf16(const char* pcszValue);
+				static wchar_t* AllocAsUtf16(const char* pcszValue);
 
-				std::wstring ToUtf16(const std::string& value)
+				static std::wstring ToUtf16(const std::string& value)
 				{
-					return ToUtf16(value.c_str());
+					auto alloced = AllocAsUtf16(value.c_str());
+					if (alloced != nullptr)
+					{
+						// is there no way to let wstring take ownership?
+						auto result = std::wstring(alloced);
+						std::free(alloced);
+
+						return result;
+					}
+					return std::wstring();
 				}
 
-				static std::string ToUtf8(const wchar_t* pwcszValue);
+				static char* AllocAsUtf8(const wchar_t* pwcszValue);
 
-				std::string ToUtf8(const std::wstring& value)
+				static std::string ToUtf8(const std::wstring& value)
 				{
-					return ToUtf8(value.c_str());
+					auto alloced = AllocAsUtf8(value.c_str());
+					if (alloced != nullptr)
+					{
+						// is there no way to let string take ownership?
+						auto result = std::string(alloced);
+						std::free(alloced);
+
+						return result;
+					}
+					return std::string();
 				}
 
 			private:

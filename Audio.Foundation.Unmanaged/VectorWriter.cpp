@@ -29,11 +29,12 @@ VectorWriter::VectorWriter(int channelCount, int initialSize, int growth) :
 	{
 		m_growth = m_initial;
 	}
-	InitializeBuffers();
+	AllocBuffers();
 }
 
 VectorWriter::~VectorWriter()
 {
+	FreeBuffers();
 }
 
 IMPLEMENT_IUNKNOWN(VectorWriter)
@@ -136,7 +137,7 @@ void VectorWriter::DropRecording(bool continueRecording)
 
 		const std::lock_guard<std::recursive_mutex> lock(m_buffers_mutex);
 
-		m_buffers.clear();
+		FreeBuffers();
 
 		if (continueRecording)
 		{
@@ -145,8 +146,12 @@ void VectorWriter::DropRecording(bool continueRecording)
 	}
 }
 
-void VectorWriter::InitializeBuffers()
+void VectorWriter::AllocBuffers()
 {
+	const std::lock_guard<std::recursive_mutex> lock(m_buffers_mutex);
+
+	FreeBuffers();
+
 	m_buffers.reserve(m_channelCount);
 
 	for (int i = 0; i < m_channelCount; i++)
@@ -155,6 +160,17 @@ void VectorWriter::InitializeBuffers()
 	}
 	m_avail = m_initial;
 	m_inUse = 0;
+}
+
+void VectorWriter::FreeBuffers()
+{
+	const std::lock_guard<std::recursive_mutex> lock(m_buffers_mutex);
+
+	for (auto&& pSamples : m_buffers)
+	{
+		std::free(pSamples);
+	}
+	m_buffers.clear();
 }
 
 bool VectorWriter::get_IsBypassed()
@@ -170,7 +186,7 @@ void VectorWriter::put_IsBypassed(bool value)
 		{
 			const std::lock_guard<std::recursive_mutex> lock(m_buffers_mutex);
 
-			InitializeBuffers();
+			AllocBuffers();
 		}
 		m_isBypassed = value;
 	}

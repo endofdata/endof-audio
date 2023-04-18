@@ -20,6 +20,8 @@ namespace Audio
 				{
 					const wchar_t* AddLibrary(const wchar_t* pwcszPath) = 0;
 
+					void RemoveAllLibraries() = 0;
+
 					ISampleProcessorPtr CreateSampleProcessor(const wchar_t* pwcszPluginId) = 0;
 				};
 

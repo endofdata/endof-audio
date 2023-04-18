@@ -32,7 +32,8 @@ namespace Audio
 
 			protected:
 				virtual bool GetInterface(REFIID riid, void** pResult);
-				void InitializeBuffers();
+				void AllocBuffers();
+				void FreeBuffers();
 
 			private:
 				int m_channelCount;
