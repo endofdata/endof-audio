@@ -131,7 +131,7 @@ namespace Audio
 					\param[in] maxValue		Maximum sample value (usually 1.0f)
 					\return					32-bit int little endian sample
 				*/
-				static inline int SaturatedConvertInt32(Sample value, Sample maxValue)
+				static inline int SampleToSaturatedInt32(Sample value, Sample maxValue)
 				{
 					return static_cast<int>(Saturated(value, maxValue) * SampleToInt32Factor);
 				}
@@ -142,7 +142,7 @@ namespace Audio
 					\param[in] maxValue		Maximum sample value (usually 1.0f)
 					\return					24-bit int little endian sample
 				*/
-				static inline int SaturatedConvertInt24(Sample value, Sample maxValue)
+				static inline int SampleToSaturatedInt24(Sample value, Sample maxValue)
 				{
 					return static_cast<int>(Saturated(value, maxValue) * SampleToInt24Factor);
 				}
@@ -153,7 +153,7 @@ namespace Audio
 					\param[in] maxValue		Maximum sample value (usually 1.0f)
 					\return					16-bit int little endian sample
 				*/
-				static inline int SaturatedConvertInt16(Sample value, Sample maxValue)
+				static inline int SampleToSaturatedInt16(Sample value, Sample maxValue)
 				{
 					return static_cast<int>(Saturated(value, maxValue) * SampleToInt16Factor);
 				}
@@ -164,7 +164,7 @@ namespace Audio
 					\param[in] maxValue		Maximum sample value (usually 1.0f)
 					\return					32-bit float little endian sample
 				*/
-				static inline float SaturatedConvertFloat32(Sample value, Sample maxValue)
+				static inline float SampleToSaturatedFloat32(Sample value, Sample maxValue)
 				{
 					return static_cast<float>(Saturated(value, maxValue));
 				}

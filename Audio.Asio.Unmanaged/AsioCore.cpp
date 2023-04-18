@@ -239,7 +239,7 @@ void AsioCore::SelectSampleRate()
 	}
 }
 
-void AsioCore::CreateBuffers(const int inputChannelIds[], int numInputIds, const int outputChannelIds[], int numOutputIds, int sampleCount)
+void AsioCore::CreateBuffers(const int inputChannelIds[], int numInputIds, const int outputChannelIds[], int numOutputIds, int sampleCount, float outputSaturation)
 {
 	int requestedBufferSize = 0;
 
@@ -343,7 +343,7 @@ int AsioCore::MapSampleType(ASIOSampleType asioSampleType)
 	}
 }
 
-void AsioCore::CreateOutputChannels(int offset, int count)
+void AsioCore::CreateOutputChannels(int offset, int count, float saturation)
 {
 	int pairCount = count / 2;
 
@@ -360,7 +360,8 @@ void AsioCore::CreateOutputChannels(int offset, int count)
 				m_pHwBufferInfo[iIdx + 1].channelNum,
 				m_pHwBufferInfo[iIdx + 1].buffers[0],
 				m_pHwBufferInfo[iIdx + 1].buffers[1],
-				SampleCount);
+				SampleCount,
+				true);
 
 			if (outputPair.GetInterfacePtr() == nullptr)
 				throw AsioCoreException("AsioCore: Failed to create OutputChannelPair instance.", E_OUTOFMEMORY);

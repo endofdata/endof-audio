@@ -195,6 +195,21 @@
     <ClInclude Include="ProcessingContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SatOutputInt32ChannelPair.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SatOutputFloat32ChannelPair.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SatOutputInt24ChannelPair.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GainProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ISpatial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -285,6 +300,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ProcessingContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GainProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

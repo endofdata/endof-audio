@@ -103,6 +103,7 @@
     <ClInclude Include="ContainerWriter.h" />
     <ClInclude Include="FileReader.h" />
     <ClInclude Include="FileWriter.h" />
+    <ClInclude Include="GainProcessor.h" />
     <ClInclude Include="HostClock.h" />
     <ClInclude Include="IHostClock.h" />
     <ClInclude Include="IInputChannel.h" />
@@ -122,6 +123,7 @@
     <ClInclude Include="ISampleSharer.h" />
     <ClInclude Include="ISampleProcessor.h" />
     <ClInclude Include="ISampleSource.h" />
+    <ClInclude Include="ISpatial.h" />
     <ClInclude Include="ITake.h" />
     <ClInclude Include="ITakeSequence.h" />
     <ClInclude Include="ITransport.h" />
@@ -142,6 +144,9 @@
     <ClInclude Include="SampleContainer.h" />
     <ClInclude Include="SampleContainerSpan.h" />
     <ClInclude Include="SampleConversionUnmanaged.h" />
+    <ClInclude Include="SatOutputFloat32ChannelPair.h" />
+    <ClInclude Include="SatOutputInt24ChannelPair.h" />
+    <ClInclude Include="SatOutputInt32ChannelPair.h" />
     <ClInclude Include="SourceJoiner.h" />
     <ClInclude Include="SampleSharer.h" />
     <ClInclude Include="framework.h" />
@@ -166,6 +171,7 @@
     <ClCompile Include="ContainerWriter.cpp" />
     <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="FileWriter.cpp" />
+    <ClCompile Include="GainProcessor.cpp" />
     <ClCompile Include="HostClock.cpp" />
     <ClCompile Include="MeterChannel.cpp" />
     <ClCompile Include="MidiEvents.cpp" />

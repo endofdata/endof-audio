@@ -16,8 +16,11 @@
 #include "InputInt24Channel.h"
 #include "InputFloat32Channel.h"
 #include "OutputInt32ChannelPair.h"
+#include "SatOutputInt32ChannelPair.h"
 #include "OutputInt24ChannelPair.h"
+#include "SatOutputInt24ChannelPair.h"
 #include "OutputFloat32ChannelPair.h"
+#include "SatOutputFloat32ChannelPair.h"
 #include "AudioFoundationException.h"
 #include "ProcessingChain.h"
 #include "SourceProcessor.h"
@@ -26,6 +29,7 @@
 #include "MidiEvents.h"
 #include "Transport.h"
 #include "TransportEvents.h"
+#include "GainProcessor.h"
 #include <stdexcept>
 
 int ObjectFactory::LastTakeId = 0;
@@ -71,6 +75,11 @@ ISampleProcessorPtr ObjectFactory::CreateToStreamProcessor(std::ostream& output)
 ISampleProcessorPtr ObjectFactory::CreateToContainerProcessor(ISampleContainerPtr& target)
 {
 	return new ContainerWriter(target);
+}
+
+ISpatialPtr ObjectFactory::CreateSpatial(double level, double pan)
+{
+	return new GainProcessor(level, pan);
 }
 
 IRecorderPtr ObjectFactory::CreateRecorder(int channelCount, int initialSize, int growth)
@@ -131,30 +140,55 @@ IInputChannelPtr ObjectFactory::CreateInputChannel(int sampleType, int hwChannel
 	switch (sampleType)
 	{
 	case Int32LSB:
-		return new InputInt32Channel(hwChannelId, (int*)pHwBufferA, (int*)pHwBufferB, sampleCount);
+		return new InputInt32Channel(hwChannelId, reinterpret_cast<int*>(pHwBufferA), reinterpret_cast<int*>(pHwBufferB), sampleCount);
 	case Int24LSB:
-		return new InputInt24Channel(hwChannelId, (byte*)pHwBufferA, (byte*)pHwBufferB, sampleCount);
+		return new InputInt24Channel(hwChannelId, reinterpret_cast<byte*>(pHwBufferA), reinterpret_cast<byte*>(pHwBufferB), sampleCount);
 	case Float32LSB:
-		return new InputFloat32Channel(hwChannelId, (float*)pHwBufferA, (float*)pHwBufferB, sampleCount);
+		return new InputFloat32Channel(hwChannelId, reinterpret_cast<float*>(pHwBufferA), reinterpret_cast<float*>(pHwBufferB), sampleCount);
 	default:
 		throw AudioFoundationException("Unsupported sample type.", E_UNEXPECTED);
 	}
 }
 
-IOutputChannelPairPtr ObjectFactory::CreateOutputChannelPair(int sampleType, int hwChannelId1, void* pBufferA1, void* pBufferB1, int hwChannelId2, void* pBufferA2, void* pBufferB2, int sampleCount)
+IOutputChannelPairPtr ObjectFactory::CreateOutputChannelPair(int sampleType, int hwChannelId1, void* pBufferA1, void* pBufferB1, 
+	int hwChannelId2, void* pBufferA2, void* pBufferB2, int sampleCount, float saturation)
 {
 	IOutputChannelPairPtr outputPair = nullptr;
 
 	switch (sampleType)
 	{
 	case Int32LSB:
-		outputPair = new OutputInt32ChannelPair(hwChannelId1, (int*)pBufferA1, (int*)pBufferB1, hwChannelId2, (int*)pBufferA2, (int*)pBufferB2, sampleCount);
+		outputPair = saturation > 0.0f? 
+			reinterpret_cast<IOutputChannelPair*>(new SatOutputInt32ChannelPair(
+				hwChannelId1, reinterpret_cast<int*>(pBufferA1), reinterpret_cast<int*>(pBufferB1), 
+				hwChannelId2, reinterpret_cast<int*>(pBufferA2), reinterpret_cast<int*>(pBufferB2), 
+				sampleCount, saturation)) :
+			new OutputInt32ChannelPair(
+				hwChannelId1, reinterpret_cast<int*>(pBufferA1), reinterpret_cast<int*>(pBufferB1), 
+				hwChannelId2, reinterpret_cast<int*>(pBufferA2), reinterpret_cast<int*>(pBufferB2), 
+				sampleCount);
 		break;
 	case Int24LSB:
-		outputPair = new OutputInt24ChannelPair(hwChannelId1, (byte*)pBufferA1, (byte*)pBufferB1, hwChannelId2, (byte*)pBufferA2, (byte*)pBufferB2, sampleCount);
+		outputPair = saturation > 0.0f ?
+			reinterpret_cast<IOutputChannelPair*>(new SatOutputInt24ChannelPair(
+				hwChannelId1, reinterpret_cast<byte*>(pBufferA1), reinterpret_cast<byte*>(pBufferB1), 
+				hwChannelId2, reinterpret_cast<byte*>(pBufferA2), reinterpret_cast<byte*>(pBufferB2), 
+				sampleCount, saturation)) :
+			new OutputInt24ChannelPair(
+				hwChannelId1, reinterpret_cast<byte*>(pBufferA1), reinterpret_cast<byte*>(pBufferB1), 
+				hwChannelId2, reinterpret_cast<byte*>(pBufferA2), reinterpret_cast<byte*>(pBufferB2), 
+				sampleCount);
 		break;
 	case Float32LSB:
-		outputPair = new OutputFloat32ChannelPair(hwChannelId1, (float*)pBufferA1, (float*)pBufferB1, hwChannelId2, (float*)pBufferA2, (float*)pBufferB2, sampleCount);
+		outputPair = saturation > 0.0f ?
+			reinterpret_cast<IOutputChannelPair*>(new SatOutputFloat32ChannelPair(
+				hwChannelId1, reinterpret_cast<float*>(pBufferA1), reinterpret_cast<float*>(pBufferB1), 
+				hwChannelId2, reinterpret_cast<float*>(pBufferA2), reinterpret_cast<float*>(pBufferB2), 
+				sampleCount, saturation)) :
+			new OutputFloat32ChannelPair(
+				hwChannelId1, reinterpret_cast<float*>(pBufferA1), reinterpret_cast<float*>(pBufferB1), 
+				hwChannelId2, reinterpret_cast<float*>(pBufferA2), reinterpret_cast<float*>(pBufferB2), 
+				sampleCount);
 		break;
 	default:
 		throw AudioFoundationException("Unsupported sample type.", E_UNEXPECTED);

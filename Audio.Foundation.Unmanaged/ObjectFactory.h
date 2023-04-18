@@ -17,6 +17,7 @@
 #include <IMidiEvents.h>
 #include <IRecorder.h>
 #include <ITransport.h>
+#include <ISpatial.h>
 #include <string>
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -46,6 +47,8 @@ namespace Audio
 
 				static ISampleProcessorPtr CreateToContainerProcessor(ISampleContainerPtr& target);
 
+				static ISpatialPtr CreateSpatial(double level = 1.0f, double pan = 0.5f);
+
 				static IRecorderPtr CreateRecorder(int channelCount, int initialSize, int growth);
 
 				static ISampleSourcePtr CreateRawFileSource(const std::string& filename, int channelCount);
@@ -67,7 +70,7 @@ namespace Audio
 				static IInputChannelPtr CreateInputChannel(int sampleType, int hwChannelId, void* pHwBufferA, void* pHwBufferB, int sampleCount);
 
 				static IOutputChannelPairPtr CreateOutputChannelPair(int sampleTpe,
-					int hwChannelId1, void* pBufferA1, void* pBufferB1, int hwChannelId2, void* pBufferA2, void* pBufferB2, int sampleCount);
+					int hwChannelId1, void* pBufferA1, void* pBufferB1, int hwChannelId2, void* pBufferA2, void* pBufferB2, int sampleCount, float saturation = 0.0f);
 
 				static IProcessingChainPtr CreateProcessingChain(ITransportPtr& transport, ISampleContainerPtr& container);
 
