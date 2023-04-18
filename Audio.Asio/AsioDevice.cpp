@@ -177,6 +177,25 @@ void AsioDevice::IsPoweredOn::set(Boolean value)
 	}
 }
 
+float AsioDevice::OutputSaturation::get()
+{
+	return m_outputSaturation;
+}
+
+void AsioDevice::OutputSaturation::set(float value)
+{
+	if (value != m_outputSaturation)
+	{
+		bool wasPoweredOn = IsPoweredOn;
+		IsPoweredOn = false;
+
+		ActivateChannels();
+		OnPropertyChanged(OutputSaturationProperty);
+
+		IsPoweredOn = wasPoweredOn;
+	}
+}
+
 System::Collections::Generic::IDictionary<int, String^>^ AsioDevice::AvailableInputChannels::get()
 {
 	Dictionary<int, String^>^ result = gcnew Dictionary<int, String^>;
@@ -243,5 +262,5 @@ void AsioDevice::ActivateChannels()
 	pin_ptr<int> pInputIds = inputChannelIds->Length > 0? &inputChannelIds[0] : nullptr;
 	pin_ptr<int> pOutputIds = outputChannelIds->Length > 0? &outputChannelIds[0] : nullptr;
 
-	m_pCore->CreateBuffers(pInputIds, inputChannelIds->Length, pOutputIds, outputChannelIds->Length, AsioCore::UsePreferredSize);
+	m_pCore->CreateBuffers(pInputIds, inputChannelIds->Length, pOutputIds, outputChannelIds->Length, AsioCore::UsePreferredSize, m_outputSaturation);
 }
