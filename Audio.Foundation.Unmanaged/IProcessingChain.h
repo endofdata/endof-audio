@@ -21,6 +21,8 @@ namespace Audio
 				{
 					void OnNextBuffer(bool writeSecondHalf) = 0;
 
+					void InitShutDown() = 0;
+
 					void AddInput(IInputChannelPtr& input) = 0;
 
 					void AddOutputPair(IOutputChannelPairPtr& output) = 0;

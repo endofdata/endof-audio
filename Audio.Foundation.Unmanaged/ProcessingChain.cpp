@@ -10,6 +10,7 @@ ProcessingChain::ProcessingChain(ITransportPtr& transport, ISampleContainerPtr& 
 	m_transport(transport),
 	m_container(sampleContainer),
 	m_currentMonitorInputId(-1),
+	m_shutDownInitiated(false),
 	m_refCount(0)
 {
 }
@@ -40,48 +41,61 @@ bool ProcessingChain::GetInterface(REFIID iid, void** ppvResult)
 
 void ProcessingChain::OnNextBuffer(bool writeSecondHalf)
 {
-	int channel = 0;
-	bool readSecondHalf = !writeSecondHalf;
+	const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
 
-	m_transport->Pulse(m_container->SampleCount);
-	IHostClockPtr clock = m_transport->HostClock;
-
-	ProcessingContext context(m_transport->CurrentSamplePosition, clock->CurrentTime, m_transport->IsSkipping);
-
-	const std::lock_guard<std::mutex> lock(m_processing_mutex);
-
-	std::for_each(m_inputChannels.begin(), m_inputChannels.end(), [this, readSecondHalf, &channel]
-	(IInputChannelPtr& input)
+	if (!m_shutDownInitiated)
 	{
-		input->OnNextBuffer(m_container, readSecondHalf, channel++);
-	});
+		int channel = 0;
+		bool readSecondHalf = !writeSecondHalf;
 
-	for (int unusedChannel = channel; unusedChannel < m_container->ChannelCount; unusedChannel++)
-	{
-		m_container->Channels[unusedChannel]->Clear();
+		m_transport->Pulse(m_container->SampleCount);
+		IHostClockPtr clock = m_transport->HostClock;
+
+		ProcessingContext context(m_transport->CurrentSamplePosition, clock->CurrentTime, m_transport->IsSkipping);
+
+
+		std::for_each(m_inputChannels.begin(), m_inputChannels.end(), [this, readSecondHalf, &channel]
+		(IInputChannelPtr& input)
+		{
+			input->OnNextBuffer(m_container, readSecondHalf, channel++);
+		});
+
+		for (int unusedChannel = channel; unusedChannel < m_container->ChannelCount; unusedChannel++)
+		{
+			m_container->Channels[unusedChannel]->Clear();
+		}
+
+		std::for_each(m_processors.begin(), m_processors.end(), [this, context]
+		(std::pair<int, ISampleProcessorPtr>& item)
+		{
+			item.second->Process(m_container, context);
+		});
+
+		int firstOut = 0;
+
+		std::for_each(m_outputChannelPairs.begin(), m_outputChannelPairs.end(), [this, writeSecondHalf, &firstOut]
+		(IOutputChannelPairPtr& output)
+		{
+			output->OnNextBuffer(m_container, writeSecondHalf, firstOut);
+			firstOut += 2;
+		});
 	}
+}
 
-	std::for_each(m_processors.begin(), m_processors.end(), [this, context]
-	(std::pair<int, ISampleProcessorPtr>& item)
-	{
-		item.second->Process(m_container, context);
-	});
-
-	int firstOut = 0;
-
-	std::for_each(m_outputChannelPairs.begin(), m_outputChannelPairs.end(), [this, writeSecondHalf, &firstOut]
-	(IOutputChannelPairPtr& output)
-	{
-		output->OnNextBuffer(m_container, writeSecondHalf, firstOut);
-		firstOut += 2;
-	});
+void ProcessingChain::InitShutDown()
+{
+	const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
+	m_shutDownInitiated = true;
+	RemoveAllProcessors();
+	RemoveAllInputChannels();
+	RemoveAllOutputChannels();
 }
 
 void ProcessingChain::AddInput(IInputChannelPtr& input)
 {
 	if (input.GetInterfacePtr() != nullptr)
 	{
-		const std::lock_guard<std::mutex> lock(m_processing_mutex);
+		const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
 
 		m_inputChannels.push_back(input);
 	}
@@ -91,7 +105,7 @@ void ProcessingChain::AddOutputPair(IOutputChannelPairPtr& output)
 {
 	if (output.GetInterfacePtr() != nullptr)
 	{
-		const std::lock_guard<std::mutex> lock(m_processing_mutex);
+		const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
 
 		m_outputChannelPairs.push_back(output);
 	}
@@ -100,7 +114,7 @@ void ProcessingChain::AddOutputPair(IOutputChannelPairPtr& output)
 
 int ProcessingChain::AddProcessor(ISampleProcessorPtr& processor)
 {
-	const std::lock_guard<std::mutex> lock(m_processing_mutex);
+	const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
 
 	int nextId = GetNextProcessorId();
 	m_processors.push_back(std::pair<int, ISampleProcessorPtr>(nextId, processor));
@@ -110,7 +124,7 @@ int ProcessingChain::AddProcessor(ISampleProcessorPtr& processor)
 
 int ProcessingChain::InsertProcessorBefore(ISampleProcessorPtr& processor, int processorId)
 {
-	const std::lock_guard<std::mutex> lock(m_processing_mutex);
+	const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
 
 	int nextId = GetNextProcessorId();
 	m_processors.insert(GetProcessorsById(processorId), std::pair<int, ISampleProcessorPtr>(nextId, processor));
@@ -120,7 +134,7 @@ int ProcessingChain::InsertProcessorBefore(ISampleProcessorPtr& processor, int p
 
 bool ProcessingChain::RemoveProcessor(int processorId)
 {
-	const std::lock_guard<std::mutex> lock(m_processing_mutex);
+	const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
 
 	auto iter = GetProcessorsById(processorId);
 
@@ -185,14 +199,14 @@ IOutputChannelPairPtr ProcessingChain::FindOutput(int outputId)
 
 void ProcessingChain::RemoveAllInputChannels()
 {
-	const std::lock_guard<std::mutex> lock(m_processing_mutex);
+	const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
 
 	m_inputChannels.clear();
 }
 
 void ProcessingChain::RemoveAllOutputChannels()
 {
-	const std::lock_guard<std::mutex> lock(m_processing_mutex);
+	const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
 
 	m_outputChannelPairs.clear();
 }

@@ -41,6 +41,8 @@ namespace Audio
 
 				void OnNextBuffer(bool writeSecondHalf);
 
+				void InitShutDown();
+
 				int AddProcessor(ISampleProcessorPtr& processor);
 
 				int InsertProcessorBefore(ISampleProcessorPtr& processor, int processorId);
@@ -67,7 +69,7 @@ namespace Audio
 			private:
 				int GetNextProcessorId();
 				std::vector<std::pair<int, ISampleProcessorPtr>>::iterator GetProcessorsById(int processorId);
-				std::mutex m_processing_mutex;
+				std::recursive_mutex m_processing_mutex;
 
 				std::vector<std::pair<int, ISampleProcessorPtr>> m_processors;
 				ISampleContainerPtr m_container;
@@ -75,6 +77,7 @@ namespace Audio
 				std::vector<IInputChannelPtr> m_inputChannels;
 				std::vector<IOutputChannelPairPtr> m_outputChannelPairs;
 				int m_currentMonitorInputId;
+				bool m_shutDownInitiated;
 			};
 		}
 	}

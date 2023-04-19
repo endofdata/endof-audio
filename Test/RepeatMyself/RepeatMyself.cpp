@@ -41,7 +41,8 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, double gain
 
 	// const wchar_t* pwcszLibName = L"C:\\Program Files\\Common Files\\VST3\\Unfiltered Audio Indent.vst3";
 	// const wchar_t* pwcszLibName = L"D:\\Gamer I5\\Documents\\Projects\\vst3sdk\\out\\build\\x64-Debug\\VST3\\Debug\\adelay.vst3\\Contents\\x86_64-win\\adelay.vst3";
-	const wchar_t* pwcszLibName = L"D:\\Gamer I5\\Documents\\Projects\\vst3sdk\\out\\build\\x64-Debug\\VST3\\Debug\\panner.vst3\\Contents\\x86_64-win\\panner.vst3";
+	// const wchar_t* pwcszLibName = L"D:\\Gamer I5\\Documents\\Projects\\vst3sdk\\out\\build\\x64-Debug\\VST3\\Debug\\panner.vst3\\Contents\\x86_64-win\\panner.vst3";
+	const wchar_t* pwcszLibName = L"D:\\Gamer I5\\Documents\\Projects\\vst3sdk\\out\\build\\x64-Debug\\VST3\\Debug\\hostchecker.vst3\\Contents\\x86_64-win\\hostchecker.vst3";
 	const wchar_t* pluginIdRaw = host->AddLibrary(pwcszLibName);
 
 	if (pluginIdRaw == nullptr)
@@ -69,7 +70,7 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, double gain
 		spatial->QueryInterface<ISampleProcessor>(&spatialProcessor);
 
 		IProcessingChainPtr processingChain = device->ProcessingChain;
-		//int vstId = processingChain->AddProcessor(vstProcessor);
+		int vstId = processingChain->AddProcessor(vstProcessor);
 		int recorderId = processingChain->AddProcessor(recordingProcessor);
 		int joinerId = processingChain->AddProcessor(joiningProcessor);
 		int spatialId = processingChain->AddProcessor(spatialProcessor);
@@ -194,6 +195,7 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, double gain
 				}
 			}
 		}
+		processingChain->InitShutDown();
 	}
 }
 
