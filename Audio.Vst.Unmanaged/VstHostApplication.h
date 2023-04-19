@@ -1,6 +1,7 @@
 #pragma once
 #include <Audio.Vst.Unmanaged.h>
 #include <ivsthostapplication.h>
+#include <ivstpluginterfacesupport.h>
 #include <memory>
 #include <vector>
 #include "PluginLibrary.h"
@@ -20,7 +21,7 @@ namespace Audio
 				VstHostApplication(const std::wstring& name);
 				virtual ~VstHostApplication();
 
-				tresult queryInterface(const TUID _iid, void** obj);
+				tresult queryInterface(const TUID iid, void** obj);
 
 				uint32 addRef();
 
@@ -28,8 +29,9 @@ namespace Audio
 
 				tresult getName(String128 name);
 
-				tresult createInstance(TUID cid, TUID _iid, void** obj);
+				tresult createInstance(TUID cid, TUID iid, void** obj);
 
+				tresult isPlugInterfaceSupported(const TUID iid);
 			private:
 				unsigned int m_refCount;
 				std::wstring m_name;

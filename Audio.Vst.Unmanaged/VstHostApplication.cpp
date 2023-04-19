@@ -17,17 +17,23 @@ VstHostApplication::~VstHostApplication()
 
 }
 
-tresult VstHostApplication::queryInterface(const TUID _iid, void** obj)
+tresult VstHostApplication::queryInterface(const TUID iid, void** obj)
 {
-	if (_iid == FUnknown_iid)
+	if (FUnknownPrivate::iidEqual(iid, FUnknown_iid))
 	{
 		*obj = reinterpret_cast<FUnknown*>(this);
 		addRef();
 		return kResultOk;
 	}
-	if (_iid == IHostApplication_iid)
+	if (FUnknownPrivate::iidEqual(iid, IHostApplication_iid))
 	{
 		*obj = reinterpret_cast<IHostApplication*>(this);
+		addRef();
+		return kResultOk;
+	}
+	if (FUnknownPrivate::iidEqual(iid, IPlugInterfaceSupport_iid))
+	{
+		*obj = reinterpret_cast<IPlugInterfaceSupport*>(this);
 		addRef();
 		return kResultOk;
 	}
@@ -60,7 +66,17 @@ tresult VstHostApplication::getName(String128 name)
 	return static_cast<tresult>(count);
 }
 
-tresult VstHostApplication::createInstance(TUID cid, TUID _iid, void** obj)
+tresult VstHostApplication::createInstance(TUID cid, TUID iid, void** obj)
 {
+	if (FUnknownPrivate::iidEqual(iid, IMessage_iid))
+	{
+		// TODO: This might be worth to be implemented
+		return kNoInterface;
+	}
 	return kNoInterface;
+}
+
+tresult VstHostApplication::isPlugInterfaceSupported(const TUID iid)
+{
+	return kResultFalse;
 }
