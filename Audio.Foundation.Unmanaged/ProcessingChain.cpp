@@ -53,17 +53,18 @@ void ProcessingChain::OnNextBuffer(bool writeSecondHalf)
 
 		ProcessingContext context(m_transport->CurrentSamplePosition, clock->CurrentTime, m_transport->IsSkipping);
 
+		for (int c = 0; c < m_container->ChannelCount; c++)
+		{
+			m_container->Channels[c]->Clear();
+		}
 
 		std::for_each(m_inputChannels.begin(), m_inputChannels.end(), [this, readSecondHalf, &channel]
 		(IInputChannelPtr& input)
 		{
-			input->OnNextBuffer(m_container, readSecondHalf, channel++);
+			input->OnNextBuffer(m_container, readSecondHalf);
 		});
 
-		for (int unusedChannel = channel; unusedChannel < m_container->ChannelCount; unusedChannel++)
-		{
-			m_container->Channels[unusedChannel]->Clear();
-		}
+
 
 		std::for_each(m_processors.begin(), m_processors.end(), [this, context]
 		(std::pair<int, ISampleProcessorPtr>& item)

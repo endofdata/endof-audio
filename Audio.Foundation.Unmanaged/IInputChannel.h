@@ -77,8 +77,24 @@ namespace Audio
 					/// </summary>
 					_declspec(property(get = get_IsActive, put = put_IsActive)) bool IsActive;
 
+					double get_Pan() = 0;
+					void put_Pan(double value) = 0;
 
-					void OnNextBuffer(ISampleContainerPtr& sampleContainer, bool readSecondHalf, int channel) = 0;
+					/// <summary>
+					/// Gets or sets the mono input channel pan position in a stereo field
+					/// </summary>
+					_declspec(property(get = get_Pan, put = put_Pan)) double Pan;
+
+					double get_Level() = 0;
+					void put_Level(double value) = 0;
+
+					/// <summary>
+					/// Gets or sets the mono input channel level
+					/// </summary>
+					_declspec(property(get = get_Level, put = put_Level)) double Level;
+
+
+					void OnNextBuffer(ISampleContainerPtr& sampleContainer, bool readSecondHalf) = 0;
 				};
 
 				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(IInputChannel, __uuidof(IInputChannel));

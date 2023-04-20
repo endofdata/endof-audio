@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "SampleContainer.h"
 #include "IInputChannel.h"
+#include "SampleConversionUnmanaged.h"
 
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -27,10 +28,14 @@ namespace Audio
 						m_pBufferB(pBufferB),
 						m_pDirectMonitor(nullptr),
 						m_isActive(false),
+						m_pan(PanCenter),
+						m_level(LevelMax),
 						m_refCount(0)
 					{
 						if (nullptr == m_pBufferA || nullptr == m_pBufferB)
 							throw std::invalid_argument("InputChannel: Buffer pointers must not be nullptr.");
+
+						SampleConversion::LevelAndPanFactor(m_level, m_pan, m_factorLeft, m_factorRight);
 					}
 
 					/*! \brief Destructor
@@ -39,7 +44,7 @@ namespace Audio
 					{
 					}
 
-					virtual void OnNextBuffer(ISampleContainerPtr& container, bool readSecondHalf, int channel)
+					virtual void OnNextBuffer(ISampleContainerPtr& container, bool readSecondHalf)
 					{
 						if (IsActive)
 						{
@@ -54,11 +59,32 @@ namespace Audio
 
 							// Convert the incoming samples to internal and write them to the container
 							int sampleCount = container->SampleCount;
-							Sample* pDest = container->Channels[channel]->SamplePtr;
 
-							for (int i = 0; i < sampleCount; i++)
+							if (container->ChannelCount > 1)
 							{
-								*pDest++ = ReadSample(pSource);
+								Sample* pDestLeft = container->Channels[0]->SamplePtr;
+								Sample* pDestRight = container->Channels[1]->SamplePtr;
+								
+								for (int i = 0; i < sampleCount; i++)
+								{
+									Sample sample = ReadSample(pSource);
+
+									if (sample > 0.7)
+									{
+										int fred = 12;
+									}
+									*(pDestLeft++) += m_factorLeft * sample;
+									*(pDestRight++) += m_factorRight * sample;
+								}
+							}
+							else if (container->ChannelCount > 0)
+							{
+								Sample* pDest = container->Channels[0]->SamplePtr;
+
+								for (int i = 0; i < sampleCount; i++)
+								{
+									*pDest++ += m_level * ReadSample(pSource);
+								}
 							}
 						}
 					}
@@ -72,6 +98,29 @@ namespace Audio
 					{
 						m_isActive = value;
 					}
+
+					virtual double get_Pan()
+					{
+						return m_pan;
+					}
+
+					virtual void put_Pan(double value)
+					{
+						m_pan = value;
+						SampleConversion::LevelAndPanFactor(m_level, m_pan, m_factorLeft, m_factorRight);
+					}
+
+					virtual double get_Level()
+					{
+						return m_level;
+					}
+
+					virtual void put_Level(double value)
+					{
+						m_level = value;
+						SampleConversion::LevelAndPanFactor(m_level, m_pan, m_factorLeft, m_factorRight);
+					}
+
 
 					virtual bool get_SupportsDirectMonitor()
 					{
@@ -135,6 +184,10 @@ namespace Audio
 					TSample* m_pBufferB;
 
 					bool m_isActive;
+					double m_pan;
+					double m_level;
+					double m_factorLeft;
+					double m_factorRight;
 					IOutputChannelPairPtr m_pDirectMonitor;
 
 					unsigned long m_refCount;

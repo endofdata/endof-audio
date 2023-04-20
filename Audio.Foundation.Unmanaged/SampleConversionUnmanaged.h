@@ -23,9 +23,13 @@ namespace Audio
 			const double SampleToInt16Factor = SampleMaxRange16;
 
 			const double LevelMax = 1.0;
-			const double PanCenter = 0.0;
-			const double PanLeft = -1.0;
+			const double PanCenter = 0.5;
+			const double PanLeft = 0.0;
 			const double PanRight = +1.0;
+
+			const double PanLaw3dB = 0.7079457843841379;
+			const double PanLaw4Dot5dB = 0.5956621435290105;
+			const double PanLaw6dB = 0.5011872336272722;
 
 			class _AUDIO_FOUNDATION_UNMANAGED_API SampleConversion
 			{
@@ -39,10 +43,10 @@ namespace Audio
 				/// <param name="pan">Pan position</param>
 				/// <param name="factorLeft">Receives the factor for the left channel</param>
 				/// <param name="factorRight">Receives the factor for the right channel</param>
-				static inline void LevelAndPanFactor(double level, double pan, double& factorLeft, double& factorRight)
+				static inline void LevelAndPanFactor(double level, double pan, double& factorLeft, double& factorRight, double panLaw = PanLaw4Dot5dB)
 				{
-					factorLeft = (pan + PanLeft) * -0.5f * level;
-					factorRight = (pan + PanRight) * 0.5f * level;
+					factorLeft = level * pow((1.0 - pan), panLaw);
+					factorRight = level * pow(pan, panLaw);
 				}
 
 				/// <summary>
