@@ -171,7 +171,7 @@ int TakeSequence::Process(ISampleContainerPtr& container, const ProcessingContex
 		}
 		if (hasTake)
 		{
-			done = (*m_playPosition)->ReadSamplesTo(container, 0, container->ChannelCount, 0);
+			done = (*m_playPosition)->WriteTo(container, 0, container->ChannelCount, 0);
 
 			if (!done)
 			{
@@ -187,7 +187,7 @@ int TakeSequence::Process(ISampleContainerPtr& container, const ProcessingContex
 	return done;
 }
 
-bool TakeSequence::get_IsBypassed()
+bool TakeSequence::get_IsBypassed() const
 {
 	return m_isBypassed;
 }

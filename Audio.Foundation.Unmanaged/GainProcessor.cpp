@@ -75,7 +75,7 @@ int GainProcessor::Process(ISampleContainerPtr& container, const ProcessingConte
 	return 0;
 }
 
-bool GainProcessor::get_IsBypassed()
+bool GainProcessor::get_IsBypassed() const
 {
 	return m_isBypassed;
 }

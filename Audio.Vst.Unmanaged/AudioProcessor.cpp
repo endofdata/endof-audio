@@ -67,7 +67,7 @@ void AudioProcessor::put_IsActive(bool value)
 	}
 }
 
-bool AudioProcessor::get_IsBypassed()
+bool AudioProcessor::get_IsBypassed() const
 {
 	return m_isBypassed;
 }

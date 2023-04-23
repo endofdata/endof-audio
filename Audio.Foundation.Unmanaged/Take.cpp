@@ -104,15 +104,15 @@ bool Take::SeekTo(AudioTime offset, AudioSeek kind)
 	return false;
 }
 
-int Take::AddTo(ISampleContainerPtr& target, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const
+int Take::WriteTo(ISampleContainerPtr& target, int sampleOffset, int sampleCount, int channelOffset, int channelCount, 
+	int targetSampleOffset, int targetChannelOffset, const MixParameter& mix, bool overdub) const
 {
-	return m_container->AddTo(target, sampleOffset, sampleCount, channelOffset, channelCount, targetSampleOffset, targetChannelOffset);
+	return m_container->WriteTo(target, sampleOffset, sampleCount, channelOffset, channelCount, targetSampleOffset, targetChannelOffset, mix, overdub);
 }
 
-int Take::ReadSamplesTo(ISampleContainerPtr& target, int channelOffset, int channelCount, int targetChannelOffset)
+int Take::WriteTo(ISampleContainerPtr& target, int channelOffset, int channelCount, int targetChannelOffset)
 {
-	// TODO: Take should operate with sample position instead of AudioTime
-	int done = AddTo(target, m_readOffset, target->SampleCount, channelOffset, channelCount, 0, targetChannelOffset);
+	int done = WriteTo(target, m_readOffset, target->SampleCount, channelOffset, channelCount, 0, targetChannelOffset, MixParameter(), false);
 
 	m_readOffset += done;
 

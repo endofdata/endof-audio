@@ -78,7 +78,7 @@ int StreamWriter::Process(ISampleContainerPtr& container, const ProcessingContex
 	return 0;
 }
 
-bool StreamWriter::get_IsBypassed()
+bool StreamWriter::get_IsBypassed() const
 {
 	return m_isBypassed;
 }

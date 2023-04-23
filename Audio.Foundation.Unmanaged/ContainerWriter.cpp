@@ -36,12 +36,12 @@ int ContainerWriter::Process(ISampleContainerPtr& container, const ProcessingCon
 {
 	if (!m_isBypassed)
 	{
-		return container->CopyTo(m_pTarget, 0, container->SampleCount, 0, container->ChannelCount, 0, 0);
+		return container->WriteTo(m_pTarget, 0, container->SampleCount, 0, container->ChannelCount, 0, 0, MixParameter(), false);
 	}
 	return 0;
 }
 
-bool ContainerWriter::get_IsBypassed()
+bool ContainerWriter::get_IsBypassed() const
 {
 	return m_isBypassed;
 }

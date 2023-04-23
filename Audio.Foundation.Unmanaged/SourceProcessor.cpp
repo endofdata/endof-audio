@@ -43,12 +43,12 @@ int SourceProcessor::Process(ISampleContainerPtr& container, const ProcessingCon
 		{
 			m_pSource->SamplePosition = context.SamplePosition;
 		}
-		return m_pSource->ReadSamples(container, false);
+		return m_pSource->ReadSamples(container, MixParameter(), false);
 	}
 	return 0;
 }
 
-bool SourceProcessor::get_IsBypassed()
+bool SourceProcessor::get_IsBypassed() const
 {
 	return m_isBypassed;
 }

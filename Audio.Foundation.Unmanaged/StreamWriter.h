@@ -18,7 +18,7 @@ namespace Audio
 				StreamWriter(std::ostream& output);
 				virtual ~StreamWriter();
 
-				bool get_IsBypassed();
+				bool get_IsBypassed() const;
 				void put_IsBypassed(bool value);
 
 				int Process(ISampleContainerPtr& container, const ProcessingContext& context);

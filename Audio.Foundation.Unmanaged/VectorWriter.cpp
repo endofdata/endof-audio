@@ -173,7 +173,7 @@ void VectorWriter::FreeBuffers()
 	m_buffers.clear();
 }
 
-bool VectorWriter::get_IsBypassed()
+bool VectorWriter::get_IsBypassed() const
 {
 	return m_isBypassed;
 }

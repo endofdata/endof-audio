@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "StreamReader.h"
+#include "SampleConversionUnmanaged.h"
 
 using namespace Audio::Foundation::Unmanaged;
 
@@ -34,12 +35,12 @@ bool StreamReader::GetInterface(REFIID iid, void** ppvResult)
 }
 
 
-int StreamReader::ReadSamples(ISampleContainerPtr& container, bool overdub)
+int StreamReader::ReadSamples(ISampleContainerPtr& container, const MixParameter& mix, bool overdub)
 {
 	int samples = container->SampleCount;
 	int channels = std::min(container->ChannelCount, m_channelCount);
 
-	if (channels == 1 && !overdub)
+	if (channels == 1 && !overdub && (mix.Level == LevelMax) && (mix.Pan == PanCenter))
 	{
 		Sample* pDst = container->Channels[0]->SamplePtr;
 		std::streamsize size = samples * sizeof(Sample);
@@ -56,56 +57,30 @@ int StreamReader::ReadSamples(ISampleContainerPtr& container, bool overdub)
 			arDst.push_back(container->Channels[c]->SamplePtr);
 		}
 
-		if (overdub)
+		std::function<Sample* (const Sample& source, Sample* target, double channelFactor)> handler = overdub ?
+			[](const Sample& source, Sample* target, double channelFactor) { *target++ += source * channelFactor; return target; } :
+			[](const Sample& source, Sample* target, double channelFactor) { *target++ = source * channelFactor; return target;  };
+
+		for (int s = 0; s < samples; s++)
 		{
-			for (int s = 0; s < samples; s++)
+			for (int c = 0; c < channels; c++)
 			{
-				for (int c = 0; c < channels; c++)
+				Sample** ppDst = &arDst[c];
+				Sample value = 0.0;
+				
+				m_input.read((char*)&value, sizeof(Sample));
+				*ppDst = handler(value, *ppDst, (c & 1)? mix.FactorRight : mix.FactorLeft);
+
+				if (m_input.rdstate() & std::istream::eofbit)
 				{
-					Sample** ppDst = &arDst[c];
-					Sample value = 0.0;
-
-					m_input.read((char*)&value, sizeof(Sample));
-					**ppDst += value;
-					(*ppDst)++;
-
-					if (m_input.rdstate() & std::istream::eofbit)
+					if (m_isLooping)
 					{
-						if (m_isLooping)
-						{
-							m_input.setstate(m_input.rdstate() & ~(std::istream::failbit | std::istream::eofbit));
-							SamplePosition = 0;
-						}
-						else
-						{
-							return s;
-						}
+						m_input.setstate(m_input.rdstate() & ~(std::istream::failbit | std::istream::eofbit));
+						SamplePosition = 0;
 					}
-				}
-			}
-		}
-		else
-		{
-			for (int s = 0; s < samples; s++)
-			{
-				for (int c = 0; c < channels; c++)
-				{
-					Sample** ppDst = &arDst[c];
-
-					m_input.read((char*)*ppDst, sizeof(Sample));
-					(*ppDst)++;
-
-					if (m_input.rdstate() & std::istream::eofbit)
+					else
 					{
-						if (m_isLooping)
-						{
-							m_input.setstate(m_input.rdstate() & ~(std::istream::failbit | std::istream::eofbit));
-							SamplePosition = 0;
-						}
-						else
-						{
-							return s;
-						}
+						return s;
 					}
 				}
 			}

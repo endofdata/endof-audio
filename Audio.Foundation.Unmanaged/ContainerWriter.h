@@ -22,7 +22,7 @@ namespace Audio
 
 				int Process(ISampleContainerPtr& container, const ProcessingContext& context);
 
-				bool get_IsBypassed();
+				bool get_IsBypassed() const;
 				void put_IsBypassed(bool value);
 
 				DECLARE_IUNKNOWN

@@ -136,7 +136,7 @@ int MeterChannel::Process(ISampleContainerPtr& input, const ProcessingContext& c
 	return input->SampleCount;
 }
 
-bool MeterChannel::get_IsBypassed()
+bool MeterChannel::get_IsBypassed() const
 {
 	return m_isBypassed;
 }

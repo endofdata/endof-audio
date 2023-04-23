@@ -24,7 +24,7 @@ namespace Audio
 				void put_IsActive(bool value);
 				_declspec(property(get = get_IsActive, put = put_IsActive)) bool IsActive;
 
-				bool get_IsBypassed();
+				bool get_IsBypassed() const;
 				void put_IsBypassed(bool value);
 
 				void Initialize(int sampleCount, int sampleRate);

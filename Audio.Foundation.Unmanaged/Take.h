@@ -37,9 +37,10 @@ namespace Audio
 
 				bool SeekTo(AudioTime offset, AudioSeek kind);
 
-				int AddTo(ISampleContainerPtr& target, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const;
+				int WriteTo(ISampleContainerPtr& target, int sampleOffset, int sampleCount, int channelOffset, int channelCount, 
+					int targetSampleOffset, int targetChannelOffset, const MixParameter& mix, bool overdub) const;
 
-				int ReadSamplesTo(ISampleContainerPtr& target, int channelOffset, int channelCount, int targetChannelOffset);
+				int WriteTo(ISampleContainerPtr& target, int channelOffset, int channelCount, int targetChannelOffset);
 
 				DECLARE_IUNKNOWN
 

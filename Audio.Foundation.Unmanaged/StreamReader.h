@@ -19,7 +19,7 @@ namespace Audio
 				StreamReader(std::istream& input, int channelCount);
 				virtual ~StreamReader();
 
-				int ReadSamples(ISampleContainerPtr& container, bool overdub);
+				int ReadSamples(ISampleContainerPtr& container, const MixParameter& mix, bool overdub);
 
 				bool get_IsLooping();
 				void put_IsLooping(bool value);

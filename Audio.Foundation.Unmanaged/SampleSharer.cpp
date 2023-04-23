@@ -88,7 +88,7 @@ int SampleSharer::Process(ISampleContainerPtr& container, const ProcessingContex
 	return 0;
 }
 
-bool SampleSharer::get_IsBypassed()
+bool SampleSharer::get_IsBypassed() const
 {
 	return m_isBypassed;
 }

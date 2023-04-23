@@ -33,7 +33,7 @@ namespace Audio
 
 				void Reset();
 
-				bool get_IsBypassed();
+				bool get_IsBypassed() const;
 				void put_IsBypassed(bool value);
 
 				int Process(ISampleContainerPtr& inputBuffer, const ProcessingContext& context);
