@@ -126,7 +126,7 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, double gain
 								ISampleContainerPtr take = recorder->CreateSampleContainer(false);
 								ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take);
 								takeSource->IsLooping = true;
-								joiner->AddSource(takeSource);
+								joiner->AddSource(takeSource, MixParameter());
 
 								std::wcout << L"Loop length " << switchTime.ToString() << std::endl;
 								transport->LoopEnd = switchTime;
@@ -160,7 +160,7 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, double gain
 								ISampleContainerPtr take = recorder->CreateSampleContainer(false);
 								ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take);
 								takeSource->IsLooping = true;
-								joiner->AddSource(takeSource);
+								joiner->AddSource(takeSource, MixParameter());
 
 								std::wcout << L"Accept overdub " << dubCount;
 								if (switchTime > transport->LoopEnd)
