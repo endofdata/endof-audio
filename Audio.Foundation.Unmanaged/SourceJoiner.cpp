@@ -39,20 +39,20 @@ bool SourceJoiner::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-void SourceJoiner::AddSource(ISampleSourcePtr& Source)
+void SourceJoiner::AddSource(ISampleSourcePtr& source, const MixParameter& mix)
 {
 	// do not allow two sends to the same destination
-	RemoveSource(Source);
+	RemoveSource(source);
 
-	m_vecSources.push_back(Source);
+	m_vecSources.push_back(std::pair<ISampleSourcePtr, MixParameter>(source, mix));
 }
 
-void SourceJoiner::RemoveSource(ISampleSourcePtr& Source)
+void SourceJoiner::RemoveSource(ISampleSourcePtr& source)
 {
-	std::vector<ISampleSourcePtr>::iterator newEnd =
-		remove_if(m_vecSources.begin(), m_vecSources.end(), [&Source](ISampleSourcePtr& item)
+	auto newEnd =
+		remove_if(m_vecSources.begin(), m_vecSources.end(), [&source](std::pair<ISampleSourcePtr, MixParameter>& item)
 	{
-		if (item == Source)
+		if (item.first == source)
 		{
 			return true;
 		}
@@ -68,7 +68,12 @@ void SourceJoiner::RemoveAllSources()
 
 ISampleSourcePtr& SourceJoiner::get_Source(int index)
 {
-	return m_vecSources.at(index);
+	return m_vecSources.at(index).first;
+}
+
+MixParameter& SourceJoiner::get_MixParameter(int index)
+{
+	return m_vecSources.at(index).second;
 }
 
 int SourceJoiner::Process(ISampleContainerPtr& container, const ProcessingContext& context)
@@ -79,10 +84,10 @@ int SourceJoiner::Process(ISampleContainerPtr& container, const ProcessingContex
 
 		if (targetChannelCount > 0)
 		{
-			std::for_each(m_vecSources.begin(), m_vecSources.end(), [this, &container](ISampleSourcePtr& item)
+			std::for_each(m_vecSources.begin(), m_vecSources.end(), [this, &container](std::pair<ISampleSourcePtr, MixParameter>& item)
 			{
 				// Read in 'overub' mode to add sample values
-				item->ReadSamples(container, true);
+				item.first->ReadSamples(container, item.second, true);
 			});
 		}
 		return container->SampleCount;
@@ -90,7 +95,7 @@ int SourceJoiner::Process(ISampleContainerPtr& container, const ProcessingContex
 	return 0;
 }
 
-bool SourceJoiner::get_IsBypassed()
+bool SourceJoiner::get_IsBypassed() const
 {
 	return m_isBypassed;
 }

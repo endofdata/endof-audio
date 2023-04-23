@@ -29,9 +29,7 @@ namespace Audio
 
 				Sample* get_SamplePtr();
 
-				int AddTo(ISampleBufferPtr& other, int sampleOffset, int sampleCount, int targetOffset) const;
-
-				int CopyTo(ISampleBufferPtr& other, int sampleOffset, int sampleCount, int targetOffset) const;
+				int WriteTo(ISampleBufferPtr& other, int sampleOffset, int sampleCount, int targetOffset, double level, bool overdub) const;
 
 				DECLARE_IUNKNOWN
 
@@ -45,7 +43,6 @@ namespace Audio
 
 			private:
 				int GetEffectiveCount(int requestedOffset, int requestedCount, int maxCount) const;
-
 			};
 		}
 	}

@@ -34,25 +34,18 @@ bool ContainerReader::GetInterface(REFIID iid, void** ppvResult)
 	return false;
 }
 
-int ContainerReader::ReadSamples(ISampleContainerPtr& container, bool overdub)
+int ContainerReader::ReadSamples(ISampleContainerPtr& container, const MixParameter& mix, bool overdub)
 {
 	if (m_samplePosition < m_container->SampleCount)
 	{
-		int channelCount = std::min(m_container->ChannelCount, container->ChannelCount);
+		int channelCount = container->ChannelCount;
 		int sampleCount = 0;
 		int required = container->SampleCount;
 
 		do
 		{
 			int sliceCount = std::min(m_container->SampleCount - m_samplePosition, required - sampleCount);
-			if (overdub)
-			{
-				m_container->AddTo(container, m_samplePosition, sliceCount, 0, channelCount, 0, 0);
-			}
-			else
-			{
-				m_container->CopyTo(container, m_samplePosition, sliceCount, 0, channelCount, 0, 0);
-			}
+			m_container->WriteTo(container, m_samplePosition, sliceCount, 0, channelCount, 0, 0, mix, overdub);
 			sampleCount += sliceCount;
 			m_samplePosition += sliceCount;
 

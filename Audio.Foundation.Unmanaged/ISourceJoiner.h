@@ -5,6 +5,7 @@
 #include <Audio.Foundation.Unmanaged.h>
 #include <ISampleProcessor.h>
 #include <ISampleSource.h>
+#include <MixParameter.h>
 #include <comdef.h>
 
 namespace Audio
@@ -24,6 +25,8 @@ namespace Audio
 					/// <returns>The <see cref="ISampleSource"/> or <see langword="null"/> if <paramref name="index"/> is out of range.</returns>
 					ISampleSourcePtr& get_Source(int index) = 0;
 
+					MixParameter& get_MixParameter(int index) = 0;
+
 					/// <summary>
 					/// Gets sources as defined by previous calls to <see cref="AddSource"/>
 					/// </summary>
@@ -33,7 +36,7 @@ namespace Audio
 					/// Adds a new item to the <see cref="Sources"/> collection
 					/// </summary>
 					/// <param name="source">Source to joint into output samples</param>
-					void AddSource(ISampleSourcePtr& source) = 0;
+					void AddSource(ISampleSourcePtr& source, const MixParameter& mix) = 0;
 
 					/// <summary>
 					/// Removes an item from the <see cref="Sources"/> collection

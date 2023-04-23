@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "SampleBufferSpan.h"
+#include "MixParameter.h"
 #include <stdexcept>
 
 using namespace Audio::Foundation::Unmanaged;
@@ -65,7 +66,7 @@ Sample* SampleBufferSpan::get_SamplePtr()
 	return m_pSamples;
 }
 
-int SampleBufferSpan::AddTo(ISampleBufferPtr& other, int sampleOffset, int sampleCount, int targetOffset) const
+int SampleBufferSpan::WriteTo(ISampleBufferPtr& other, int sampleOffset, int sampleCount, int targetOffset, double level, bool overdub) const
 {
 	int sourceMax = GetEffectiveCount(sampleOffset, sampleCount, SampleCount);
 	int targetMax = GetEffectiveCount(targetOffset, sampleCount, other->SampleCount);
@@ -76,30 +77,23 @@ int SampleBufferSpan::AddTo(ISampleBufferPtr& other, int sampleOffset, int sampl
 		const Sample* pSource = &m_pSamples[sampleOffset];
 		Sample* pTarget = &other->SamplePtr[targetOffset];
 
-		for (int s = 0; s < count; s++)
+		if (overdub)
 		{
-			*pTarget++ += *pSource++;
+			for (int s = 0; s < count; s++)
+			{
+				*pTarget++ += *pSource++;
+			}
+		}
+		else
+		{
+			for (int s = 0; s < count; s++)
+			{
+				*pTarget++ = *pSource++;
+			}
 		}
 	}
 	return count;
 }
-
-int SampleBufferSpan::CopyTo(ISampleBufferPtr& other, int sampleOffset, int sampleCount, int targetOffset) const
-{
-	int sourceMax = GetEffectiveCount(sampleOffset, sampleCount, SampleCount);
-	int targetMax = GetEffectiveCount(targetOffset, sampleCount, other->SampleCount);
-	int count = std::min(sourceMax, targetMax);
-
-	if (count > 0)
-	{
-		const Sample* pSource = &m_pSamples[sampleOffset];
-		Sample* pTarget = &other->SamplePtr[targetOffset];
-
-		std::memcpy(pTarget, pSource, count * sizeof(Sample));
-	}
-	return count;
-}
-
 
 int SampleBufferSpan::GetEffectiveCount(int requestedOffset, int requestedCount, int maxCount) const
 {

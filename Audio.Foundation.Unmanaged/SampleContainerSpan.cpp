@@ -4,6 +4,7 @@
 #include "ObjectFactory.h"
 #include "SampleContainerSpan.h"
 #include "SampleBufferSpan.h"
+#include "SampleConversionUnmanaged.h"
 #include <stdexcept>
 
 using namespace Audio::Foundation::Unmanaged;
@@ -93,28 +94,17 @@ ISampleBufferPtr SampleContainerSpan::get_Channel(int index)
 	return m_vecChannels.at(index);
 }
 
-int SampleContainerSpan::AddTo(ISampleContainerPtr& other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const
+int SampleContainerSpan::WriteTo(ISampleContainerPtr& other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, 
+	int targetSampleOffset, int targetChannelOffset, const MixParameter& mix, bool overdub) const
 {
-	int maxChannels = std::min(channelCount, std::min(other->ChannelCount - targetChannelOffset, ChannelCount - channelOffset));
+	int sourceChannels = std::min(ChannelCount - channelOffset, channelCount);
 	int done = 0;
-
-	for (int c = 0; c < maxChannels; c++)
+	
+	for (int c = 0; c < channelCount; c++)
 	{
 		ISampleBufferPtr pChannel = other->Channels[c + targetChannelOffset];
-		done = m_vecChannels[c + channelOffset]->AddTo(pChannel, sampleOffset, sampleCount, targetSampleOffset);
-	}
-	return done;
-}
-
-int SampleContainerSpan::CopyTo(ISampleContainerPtr& other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const
-{
-	int maxChannels = std::min(channelCount, std::min(other->ChannelCount - targetChannelOffset, ChannelCount - channelOffset));
-	int done = 0;
-
-	for (int c = 0; c < maxChannels; c++)
-	{
-		ISampleBufferPtr pChannel = other->Channels[c + targetChannelOffset];
-		done = m_vecChannels[c + channelOffset]->CopyTo(pChannel, sampleOffset, sampleCount, targetSampleOffset);
+		double channelLevel = (c & 1) ? mix.FactorRight : mix.FactorLeft;
+		done = m_vecChannels[(c % sourceChannels) + channelOffset]->WriteTo(pChannel, sampleOffset, sampleCount, targetSampleOffset, channelLevel, overdub);
 	}
 	return done;
 }

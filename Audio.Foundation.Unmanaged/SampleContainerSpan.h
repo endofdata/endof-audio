@@ -29,9 +29,8 @@ namespace Audio
 
 				virtual ISampleBufferPtr get_Channel(int index);
 
-				virtual int AddTo(ISampleContainerPtr& other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const;
-
-				virtual int CopyTo(ISampleContainerPtr& other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, int targetSampleOffset, int targetChannelOffset) const;
+				virtual int WriteTo(ISampleContainerPtr& other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, 
+					int targetSampleOffset, int targetChannelOffset, const MixParameter& mix, bool overdub) const;
 
 				virtual ISampleContainerPtr Span(int sampleOffset, int sampleCount, int channelOffset, int channelCount);
 

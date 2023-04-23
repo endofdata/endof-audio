@@ -132,6 +132,7 @@
     <ClInclude Include="MidiEvents.h" />
     <ClInclude Include="MidiInput.h" />
     <ClInclude Include="MidiMessage.h" />
+    <ClInclude Include="MixParameter.h" />
     <ClInclude Include="ObjectFactory.h" />
     <ClInclude Include="OutputFloat32ChannelPair.h" />
     <ClInclude Include="OutputInt24ChannelPair.h" />
