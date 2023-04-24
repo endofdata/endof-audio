@@ -298,7 +298,7 @@ void AsioCore::CreateBuffers(const int inputChannelIds[], int numInputIds, const
 			m_processingChain = ObjectFactory::CreateProcessingChain(transport, container);
 
 			CreateInputChannels(0, numInputIds);
-			CreateOutputChannels(numInputIds, numOutputIds);
+			CreateOutputChannels(numInputIds, numOutputIds, outputSaturation);
 		}
 		catch (...)
 		{
@@ -361,7 +361,7 @@ void AsioCore::CreateOutputChannels(int offset, int count, float saturation)
 				m_pHwBufferInfo[iIdx + 1].buffers[0],
 				m_pHwBufferInfo[iIdx + 1].buffers[1],
 				SampleCount,
-				true);
+				saturation);
 
 			if (outputPair.GetInterfacePtr() == nullptr)
 				throw AsioCoreException("AsioCore: Failed to create OutputChannelPair instance.", E_OUTOFMEMORY);
