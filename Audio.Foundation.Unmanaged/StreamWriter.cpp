@@ -12,7 +12,10 @@ StreamWriter::StreamWriter(std::ostream& output) :
 
 StreamWriter::~StreamWriter()
 {
-	m_output.flush();
+	if (m_output.good())
+	{
+		m_output.flush();
+	}
 }
 
 IMPLEMENT_IUNKNOWN(StreamWriter)
@@ -34,7 +37,7 @@ bool StreamWriter::GetInterface(REFIID iid, void** ppvResult)
 
 int StreamWriter::Process(ISampleContainerPtr& container, const ProcessingContext& context)
 {
-	if (!m_isBypassed)
+	if (!m_isBypassed && m_output.good())
 	{
 		int samples = container->SampleCount;
 		int channels = container->ChannelCount;
