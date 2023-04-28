@@ -14,15 +14,16 @@ namespace Audio
 			class FileWriter : public StreamWriter
 			{
 			public:
-				FileWriter(const std::string& filename);
+				FileWriter(const std::wstring& filename);
 				virtual ~FileWriter();
 
-				const std::string& get_Filename() const;
+				const std::wstring& get_Filename() const;
 
-				_declspec(property(get = get_Filename)) const std::string& Filename;
+				_declspec(property(get = get_Filename)) const std::wstring& Filename;
 
 			private:
-				const std::string& m_filename;
+				const std::wstring& m_filename;
+				std::ofstream m_ofstream;
 			};
 		}
 	}

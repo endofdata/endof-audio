@@ -14,15 +14,16 @@ namespace Audio
 			class FileReader : public StreamReader
 			{
 			public:
-				FileReader(const std::string& filename, int channelCount);
+				FileReader(const std::wstring& filename, int channelCount);
 				virtual ~FileReader();
 
-				const std::string& get_Filename() const;
+				const std::wstring& get_Filename() const;
 
-				_declspec(property(get = get_Filename)) const std::string& Filename;
+				_declspec(property(get = get_Filename)) const std::wstring& Filename;
 
 			private:
-				const std::string& m_filename;
+				const std::wstring& m_filename;
+				std::ifstream m_ifstream;
 			};
 		}
 	}
