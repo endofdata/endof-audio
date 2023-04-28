@@ -11,6 +11,10 @@ ContainerReader::ContainerReader(ISampleContainerPtr& source) :
 	m_refCount(0),
 	m_span(source)
 {
+	if (source == nullptr)
+	{
+		throw std::invalid_argument("'source' cannot be null.");
+	}
 }
 
 ContainerReader::~ContainerReader()
