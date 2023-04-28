@@ -41,7 +41,7 @@ namespace Audio
 
 				static IMeterChannelPtr CreateMeterChannel(int sampleRate, int channelCount);
 
-				static ISampleProcessorPtr CreateToFileProcessor(const std::string& filename);
+				static ISampleProcessorPtr CreateToFileProcessor(const std::wstring& filename);
 
 				static ISampleProcessorPtr CreateToStreamProcessor(std::ostream& output);
 
@@ -51,7 +51,7 @@ namespace Audio
 
 				static IRecorderPtr CreateRecorder(int channelCount, int initialSize, int growth);
 
-				static ISampleSourcePtr CreateRawFileSource(const std::string& filename, int channelCount);
+				static ISampleSourcePtr CreateRawFileSource(const std::wstring& filename, int channelCount);
 
 				static ISampleSourcePtr CreateContainerSource(ISampleContainerPtr& source);
 
@@ -73,6 +73,8 @@ namespace Audio
 					int hwChannelId1, void* pBufferA1, void* pBufferB1, int hwChannelId2, void* pBufferA2, void* pBufferB2, int sampleCount, float saturation = 0.0f);
 
 				static IProcessingChainPtr CreateProcessingChain(ITransportPtr& transport, ISampleContainerPtr& container);
+
+				static ISampleProcessorPtr CreateTestOscillator(double sampleRate, double frequency, double amplitude);
 
 				static IMidiInputPtr CreateMidiInput();
 

@@ -30,6 +30,7 @@
 #include "Transport.h"
 #include "TransportEvents.h"
 #include "GainProcessor.h"
+#include "Oscillator.h"
 #include <stdexcept>
 
 int ObjectFactory::LastTakeId = 0;
@@ -62,7 +63,7 @@ IMeterChannelPtr ObjectFactory::CreateMeterChannel(int sampleRate, int channelCo
 	return new MeterChannel(sampleRate, channelCount);
 }
 
-ISampleProcessorPtr ObjectFactory::CreateToFileProcessor(const std::string& filename)
+ISampleProcessorPtr ObjectFactory::CreateToFileProcessor(const std::wstring& filename)
 {
 	return new FileWriter(filename);
 }
@@ -87,7 +88,7 @@ IRecorderPtr ObjectFactory::CreateRecorder(int channelCount, int initialSize, in
 	return new VectorWriter(channelCount, initialSize, growth);
 }
 
-ISampleSourcePtr ObjectFactory::CreateRawFileSource(const std::string& filename, int channelCount)
+ISampleSourcePtr ObjectFactory::CreateRawFileSource(const std::wstring& filename, int channelCount)
 {
 	return new FileReader(filename, channelCount);
 }
@@ -203,6 +204,15 @@ IOutputChannelPairPtr ObjectFactory::CreateOutputChannelPair(int sampleType, int
 IProcessingChainPtr ObjectFactory::CreateProcessingChain(ITransportPtr& transport, ISampleContainerPtr& container)
 {
 	return new ProcessingChain(transport, container);
+}
+
+ISampleProcessorPtr ObjectFactory::CreateTestOscillator(double sampleRate, double frequency, double amplitude)
+{
+	Oscillator* oscillator = new Oscillator(sampleRate);
+	oscillator->Frequency = frequency;
+	oscillator->Amplitude = amplitude;
+
+	return oscillator;
 }
 
 int ObjectFactory::SelectMidiInputDevice(MidiInCapsHandler handler)

@@ -134,6 +134,7 @@
     <ClInclude Include="MidiMessage.h" />
     <ClInclude Include="MixParameter.h" />
     <ClInclude Include="ObjectFactory.h" />
+    <ClInclude Include="Oscillator.h" />
     <ClInclude Include="OutputFloat32ChannelPair.h" />
     <ClInclude Include="OutputInt24ChannelPair.h" />
     <ClInclude Include="OutputInt32ChannelPair.h" />
@@ -179,6 +180,7 @@
     <ClCompile Include="MidiInput.cpp" />
     <ClCompile Include="MidiMessage.cpp" />
     <ClCompile Include="ObjectFactory.cpp" />
+    <ClCompile Include="Oscillator.cpp" />
     <ClCompile Include="ProcessingChain.cpp" />
     <ClCompile Include="ProcessingContext.cpp" />
     <ClCompile Include="SampleBuffer.cpp" />
