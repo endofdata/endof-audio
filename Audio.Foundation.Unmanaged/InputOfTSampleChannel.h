@@ -28,14 +28,10 @@ namespace Audio
 						m_pBufferB(pBufferB),
 						m_pDirectMonitor(nullptr),
 						m_isActive(false),
-						m_pan(PanCenter),
-						m_level(LevelMax),
 						m_refCount(0)
 					{
 						if (nullptr == m_pBufferA || nullptr == m_pBufferB)
 							throw std::invalid_argument("InputChannel: Buffer pointers must not be nullptr.");
-
-						SampleConversion::LevelAndPanFactor(m_level, m_pan, m_factorLeft, m_factorRight);
 					}
 
 					/*! \brief Destructor
@@ -62,6 +58,8 @@ namespace Audio
 
 							if (container->ChannelCount > 1)
 							{
+								double factorLeft = m_mix.FactorLeft;
+								double factorRight = m_mix.FactorRight;
 								Sample* pDestLeft = container->Channels[0]->SamplePtr;
 								Sample* pDestRight = container->Channels[1]->SamplePtr;
 								
@@ -69,21 +67,18 @@ namespace Audio
 								{
 									Sample sample = ReadSample(pSource);
 
-									if (sample > 0.7)
-									{
-										int fred = 12;
-									}
-									*(pDestLeft++) += m_factorLeft * sample;
-									*(pDestRight++) += m_factorRight * sample;
+									*(pDestLeft++) += factorLeft * sample;
+									*(pDestRight++) += factorRight * sample;
 								}
 							}
 							else if (container->ChannelCount > 0)
 							{
+								double level = m_mix.Level;
 								Sample* pDest = container->Channels[0]->SamplePtr;
 
 								for (int i = 0; i < sampleCount; i++)
 								{
-									*pDest++ += m_level * ReadSample(pSource);
+									*pDest++ += level * ReadSample(pSource);
 								}
 							}
 						}
@@ -99,28 +94,10 @@ namespace Audio
 						m_isActive = value;
 					}
 
-					virtual double get_Pan()
+					virtual MixParameter& get_Mix()
 					{
-						return m_pan;
+						return m_mix;
 					}
-
-					virtual void put_Pan(double value)
-					{
-						m_pan = value;
-						SampleConversion::LevelAndPanFactor(m_level, m_pan, m_factorLeft, m_factorRight);
-					}
-
-					virtual double get_Level()
-					{
-						return m_level;
-					}
-
-					virtual void put_Level(double value)
-					{
-						m_level = value;
-						SampleConversion::LevelAndPanFactor(m_level, m_pan, m_factorLeft, m_factorRight);
-					}
-
 
 					virtual bool get_SupportsDirectMonitor()
 					{
@@ -184,10 +161,7 @@ namespace Audio
 					TSample* m_pBufferB;
 
 					bool m_isActive;
-					double m_pan;
-					double m_level;
-					double m_factorLeft;
-					double m_factorRight;
+					MixParameter m_mix;
 					IOutputChannelPairPtr m_pDirectMonitor;
 
 					unsigned long m_refCount;

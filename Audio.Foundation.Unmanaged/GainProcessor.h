@@ -25,11 +25,7 @@ namespace Audio
 
 				int Process(ISampleContainerPtr& container, const ProcessingContext& context);
 
-				double get_Level() const;
-				void put_Level(double value);
-
-				double get_Pan() const;
-				void put_Pan(double value);
+				MixParameter& get_Mix();
 
 				DECLARE_IUNKNOWN
 
@@ -37,8 +33,7 @@ namespace Audio
 				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
-				double m_level;
-				double m_pan;
+				MixParameter m_mix;
 				bool m_isBypassed;
 			};
 		}

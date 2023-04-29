@@ -33,12 +33,14 @@ namespace Audio
 
 				virtual ISampleContainerPtr get_Container();
 
+				virtual MixParameter& get_Mix();
+
 				virtual bool HasDataAt(AudioTime position) const;
 
 				bool SeekTo(AudioTime offset, AudioSeek kind);
 
-				int WriteTo(ISampleContainerPtr& target, int sampleOffset, int sampleCount, int channelOffset, int channelCount, 
-					int targetSampleOffset, int targetChannelOffset, const MixParameter& mix, bool overdub) const;
+				//int WriteTo(ISampleContainerPtr& target, int sampleOffset, int sampleCount, int channelOffset, int channelCount, 
+				//	int targetSampleOffset, int targetChannelOffset, const MixParameter& mix, bool overdub) const;
 
 				int WriteTo(ISampleContainerPtr& target, int channelOffset, int channelCount, int targetChannelOffset);
 
@@ -50,6 +52,7 @@ namespace Audio
 			private:
 				int m_id;
 				ISampleContainerPtr m_container;
+				MixParameter m_mix;
 				AudioTime m_position;
 				AudioTime m_length;
 				AudioTime m_readOffset;

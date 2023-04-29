@@ -77,21 +77,12 @@ namespace Audio
 					/// </summary>
 					_declspec(property(get = get_IsActive, put = put_IsActive)) bool IsActive;
 
-					double get_Pan() = 0;
-					void put_Pan(double value) = 0;
+					MixParameter& get_Mix() = 0;
 
 					/// <summary>
-					/// Gets or sets the mono input channel pan position in a stereo field
+					/// Gets or sets the mix parameter of a mono input channel in a stereo field
 					/// </summary>
-					_declspec(property(get = get_Pan, put = put_Pan)) double Pan;
-
-					double get_Level() = 0;
-					void put_Level(double value) = 0;
-
-					/// <summary>
-					/// Gets or sets the mono input channel level
-					/// </summary>
-					_declspec(property(get = get_Level, put = put_Level)) double Level;
+					_declspec(property(get = get_Mix)) MixParameter& Mix;
 
 
 					void OnNextBuffer(ISampleContainerPtr& sampleContainer, bool readSecondHalf) = 0;

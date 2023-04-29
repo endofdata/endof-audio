@@ -8,8 +8,6 @@ using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 GainProcessor::GainProcessor(double level, double pan) :
-	m_level(level),
-	m_pan(pan),
 	m_isBypassed(false),
 	m_refCount(0)
 {
@@ -52,11 +50,12 @@ int GainProcessor::Process(ISampleContainerPtr& container, const ProcessingConte
 
 		if (channels > 1)
 		{
-			SampleConversion::LevelAndPanFactor(m_level, m_pan, factorLeft, factorRight);
+			factorLeft = m_mix.FactorLeft;
+			factorRight = m_mix.FactorRight;
 		}
 		else
 		{
-			factorLeft = factorRight = m_level;
+			factorLeft = factorRight = m_mix.Level;
 		}
 
 		double factor = factorLeft;
@@ -85,22 +84,7 @@ void GainProcessor::put_IsBypassed(bool value)
 	m_isBypassed = value;
 }
 
-double GainProcessor::get_Level() const
+MixParameter& GainProcessor::get_Mix()
 {
-	return m_level;
-}
-
-void GainProcessor::put_Level(double value)
-{
-	m_level = value;
-}
-
-double GainProcessor::get_Pan() const
-{
-	return m_pan;
-}
-
-void GainProcessor::put_Pan(double value)
-{
-	m_pan = value;
+	return m_mix;
 }
