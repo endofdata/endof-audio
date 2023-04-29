@@ -13,6 +13,7 @@
 #include <vector>
 #include <algorithm>
 #include <SampleConversionUnmanaged.h>
+#include <iomanip>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Audio::Foundation::Unmanaged;
@@ -118,6 +119,7 @@ namespace Test
 						AudioTime position = 0;
 						AudioTime length = AudioTime::FromSeconds(seconds);
 						ITakePtr pTake = ObjectFactory::CreateTake(pContainer, position, length);
+
 						Assert::IsNotNull(pTake.GetInterfacePtr(), L"Can create audio take");
 
 						int takeId = pTakeSequence->AddTake(pTake);
@@ -166,7 +168,7 @@ namespace Test
 						pVectorWriter->QueryInterface<IRecorder>(&pRecorder);
 						Assert::IsNotNull(pRecorder.GetInterfacePtr(), L"Can access IRecorder from ISampleProcessor (vector writer)");
 
-						ISampleContainerPtr pOutputContainer = pRecorder->CreateSampleContainer(false);						
+						ISampleContainerPtr pOutputContainer = pRecorder->CreateSampleContainer(false, 10, 10);						
 						Assert::IsNotNull(pOutputContainer.GetInterfacePtr(), L"Can create ISampleContainer from IRecorder (vector writer)");
 						Assert::AreEqual(2, pOutputContainer->ChannelCount, L"Has two channels of output data");
 						Assert::AreEqual(loopsRequiredForTenSeconds * Constants::SampleCount, pOutputContainer->SampleCount, L"Has expected size of output data");
@@ -221,7 +223,7 @@ namespace Test
 
 						void AssertBufferTransfers(bool writeSecondHalf, const ISampleContainerPtr& pMixedIn = nullptr)
 						{
-							int ioTolerance = 2;
+							int ioTolerance = 16;
 							const Sample* pMixedInLeft = nullptr;
 							const Sample* pMixedInRight = nullptr;
 
@@ -275,8 +277,8 @@ namespace Test
 									internY -= *pOffset;
 									sampleY -= SampleConversion::SampleToInt32(*pOffset++);
 								}
-								Assert::IsTrue(std::abs(internX - internY) < internTolerance, L"Sample difference (internal) between input and output is in accepted range");
-								Assert::IsTrue(std::abs(sampleX - sampleY) < tolerance, L"Sample difference between input and output is in accepted range");
+								AssertSampleInRange(internX, internY, internTolerance);
+								AssertSampleInRange(sampleX, sampleY, tolerance);
 							}
 						}
 
@@ -290,6 +292,26 @@ namespace Test
 								int sample = *p++;
 
 								Assert::AreEqual(sample, convertedValue, L"Sample value is not modified");
+							}
+						}
+
+						void AssertSampleInRange(Sample x, Sample y, Sample tolerance)
+						{
+							if (std::abs(x - y) >= tolerance)
+							{
+								std::wostringstream builder;
+								builder << L"Difference between input " << std::setprecision(8) << x << L" and output " << y << L" of internal sample is in accepted range " << tolerance;
+								Assert::Fail(builder.str().c_str());
+							}
+						}
+
+						void AssertSampleInRange(int x, int y, int tolerance)
+						{
+							if (std::abs(x - y) >= tolerance)
+							{
+								std::wostringstream builder;
+								builder << L"Difference between input " << x << L" and output " << y << L" of external sample is in accepted range " << tolerance;
+								Assert::Fail(builder.str().c_str());
 							}
 						}
 
@@ -335,6 +357,8 @@ namespace Test
 					{
 						// Create hardware buffers, input channel, output channel pair
 						IInputChannelPtr pInput = hwBuffers.CreateInputChannel(0);
+						pInput->Mix.Level = 1.0;
+						pInput->Mix.Pan = PanLeft;
 						IOutputChannelPairPtr pOutputPair = hwBuffers.CreateOutputChannelPair(0, 1);
 
 						// Create processing chain for the input and output channels

@@ -40,7 +40,7 @@ namespace Test
 						pWriter->QueryInterface<IRecorder>(&pRecorder);
 						Assert::IsNotNull(pRecorder.GetInterfacePtr(), L"Can access recorder from vector writer.");
 
-						ISampleContainerPtr pFullDataContainer = pRecorder->CreateSampleContainer(false);
+						ISampleContainerPtr pFullDataContainer = pRecorder->CreateSampleContainer(false, 10, 10);
 						Assert::IsNotNull(pFullDataContainer.GetInterfacePtr(), L"Can create full data container from recorder.");
 
 						// create a source processor from the full-data container 
@@ -58,7 +58,7 @@ namespace Test
 
 						IRecorderPtr pOutputRecorder = nullptr;
 						pOutputWriter->QueryInterface<IRecorder>(&pOutputRecorder);
-						ISampleContainerPtr pResult = pOutputRecorder->CreateSampleContainer(false);
+						ISampleContainerPtr pResult = pOutputRecorder->CreateSampleContainer(false, 10, 10);
 						Assert::IsNotNull(pResult.GetInterfacePtr(), L"Can access output data container from output recorder.");
 					}
 				};
