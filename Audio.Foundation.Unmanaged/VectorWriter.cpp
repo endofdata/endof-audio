@@ -108,13 +108,15 @@ int VectorWriter::Process(ISampleContainerPtr& container, const ProcessingContex
 	return 0;
 }
 
-ISampleContainerPtr VectorWriter::CreateSampleContainer(bool continueRecording)
+ISampleContainerPtr VectorWriter::CreateSampleContainer(bool continueRecording, int fadeIn, int fadeOut)
 {
 	if (m_inUse > 0)
 	{
 		IsBypassed = true;
 
 		const std::lock_guard<std::recursive_mutex> lock(m_buffers_mutex);
+
+		FadeBuffers(fadeIn, fadeOut);
 
 		auto container = new SampleContainer(m_buffers, m_inUse);
 		m_buffers.clear();
@@ -171,6 +173,32 @@ void VectorWriter::FreeBuffers()
 		std::free(pSamples);
 	}
 	m_buffers.clear();
+}
+
+void VectorWriter::FadeBuffers(int fadeIn, int fadeOut)
+{
+	fadeIn = std::min(m_inUse / 2, fadeIn);
+	fadeOut = std::min(m_inUse / 2, fadeOut);
+
+	std::function<Sample(Sample, int)> fadeInFunc = [fadeIn](Sample sample, int index) { return sample * index / fadeIn; };
+	std::function<Sample(Sample, int)> fadeOutFunc = [fadeOut](Sample sample, int index) { return sample * (fadeOut - index) / fadeOut; };
+
+	for (Sample* buffer : m_buffers)
+	{
+		Sample* target = buffer;
+
+		for (int s = 0; s < fadeIn; s++)
+		{
+			*target++ = fadeInFunc(*target, s);
+		}
+
+		target += m_inUse - fadeIn - fadeOut;
+
+		for (int s = 0; s < fadeOut; s++)
+		{
+			*target++ = fadeOutFunc(*target, s);
+		}
+	}
 }
 
 bool VectorWriter::get_IsBypassed() const

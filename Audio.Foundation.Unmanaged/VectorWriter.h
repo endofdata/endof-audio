@@ -25,7 +25,7 @@ namespace Audio
 				bool get_IsBypassed() const;
 				void put_IsBypassed(bool value);
 
-				ISampleContainerPtr CreateSampleContainer(bool continueRecording);
+				ISampleContainerPtr CreateSampleContainer(bool continueRecording, int fadeIn, int fadeOut);
 				void DropRecording(bool continueRecording);
 
 				DECLARE_IUNKNOWN
@@ -34,6 +34,7 @@ namespace Audio
 				virtual bool GetInterface(REFIID riid, void** pResult);
 				void AllocBuffers();
 				void FreeBuffers();
+				void FadeBuffers(int fadeIn, int fadeOut);
 
 			private:
 				int m_channelCount;

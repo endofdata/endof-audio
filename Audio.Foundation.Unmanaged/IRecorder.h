@@ -20,7 +20,7 @@ namespace Audio
 					/// Creates an audio take from current recording data.
 					/// </summary>
 					/// <param name="continueRecording">Controls whether recorder should go on with next recording</param>
-					ISampleContainerPtr CreateSampleContainer(bool continueRecording) = 0;
+					ISampleContainerPtr CreateSampleContainer(bool continueRecording, int fadeIn, int fadeOut) = 0;
 
 					/// <summary>
 					/// Drops any recording data.
