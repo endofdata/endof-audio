@@ -28,7 +28,7 @@ namespace Audio
 					void AddOutputPair(IOutputChannelPairPtr& output) = 0;
 
 					void SetInputMonitoring(int inputId, int outputId) = 0;
-
+					
 					IInputChannelPtr FindInput(int inputId) = 0;
 
 					IOutputChannelPairPtr FindOutput(int outputId) = 0;
@@ -62,6 +62,10 @@ namespace Audio
 
 					ITransportPtr& get_Transport() = 0;
 					_declspec(property(get = get_Transport)) ITransportPtr Transport;
+
+					ISampleProcessorPtr& get_MixRecorder() = 0;
+					void put_MixRecorder(ISampleProcessorPtr& value) = 0;
+					_declspec(property(get = get_MixRecorder, put = put_MixRecorder)) ISampleProcessorPtr& MixRecorder;
 				};
 
 				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(IProcessingChain, __uuidof(IProcessingChain));

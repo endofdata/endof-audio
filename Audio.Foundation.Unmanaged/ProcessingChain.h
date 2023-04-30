@@ -61,10 +61,15 @@ namespace Audio
 
 				ITransportPtr& get_Transport();
 
+				ISampleProcessorPtr& get_MixRecorder();
+				void put_MixRecorder(ISampleProcessorPtr& value);
+
 				DECLARE_IUNKNOWN
 
 			protected:
 				virtual bool GetInterface(REFIID riid, void** pResult);
+
+				void FadeBuffers(int fadeIn, int fadeOut);
 
 			private:
 				int GetNextProcessorId();
@@ -74,6 +79,7 @@ namespace Audio
 				std::vector<std::pair<int, ISampleProcessorPtr>> m_processors;
 				ISampleContainerPtr m_container;
 				ITransportPtr m_transport;
+				ISampleProcessorPtr m_mixRecorder;
 				std::vector<IInputChannelPtr> m_inputChannels;
 				std::vector<IOutputChannelPairPtr> m_outputChannelPairs;
 				int m_currentMonitorInputId;

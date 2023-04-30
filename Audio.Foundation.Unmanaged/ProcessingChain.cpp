@@ -48,10 +48,8 @@ void ProcessingChain::OnNextBuffer(bool writeSecondHalf)
 		int channel = 0;
 		bool readSecondHalf = !writeSecondHalf;
 
-		m_transport->Pulse(m_container->SampleCount);
+		ProcessingContext context = m_transport->Pulse();
 		IHostClockPtr clock = m_transport->HostClock;
-
-		ProcessingContext context(m_transport->CurrentSamplePosition, clock->CurrentTime, m_transport->IsSkipping);
 
 		for (int c = 0; c < m_container->ChannelCount; c++)
 		{
@@ -64,13 +62,14 @@ void ProcessingChain::OnNextBuffer(bool writeSecondHalf)
 			input->OnNextBuffer(m_container, readSecondHalf);
 		});
 
-
-
 		std::for_each(m_processors.begin(), m_processors.end(), [this, context]
 		(std::pair<int, ISampleProcessorPtr>& item)
 		{
 			item.second->Process(m_container, context);
 		});
+
+		int fadeWidth = m_container->SampleCount / 2;
+		FadeBuffers(context.IsLoopStart? fadeWidth: 0, context.IsLoopEnd? fadeWidth : 0);
 
 		int firstOut = 0;
 
@@ -80,6 +79,46 @@ void ProcessingChain::OnNextBuffer(bool writeSecondHalf)
 			output->OnNextBuffer(m_container, writeSecondHalf, firstOut);
 			firstOut += 2;
 		});
+
+		if (m_mixRecorder != nullptr)
+		{
+			m_mixRecorder->Process(m_container, context);
+		}
+	}
+}
+
+void ProcessingChain::FadeBuffers(int fadeIn, int fadeOut)
+{
+	int sampleCount = m_container->SampleCount;
+	int channelCount = m_container->ChannelCount;
+
+	fadeIn = std::min(sampleCount, fadeIn);
+	fadeOut = std::min(sampleCount, fadeOut);
+
+	if (fadeIn > 0 || fadeOut > 0)
+	{
+		double fadeInFac = fadeIn;
+		double fadeOutFac = fadeOut;
+
+		std::function<Sample(Sample, int)> fadeInFunc = [fadeInFac](Sample sample, int index) { return sample * (double)index / fadeInFac; };
+		std::function<Sample(Sample, int)> fadeOutFunc = [fadeOutFac](Sample sample, int index) { return sample * (fadeOutFac - 1.0 - (double)index) / fadeOutFac; };
+
+		for (int c = 0; c < channelCount; c++)
+		{
+			Sample* target = m_container->Channels[c]->SamplePtr;
+
+			for (int s = 0; s < fadeIn; s++)
+			{
+				*target++ = fadeInFunc(*target, s);
+			}
+
+			target += sampleCount - fadeIn - fadeOut;
+
+			for (int s = 0; s < fadeOut; s++)
+			{
+				*target++ = fadeOutFunc(*target, s);
+			}
+		}
 	}
 }
 
@@ -214,6 +253,8 @@ void ProcessingChain::RemoveAllOutputChannels()
 
 void ProcessingChain::SetInputMonitoring(int inputChannelId, int outputChannelPairId)
 {
+	const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
+
 	if (m_currentMonitorInputId >= 0)
 	{
 		auto currentInput = FindInput(m_currentMonitorInputId);
@@ -269,3 +310,16 @@ ITransportPtr& ProcessingChain::get_Transport()
 {
 	return m_transport;
 }
+
+ISampleProcessorPtr& ProcessingChain::get_MixRecorder()
+{
+	return m_mixRecorder;
+}
+
+void ProcessingChain::put_MixRecorder(ISampleProcessorPtr& value)
+{
+	const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
+
+	m_mixRecorder = value;
+}
+
