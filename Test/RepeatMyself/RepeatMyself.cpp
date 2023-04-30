@@ -104,7 +104,7 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSe
 		ISampleProcessorPtr testOscillator = ObjectFactory::CreateTestOscillator(device->SampleRate, 440.0, 0.5);
 
 		IProcessingChainPtr processingChain = device->ProcessingChain;
-		int oscId = processingChain->AddProcessor(testOscillator);
+		//int oscId = processingChain->AddProcessor(testOscillator);
 		int recorderId = processingChain->AddProcessor(recordingProcessor);
 		//int vstId = processingChain->AddProcessor(vstProcessor);
 		int joinerId = processingChain->AddProcessor(joiningProcessor);
@@ -134,8 +134,8 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSe
 
 			TransportCode transportStatus = TransportCode::None;
 			ProcessingContext& context = transport->Context;
-			int autoRecStart = 2;
-			int autoRecEnd = 5;
+			int autoRecStart = 1;
+			int autoRecEnd = 2;
 			int loopCount = 0;
 
 			while (transportStatus != TransportCode::Stop)
@@ -145,12 +145,12 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSe
 				// check for control input (MIDI)
 				bool hasControl = transportControl->GetNext(1000, transportStatus);
 
-				loopCount++;
-				if (loopCount == autoRecStart || loopCount == autoRecEnd)
-				{
-					transportStatus = TransportCode::Record;
-					hasControl = true;
-				}
+				//loopCount++;
+				//if (loopCount == autoRecStart || loopCount == autoRecEnd)
+				//{
+				//	transportStatus = TransportCode::Record;
+				//	hasControl = true;
+				//}
 
 				if (hasControl)
 				{
