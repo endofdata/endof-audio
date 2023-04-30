@@ -37,6 +37,7 @@ namespace Audio
 						m_pOutputRightB(pBufferRightB),
 						m_sampleCount(sampleCount),
 						m_writeSecondHalf(true),
+						m_isActive(false),
 						m_refCount(0)
 					{
 						if (nullptr == pBufferLeftA || nullptr == pBufferLeftB || nullptr == pBufferRightA || nullptr == pBufferRightB)

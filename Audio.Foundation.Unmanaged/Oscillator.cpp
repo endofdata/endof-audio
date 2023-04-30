@@ -72,7 +72,7 @@ void Oscillator::put_IsBypassed(bool value)
 
 int Oscillator::Process(ISampleContainerPtr& container, const ProcessingContext& context)
 {
-	if (context.IsSkipping)
+	if (context.IsLoopStart)
 	{
 		m_phasePos = 0.0;
 	}

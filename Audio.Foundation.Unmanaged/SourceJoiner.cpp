@@ -86,7 +86,7 @@ int SourceJoiner::Process(ISampleContainerPtr& container, const ProcessingContex
 		{
 			std::for_each(m_vecSources.begin(), m_vecSources.end(), [this, &container](std::pair<ISampleSourcePtr, MixParameter>& item)
 			{
-				// Read in 'overub' mode to add sample values
+				// Read in 'overdub' mode to add sample values
 				item.first->ReadSamples(container, item.second, true);
 			});
 		}

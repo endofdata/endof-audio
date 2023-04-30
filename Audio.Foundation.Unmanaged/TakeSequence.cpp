@@ -149,7 +149,7 @@ int TakeSequence::Process(ISampleContainerPtr& container, const ProcessingContex
 	{
 		bool hasTake = false;
 
-		if (m_transport->IsSkipping)
+		if (context.IsLoopStart)
 		{
 			PlayPosition = m_transport->HostClock->CurrentTime;
 			hasTake = m_playPosition != m_takes.end();

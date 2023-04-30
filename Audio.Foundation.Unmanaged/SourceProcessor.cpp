@@ -39,7 +39,7 @@ int SourceProcessor::Process(ISampleContainerPtr& container, const ProcessingCon
 {
 	if (!m_isBypassed)
 	{
-		if (context.IsSkipping)
+		if (context.IsLoopStart)
 		{
 			m_pSource->SamplePosition = context.SamplePosition;
 		}
