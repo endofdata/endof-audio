@@ -4,13 +4,10 @@
 using namespace Audio::Foundation::Unmanaged;
 
 
-Transport::Transport(IHostClockPtr& hostClock, ITransportEventsPtr& events) :
+Transport::Transport(IHostClockPtr& hostClock, ITransportEventsPtr& events, int sampleCount) :
 	m_hostClock(hostClock),
+	m_context(sampleCount),
 	m_events(events),
-	m_loopStartPosition(0),
-	m_loopEndPosition(0),
-	m_isLooping(false),
-	m_isSkipping(false),
 	m_refCount(0)
 {
 }
@@ -40,7 +37,7 @@ bool Transport::GetInterface(REFIID iid, void** ppvResult)
 void Transport::Start()
 {
 	m_hostClock->Start();
-	m_currentSamplePosition = AudioTimeToSamplePosition(m_hostClock->CurrentTime);
+	m_context.SamplePosition = AudioTimeToSamplePosition(m_hostClock->CurrentTime);
 	m_events->Transport(TransportCode::Start);
 }
 
@@ -50,87 +47,54 @@ void Transport::Stop()
 	m_events->Transport(TransportCode::Stop);
 }
 
-void Transport::Pulse(int sampleCount)
+ProcessingContext& Transport::Pulse()
 {
-	m_currentSamplePosition += sampleCount;
-	m_isSkipping = false;
+	m_context.SamplePosition += m_context.SampleCount;
 
-	if (m_isLooping)
+	if (m_context.IsLooping)
 	{
-		if (m_currentSamplePosition >= m_loopEndPosition)
+		if (m_context.IsLoopStart)
 		{
-			m_currentSamplePosition = m_loopStartPosition;
-			m_hostClock->CurrentTime = SamplePositionToAudioTime(m_currentSamplePosition);
-			m_isSkipping = true;
+			m_hostClock->CurrentTime = LoopStartTime;
 			m_events->Transport(TransportCode::Locate);
 		}
 	}
+	return m_context;
 }
 
-int Transport::get_CurrentSamplePosition() const
+ProcessingContext& Transport::get_Context()
 {
-	return m_currentSamplePosition;
+	return m_context;
 }
 
-void Transport::put_CurrentSamplePosition(int value)
+AudioTime Transport::get_TimePosition() const
 {
-	m_currentSamplePosition = value;
+	return SamplePositionToAudioTime(m_context.SamplePosition);
 }
 
-
-bool Transport::get_IsSkipping()
+void Transport::put_TimePosition(AudioTime value)
 {
-	return m_isSkipping;
+	m_context.SamplePosition = AudioTimeToSamplePosition(value);
 }
 
-bool Transport::get_IsLooping()
+AudioTime Transport::get_LoopStartTime()
 {
-	return m_isLooping;
+	return SamplePositionToAudioTime(m_context.LoopStartSample);
 }
 
-void Transport::put_IsLooping(bool value)
+void Transport::put_LoopStartTime(AudioTime value)
 {
-	m_isLooping = value;
+	m_context.LoopStartSample = AudioTimeToSamplePosition(value);
 }
 
-AudioTime Transport::get_LoopStart()
+AudioTime Transport::get_LoopEndTime()
 {
-	return SamplePositionToAudioTime(m_loopStartPosition);
+	return SamplePositionToAudioTime(m_context.LoopEndSample);
 }
 
-void Transport::put_LoopStart(AudioTime value)
+void Transport::put_LoopEndTime(AudioTime value)
 {
-	int samplePosition = AudioTimeToSamplePosition(value);
-
-	if (samplePosition > m_loopEndPosition)
-	{
-		m_loopStartPosition = m_loopEndPosition;
-		m_loopEndPosition = samplePosition;
-	}
-	else
-	{
-		m_loopStartPosition = samplePosition;
-	}
-}
-
-AudioTime Transport::get_LoopEnd()
-{
-	return SamplePositionToAudioTime(m_loopEndPosition);
-}
-
-void Transport::put_LoopEnd(AudioTime value)
-{
-	int samplePosition = AudioTimeToSamplePosition(value);
-
-	if (samplePosition < m_loopStartPosition)
-	{
-		m_loopEndPosition = m_loopStartPosition;
-		m_loopStartPosition = samplePosition;
-	}
-	else
-	{
-		m_loopEndPosition = samplePosition;
-	}
+	m_context.LoopEndSample = AudioTimeToSamplePosition(value);
 }
 
 IHostClockPtr& Transport::get_HostClock()

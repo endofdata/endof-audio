@@ -16,27 +16,24 @@ namespace Audio
 			class Transport : public ITransport
 			{
 			public:
-				Transport(IHostClockPtr& hostClock, ITransportEventsPtr& events);
+				Transport(IHostClockPtr& hostClock, ITransportEventsPtr& events, int sampleCount);
 				virtual ~Transport();
 
 				void Start();
 				void Stop();
 
-				void Pulse(int sampleCount);
+				ProcessingContext& Pulse();
 
-				int get_CurrentSamplePosition() const;
-				void put_CurrentSamplePosition(int value);
+				ProcessingContext& get_Context();
 
-				bool get_IsSkipping();
+				AudioTime get_TimePosition() const;
+				void put_TimePosition(AudioTime value);
 
-				bool get_IsLooping();
-				void put_IsLooping(bool value);
+				AudioTime get_LoopStartTime();
+				void put_LoopStartTime(AudioTime value);
 
-				AudioTime get_LoopStart();
-				void put_LoopStart(AudioTime value);
-
-				AudioTime get_LoopEnd();
-				void put_LoopEnd(AudioTime value);
+				AudioTime get_LoopEndTime();
+				void put_LoopEndTime(AudioTime value);
 
 				IHostClockPtr& get_HostClock();
 
@@ -53,11 +50,7 @@ namespace Audio
 			private:
 				IHostClockPtr m_hostClock;
 				ITransportEventsPtr m_events;
-				int m_currentSamplePosition;
-				int m_loopStartPosition;
-				int m_loopEndPosition;
-				bool m_isLooping;
-				bool m_isSkipping;
+				ProcessingContext m_context;
 			};
 		}
 	}

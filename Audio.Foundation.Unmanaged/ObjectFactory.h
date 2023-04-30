@@ -63,7 +63,7 @@ namespace Audio
 
 				static IHostClockPtr CreateHostClock(double sampleRate = 0.0);
 
-				static ITransportPtr CreateTransport(IHostClockPtr& hostClock);
+				static ITransportPtr CreateTransport(IHostClockPtr& hostClock, int sampleCount);
 
 				static ITakeSequencePtr CreateTakeSequence(ITransportPtr& transport);
 

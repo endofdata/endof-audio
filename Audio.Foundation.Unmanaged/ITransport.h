@@ -5,6 +5,7 @@
 #include <comdef.h>
 #include <IHostClock.h>
 #include <ITransportEvents.h>
+#include <ProcessingContext.h>
 
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -25,26 +26,22 @@ namespace Audio
 					void Start() = 0;
 					void Stop() = 0;
 
-					void Pulse(int sampleCount) = 0;
+					ProcessingContext& Pulse() = 0;
 
-					int get_CurrentSamplePosition() const = 0;
-					void put_CurrentSamplePosition(int value) = 0;
-					_declspec(property(get = get_CurrentSamplePosition, put = put_CurrentSamplePosition)) int CurrentSamplePosition;
+					ProcessingContext& get_Context() = 0;
+					_declspec(property(get = get_Context)) ProcessingContext& Context;
 
-					bool get_IsSkipping() = 0;
-					_declspec(property(get = get_IsSkipping)) bool IsSkipping;
+					AudioTime get_TimePosition() const = 0;
+					void put_TimePosition(AudioTime value) = 0;
+					_declspec(property(get = get_TimePosition, put = put_TimePosition)) AudioTime TimePosition;
 
-					bool get_IsLooping() = 0;
-					void put_IsLooping(bool value) = 0;
-					_declspec(property(get = get_IsLooping, put = put_IsLooping)) bool IsLooping;
+					AudioTime get_LoopStartTime() = 0;
+					void put_LoopStartTime(AudioTime value) = 0;
+					_declspec(property(get = get_LoopStartTime, put = put_LoopStartTime)) AudioTime LoopStartTime;
 
-					AudioTime get_LoopStart() = 0;
-					void put_LoopStart(AudioTime value) = 0;
-					_declspec(property(get = get_LoopStart, put = put_LoopStart)) AudioTime LoopStart;
-
-					AudioTime get_LoopEnd() = 0;
-					void put_LoopEnd(AudioTime value) = 0;
-					_declspec(property(get = get_LoopEnd, put = put_LoopEnd)) AudioTime LoopEnd;
+					AudioTime get_LoopEndTime() = 0;
+					void put_LoopEndTime(AudioTime value) = 0;
+					_declspec(property(get = get_LoopEndTime, put = put_LoopEndTime)) AudioTime LoopEndTime;
 
 					IHostClockPtr& get_HostClock() = 0;
 					_declspec(property(get = get_HostClock)) IHostClockPtr HostClock;

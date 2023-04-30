@@ -125,10 +125,10 @@ IHostClockPtr ObjectFactory::CreateHostClock(double sampleRate)
 	return new HostClock(std::max(8000.0, sampleRate));
 }
 
-ITransportPtr ObjectFactory::CreateTransport(IHostClockPtr& hostClock)
+ITransportPtr ObjectFactory::CreateTransport(IHostClockPtr& hostClock, int sampleCount)
 {
 	ITransportEventsPtr events = new TransportEvents();
-	return new Transport(hostClock, events);
+	return new Transport(hostClock, events, sampleCount);
 }
 
 ITakeSequencePtr ObjectFactory::CreateTakeSequence(ITransportPtr& transport)
