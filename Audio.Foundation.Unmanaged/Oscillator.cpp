@@ -12,6 +12,7 @@ Oscillator::Oscillator(double sampleRate) :
 	m_amplitude(1.0),
 	m_frequency(440.0),
 	m_isBypassed(false),
+	m_fade(false),
 	m_refCount(0)
 {
 }
@@ -62,38 +63,56 @@ void Oscillator::put_Frequency(double value)
 
 bool Oscillator::get_IsBypassed() const
 {
-	return m_isBypassed;
+	return m_isBypassed == true && m_fade == false;
 }
 
 void Oscillator::put_IsBypassed(bool value)
 {
-	m_isBypassed = value;
+	if (value != m_isBypassed)
+	{
+		m_fade = true;
+		m_isBypassed = value;
+	}
 }
 
 int Oscillator::Process(ISampleContainerPtr& container, const ProcessingContext& context)
 {
-	if (context.IsLoopStart)
-	{
-		m_phasePos = 0.0;
-	}
-
 	if (!IsBypassed)
 	{
 		int channelCount = container->ChannelCount;
 		int sampleCount = container->SampleCount;
 		double phasePos = 0.0;
+		double ampChange = 0.0;
+		double amplitude = 0.0;
+
+		if (m_fade)
+		{
+			if (m_isBypassed)
+			{
+				ampChange = m_amplitude / -sampleCount;
+			}
+			else
+			{
+				ampChange = m_amplitude / sampleCount;
+				m_amplitude = 0.0;
+			}
+		}
 
 		for (int c = 0; c < channelCount; c++)
 		{
 			Sample* pTarget = container->Channels[c]->SamplePtr;
 			phasePos = m_phasePos;
+			amplitude = m_amplitude;
 
 			for (int s = 0; s < sampleCount; s++)
 			{
-				*pTarget++ = std::sin(phasePos) * m_amplitude;
+				*pTarget++ = std::sin(phasePos) * amplitude;
 				phasePos += m_phaseStep;
+				amplitude += ampChange;
 			}
 		}
+		m_amplitude = amplitude;
+		m_fade = false;
 		m_phasePos = std::fmod(phasePos, TwoPi);
 
 		return sampleCount;

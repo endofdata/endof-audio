@@ -44,6 +44,7 @@ namespace Audio
 				double m_amplitude;
 				double m_frequency;
 				bool m_isBypassed;
+				bool m_fade;
 			};
 		}
 	}
