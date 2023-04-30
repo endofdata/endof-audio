@@ -293,8 +293,8 @@ void AsioCore::CreateBuffers(const int inputChannelIds[], int numInputIds, const
 		try
 		{
 			auto hostClock = ObjectFactory::CreateHostClock(SampleRate);
-			auto transport = ObjectFactory::CreateTransport(hostClock);
-			auto container = ObjectFactory::CreateSampleContainer(m_iSampleCount, std::max<int>(numInputIds, numOutputIds));
+			auto transport = ObjectFactory::CreateTransport(hostClock, SampleCount);
+			auto container = ObjectFactory::CreateSampleContainer(SampleCount, std::max<int>(numInputIds, numOutputIds));
 			m_processingChain = ObjectFactory::CreateProcessingChain(transport, container);
 
 			CreateInputChannels(0, numInputIds);
