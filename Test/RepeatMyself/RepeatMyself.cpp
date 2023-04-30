@@ -88,10 +88,10 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSe
 		recorder->QueryInterface<ISampleProcessor>(&recordingProcessor);
 		recordingProcessor->IsBypassed = true;
 
-		IRecorderPtr masterRecorder = ObjectFactory::CreateRecorder(countSelectedOutputs, (int)samplesPerTenSecs, (int)samplesPerTenSecs);
-		ISampleProcessorPtr masterRecProcessor = nullptr;
-		masterRecorder->QueryInterface<ISampleProcessor>(&masterRecProcessor);
-		masterRecProcessor->IsBypassed = false;
+		//IRecorderPtr masterRecorder = ObjectFactory::CreateRecorder(countSelectedOutputs, (int)samplesPerTenSecs, (int)samplesPerTenSecs);
+		//ISampleProcessorPtr masterRecProcessor = nullptr;
+		//masterRecorder->QueryInterface<ISampleProcessor>(&masterRecProcessor);
+		//masterRecProcessor->IsBypassed = false;
 
 		ISourceJoinerPtr joiner = ObjectFactory::CreateSourceJoiner();
 		ISampleProcessorPtr joiningProcessor = nullptr;
@@ -109,7 +109,7 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSe
 		//int vstId = processingChain->AddProcessor(vstProcessor);
 		int joinerId = processingChain->AddProcessor(joiningProcessor);
 		//int spatialId = processingChain->AddProcessor(spatialProcessor);
-		processingChain->MixRecorder = masterRecProcessor;
+		//processingChain->MixRecorder = masterRecProcessor;
 
 		processingChain->OutputChannelPair[0]->IsActive = true;
 		processingChain->InputChannel[0]->IsActive = true;
@@ -221,8 +221,8 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSe
 						break;
 					case TransportCode::Start:
 					{
-						ISampleContainerPtr recording = masterRecorder->CreateSampleContainer(false, 0, 0);
-						writeContents(recording);
+						//ISampleContainerPtr recording = masterRecorder->CreateSampleContainer(false, 0, 0);
+						//writeContents(recording);
 
 						// Drop current recording, continue looping
 						if (!recordingProcessor->IsBypassed)
