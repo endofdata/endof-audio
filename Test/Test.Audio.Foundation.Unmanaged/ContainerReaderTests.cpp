@@ -27,7 +27,7 @@ namespace Test
 						ISampleContainerPtr pBufferContainer = HelperMethods::CreateTestContainer(Constants::SampleCount, Constants::ChannelCount);
 						ISampleProcessorPtr pWriter = ObjectFactory::CreateRecorder(Constants::ChannelCount, Constants::SampleCount * 10, Constants::SampleCount * 2);
 
-						ProcessingContext context;
+						ProcessingContext context(Constants::SampleCount);
 
 						int loopsForTenSeconds = (Constants::SampleRate * 10 / Constants::SampleCount) + 1;
 						for (int i = 0; i < loopsForTenSeconds; i++)

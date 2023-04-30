@@ -35,7 +35,7 @@ namespace Test
 
 						ISampleProcessorPtr osc = ObjectFactory::CreateTestOscillator(Constants::SampleRate, 440, 0.5);
 						ISampleContainerPtr buffer = ObjectFactory::CreateSampleContainer(Constants::SampleCount, 1);
-						ProcessingContext context;
+						ProcessingContext context(Constants::SampleCount);
 
 						for (int b = 0; b < 1000; b++)
 						{

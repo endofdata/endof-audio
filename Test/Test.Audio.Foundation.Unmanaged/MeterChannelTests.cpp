@@ -46,7 +46,7 @@ namespace Test
 						ISampleProcessorPtr pMeterProcessor = nullptr;
 						Assert::AreEqual(S_OK, pMeterChannel->QueryInterface(&pMeterProcessor), L"Can get ISampleProcessor from IMeterChannel");
 
-						ProcessingContext context;
+						ProcessingContext context(Constants::SampleCount);
 
 						pMeterProcessor->Process(pTestBuffers, context);
 						pTarget->Process(pTestBuffers, context);

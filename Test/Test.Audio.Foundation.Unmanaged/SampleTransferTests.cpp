@@ -33,7 +33,7 @@ namespace Test
 					TEST_METHOD(BasicInitialization)
 					{
 						IHostClockPtr pHostClock = ObjectFactory::CreateHostClock();
-						ITransportPtr pTransport = ObjectFactory::CreateTransport(pHostClock);
+						ITransportPtr pTransport = ObjectFactory::CreateTransport(pHostClock, Constants::SampleCount);
 						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pTransport);
 
 						Assert::AreEqual(0, pTakeSequence->get_TakeCount(), L"New takeSequence has no takes");
@@ -96,7 +96,7 @@ namespace Test
 
 						// Create take sequence
 						IHostClockPtr pHostClock = ObjectFactory::CreateHostClock();
-						ITransportPtr pTransport = ObjectFactory::CreateTransport(pHostClock);
+						ITransportPtr pTransport = ObjectFactory::CreateTransport(pHostClock, Constants::SampleCount);
 						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pTransport);
 						Assert::IsNotNull(pTakeSequence.GetInterfacePtr(), L"Can create take sequence");
 
@@ -363,7 +363,7 @@ namespace Test
 
 						// Create processing chain for the input and output channels
 						IHostClockPtr pHostClock = ObjectFactory::CreateHostClock(Constants::SampleRate);
-						ITransportPtr pTransport = ObjectFactory::CreateTransport(pHostClock);
+						ITransportPtr pTransport = ObjectFactory::CreateTransport(pHostClock, Constants::SampleCount);
 						ISampleContainerPtr pContainer = ObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
 						IProcessingChainPtr pProcessingChain = ObjectFactory::CreateProcessingChain(pTransport, pContainer);
 
