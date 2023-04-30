@@ -21,42 +21,47 @@ const wchar_t* ClearLine = L"\33[2K\r";
 
 void writeContents(ISampleContainerPtr& container)
 {
-	for (int c = 0; c < container->ChannelCount; c++)
+	if (container != nullptr)
 	{
-		std::wostringstream builder;
-		builder << L"fred_" << c << L".dat" << std::ends;
+		for (int c = 0; c < container->ChannelCount; c++)
+		{
+			std::wostringstream builder;
+			builder << L"fred_" << c << L".dat" << std::ends;
 
-		auto filename = builder.str();
+			auto filename = builder.str();
 
-		std::ofstream out(filename, std::ios_base::out + std::ios_base::binary + std::ios_base::trunc);
-		auto data = reinterpret_cast<const char*>(container->Channels[c]->SamplePtr);
+			std::ofstream out(filename, std::ios_base::out + std::ios_base::binary + std::ios_base::trunc);
+			auto data = reinterpret_cast<const char*>(container->Channels[c]->SamplePtr);
 
-		out.write(data, container->SampleCount * sizeof(Sample));
-		out.flush();
+			out.write(data, container->SampleCount * sizeof(Sample));
+			out.flush();
+		}
 	}
 }
 
-bool addTake(ITransportPtr& transport, IRecorderPtr& recorder, ISourceJoinerPtr& joiner, AudioTime& switchTime)
+bool addTake(ITransportPtr& transport, IRecorderPtr& recorder, ISourceJoinerPtr& joiner)
 {
-	switchTime = transport->HostClock->CurrentTime;
-
-	ISampleContainerPtr take = recorder->CreateSampleContainer(false);
+	ISampleContainerPtr take = recorder->CreateSampleContainer(false, 0, 0);
 
 	if (take == nullptr)
 	{
-		std::wcout << ClearLine << L"No data recorded " << switchTime.ToString() << std::endl;
+		std::wcout << ClearLine << L"No data recorded " << std::endl;
 		return false;
 	}
 	else
 	{
+		MixParameter mix;
+		//mix.Level = 0.7;
+		//mix.Pan = PanRight;
+
 		ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take);
 		takeSource->IsLooping = true;
-		joiner->AddSource(takeSource, MixParameter());
+		joiner->AddSource(takeSource, mix);
 		return true;
 	}
 }
 
-static void runVstHost(AsioCorePtr& device, int countSelectedInputs, double gain, double pan)
+static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSelectedOutputs, double gain, double pan)
 {
 	// create processor chain input -> vst -> recorder -> output
 	IVstHostPtr host = VstObjectFactory::CreateVstHost(L"RepeatMyself", device->SampleCount, device->SampleRate);
@@ -83,6 +88,11 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, double gain
 		recorder->QueryInterface<ISampleProcessor>(&recordingProcessor);
 		recordingProcessor->IsBypassed = true;
 
+		IRecorderPtr masterRecorder = ObjectFactory::CreateRecorder(countSelectedOutputs, (int)samplesPerTenSecs, (int)samplesPerTenSecs);
+		ISampleProcessorPtr masterRecProcessor = nullptr;
+		masterRecorder->QueryInterface<ISampleProcessor>(&masterRecProcessor);
+		masterRecProcessor->IsBypassed = false;
+
 		ISourceJoinerPtr joiner = ObjectFactory::CreateSourceJoiner();
 		ISampleProcessorPtr joiningProcessor = nullptr;
 		joiner->QueryInterface<ISampleProcessor>(&joiningProcessor);
@@ -94,11 +104,12 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, double gain
 		ISampleProcessorPtr testOscillator = ObjectFactory::CreateTestOscillator(device->SampleRate, 440.0, 0.5);
 
 		IProcessingChainPtr processingChain = device->ProcessingChain;
+		int oscId = processingChain->AddProcessor(testOscillator);
+		int recorderId = processingChain->AddProcessor(recordingProcessor);
 		//int vstId = processingChain->AddProcessor(vstProcessor);
-		//int recorderId = processingChain->AddProcessor(recordingProcessor);
 		int joinerId = processingChain->AddProcessor(joiningProcessor);
 		//int spatialId = processingChain->AddProcessor(spatialProcessor);
-		int oscId = processingChain->AddProcessor(testOscillator);
+		processingChain->MixRecorder = masterRecProcessor;
 
 		processingChain->OutputChannelPair[0]->IsActive = true;
 		processingChain->InputChannel[0]->IsActive = true;
@@ -122,18 +133,31 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, double gain
 			transportControl->IsActive = true;
 
 			TransportCode transportStatus = TransportCode::None;
+			ProcessingContext& context = transport->Context;
+			int autoRecStart = 2;
+			int autoRecEnd = 5;
+			int loopCount = 0;
 
 			while (transportStatus != TransportCode::Stop)
 			{
 				std::wcout << transport->HostClock->CurrentTime.ToString() << '\r';
 
 				// check for control input (MIDI)
-				if (transportControl->GetNext(1000, transportStatus))
+				bool hasControl = transportControl->GetNext(1000, transportStatus);
+
+				loopCount++;
+				if (loopCount == autoRecStart || loopCount == autoRecEnd)
+				{
+					transportStatus = TransportCode::Record;
+					hasControl = true;
+				}
+
+				if (hasControl)
 				{
 					switch (transportStatus)
 					{
 					case TransportCode::Record:
-						if (!transport->IsLooping)
+						if (!context.IsLooping)
 						{
 							// Initial loop recording
 							if (recordingProcessor->IsBypassed)
@@ -146,12 +170,14 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, double gain
 							else
 							{
 								// Step 2: press record again to stop recording and begin loop
-								AudioTime switchTime;
-								if (addTake(transport, recorder, joiner, switchTime))
+								int switchSamplePos = transport->Context.SamplePosition;
+								if (addTake(transport, recorder, joiner))
 								{
-									std::wcout << ClearLine << L"Loop length " << switchTime.ToString() << std::endl;
-									transport->LoopEnd = switchTime;
-									transport->IsLooping = true;
+									context.LoopEndSample = switchSamplePos;
+									context.IsLooping = true;
+									testOscillator->IsBypassed = true;
+									AudioTime switchTime = transport->SamplePositionToAudioTime(switchSamplePos);
+									std::wcout << ClearLine << L"Loop length " << switchTime.ToString() << L"(samples: " << switchSamplePos << L")" << std::endl;
 								}
 							}
 						}
@@ -177,15 +203,16 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, double gain
 							else
 							{
 								// Step n + 1: stop overdub and add loop
-								AudioTime switchTime;
-								if (addTake(transport, recorder, joiner, switchTime))
+								int switchSamplePos = transport->Context.SamplePosition;								
+								if (addTake(transport, recorder, joiner))
 								{
 									std::wcout << ClearLine << L"Accept overdub " << dubCount;
 
-									if (switchTime > transport->LoopEnd)
+									if (switchSamplePos > transport->Context.LoopEndSample)
 									{
-										std::wcout << ClearLine << L", loop length adjusted to " << switchTime.ToString();
-										transport->LoopEnd = switchTime;
+										AudioTime switchTime;
+										std::wcout << ClearLine << L", loop length adjusted to " << switchTime.ToString() << L"(samples: " << switchSamplePos << L")";
+										transport->Context.LoopEndSample = switchSamplePos;
 									}
 									std::wcout << std::endl;
 								}
@@ -193,6 +220,10 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, double gain
 						}
 						break;
 					case TransportCode::Start:
+					{
+						ISampleContainerPtr recording = masterRecorder->CreateSampleContainer(false, 0, 0);
+						writeContents(recording);
+
 						// Drop current recording, continue looping
 						if (!recordingProcessor->IsBypassed)
 						{
@@ -200,6 +231,7 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, double gain
 							std::wcout << ClearLine << L"Drop overdub " << dubCount << std::endl;
 							dubCount--;
 						}
+					}
 						break;
 
 					case TransportCode::Stop:
@@ -250,7 +282,7 @@ int main()
 
 			device->CreateBuffers(selectedInputs, _countof(selectedInputs), selectedOutputs, _countof(selectedOutputs), sampleCount, outputSaturation);
 
-			runVstHost(device, _countof(selectedInputs), gain, pan);
+			runVstHost(device, _countof(selectedInputs), _countof(selectedOutputs), gain, pan);
 
 			std::wcout << L"Shutting down everything. Bye!" << std::endl;
 
