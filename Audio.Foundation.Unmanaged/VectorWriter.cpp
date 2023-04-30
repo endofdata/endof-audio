@@ -177,11 +177,14 @@ void VectorWriter::FreeBuffers()
 
 void VectorWriter::FadeBuffers(int fadeIn, int fadeOut)
 {
-	fadeIn = std::min(m_inUse / 2, fadeIn);
-	fadeOut = std::min(m_inUse / 2, fadeOut);
+	fadeIn = std::max(0, std::min(m_inUse / 2, fadeIn));
+	fadeOut = std::max(0, std::min(m_inUse / 2, fadeOut));
 
-	std::function<Sample(Sample, int)> fadeInFunc = [fadeIn](Sample sample, int index) { return sample * index / fadeIn; };
-	std::function<Sample(Sample, int)> fadeOutFunc = [fadeOut](Sample sample, int index) { return sample * (fadeOut - index) / fadeOut; };
+	double fadeInFac = fadeIn;
+	double fadeOutFac = fadeOut;
+
+	std::function<Sample(Sample, int)> fadeInFunc = [fadeInFac](Sample sample, int index) { return sample * (double)index / fadeInFac; };
+	std::function<Sample(Sample, int)> fadeOutFunc = [fadeOutFac](Sample sample, int index) { return sample * (fadeOutFac - (double)index - 1) / fadeOutFac; };
 
 	for (Sample* buffer : m_buffers)
 	{
