@@ -114,12 +114,10 @@
     </ClCompile>
     <ClCompile Include="RepeatMyself.cpp" />
     <ClCompile Include="SteinbergUrRt2.cpp" />
-    <ClCompile Include="TransportControl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="SteinbergUrRt2.h" />
-    <ClInclude Include="TransportControl.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Audio.Asio.Unmanaged\Audio.Asio.Unmanaged.vcxproj">

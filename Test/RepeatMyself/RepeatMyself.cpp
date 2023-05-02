@@ -7,17 +7,34 @@
 #include <AsioCoreException.h>
 #include <VstObjectFactory.h>
 #include <VstCom.h>
+#include <StrConv.h>
 
 #include "SteinbergUrRt2.h"
-#include "TransportControl.h"
+#include <ITransportControl.h>
 
-using namespace RepeatMyself;
 using namespace Audio::Asio;
 using namespace Audio::Vst::Unmanaged;
 using namespace Audio::Asio::Unmanaged;
 using namespace Audio::Foundation::Unmanaged;
 
 const wchar_t* ClearLine = L"\33[2K\r";
+
+bool onDeviceCaps(unsigned int id, const MIDIINCAPS& devcaps)
+{
+	std::string name = StrConv::ToUtf8(devcaps.szPname);
+
+	std::cout << "Input ID " << id << " '" << name.c_str() << "'" << std::endl;
+
+	bool isSelected = name == "2- Steinberg UR-RT2-1";
+	//bool isSelected = name == "LoopBe Internal MIDI";
+
+	if (isSelected)
+	{
+		std::cout << "Selected MIDI input device ID '" << id << "'" << std::endl;
+	}
+
+	return isSelected;
+}
 
 void writeContents(ISampleContainerPtr& container)
 {
@@ -67,7 +84,7 @@ void saveSession(IRecorderPtr& masterRecorder)
 	writeContents(recording);
 }
 
-static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSelectedOutputs, double gain, double pan)
+static void runVstHost(AsioCorePtr& device, int midiInId, int countSelectedInputs, int countSelectedOutputs, double gain, double pan)
 {
 	// create processor chain input -> vst -> recorder -> output
 	IVstHostPtr host = VstObjectFactory::CreateVstHost(L"RepeatMyself", device->SampleCount, device->SampleRate);
@@ -109,7 +126,7 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSe
 		processingChain->InputChannel[0]->IsActive = true;
 
 		ITransportPtr transport = processingChain->Transport;
-		TransportControlPtr transportControl = TransportControl::Create(transport);
+		ITransportControlPtr transportControl = ObjectFactory::CreateMidiTransportControl(transport, midiInId);
 
 		if (transportControl == nullptr)
 		{
@@ -217,7 +234,7 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSe
 							dubCount--;
 						}
 					}
-						break;
+					break;
 
 					case TransportCode::Stop:
 						transport->Stop();
@@ -263,16 +280,25 @@ int main()
 
 		try
 		{
-			device = AsioCore::CreateInstancePtr(IID_STEINBERG_UR_RT2);
-			//device = AsioCore::CreateInstancePtr(CLSID_AsioDebugDriver);
+			int midiInId = ObjectFactory::SelectMidiInputDevice(onDeviceCaps);
 
-			device->CreateBuffers(selectedInputs, _countof(selectedInputs), selectedOutputs, _countof(selectedOutputs), sampleCount, outputSaturation);
+			if (midiInId < 0)
+			{
+				std::wcerr << L"Failed to select MIDI input device." << std::endl;
+			}
+			else
+			{
+				device = AsioCore::CreateInstancePtr(IID_STEINBERG_UR_RT2);
+				//device = AsioCore::CreateInstancePtr(CLSID_AsioDebugDriver);
 
-			runVstHost(device, _countof(selectedInputs), _countof(selectedOutputs), gain, pan);
+				device->CreateBuffers(selectedInputs, _countof(selectedInputs), selectedOutputs, _countof(selectedOutputs), sampleCount, outputSaturation);
 
-			std::wcout << L"Shutting down everything. Bye!" << std::endl;
+				runVstHost(device, midiInId, _countof(selectedInputs), _countof(selectedOutputs), gain, pan);
 
-			device->Stop();
+				std::wcout << L"Shutting down everything. Bye!" << std::endl;
+
+				device->Stop();
+			}
 		}
 		catch (const AsioCoreException& acx)
 		{
