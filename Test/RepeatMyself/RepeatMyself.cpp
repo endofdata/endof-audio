@@ -61,6 +61,12 @@ bool addTake(ITransportPtr& transport, IRecorderPtr& recorder, ISourceJoinerPtr&
 	}
 }
 
+void saveSession(IRecorderPtr& masterRecorder)
+{
+	ISampleContainerPtr recording = masterRecorder->CreateSampleContainer(false, 0, 0);
+	writeContents(recording);
+}
+
 static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSelectedOutputs, double gain, double pan)
 {
 	// create processor chain input -> vst -> recorder -> output
@@ -78,38 +84,26 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSe
 	}
 	else
 	{
-		std::wstring pluginId(pluginIdRaw);
-		ISampleProcessorPtr vstProcessor = host->CreateSampleProcessor(pluginId.c_str());
-		vstProcessor->IsBypassed = false;
-
 		float samplesPerTenSecs = device->SampleRate * 60.0f;
+
 		IRecorderPtr recorder = ObjectFactory::CreateRecorder(countSelectedInputs, (int)samplesPerTenSecs, (int)samplesPerTenSecs);
 		ISampleProcessorPtr recordingProcessor = nullptr;
 		recorder->QueryInterface<ISampleProcessor>(&recordingProcessor);
 		recordingProcessor->IsBypassed = true;
 
-		//IRecorderPtr masterRecorder = ObjectFactory::CreateRecorder(countSelectedOutputs, (int)samplesPerTenSecs, (int)samplesPerTenSecs);
-		//ISampleProcessorPtr masterRecProcessor = nullptr;
-		//masterRecorder->QueryInterface<ISampleProcessor>(&masterRecProcessor);
-		//masterRecProcessor->IsBypassed = false;
+		IRecorderPtr masterRecorder = ObjectFactory::CreateRecorder(countSelectedOutputs, (int)samplesPerTenSecs, (int)samplesPerTenSecs);
+		ISampleProcessorPtr masterRecProcessor = nullptr;
+		masterRecorder->QueryInterface<ISampleProcessor>(&masterRecProcessor);
+		masterRecProcessor->IsBypassed = true;
 
 		ISourceJoinerPtr joiner = ObjectFactory::CreateSourceJoiner();
 		ISampleProcessorPtr joiningProcessor = nullptr;
 		joiner->QueryInterface<ISampleProcessor>(&joiningProcessor);
 
-		ISpatialPtr spatial = ObjectFactory::CreateSpatial(gain, pan);
-		ISampleProcessorPtr spatialProcessor = nullptr;
-		spatial->QueryInterface<ISampleProcessor>(&spatialProcessor);
-
-		ISampleProcessorPtr testOscillator = ObjectFactory::CreateTestOscillator(device->SampleRate, 440.0, 0.5);
-
 		IProcessingChainPtr processingChain = device->ProcessingChain;
-		//int oscId = processingChain->AddProcessor(testOscillator);
 		int recorderId = processingChain->AddProcessor(recordingProcessor);
-		//int vstId = processingChain->AddProcessor(vstProcessor);
 		int joinerId = processingChain->AddProcessor(joiningProcessor);
-		//int spatialId = processingChain->AddProcessor(spatialProcessor);
-		//processingChain->MixRecorder = masterRecProcessor;
+		processingChain->MixRecorder = masterRecProcessor;
 
 		processingChain->OutputChannelPair[0]->IsActive = true;
 		processingChain->InputChannel[0]->IsActive = true;
@@ -134,9 +128,6 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSe
 
 			TransportCode transportStatus = TransportCode::None;
 			ProcessingContext& context = transport->Context;
-			int autoRecStart = 1;
-			int autoRecEnd = 2;
-			int loopCount = 0;
 
 			while (transportStatus != TransportCode::Stop)
 			{
@@ -145,12 +136,6 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSe
 				// check for control input (MIDI)
 				bool hasControl = transportControl->GetNext(1000, transportStatus);
 
-				//loopCount++;
-				//if (loopCount == autoRecStart || loopCount == autoRecEnd)
-				//{
-				//	transportStatus = TransportCode::Record;
-				//	hasControl = true;
-				//}
 
 				if (hasControl)
 				{
@@ -164,6 +149,7 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSe
 							{
 								// Step 1: press record to start								
 								recordingProcessor->IsBypassed = false;
+								masterRecProcessor->IsBypassed = false;
 								transport->Start();
 								std::wcout << ClearLine << L"Record" << std::endl;
 							}
@@ -173,9 +159,9 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSe
 								int switchSamplePos = transport->Context.SamplePosition;
 								if (addTake(transport, recorder, joiner))
 								{
+									masterRecProcessor->IsBypassed = true;
 									context.LoopEndSample = switchSamplePos;
 									context.IsLooping = true;
-									testOscillator->IsBypassed = true;
 									AudioTime switchTime = transport->SamplePositionToAudioTime(switchSamplePos);
 									std::wcout << ClearLine << L"Loop length " << switchTime.ToString() << L"(samples: " << switchSamplePos << L")" << std::endl;
 								}
@@ -198,14 +184,16 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSe
 							{
 								// Step n: start overdub
 								recordingProcessor->IsBypassed = false;
+								masterRecProcessor->IsBypassed = false;
 								std::wcout << ClearLine << L"Start overdub " << ++dubCount << std::endl;
 							}
 							else
 							{
 								// Step n + 1: stop overdub and add loop
-								int switchSamplePos = transport->Context.SamplePosition;								
+								int switchSamplePos = transport->Context.SamplePosition;
 								if (addTake(transport, recorder, joiner))
 								{
+									masterRecProcessor->IsBypassed = true;
 									std::wcout << ClearLine << L"Accept overdub " << dubCount;
 
 									if (switchSamplePos > transport->Context.LoopEndSample)
@@ -221,9 +209,6 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSe
 						break;
 					case TransportCode::Start:
 					{
-						//ISampleContainerPtr recording = masterRecorder->CreateSampleContainer(false, 0, 0);
-						//writeContents(recording);
-
 						// Drop current recording, continue looping
 						if (!recordingProcessor->IsBypassed)
 						{
@@ -243,6 +228,7 @@ static void runVstHost(AsioCorePtr& device, int countSelectedInputs, int countSe
 							dubCount--;
 						}
 						std::wcout << ClearLine << L"Transport stopped." << std::endl;
+						saveSession(masterRecorder);
 						break;
 					default:
 						break;
@@ -287,10 +273,6 @@ int main()
 			std::wcout << L"Shutting down everything. Bye!" << std::endl;
 
 			device->Stop();
-
-			// Ensure that processors can be released before the VST plugin libraries are unloaded
-			//processingChain->RemoveAllProcessors();
-			//host->RemoveAllLibraries();
 		}
 		catch (const AsioCoreException& acx)
 		{
