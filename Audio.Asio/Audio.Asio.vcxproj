@@ -89,6 +89,7 @@
       <ShowIncludes>false</ShowIncludes>
       <AdditionalUsingDirectories>$(ProjectDir)..\Audio.Foundation\bin\$(Configuration)\$(Platform)</AdditionalUsingDirectories>
       <LanguageStandard>Default</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Audio.Foundation.Unmanaged\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ole32.lib</AdditionalDependencies>
