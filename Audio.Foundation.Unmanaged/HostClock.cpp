@@ -17,20 +17,18 @@ HostClock::~HostClock()
 
 IMPLEMENT_IUNKNOWN(HostClock)
 
-bool HostClock::GetInterface(REFIID iid, void** ppvResult)
+void* HostClock::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(this);
-		return true;
+		return dynamic_cast<IUnknown*>(this);
 	}
 
 	if (iid == __uuidof(IHostClock))
 	{
-		*ppvResult = dynamic_cast<IHostClock*>(this);
-		return true;
+		return dynamic_cast<IHostClock*>(this);
 	}
-	return false;
+	return nullptr;
 }
 
 AudioTime HostClock::get_CurrentTime() const

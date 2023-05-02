@@ -23,20 +23,17 @@ ProcessingChain::~ProcessingChain()
 IMPLEMENT_IUNKNOWN(ProcessingChain)
 
 
-bool ProcessingChain::GetInterface(REFIID iid, void** ppvResult)
+void* ProcessingChain::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(this);
-		return true;
+		return dynamic_cast<IUnknown*>(this);
 	}
 	if (iid == __uuidof(IProcessingChain))
 	{
-		*ppvResult = dynamic_cast<IProcessingChain*>(this);
-		return true;
+		return dynamic_cast<IProcessingChain*>(this);
 	}
-	return false;
-
+	return nullptr;
 }
 
 void ProcessingChain::OnNextBuffer(bool writeSecondHalf)

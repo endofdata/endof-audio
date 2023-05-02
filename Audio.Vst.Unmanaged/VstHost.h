@@ -28,9 +28,6 @@ namespace Audio
 
 				DECLARE_IUNKNOWN
 
-			protected:
-				virtual bool GetInterface(REFIID riid, void** pResult);
-
 			private:
 				PluginLibraryPtr FindPlugin(const wchar_t* pwcszPluginId);
 

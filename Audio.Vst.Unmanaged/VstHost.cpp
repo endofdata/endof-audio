@@ -6,7 +6,8 @@ using namespace Audio::Vst::Unmanaged;
 VstHost::VstHost(IHostApplicationPtr& application, int sampleCount, double sampleRate) :
 	m_application(application),
 	m_sampleCount(sampleCount),
-	m_sampleRate(sampleRate)
+	m_sampleRate(sampleRate),
+	m_refCount(0)
 {
 }
 
@@ -16,19 +17,17 @@ VstHost::~VstHost()
 
 IMPLEMENT_IUNKNOWN(VstHost)
 
-bool VstHost::GetInterface(REFIID iid, void** ppvResult)
+void* VstHost::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(this);
-		return true;
+		return dynamic_cast<IUnknown*>(this);
 	}
 	if (iid == __uuidof(IVstHost))
 	{
-		*ppvResult = dynamic_cast<IVstHost*>(this);
-		return true;
+		return dynamic_cast<IVstHost*>(this);
 	}
-	return false;
+	return nullptr;
 }
 
 const wchar_t* VstHost::AddLibrary(const wchar_t* pwcszPath)

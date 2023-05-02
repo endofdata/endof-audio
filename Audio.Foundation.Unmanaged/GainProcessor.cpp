@@ -19,24 +19,19 @@ GainProcessor::~GainProcessor()
 
 IMPLEMENT_IUNKNOWN(GainProcessor)
 
-bool GainProcessor::GetInterface(REFIID iid, void** ppvResult)
+void* GainProcessor::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(dynamic_cast<ISampleProcessor*>(this));
-		return true;
-	}
+		return dynamic_cast<IUnknown*>(dynamic_cast<ISampleProcessor*>(this));	}
 	if (iid == __uuidof(ISampleProcessor))
 	{
-		*ppvResult = dynamic_cast<ISampleProcessor*>(this);
-		return true;
-	}
+		return dynamic_cast<ISampleProcessor*>(this);	}
 	if (iid == __uuidof(ISpatial))
 	{
-		*ppvResult = dynamic_cast<ISpatial*>(this);
-		return true;
+		return dynamic_cast<ISpatial*>(this);
 	}
-	return false;
+	return nullptr;
 }
 
 int GainProcessor::Process(ISampleContainerPtr& container, const ProcessingContext& context)

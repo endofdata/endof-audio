@@ -18,19 +18,17 @@ Take::~Take()
 
 IMPLEMENT_IUNKNOWN(Take)
 
-bool Take::GetInterface(REFIID iid, void** ppvResult)
+void* Take::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(dynamic_cast<ITake*>(this));
-		return true;
+		return dynamic_cast<IUnknown*>(dynamic_cast<ITake*>(this));
 	}
 	if (iid == __uuidof(ITake))
 	{
-		*ppvResult = dynamic_cast<ITake*>(this);
-		return true;
+		return dynamic_cast<ITake*>(this);
 	}
-	return false;
+	return nullptr;
 }
 
 

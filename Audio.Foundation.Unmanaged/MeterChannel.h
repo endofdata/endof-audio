@@ -43,8 +43,6 @@ namespace Audio
 			protected:
 				virtual void OnMeterUpdate();
 
-				virtual bool GetInterface(REFIID riid, void** pResult);
-
 			private:
 				static const float DbFSMin;
 

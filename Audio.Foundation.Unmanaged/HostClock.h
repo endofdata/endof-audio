@@ -27,13 +27,7 @@ namespace Audio
 				double get_SampleRate() const;
 				void put_SampleRate(double value);
 
-				int AudioTimeToSamplePosition(const AudioTime& time) const;
-				AudioTime SamplePositonToAudioTime(int samplePosition) const;
-
 				DECLARE_IUNKNOWN
-
-			protected:
-				virtual bool GetInterface(REFIID riid, void** pResult);
 
 			private:
 

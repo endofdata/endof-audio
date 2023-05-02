@@ -44,9 +44,6 @@ namespace Audio
 
 				DECLARE_IUNKNOWN
 
-			protected:
-				virtual bool GetInterface(REFIID riid, void** pResult);
-
 			private:
 				void Invoke(MidiEventHandler handler);
 				void Invoke(MidiMessageHandler handler, const MidiMessage& msg, unsigned int timeStamp);

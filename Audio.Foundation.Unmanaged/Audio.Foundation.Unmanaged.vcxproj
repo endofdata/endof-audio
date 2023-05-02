@@ -127,6 +127,7 @@
     <ClInclude Include="ITake.h" />
     <ClInclude Include="ITakeSequence.h" />
     <ClInclude Include="ITransport.h" />
+    <ClInclude Include="ITransportControl.h" />
     <ClInclude Include="ITransportEvents.h" />
     <ClInclude Include="MeterChannel.h" />
     <ClInclude Include="MidiEvents.h" />
@@ -161,6 +162,7 @@
     <ClInclude Include="TakeSequence.h" />
     <ClInclude Include="AudioTime.h" />
     <ClInclude Include="Transport.h" />
+    <ClInclude Include="MidiTransportControl.h" />
     <ClInclude Include="TransportEvents.h" />
     <ClInclude Include="UnknownBase.h" />
     <ClInclude Include="ContainerReader.h" />
@@ -200,6 +202,7 @@
     <ClCompile Include="Take.cpp" />
     <ClCompile Include="TakeSequence.cpp" />
     <ClCompile Include="Transport.cpp" />
+    <ClCompile Include="MidiTransportControl.cpp" />
     <ClCompile Include="TransportEvents.cpp" />
     <ClCompile Include="VectorWriter.cpp" />
   </ItemGroup>

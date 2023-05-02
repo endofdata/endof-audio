@@ -39,8 +39,6 @@ namespace Audio
 			protected:
 				SampleContainerSpan();
 
-				virtual bool GetInterface(REFIID riid, void** pResult);
-
 				virtual void CreateChannels(int sampleCount, int channelCount);
 
 				ISampleContainerPtr m_source;

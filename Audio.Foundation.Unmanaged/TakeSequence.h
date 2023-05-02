@@ -42,9 +42,6 @@ namespace Audio
 
 				DECLARE_IUNKNOWN
 
-			protected:
-				virtual bool GetInterface(REFIID riid, void** pResult);
-
 			private:
 
 				ITransportPtr m_transport;

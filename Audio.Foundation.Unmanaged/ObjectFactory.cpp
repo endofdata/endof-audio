@@ -29,6 +29,7 @@
 #include "MidiEvents.h"
 #include "Transport.h"
 #include "TransportEvents.h"
+#include "MidiTransportControl.h"
 #include "GainProcessor.h"
 #include "Oscillator.h"
 #include <stdexcept>
@@ -129,6 +130,20 @@ ITransportPtr ObjectFactory::CreateTransport(IHostClockPtr& hostClock, int sampl
 {
 	ITransportEventsPtr events = new TransportEvents();
 	return new Transport(hostClock, events, sampleCount);
+}
+
+ITransportControlPtr ObjectFactory::CreateMidiTransportControl(ITransportPtr& transport, int midiDevId)
+{
+	if (midiDevId >= 0)
+	{
+		IMidiInputPtr midiInput = ObjectFactory::CreateMidiInput();
+
+		if (midiInput->Open(midiDevId))
+		{
+			return ITransportControlPtr(new MidiTransportControl(midiInput, transport));
+		}
+	}
+	return nullptr;
 }
 
 ITakeSequencePtr ObjectFactory::CreateTakeSequence(ITransportPtr& transport)

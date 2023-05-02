@@ -39,9 +39,6 @@ namespace Audio
 
 				DECLARE_IUNKNOWN
 
-			protected:
-				virtual bool GetInterface(REFIID riid, void** pResult);
-
 			private:
 				std::vector<std::pair<ISampleSourcePtr, MixParameter>> m_vecSources;
 				bool m_isBypassed;

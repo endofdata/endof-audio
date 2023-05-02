@@ -6,6 +6,8 @@
 		virtual STDMETHODIMP QueryInterface(REFIID riid, void **ppv);				\
 		virtual STDMETHODIMP_(ULONG) AddRef();										\
 		virtual STDMETHODIMP_(ULONG) Release();										\
+	protected:																		\
+		virtual void* GetInterface(REFIID riid);									\
 	private:																		\
 		ULONG m_refCount;															\
 
@@ -13,14 +15,14 @@
 	HRESULT STDMETHODCALLTYPE TYPE_NAME::QueryInterface(							\
 		const IID& riid, void** ppvObject)											\
 	{																				\
-		if (ppvObject == nullptr)														\
+		if (ppvObject == nullptr)													\
 		{																			\
 			return E_INVALIDARG;													\
 		}																			\
 																					\
-		*ppvObject = nullptr;															\
+		*ppvObject = GetInterface(riid);											\
 																					\
-		if (GetInterface(riid, ppvObject))											\
+		if (*ppvObject != nullptr)													\
 		{																			\
 			AddRef();																\
 			return S_OK;															\

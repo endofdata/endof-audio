@@ -18,20 +18,18 @@ Transport::~Transport()
 
 IMPLEMENT_IUNKNOWN(Transport)
 
-bool Transport::GetInterface(REFIID iid, void** ppvResult)
+void* Transport::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(this);
-		return true;
+		return dynamic_cast<IUnknown*>(this);
 	}
 
 	if (iid == __uuidof(ITransport))
 	{
-		*ppvResult = dynamic_cast<ITransport*>(this);
-		return true;
+		return dynamic_cast<ITransport*>(this);
 	}
-	return false;
+	return nullptr;
 }
 
 void Transport::Start()

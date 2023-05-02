@@ -36,8 +36,6 @@ namespace Audio
 			protected:
 				SampleBufferSpan();
 
-				virtual bool GetInterface(REFIID riid, void** pResult);
-
 				Sample* m_pSamples;
 				int m_iSamples;
 

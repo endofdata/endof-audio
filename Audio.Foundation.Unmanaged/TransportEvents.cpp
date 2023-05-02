@@ -17,22 +17,18 @@ TransportEvents::~TransportEvents()
 
 IMPLEMENT_IUNKNOWN(TransportEvents)
 
-bool TransportEvents::GetInterface(REFIID iid, void** ppvResult)
+void* TransportEvents::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(this);
-		return true;
+		return dynamic_cast<IUnknown*>(this);
 	}
 
 	if (iid == __uuidof(ITransportEvents))
 	{
-		*ppvResult = dynamic_cast<ITransportEvents*>(this);
-		return true;
+		return dynamic_cast<ITransportEvents*>(this);
 	}
-
-	*ppvResult = nullptr;
-	return false;
+	return nullptr;
 }
 
 void* TransportEvents::get_Context()

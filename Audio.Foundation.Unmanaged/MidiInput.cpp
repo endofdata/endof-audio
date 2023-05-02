@@ -21,22 +21,18 @@ MidiInput::~MidiInput()
 
 IMPLEMENT_IUNKNOWN(MidiInput)
 
-bool MidiInput::GetInterface(REFIID iid, void** ppvResult)
+void* MidiInput::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(this);
-		return true;
+		return dynamic_cast<IUnknown*>(this);
 	}
 
 	if (iid == __uuidof(IMidiInput))
 	{
-		*ppvResult = dynamic_cast<IMidiInput*>(this);
-		return true;
+		return dynamic_cast<IMidiInput*>(this);
 	}
-
-	*ppvResult = nullptr;
-	return false;
+	return nullptr;
 }
 
 bool MidiInput::Open(int deviceId)

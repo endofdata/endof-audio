@@ -27,9 +27,6 @@ namespace Audio
 
 				DECLARE_IUNKNOWN
 
-			protected:
-				virtual bool GetInterface(REFIID riid, void** pResult);
-
 			private:
 				ISampleSourcePtr m_pSource;
 				bool m_isBypassed;

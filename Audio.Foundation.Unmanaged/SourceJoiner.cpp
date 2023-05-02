@@ -19,24 +19,21 @@ SourceJoiner::~SourceJoiner()
 
 IMPLEMENT_IUNKNOWN(SourceJoiner)
 
-bool SourceJoiner::GetInterface(REFIID iid, void** ppvResult)
+void* SourceJoiner::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(dynamic_cast<ISourceJoiner*>(this));
-		return true;
+		return dynamic_cast<IUnknown*>(dynamic_cast<ISourceJoiner*>(this));
 	}
 	if (iid == __uuidof(ISourceJoiner))
 	{
-		*ppvResult = dynamic_cast<ISourceJoiner*>(this);
-		return true;
+		return dynamic_cast<ISourceJoiner*>(this);
 	}
 	if (iid == __uuidof(ISampleProcessor))
 	{
-		*ppvResult = dynamic_cast<ISampleProcessor*>(this);
-		return true;
+		return dynamic_cast<ISampleProcessor*>(this);
 	}
-	return false;
+	return nullptr;
 }
 
 void SourceJoiner::AddSource(ISampleSourcePtr& source, const MixParameter& mix)

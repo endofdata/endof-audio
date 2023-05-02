@@ -25,24 +25,21 @@ TakeSequence::~TakeSequence()
 
 IMPLEMENT_IUNKNOWN(TakeSequence)
 
-bool TakeSequence::GetInterface(REFIID iid, void** ppvResult)
+void* TakeSequence::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(dynamic_cast<ITakeSequence*>(this));
-		return true;
+		return dynamic_cast<IUnknown*>(dynamic_cast<ITakeSequence*>(this));
 	}
 	if (iid == __uuidof(ITakeSequence))
 	{
-		*ppvResult = dynamic_cast<ITakeSequence*>(this);
-		return true;
+		return dynamic_cast<ITakeSequence*>(this);
 	}
 	if (iid == __uuidof(ISampleProcessor))
 	{
-		*ppvResult = dynamic_cast<ISampleProcessor*>(this);
-		return true;
+		return dynamic_cast<ISampleProcessor*>(this);
 	}
-	return false;
+	return nullptr;
 }
 
 int TakeSequence::get_TakeCount()

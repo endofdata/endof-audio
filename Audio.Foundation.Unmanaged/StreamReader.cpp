@@ -19,19 +19,17 @@ StreamReader::~StreamReader()
 
 IMPLEMENT_IUNKNOWN(StreamReader)
 
-bool StreamReader::GetInterface(REFIID iid, void** ppvResult)
+void* StreamReader::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(this);
-		return true;
+		return dynamic_cast<IUnknown*>(this);
 	}
 	if (iid == __uuidof(ISampleSource))
 	{
-		*ppvResult = dynamic_cast<ISampleSource*>(this);
-		return true;
+		return dynamic_cast<ISampleSource*>(this);
 	}
-	return false;
+	return nullptr;
 }
 
 

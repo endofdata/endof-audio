@@ -35,22 +35,18 @@ AudioProcessor& AudioProcessor::operator =(const AudioProcessor& other)
 
 IMPLEMENT_IUNKNOWN(AudioProcessor)
 
-bool AudioProcessor::GetInterface(REFIID iid, void** ppvResult)
+void* AudioProcessor::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(this);
-		return true;
+		return dynamic_cast<IUnknown*>(this);
 	}
 
 	if (iid == __uuidof(ISampleProcessor))
 	{
-		*ppvResult = dynamic_cast<ISampleProcessor*>(this);
-		return true;
+		return dynamic_cast<ISampleProcessor*>(this);
 	}
-
-	*ppvResult = nullptr;
-	return false;
+	return nullptr;
 }
 
 bool AudioProcessor::get_IsActive() const

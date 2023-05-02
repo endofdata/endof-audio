@@ -50,19 +50,17 @@ SampleContainerSpan::~SampleContainerSpan()
 
 IMPLEMENT_IUNKNOWN(SampleContainerSpan)
 
-bool SampleContainerSpan::GetInterface(REFIID iid, void** ppvResult)
+void* SampleContainerSpan::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(this);
-		return true;
+		return dynamic_cast<IUnknown*>(this);
 	}
 	if (iid == __uuidof(ISampleContainer))
 	{
-		*ppvResult = dynamic_cast<ISampleContainer*>(this);
-		return true;
+		return dynamic_cast<ISampleContainer*>(this);
 	}
-	return false;
+	return nullptr;
 }
 
 int SampleContainerSpan::get_SampleCount() const

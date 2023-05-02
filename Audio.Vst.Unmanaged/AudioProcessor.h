@@ -35,9 +35,6 @@ namespace Audio
 
 				DECLARE_IUNKNOWN
 
-			protected:
-				virtual bool GetInterface(REFIID riid, void** pResult);
-
 			private:
 				IAudioProcessorPtr m_processor;
 				IComponentPtr m_component;

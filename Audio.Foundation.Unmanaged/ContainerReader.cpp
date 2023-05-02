@@ -23,19 +23,17 @@ ContainerReader::~ContainerReader()
 
 IMPLEMENT_IUNKNOWN(ContainerReader)
 
-bool ContainerReader::GetInterface(REFIID iid, void** ppvResult)
+void* ContainerReader::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(this);
-		return true;
+		return dynamic_cast<IUnknown*>(this);
 	}
 	if (iid == __uuidof(ISampleSource))
 	{
-		*ppvResult = dynamic_cast<ISampleSource*>(this);
-		return true;
+		return dynamic_cast<ISampleSource*>(this);
 	}
-	return false;
+	return nullptr;
 }
 
 int ContainerReader::ReadSamples(ISampleContainerPtr& container, const MixParameter& mix, bool overdub)

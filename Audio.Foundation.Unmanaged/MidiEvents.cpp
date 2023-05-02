@@ -21,22 +21,18 @@ MidiEvents::~MidiEvents()
 
 IMPLEMENT_IUNKNOWN(MidiEvents)
 
-bool MidiEvents::GetInterface(REFIID iid, void** ppvResult)
+void* MidiEvents::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(this);
-		return true;
+		return dynamic_cast<IUnknown*>(this);
 	}
 
 	if (iid == __uuidof(IMidiEvents))
 	{
-		*ppvResult = dynamic_cast<IMidiEvents*>(this);
-		return true;
+		return dynamic_cast<IMidiEvents*>(this);
 	}
-
-	*ppvResult = nullptr;
-	return false;
+	return nullptr;
 }
 
 void* MidiEvents::get_Context()

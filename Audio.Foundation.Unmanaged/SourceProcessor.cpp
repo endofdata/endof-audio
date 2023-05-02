@@ -20,19 +20,17 @@ SourceProcessor::~SourceProcessor()
 
 IMPLEMENT_IUNKNOWN(SourceProcessor)
 
-bool SourceProcessor::GetInterface(REFIID iid, void** ppvResult)
+void* SourceProcessor::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(this);
-		return true;
+		return dynamic_cast<IUnknown*>(this);
 	}
 	if (iid == __uuidof(ISampleProcessor))
 	{
-		*ppvResult = dynamic_cast<ISampleProcessor*>(this);
-		return true;
+		return dynamic_cast<ISampleProcessor*>(this);
 	}
-	return false;
+	return nullptr;
 }
 
 int SourceProcessor::Process(ISampleContainerPtr& container, const ProcessingContext& context)

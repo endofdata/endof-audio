@@ -29,9 +29,6 @@ namespace Audio
 
 				DECLARE_IUNKNOWN
 
-			protected:
-				virtual bool GetInterface(REFIID riid, void** pResult);
-
 			private:
 				MixParameter m_mix;
 				bool m_isBypassed;

@@ -25,20 +25,17 @@ SampleBufferSpan::~SampleBufferSpan()
 
 IMPLEMENT_IUNKNOWN(SampleBufferSpan)
 
-bool SampleBufferSpan::GetInterface(REFIID iid, void** ppvResult)
+void* SampleBufferSpan::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(this);
-		return true;
+		return dynamic_cast<IUnknown*>(this);
 	}
 	if (iid == __uuidof(ISampleBuffer))
 	{
-		*ppvResult = dynamic_cast<ISampleBuffer*>(this);
-		return true;
+		return dynamic_cast<ISampleBuffer*>(this);
 	}
-	return false;
-
+	return nullptr;
 }
 
 void SampleBufferSpan::Clear()

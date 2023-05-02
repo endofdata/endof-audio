@@ -17,19 +17,17 @@ ContainerWriter::~ContainerWriter()
 
 IMPLEMENT_IUNKNOWN(ContainerWriter)
 
-bool ContainerWriter::GetInterface(REFIID iid, void** ppvResult)
+void* ContainerWriter::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(this);
-		return true;
+		return dynamic_cast<IUnknown*>(this);
 	}
 	if (iid == __uuidof(ISampleProcessor))
 	{
-		*ppvResult = dynamic_cast<ISampleProcessor*>(this);
-		return true;
+		return dynamic_cast<ISampleProcessor*>(this);
 	}
-	return false;
+	return nullptr;
 }
 
 int ContainerWriter::Process(ISampleContainerPtr& container, const ProcessingContext& context)

@@ -39,24 +39,21 @@ VectorWriter::~VectorWriter()
 
 IMPLEMENT_IUNKNOWN(VectorWriter)
 
-bool VectorWriter::GetInterface(REFIID iid, void** ppvResult)
+void* VectorWriter::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(dynamic_cast<IRecorder*>(this));
-		return true;
+		return dynamic_cast<IUnknown*>(dynamic_cast<IRecorder*>(this));
 	}
 	if (iid == __uuidof(IRecorder))
 	{
-		*ppvResult = dynamic_cast<IRecorder*>(this);
-		return true;
+		return dynamic_cast<IRecorder*>(this);
 	}
 	if (iid == __uuidof(ISampleProcessor))
 	{
-		*ppvResult = dynamic_cast<ISampleProcessor*>(this);
-		return true;
+		return dynamic_cast<ISampleProcessor*>(this);
 	}
-	return false;
+	return nullptr;
 }
 
 int VectorWriter::Process(ISampleContainerPtr& container, const ProcessingContext& context)

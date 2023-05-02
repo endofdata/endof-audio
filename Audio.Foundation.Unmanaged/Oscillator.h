@@ -34,9 +34,6 @@ namespace Audio
 
 				DECLARE_IUNKNOWN
 
-			protected:
-				bool GetInterface(REFIID riid, void** pResult);
-
 			private:
 				double m_sampleRate;
 				double m_phasePos;

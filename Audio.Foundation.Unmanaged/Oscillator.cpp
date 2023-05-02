@@ -23,20 +23,17 @@ Oscillator::~Oscillator()
 
 IMPLEMENT_IUNKNOWN(Oscillator)
 
-bool Oscillator::GetInterface(REFIID iid, void** pResult)
+void* Oscillator::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*pResult = reinterpret_cast<IUnknown*>(this);
-		return true;
+		return reinterpret_cast<IUnknown*>(this);
 	}
 	if (iid == __uuidof(ISampleProcessor))
 	{
-		*pResult = reinterpret_cast<ISampleProcessor*>(this);
-		return true;
+		return reinterpret_cast<ISampleProcessor*>(this);
 	}
-	*pResult = nullptr;
-	return false;
+	return nullptr;
 }
 
 double Oscillator::get_Amplitude() const

@@ -32,9 +32,6 @@ namespace Audio
 
 				DECLARE_IUNKNOWN
 
-			protected:
-				virtual bool GetInterface(REFIID riid, void** pResult);
-
 			private:
 				std::vector<ISampleProcessorPtr> m_vecTargets;
 				bool m_isBypassed;

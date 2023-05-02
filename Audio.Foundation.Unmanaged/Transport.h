@@ -44,9 +44,6 @@ namespace Audio
 
 				DECLARE_IUNKNOWN
 
-			protected:
-				virtual bool GetInterface(REFIID riid, void** pResult);
-
 			private:
 				IHostClockPtr m_hostClock;
 				ITransportEventsPtr m_events;

@@ -21,25 +21,22 @@ SampleSharer::~SampleSharer()
 
 IMPLEMENT_IUNKNOWN(SampleSharer)
 
-bool SampleSharer::GetInterface(REFIID iid, void** ppvResult)
+void* SampleSharer::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(dynamic_cast<ISampleSharer*>(this));
-		return true;
+		return dynamic_cast<IUnknown*>(dynamic_cast<ISampleSharer*>(this));
 	}
 
 	if (iid == __uuidof(ISampleSharer))
 	{
-		*ppvResult = dynamic_cast<ISampleSharer*>(this);
-		return true;
+		return dynamic_cast<ISampleSharer*>(this);
 	}
 	if (iid == __uuidof(ISampleProcessor))
 	{
-		*ppvResult = dynamic_cast<ISampleProcessor*>(this);
-		return true;
+		return dynamic_cast<ISampleProcessor*>(this);
 	}
-	return false;
+	return nullptr;
 }
 
 void SampleSharer::AddTarget(ISampleProcessorPtr& target)

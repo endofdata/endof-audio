@@ -28,28 +28,23 @@ MeterChannel::~MeterChannel()
 
 IMPLEMENT_IUNKNOWN(MeterChannel)
 
-bool MeterChannel::GetInterface(REFIID iid, void** ppvResult)
+void* MeterChannel::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		*ppvResult = dynamic_cast<IUnknown*>(dynamic_cast<IMeterChannel*>(this));
-		return true;
+		return dynamic_cast<IUnknown*>(dynamic_cast<IMeterChannel*>(this));
 	}
 
 	if (iid == __uuidof(IMeterChannel))
 	{
-		*ppvResult = dynamic_cast<IMeterChannel*>(this);
-		return true;
+		return dynamic_cast<IMeterChannel*>(this);
 	}
 
 	if (iid == __uuidof(ISampleProcessor))
 	{
-		*ppvResult = dynamic_cast<ISampleProcessor*>(this);
-		return true;
+		return dynamic_cast<ISampleProcessor*>(this);
 	}
-
-	*ppvResult = nullptr;
-	return false;
+	return nullptr;
 }
 
 void MeterChannel::Reset()

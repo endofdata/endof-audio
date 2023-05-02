@@ -46,9 +46,6 @@ namespace Audio
 
 				DECLARE_IUNKNOWN
 
-			protected:
-				virtual bool GetInterface(REFIID riid, void** pResult);
-
 			private:
 				int m_id;
 				ISampleContainerPtr m_container;
