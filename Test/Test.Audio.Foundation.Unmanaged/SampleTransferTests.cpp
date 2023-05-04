@@ -14,7 +14,9 @@
 #include <algorithm>
 #include <SampleConversionUnmanaged.h>
 #include <iomanip>
+#include <MemCheck.h>
 
+using namespace Test::Audio::Common;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Audio::Foundation::Unmanaged;
 
@@ -173,7 +175,15 @@ namespace Test
 						Assert::AreEqual(2, pOutputContainer->ChannelCount, L"Has two channels of output data");
 						Assert::AreEqual(loopsRequiredForTenSeconds * Constants::SampleCount, pOutputContainer->SampleCount, L"Has expected size of output data");
 					}
+					TEST_METHOD_INITIALIZE(Init)
+					{
+						m_memCheck.BeginCheck();
+					}
 
+					TEST_METHOD_CLEANUP(CleanUp)
+					{
+						m_memCheck.EndCheck();
+					}
 				private:
 					class HardwareBuffers
 					{
@@ -374,6 +384,8 @@ namespace Test
 
 						return pProcessingChain;
 					}
+
+					MemCheck m_memCheck;
 				};
 			}
 		}

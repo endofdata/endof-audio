@@ -4,8 +4,9 @@
 #include "HelperMethods.h"
 #include <ISampleBuffer.h>
 #include <ObjectFactory.h>
+#include <MemCheck.h>
 
-
+using namespace Test::Audio::Common;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Audio::Foundation::Unmanaged;
 
@@ -52,6 +53,18 @@ namespace Test
 
 						HelperMethods::TestSampleContainer(pContainer, Constants::SampleCount, Constants::ChannelCount);
 					}
+
+					TEST_METHOD_INITIALIZE(Init)
+					{
+						m_memCheck.BeginCheck();
+					}
+
+					TEST_METHOD_CLEANUP(CleanUp)
+					{
+						m_memCheck.EndCheck();
+					}
+				private:
+					MemCheck m_memCheck;
 
 				};
 			}

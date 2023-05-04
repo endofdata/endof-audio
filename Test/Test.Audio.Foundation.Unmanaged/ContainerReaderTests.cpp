@@ -5,7 +5,9 @@
 #include <ISampleBuffer.h>
 #include <ObjectFactory.h>
 #include <ProcessingContext.h>
+#include <MemCheck.h>
 
+using namespace Test::Audio::Common;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Audio::Foundation::Unmanaged;
 
@@ -61,6 +63,19 @@ namespace Test
 						ISampleContainerPtr pResult = pOutputRecorder->CreateSampleContainer(false, 10, 10);
 						Assert::IsNotNull(pResult.GetInterfacePtr(), L"Can access output data container from output recorder.");
 					}
+
+					TEST_METHOD_INITIALIZE(Init)
+					{
+						m_memCheck.BeginCheck();
+					}
+
+					TEST_METHOD_CLEANUP(CleanUp)
+					{
+						m_memCheck.EndCheck();
+					}
+				private:
+					MemCheck m_memCheck;
+
 				};
 			}
 		}
