@@ -49,12 +49,12 @@
 #define TEMPLATED_IUNKNOWN															\
 	HRESULT STDMETHODCALLTYPE QueryInterface(const IID& riid, void** ppvObject)		\
 	{																				\
-		if (ppvObject == nullptr)														\
+		if (ppvObject == nullptr)													\
 		{																			\
 			return E_INVALIDARG;													\
 		}																			\
 																					\
-		*ppvObject = nullptr;															\
+		*ppvObject = nullptr;														\
 																					\
 		if (GetInterface(riid, ppvObject))											\
 		{																			\
