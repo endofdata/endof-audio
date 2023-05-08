@@ -28,6 +28,9 @@ namespace Audio
 				ISampleContainerPtr CreateSampleContainer(bool continueRecording, int fadeIn, int fadeOut);
 				void DropRecording(bool continueRecording);
 
+				bool get_IsActive();
+				void put_IsActive(bool value);
+
 				DECLARE_IUNKNOWN
 
 			protected:

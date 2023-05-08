@@ -180,8 +180,8 @@ void VectorWriter::FadeBuffers(int fadeIn, int fadeOut)
 	double fadeInFac = fadeIn;
 	double fadeOutFac = fadeOut;
 
-	std::function<Sample(Sample, int)> fadeInFunc = [fadeInFac](Sample sample, int index) { return sample * (double)index / fadeInFac; };
-	std::function<Sample(Sample, int)> fadeOutFunc = [fadeOutFac](Sample sample, int index) { return sample * (fadeOutFac - (double)index - 1) / fadeOutFac; };
+	std::function<Sample(Sample, int)> fadeInFunc = [fadeInFac](Sample sample, int index) { return static_cast<Sample>(sample * (double)index / fadeInFac); };
+	std::function<Sample(Sample, int)> fadeOutFunc = [fadeOutFac](Sample sample, int index) { return static_cast<Sample>(sample * (fadeOutFac - (double)index - 1) / fadeOutFac); };
 
 	for (Sample* buffer : m_buffers)
 	{
@@ -219,3 +219,14 @@ void VectorWriter::put_IsBypassed(bool value)
 		m_isBypassed = value;
 	}
 }
+
+bool VectorWriter::get_IsActive()
+{
+	return !IsBypassed;
+}
+
+void VectorWriter::put_IsActive(bool value)
+{
+	IsBypassed = !value;
+}
+
