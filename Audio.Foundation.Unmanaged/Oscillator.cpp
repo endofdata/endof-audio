@@ -103,7 +103,7 @@ int Oscillator::Process(ISampleContainerPtr& container, const ProcessingContext&
 
 			for (int s = 0; s < sampleCount; s++)
 			{
-				*pTarget++ = std::sin(phasePos) * amplitude;
+				*pTarget++ = static_cast<Sample>(std::sin(phasePos) * amplitude);
 				phasePos += m_phaseStep;
 				amplitude += ampChange;
 			}

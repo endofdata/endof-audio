@@ -67,8 +67,8 @@ namespace Audio
 								{
 									Sample sample = ReadSample(pSource);
 
-									*(pDestLeft++) += factorLeft * sample;
-									*(pDestRight++) += factorRight * sample;
+									*(pDestLeft++) += static_cast<Sample>(factorLeft * sample);
+									*(pDestRight++) += static_cast<Sample>(factorRight * sample);
 								}
 							}
 							else if (container->ChannelCount > 0)
@@ -78,7 +78,7 @@ namespace Audio
 
 								for (int i = 0; i < sampleCount; i++)
 								{
-									*pDest++ += level * ReadSample(pSource);
+									*pDest++ += static_cast<Sample>(level * ReadSample(pSource));
 								}
 							}
 						}

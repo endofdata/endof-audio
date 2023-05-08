@@ -56,7 +56,7 @@ namespace Audio
 				/// <returns>Float sample</returns>
 				static inline Sample Int32ToSample(int value)
 				{
-					return value * Int32ToSampleFactor;
+					return static_cast<Sample>(value * Int32ToSampleFactor);
 				}
 
 				/// <summary>
@@ -76,7 +76,7 @@ namespace Audio
 				/// <returns>Float sample</returns>
 				static inline Sample Int24ToSample(int value)
 				{
-					return value * Int24ToSampleFactor;
+					return static_cast<Sample>(value * Int24ToSampleFactor);
 				}
 
 				/// <summary>
@@ -96,7 +96,7 @@ namespace Audio
 				/// <returns>Float sample</returns>
 				static inline Sample Int16ToSample(short value)
 				{
-					return value * Int16ToSampleFactor;
+					return static_cast<Sample>(value * Int16ToSampleFactor);
 				}
 
 				/// <summary>
@@ -181,7 +181,7 @@ namespace Audio
 				*/
 				static inline Sample Saturated(Sample value, Sample maxValue)
 				{
-					return fabsl(value + maxValue) - fabsl(value - maxValue);
+					return static_cast<Sample>(fabsl(value + maxValue) - fabsl(value - maxValue));
 				}
 
 				/// <summary>
