@@ -61,7 +61,26 @@ static void runLooper(const LooperConfig& config)
 			int pair[2] = { config.OutputChannel[i], config.OutputChannel[i + 1] };
 			looper->SelectOutputPair(pair, true);
 		}
+
+		// create master recording
+		looper->IsRecording = true;
+
+		std::wcout << L"Running the looper" << std::endl;
+
 		looper->Run();
+
+		std::wostringstream builder;
+		SYSTEMTIME st;
+		GetSystemTime(&st);
+		builder << L"sessions\\" 
+			<< std::setw(4) << st.wYear 
+			<< std::setw(2) << std::setfill(L'0') << st.wMonth << st.wDay << L"_"
+			<< std::setw(2) << std::setfill(L'0') << st.wHour << st.wMinute << st.wSecond << L"_";
+		std::wstring filenameBase = builder.str();
+
+		std::wcout << L"Writing session to file set '" << filenameBase << L"*'." << std::endl;
+
+		looper->SaveSession(filenameBase.c_str());
 	}
 	catch (const std::exception&)
 	{
@@ -73,7 +92,7 @@ static void runLooper(const LooperConfig& config)
 
 int main()
 {
-	int selectedInputs[] = { 0 };
+	int selectedInputs[] = { 0, 1 };
 	int selectedOutputs[] = { 0, 1 };
 	int sampleCount = 512;
 	float outputSaturation = 0.5f;
@@ -101,7 +120,7 @@ int main()
 			looperConfig.MidiInput = midiInId;
 			looperConfig.AsioDevice = IID_STEINBERG_UR_RT2;
 			//looperConfig.AsioDevice = CLSID_AsioDebugDriver;
-			looperConfig.AddInputChannelList(selectedInputs, 1);
+			looperConfig.AddInputChannelList(selectedInputs, 2);
 			looperConfig.AddOutputChannelList(selectedOutputs, 2);
 
 			// optional
