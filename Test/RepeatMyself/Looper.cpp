@@ -268,7 +268,7 @@ void Looper::CreateProcessingChain()
 	m_recorder->QueryInterface<ISampleProcessor>(&recordingProcessor);
 	recordingProcessor->IsBypassed = true;
 
-	m_masterRecorder = ObjectFactory::CreateRecorder(processingChain->OutputChannelPairCount, samplesPerTenSecs, samplesPerTenSecs);
+	m_masterRecorder = ObjectFactory::CreateRecorder(processingChain->OutputChannelPairCount * 2, samplesPerTenSecs, samplesPerTenSecs);
 	ISampleProcessorPtr masterRecProcessor = nullptr;
 	m_masterRecorder->QueryInterface<ISampleProcessor>(&masterRecProcessor);
 	masterRecProcessor->IsBypassed = true;
