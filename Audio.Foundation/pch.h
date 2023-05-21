@@ -7,6 +7,7 @@
 #ifndef PCH_H
 #define PCH_H
 
+#define WINDOWS_LEAN_AND_MEAN
 #include <Windows.h>
 #include <guiddef.h>
 #include <math.h>
