@@ -97,8 +97,8 @@ void ProcessingChain::FadeBuffers(int fadeIn, int fadeOut)
 		double fadeInFac = fadeIn;
 		double fadeOutFac = fadeOut;
 
-		std::function<Sample(Sample, int)> fadeInFunc = [fadeInFac](Sample sample, int index) { return sample * (double)index / fadeInFac; };
-		std::function<Sample(Sample, int)> fadeOutFunc = [fadeOutFac](Sample sample, int index) { return sample * (fadeOutFac - 1.0 - (double)index) / fadeOutFac; };
+		std::function<Sample(Sample, int)> fadeInFunc = [fadeInFac](Sample sample, int index) { return sample * static_cast<Sample>((double)index / fadeInFac); };
+		std::function<Sample(Sample, int)> fadeOutFunc = [fadeOutFac](Sample sample, int index) { return sample * static_cast<Sample>((fadeOutFac - 1.0 - (double)index) / fadeOutFac); };
 
 		for (int c = 0; c < channelCount; c++)
 		{

@@ -56,7 +56,7 @@ ParamID ParamValueQueue::getParameterId()
 
 int32 ParamValueQueue::getPointCount()
 {
-	return m_points.size();
+	return static_cast<int32>(m_points.size());
 }
 
 tresult ParamValueQueue::getPoint(int32 index, int32& sampleOffset, ParamValue& value)
@@ -77,7 +77,7 @@ tresult ParamValueQueue::getPoint(int32 index, int32& sampleOffset, ParamValue& 
 
 tresult ParamValueQueue::addPoint(int32 sampleOffset, ParamValue value, int32& index)
 {
-	index = m_points.size();
+	index = static_cast<int32>(m_points.size());
 	m_points.push_back(std::pair<int32, ParamValue>(sampleOffset, value));
 
 	return kResultOk;

@@ -56,8 +56,8 @@ int StreamReader::ReadSamples(ISampleContainerPtr& container, const MixParameter
 		}
 
 		std::function<Sample* (const Sample& source, Sample* target, double channelFactor)> handler = overdub ?
-			[](const Sample& source, Sample* target, double channelFactor) { *target++ += source * channelFactor; return target; } :
-			[](const Sample& source, Sample* target, double channelFactor) { *target++ = source * channelFactor; return target;  };
+			[](const Sample& source, Sample* target, double channelFactor) { *target++ += static_cast<Sample>(source * channelFactor); return target; } :
+			[](const Sample& source, Sample* target, double channelFactor) { *target++ = static_cast<Sample>(source * channelFactor); return target;  };
 
 		for (int s = 0; s < samples; s++)
 		{

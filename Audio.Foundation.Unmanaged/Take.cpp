@@ -110,7 +110,7 @@ bool Take::SeekTo(AudioTime offset, AudioSeek kind)
 
 int Take::WriteTo(ISampleContainerPtr& target, int channelOffset, int channelCount, int targetChannelOffset)
 {
-	int done = m_container->WriteTo(target, m_readOffset, target->SampleCount, channelOffset, channelCount, 0, targetChannelOffset, m_mix, true);
+	int done = m_container->WriteTo(target, static_cast<int>(m_readOffset), target->SampleCount, channelOffset, channelCount, 0, targetChannelOffset, m_mix, true);
 	m_readOffset += done;
 
 	return done;

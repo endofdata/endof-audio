@@ -23,10 +23,12 @@ void* GainProcessor::GetInterface(REFIID iid)
 {
 	if (iid == __uuidof(IUnknown))
 	{
-		return dynamic_cast<IUnknown*>(dynamic_cast<ISampleProcessor*>(this));	}
+		return dynamic_cast<IUnknown*>(dynamic_cast<ISampleProcessor*>(this));
+	}
 	if (iid == __uuidof(ISampleProcessor))
 	{
-		return dynamic_cast<ISampleProcessor*>(this);	}
+		return dynamic_cast<ISampleProcessor*>(this);
+	}
 	if (iid == __uuidof(ISpatial))
 	{
 		return dynamic_cast<ISpatial*>(this);
@@ -61,7 +63,7 @@ int GainProcessor::Process(ISampleContainerPtr& container, const ProcessingConte
 
 			for (int s = 0; s < sampleCount; s++)
 			{
-				*pSamples++ *= factor;
+				*pSamples++ = static_cast<Sample>(*pSamples * factor);
 			}
 			factor = factorRight;
 		}

@@ -52,7 +52,7 @@ uint32 ParameterChanges::release()
 
 int32 ParameterChanges::getParameterCount()
 {
-	return m_parameters.size();
+	return static_cast<int32>(m_parameters.size());
 }
 
 IParamValueQueue* ParameterChanges::getParameterData(int32 index)
@@ -66,7 +66,7 @@ IParamValueQueue* ParameterChanges::getParameterData(int32 index)
 
 IParamValueQueue* ParameterChanges::addParameterData(const ParamID& id, int32& index /*out*/)
 {
-	index = m_parameters.size();
+	index = static_cast<int32>(m_parameters.size());
 	IParamValueQueuePtr value = IPtr<IParamValueQueue>(new ParamValueQueue(id));
 	m_parameters.push_back(value);
 
