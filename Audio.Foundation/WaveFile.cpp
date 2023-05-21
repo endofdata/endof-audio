@@ -14,6 +14,7 @@ using namespace Audio::Foundation::Unmanaged;
 WaveFile::WaveFile() : m_mode(Mode::Closed)
 {
 	m_lock = gcnew Mutex();
+	m_24BitBuffer = gcnew array<byte>(3);
 }
 
 WaveFile::WaveFile(String^ fileName, WaveFormat^ format) : m_mode(Mode::Closed)
@@ -28,6 +29,7 @@ WaveFile::WaveFile(String^ fileName, WaveFormat^ format) : m_mode(Mode::Closed)
 	}
 
 	m_lock = gcnew Mutex();
+	m_24BitBuffer = gcnew array<byte>(3);
 
 	Create(fileName, format);
 }
@@ -40,6 +42,7 @@ WaveFile::WaveFile(String^ fileName) : m_mode(Mode::Closed)
 	}
 
 	m_lock = gcnew Mutex();
+	m_24BitBuffer = gcnew array<byte>(3);
 
 	Open(fileName);
 }
@@ -70,7 +73,7 @@ void WaveFile::Format::set(WaveFormat^ value)
 
 Boolean WaveFile::IsEOF::get()
 {
-	return m_bufferedStream->Length == m_bufferedStream->Position;
+	return m_bufferedStream->Length <= m_bufferedStream->Position;
 }
 
 void WaveFile::Create(String^ fileName, WaveFormat^ format)
@@ -104,6 +107,9 @@ void WaveFile::Create(String^ fileName, WaveFormat^ format)
 			{
 				case sizeof(short) :
 					m_sampleWriter = gcnew SampleWriter(this, &WaveFile::WritePCM16);
+					break;
+				case 3:
+					m_sampleWriter = gcnew SampleWriter(this, &WaveFile::WritePCM32);
 					break;
 					case sizeof(int) :
 						m_sampleWriter = gcnew SampleWriter(this, &WaveFile::WritePCM32);
@@ -147,10 +153,14 @@ void WaveFile::Open(String^ fileName)
 			m_sampleReader = gcnew SampleReader(this, &WaveFile::ReadFloat);
 			break;
 		case SampleFormat::PCM:
+			// VSCode 2022 cannot auto-format nested switch/case obviously
 			switch (m_wavFormat->SampleSize)
 			{
 				case sizeof(short) :
 					m_sampleReader = gcnew SampleReader(this, &WaveFile::ReadPCM16);
+					break;
+				case 3:
+					m_sampleReader = gcnew SampleReader(this, &WaveFile::ReadPCM24);
 					break;
 					case sizeof(int) :
 						m_sampleReader = gcnew SampleReader(this, &WaveFile::ReadPCM32);
@@ -227,7 +237,7 @@ void WaveFile::Close()
 	}
 }
 
-int WaveFile::ReadSamples(IAudioBuffer^ data)
+int WaveFile::ReadSamples(IAudioBuffer^ target)
 {
 	if (m_mode != Mode::Play)
 	{
@@ -235,22 +245,22 @@ int WaveFile::ReadSamples(IAudioBuffer^ data)
 	}
 
 	int sourceChannels = Format->Channels;
-	int targetChannels = data->ChannelCount;
+	int targetChannels = target->ChannelCount;
 	int done;
-	
+
 	if (sourceChannels == targetChannels == 1)
 	{
-		return ReadSamples((Sample*)data->SamplePointer[0].ToPointer(), data->SampleCount);
+		return ReadSamples((Sample*)target->SamplePointer[0].ToPointer(), target->SampleCount, false);
 	}
 
 	array<Sample*>^ pTargets = gcnew array<Sample*>(targetChannels);
 
 	for (int c = 0; c < targetChannels; c++)
 	{
-		pTargets[c] = (Sample*)data->SamplePointer[c].ToPointer();
+		pTargets[c] = (Sample*)target->SamplePointer[c].ToPointer();
 	}
 
-	for (done = 0; done < data->SampleCount; done++)
+	for (done = 0; done < target->SampleCount; done++)
 	{
 		for (int c = 0; c < sourceChannels; c++)
 		{
@@ -267,18 +277,18 @@ int WaveFile::ReadSamples(IAudioBuffer^ data)
 	return done;
 }
 
-int WaveFile::ReadSamples(array<Sample>^ data, int offset, int count)
+int WaveFile::ReadSamples(array<Sample>^ target, int offset, int count, bool deInterleave)
 {
-	return ReadSamples(gcnew Memory<Sample>(data, offset, count));
+	return ReadSamples(gcnew Memory<Sample>(target, offset, count), deInterleave);
 }
 
-int WaveFile::ReadSamples(Memory<Sample>^ data)
+int WaveFile::ReadSamples(Memory<Sample>^ target, bool deInterleave)
 {
-	MemoryHandle^ handle = data->Pin();
+	MemoryHandle^ handle = target->Pin();
 
 	try
 	{
-		return ReadSamples((Sample*)handle->Pointer, data->Length);
+		return ReadSamples((Sample*)handle->Pointer, target->Length, deInterleave);
 	}
 	finally
 	{
@@ -286,7 +296,61 @@ int WaveFile::ReadSamples(Memory<Sample>^ data)
 	}
 }
 
-int WaveFile::ReadSamples(Sample* pData, int count)
+int WaveFile::ReadSamples(Sample* pTarget, int count, bool deInterleave)
+{
+	if (m_mode != Mode::Play)
+	{
+		throw gcnew InvalidOperationException("Invalid Mode.");
+	}
+
+	int done;
+	Sample value;
+
+	if (deInterleave && m_wavFormat->Channels > 1)
+	{
+		int channelCount = m_wavFormat->Channels;
+		int samplesPerChannel = count / channelCount;		
+		Sample** pTargets = reinterpret_cast<Sample**>(_malloca(sizeof(Sample*) * channelCount));
+
+		try
+		{
+			Sample* pChannelStart = pTarget;
+
+			for (int c = 0; c < channelCount; c++)
+			{
+				pTargets[c] = pChannelStart;
+				pChannelStart += samplesPerChannel;
+			}
+
+			for (done = 0; done < samplesPerChannel; done++)
+			{
+				for (int c = 0; c < channelCount && CheckedReadSample(value); c++)
+				{
+					*pTargets[c]++ = value;
+				}
+			}
+		}
+		catch (const std::exception&)
+		{
+			_freea(pTargets);
+			pTargets = nullptr;
+		}
+		if (pTargets != nullptr)
+		{
+			_freea(pTargets);
+		}
+	}
+	else
+	{
+		for (done = 0; done < count && CheckedReadSample(value); done++)
+		{
+			*pTarget++ = value;
+		}
+	}
+	return done;
+}
+
+int WaveFile::ReadSamples(Stream^ target, int count, bool deInterleave)
 {
 	if (m_mode != Mode::Play)
 	{
@@ -295,69 +359,68 @@ int WaveFile::ReadSamples(Sample* pData, int count)
 
 	int done;
 
-	for (done = 0; done < count; done++)
+	BinaryWriter^ writer = gcnew BinaryWriter(target, System::Text::Encoding::Default, true);
+
+	if (deInterleave && m_wavFormat->Channels > 1)
 	{
-		if (m_binaryReader->BaseStream->Length > m_binaryReader->BaseStream->Position)
-		{
-			*pData++ = m_sampleReader();
+		int channelCount = m_wavFormat->Channels;
+		int samplesPerChannel = count / channelCount;
+		long long startPos = m_binaryReader->BaseStream->Position;
+		bool isEof = false;
+
+		for (int c = 0; c < channelCount && !isEof; c++)
+		{			
+			for (done = 0; done < samplesPerChannel && !isEof; done++)
+			{
+				Sample value;
+
+				for (int channel = 0; channel < channelCount && CheckedReadSample(value); channel++)
+				{
+					if (channel == c)
+					{
+						writer->Write(value);
+					}
+				}
+			}
+			m_binaryReader->BaseStream->Position = startPos;
 		}
-		else
+	}
+	else
+	{
+		Sample value;
+
+		for (done = 0; done < count && CheckedReadSample(value); done++)
 		{
-			break;
+			writer->Write(value);
 		}
 	}
 	return done;
 }
 
-int WaveFile::ReadSamples(Stream^ output, int count)
-{
-	if (m_mode != Mode::Play)
-	{
-		throw gcnew InvalidOperationException("Invalid Mode.");
-	}
-
-	int done;
-
-	BinaryWriter^ writer = gcnew BinaryWriter(output, System::Text::Encoding::Default, true);
-
-	for (done = 0; done < count; done++)
-	{
-		if (m_binaryReader->BaseStream->Length > m_binaryReader->BaseStream->Position)
-		{
-			writer->Write(m_sampleReader());
-		}
-		else
-		{
-			break;
-		}
-	}
-	return done;
-}
-
-int WaveFile::WriteSamples(IAudioBuffer^ data)
+int WaveFile::WriteSamples(IAudioBuffer^ source)
 {
 	if (m_mode != Mode::Record)
 	{
 		throw gcnew InvalidOperationException("Invalid Mode.");
 	}
 
-	int sourceChannels = data->ChannelCount;
-	int targetChannels = Format->Channels; 
+	int sourceChannels = source->ChannelCount;
+	int targetChannels = Format->Channels;
 	int done;
 
 	if (sourceChannels == targetChannels == 1)
 	{
-		return WriteSamples((Sample*)data->SamplePointer[0].ToPointer(), data->SampleCount);
+		return WriteSamples((Sample*)source->SamplePointer[0].ToPointer(), source->SampleCount);
 	}
 
 	array<const Sample*>^ pSources = gcnew array<const Sample*>(sourceChannels);
 
 	for (int c = 0; c < sourceChannels; c++)
 	{
-		pSources[c] = (const Sample*)data->SamplePointer[c].ToPointer();
+		pSources[c] = (const Sample*)source->SamplePointer[c].ToPointer();
 	}
 
-	for (done = 0; done < data->SampleCount; done++)
+	for (done = 0; done < source->SampleCount; done++)
 	{
 		for (int c = 0; c < targetChannels; c++)
 		{
@@ -375,12 +438,12 @@ int WaveFile::WriteSamples(IAudioBuffer^ data)
 	return done;
 }
 
-int WaveFile::WriteSamples(array<Sample>^ data, int offset, int count)
+int WaveFile::WriteSamples(array<Sample>^ source, int offset, int count)
 {
-	return WriteSamples(ReadOnlySpan<Sample>(data, offset, count));
+	return WriteSamples(ReadOnlySpan<Sample>(source, offset, count));
 }
 
-int WaveFile::WriteSamples(ReadOnlySpan<Sample>^ data)
+int WaveFile::WriteSamples(ReadOnlySpan<Sample> source)
 {
 	if (m_mode != Mode::Record)
 	{
@@ -394,11 +457,11 @@ int WaveFile::WriteSamples(ReadOnlySpan<Sample>^ data)
 	{
 		if (m_mode == Mode::Record)
 		{
-			for each(Sample value in data)
+			for each (Sample value in source)
 			{
 				m_sampleWriter(value);
 			}
-			done = data->Length;
+			done = source.Length;
 		}
 	}
 	finally
@@ -410,7 +473,7 @@ int WaveFile::WriteSamples(ReadOnlySpan<Sample>^ data)
 	return done;
 }
 
-int WaveFile::WriteSamples(const Sample* pData, int count)
+int WaveFile::WriteSamples(const Sample* pSource, int count)
 {
 	if (m_mode != Mode::Record)
 	{
@@ -419,14 +482,14 @@ int WaveFile::WriteSamples(const Sample* pData, int count)
 
 	m_lock->WaitOne();
 	int done = 0;
-	
+
 	try
 	{
 		if (m_mode == Mode::Record)
 		{
-			for(done = 0; done < count; done++)
+			for (done = 0; done < count; done++)
 			{
-				m_sampleWriter(*pData++);
+				m_sampleWriter(*pSource++);
 			}
 		}
 	}
@@ -439,7 +502,7 @@ int WaveFile::WriteSamples(const Sample* pData, int count)
 	return done;
 }
 
-int WaveFile::WriteSamples(Stream^ input, int count)
+int WaveFile::WriteSamples(Stream^ source, int count)
 {
 	if (m_mode != Mode::Record)
 	{
@@ -451,7 +514,7 @@ int WaveFile::WriteSamples(Stream^ input, int count)
 
 	try
 	{
-		BinaryReader^ reader = gcnew BinaryReader(input, System::Text::Encoding::Default, true);
+		BinaryReader^ reader = gcnew BinaryReader(source, System::Text::Encoding::Default, true);
 
 		try
 		{
@@ -485,6 +548,34 @@ Sample WaveFile::ReadPCM16()
 void WaveFile::WritePCM16(Sample value)
 {
 	m_binaryWriter->Write(Unmanaged::SampleConversion::SampleToInt16(value));
+}
+
+Sample WaveFile::ReadPCM24()
+{
+	m_binaryReader->Read(m_24BitBuffer, 0, 3);
+
+	int nativeSample = 0;
+
+	for (int i = 0; i < 3; i++)
+	{
+		nativeSample <<= 8;
+		nativeSample += m_24BitBuffer[i];
+	}
+
+	return Unmanaged::SampleConversion::Int24ToSample(nativeSample);
+}
+
+void WaveFile::WritePCM24(Sample value)
+{
+	int nativeSample = Unmanaged::SampleConversion::SampleToInt24(value);
+
+	for (int i = 0; i < 3; i++)
+	{
+		m_24BitBuffer[i] = nativeSample & 0xFF;
+		nativeSample >>= 8;
+	}
+
+	m_binaryWriter->Write(m_24BitBuffer, 0, 3);
 }
 
 Sample WaveFile::ReadPCM32()
@@ -614,4 +705,14 @@ long long WaveFile::TimeSpanToSamples(double sampleRate, TimeSpan value)
 TimeSpan WaveFile::SamplesToTimeSpan(double sampleRate, long long samples)
 {
 	return TimeSpan::FromMilliseconds(samples / sampleRate * 1000.0f);
+}
+
+bool WaveFile::CheckedReadSample(Sample& value)
+{
+	if (!IsEOF)
+	{
+		value = m_sampleReader();
+		return true;
+	}
+	return false;
 }
