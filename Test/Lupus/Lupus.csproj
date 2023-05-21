@@ -11,6 +11,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Audio.Asio\Audio.Asio.vcxproj" />
+		<ProjectReference Include="..\..\Audio.Foundation\Audio.Foundation.vcxproj" />
 	</ItemGroup>
 
 	<Target Name="CopyDependencies" AfterTargets="Build" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

@@ -24,12 +24,7 @@
 			<CopyLocal>True</CopyLocal>
 			<CopyLocalSatelliteAssemblies>True</CopyLocalSatelliteAssemblies>
 		</ProjectReference>
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include="..\..\bin\Debug\x64\Audio.Foundation.Unmanaged.dll" Link="Audio.Foundation.Unmanaged.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
+		<ProjectReference Include="..\..\Audio.Foundation\Audio.Foundation.vcxproj" />
 	</ItemGroup>
 	
 	<ItemGroup>

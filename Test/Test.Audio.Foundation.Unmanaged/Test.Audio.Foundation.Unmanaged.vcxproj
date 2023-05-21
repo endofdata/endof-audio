@@ -122,14 +122,6 @@
       <Project>{52e505c9-94fc-44cf-b23e-788bcc0e34b3}</Project>
     </ProjectReference>
   </ItemGroup>
-  <Target Name="CopyDependencies" AfterTargets="Build" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Message Text="Copy dependencies to $(OutDir)" Importance="high" />
-    <ItemGroup>
-      <Dependencies Include="..\..\Audio.Foundation.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Foundation.Unmanaged.dll" />
-      <Dependencies Include="..\..\Audio.Foundation.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Foundation.Unmanaged.pdb" />
-    </ItemGroup>
-    <Copy SourceFiles="@(Dependencies)" DestinationFolder="$(OutDir)" />
-  </Target>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
