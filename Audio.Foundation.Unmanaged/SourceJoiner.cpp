@@ -73,6 +73,11 @@ MixParameter& SourceJoiner::get_MixParameter(int index)
 	return m_vecSources.at(index).second;
 }
 
+int SourceJoiner::get_SourceCount() const
+{
+	return static_cast<int>(m_vecSources.size());
+}
+
 int SourceJoiner::Process(ISampleContainerPtr& container, const ProcessingContext& context)
 {
 	if (!m_isBypassed)

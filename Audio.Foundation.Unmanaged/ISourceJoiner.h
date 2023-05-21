@@ -25,12 +25,16 @@ namespace Audio
 					/// <returns>The <see cref="ISampleSource"/> or <see langword="null"/> if <paramref name="index"/> is out of range.</returns>
 					ISampleSourcePtr& get_Source(int index) = 0;
 
-					MixParameter& get_MixParameter(int index) = 0;
-
 					/// <summary>
 					/// Gets sources as defined by previous calls to <see cref="AddSource"/>
 					/// </summary>
 					_declspec(property(get = get_Source)) ISampleSourcePtr Sources[];
+
+					int get_SourceCount() const;
+					_declspec(property(get = get_SourceCount)) int SourceCount;
+
+					MixParameter& get_MixParameter(int index) = 0;
+
 
 					/// <summary>
 					/// Adds a new item to the <see cref="Sources"/> collection
