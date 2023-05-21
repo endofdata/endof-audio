@@ -48,7 +48,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(IncludePath)</IncludePath>
-    <OutDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Configuration)\$(Platform)\</IntDir>
     <ExternalIncludePath>D:\Gamer I5\Documents\Projects\ASIOSDK2\common;D:\Gamer I5\Documents\Projects\Audio\Audio.Asio.Unmanaged;$(ExternalIncludePath)</ExternalIncludePath>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
@@ -56,7 +56,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(IncludePath)</IncludePath>
-    <OutDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Configuration)\$(Platform)\</IntDir>
     <ExternalIncludePath>D:\Gamer I5\Documents\Projects\ASIOSDK2\common;D:\Gamer I5\Documents\Projects\Audio\Audio.Asio.Unmanaged;$(ExternalIncludePath)</ExternalIncludePath>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
@@ -152,16 +152,6 @@
       <Project>{33764059-8096-43a3-b973-866f941fd5f3}</Project>
     </ProjectReference>
   </ItemGroup>
-  <Target Name="CopyDependencies" AfterTargets="Build" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Message Text="Copy dependencies to $(OutDir)" Importance="high" />
-    <ItemGroup>
-      <Dependencies Include="..\Audio.Asio.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Asio.Unmanaged.dll" />
-      <Dependencies Include="..\Audio.Asio.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Asio.Unmanaged.pdb" />
-      <Dependencies Include="..\Audio.Foundation.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Foundation.Unmanaged.dll" />
-      <Dependencies Include="..\Audio.Foundation.Unmanaged\bin\$(Configuration)\$(PlatformTarget)\Audio.Foundation.Unmanaged.pdb" />
-    </ItemGroup>
-    <Copy SourceFiles="@(Dependencies)" DestinationFolder="$(OutDir)" />
-  </Target>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

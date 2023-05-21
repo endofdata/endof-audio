@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+	<metadata>
+		<id>Audio.Foundation.Unmanaged</id>
+		<version>1.0.0</version>
+		<title>Audio Foundation Unmanaged</title>
+		<authors>endofdata</authors>
+		<owners>endofdata</owners>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>Foundation classes for audio development</description>
+		<copyright>Copyright endofdata 2023</copyright>
+		<tags>audio native</tags>
+	</metadata>
+	<files>
+		<file src="..\bin\$configuration$\x64\Audio.Foundation.Unmanaged.dll" target="runtimes\win-x64\native\Audio.Foundation.Unmanaged.dll"/>
+	</files>
+</package>

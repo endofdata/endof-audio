@@ -5,6 +5,7 @@ VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{622E2AF6-27A0-401F-837C-0CE5A20BFC9C}"
 	ProjectSection(SolutionItems) = preProject
+		Get-Nuget.ps1 = Get-Nuget.ps1
 		Start-MidiSim.ps1 = Start-MidiSim.ps1
 		Test.runsettings = Test.runsettings
 	EndProjectSection

@@ -18,3 +18,5 @@ Audio.Asio/TestResults/
 /x64/Release
 /Test/RepeatMyself/fred_1.dat
 /Test/Test.Audio.Common/x64/Debug
+/Audio.Foundation/Audio.Foundation.1.0.0.nupkg
+/Audio.Foundation.Unmanaged/Audio.Foundation.Unmanaged.1.0.0.nupkg
