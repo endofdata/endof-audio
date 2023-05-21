@@ -45,7 +45,7 @@ namespace Test
 						ISampleContainerPtr container = ObjectFactory::CreateSampleContainer((int)(sampleRate * seconds), 2);
 
 						AudioTime position = 0;
-						AudioTime length = (AudioTime)(seconds * 1000);
+						AudioTime length = static_cast<long long>(seconds * 1000ul);
 
 						ITakePtr pTake = ObjectFactory::CreateTake(container, position, length);
 
@@ -58,7 +58,7 @@ namespace Test
 
 						Assert::AreEqual(takeId, pTakeFromTakeSequence->Id, L"Take-ID is OK");
 
-						AudioTime movedPosition = (AudioTime)(seconds * 3000);
+						AudioTime movedPosition = static_cast<long long>(seconds * 3000ul);
 						Assert::IsTrue(pTakeSequence->MoveTake(takeId, movedPosition), L"Can move take by ID");
 
 						ITakePtr pMovedTake = pTakeSequence->FindTake(takeId);
@@ -116,7 +116,7 @@ namespace Test
 						ISampleContainerPtr pContainer = ObjectFactory::CreateSampleContainer((int)(seconds * sampleRate), channelCount);
 						Assert::IsNotNull(pContainer.GetInterfacePtr(), L"Can create sample container");
 
-						InitSampleBuffers(pContainer, -0.16, -0.32);
+						InitSampleBuffers(pContainer, -0.16f, -0.32f);
 
 						AudioTime position = 0;
 						AudioTime length = AudioTime::FromSeconds(seconds);
@@ -204,12 +204,12 @@ namespace Test
 
 						void ResetBuffers()
 						{
-							InitInt32Buffer(_inBufferA, 0.01);
-							InitInt32Buffer(_inBufferB, 0.02);
-							InitInt32Buffer(_outBufferA1, 0.04);
-							InitInt32Buffer(_outBufferB1, 0.08);
-							InitInt32Buffer(_outBufferA2, 0.16);
-							InitInt32Buffer(_outBufferB2, 0.32);
+							InitInt32Buffer(_inBufferA, 0.01f);
+							InitInt32Buffer(_inBufferB, 0.02f);
+							InitInt32Buffer(_outBufferA1, 0.04f);
+							InitInt32Buffer(_outBufferB1, 0.08f);
+							InitInt32Buffer(_outBufferA2, 0.16f);
+							InitInt32Buffer(_outBufferB2, 0.32f);
 						}
 
 						IInputChannelPtr CreateInputChannel(int hwChannelId)
@@ -260,13 +260,13 @@ namespace Test
 								// (input bufer A or cleared) + pMixedInRight -> output buffer A2
 								AssertBufferValue(_outBufferA2, pMixedInRight != nullptr ? *pMixedInRight : 0.0);
 								// Output buffers B1 and B2 are not modified
-								AssertBufferValue(_outBufferB1, 0.08);
-								AssertBufferValue(_outBufferB2, 0.32);
+								AssertBufferValue(_outBufferB1, 0.08f);
+								AssertBufferValue(_outBufferB2, 0.32f);
 							}
 
 							// Input buffers are not modified
-							AssertBufferValue(_inBufferA, 0.01);
-							AssertBufferValue(_inBufferB, 0.02);
+							AssertBufferValue(_inBufferA, 0.01f);
+							AssertBufferValue(_inBufferB, 0.02f);
 						}
 
 						void AssertBufferEquals(const std::unique_ptr<int>& bufferX, const std::unique_ptr<int>& bufferY, int tolerance = 0, const Sample* pOffset = nullptr)

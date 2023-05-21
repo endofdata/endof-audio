@@ -30,7 +30,7 @@ namespace Test
 						auto currentTake = takes.begin();
 
 						int sampleCount = Constants::SampleRate * 5;
-						AudioTime takeLength = (AudioTime)(sampleCount / Constants::SampleRate * 1000.0);
+						AudioTime takeLength = static_cast<long long>(sampleCount / Constants::SampleRate * 1000.0);
 						AudioTime takePosition = 0;
 
 						for (auto iter = takes.begin(); iter!= takes.end(); iter++)
