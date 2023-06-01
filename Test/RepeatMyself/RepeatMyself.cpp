@@ -8,13 +8,12 @@
 
 #include "Looper.h"
 #include "LooperConfig.h"
+#include "LooperEvents.h"
 
 using namespace Audio::Asio;
 using namespace Audio::Vst::Unmanaged;
 using namespace Audio::Asio::Unmanaged;
 using namespace Audio::Foundation::Unmanaged;
-
-const wchar_t* ClearLine = L"\33[2K\r";
 
 bool onDeviceCaps(unsigned int id, const MIDIINCAPS& devcaps)
 {
@@ -47,40 +46,45 @@ static void addVstFx(Looper* looper)
 static void runLooper(const LooperConfig& config)
 {
 	Looper* looper = Looper::Create(config, L"RepeatMyself");
+	ILooperEventsPtr looperEvents = new LooperEvents();
 
 	try
 	{
-		// addVstFx(looper);
+		looper->LooperEvents = looperEvents;
+		addVstFx(looper);
 
-		for (size_t i = 0; i < config.InputChannelCount; i++)
+		for (int i = 0; i < static_cast<int>(config.InputChannelCount); i++)
 		{
 			looper->SelectInput(config.InputChannel[i], true);
 		}
-		for (size_t i = 0; i < config.OutputChannelCount; i += 2)
+		for (int i = 0; i < static_cast<int>(config.OutputChannelCount); i += 2)
 		{
 			int pair[2] = { config.OutputChannel[i], config.OutputChannel[i + 1] };
 			looper->SelectOutputPair(pair, true);
 		}
 
 		// create master recording
-		looper->IsRecording = true;
+		looper->IsSessionRecording = true;
 
 		std::wcout << L"Running the looper" << std::endl;
 
 		looper->Run();
 
-		std::wostringstream builder;
-		SYSTEMTIME st;
-		GetSystemTime(&st);
-		builder << L"sessions\\" 
-			<< std::setw(4) << st.wYear 
-			<< std::setw(2) << std::setfill(L'0') << st.wMonth << st.wDay << L"_"
-			<< std::setw(2) << std::setfill(L'0') << st.wHour << st.wMinute << st.wSecond << L"_";
-		std::wstring filenameBase = builder.str();
+		if (looper->IsSessionRecording)
+		{
+			std::wostringstream builder;
+			SYSTEMTIME st;
+			GetSystemTime(&st);
+			builder << L"sessions\\"
+				<< std::setw(4) << st.wYear
+				<< std::setw(2) << std::setfill(L'0') << st.wMonth << st.wDay << L"_"
+				<< std::setw(2) << std::setfill(L'0') << st.wHour << st.wMinute << st.wSecond << L"_";
+			std::wstring filenameBase = builder.str();
 
-		std::wcout << L"Writing session to file set '" << filenameBase << L"*'." << std::endl;
+			std::wcout << L"Writing session to file set '" << filenameBase << L"*'." << std::endl;
 
-		looper->SaveSession(filenameBase.c_str());
+			looper->SaveSession(filenameBase.c_str());
+		}
 	}
 	catch (const std::exception&)
 	{
@@ -97,7 +101,14 @@ int main()
 	int sampleCount = 512;
 	float outputSaturation = 0.5f;
 
-	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+	bool isPrioritySet = SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+
+	if (isPrioritySet == FALSE)
+	{
+		std::wcerr << L"Cannot set process priority class to 'high'.";
+	}
+
+	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_SPEED_OVER_MEMORY);
 
 	if (hr != S_OK)
 	{
@@ -120,12 +131,12 @@ int main()
 			looperConfig.MidiInput = midiInId;
 			looperConfig.AsioDevice = IID_STEINBERG_UR_RT2;
 			//looperConfig.AsioDevice = CLSID_AsioDebugDriver;
-			looperConfig.AddInputChannelList(selectedInputs, 2);
-			looperConfig.AddOutputChannelList(selectedOutputs, 2);
+			looperConfig.AddInputChannelList(selectedInputs, _countof(selectedInputs));
+			looperConfig.AddOutputChannelList(selectedOutputs, _countof(selectedOutputs));
 
 			// optional
-			//looperConfig.SampleCount = 512;
-			//looperConfig.OutputSaturation = 0.5f;
+			looperConfig.SampleCount = AsioCore::UsePreferredSize;
+			looperConfig.OutputSaturation = 1.0f;
 
 			runLooper(looperConfig);
 
