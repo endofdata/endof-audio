@@ -6,6 +6,8 @@
 #include <ISampleProcessor.h>
 #include <ISourceJoiner.h>
 #include <IVstHost.h>
+#include <ILooper.h>
+#include <ILooperEvents.h>
 #include <LooperConfig.h>
 #include <UnknownBase.h>
 
@@ -13,7 +15,7 @@ using namespace Audio::Asio::Unmanaged;
 using namespace Audio::Vst::Unmanaged::Abstractions;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
-class Looper
+class Looper : public ILooper
 {
 public:
 	static Looper* Create(const LooperConfig& config, const wchar_t* pwcszName);
@@ -33,13 +35,26 @@ public:
 	int InsertFx(ISampleProcessorPtr effect);
 	bool RemoveFx(int id);
 
-	bool get_IsRecording() const;
-	void put_IsRecording(bool value);
-	_declspec(property(get = get_IsRecording, put = put_IsRecording)) bool IsRecording;
+	bool get_IsLooping() const;
+	_declspec(property(get = get_IsLooping)) bool IsLooping;
+
+	int get_LoopCount() const;
+	_declspec(property(get = get_LoopCount)) int LoopCount;
+
+	bool get_IsLoopRecording() const;
+	_declspec(property(get = get_IsLoopRecording)) bool IsLoopRecording;
+
+	bool get_IsSessionRecording() const;
+	void put_IsSessionRecording(bool value);
+	_declspec(property(get = get_IsSessionRecording, put = put_IsSessionRecording)) bool IsSessionRecording;
 
 	const wchar_t* get_Name() const;
 	void put_Name(const wchar_t* value);
 	_declspec(property(get = get_Name, put = put_Name)) const wchar_t* Name;
+
+	ILooperEventsPtr get_LooperEvents();
+	void put_LooperEvents(ILooperEventsPtr& value);
+	_declspec(property(get = get_LooperEvents, put = put_LooperEvents)) ILooperEventsPtr LooperEvents;
 
 	DECLARE_IUNKNOWN
 
@@ -50,14 +65,26 @@ private:
 	void CreateVstHost();
 	void CreateProcessingChain();
 
-	bool AddTake();
+	bool ToggleRecording(ITransportPtr& transport);
+	bool DropRecording(bool continueRecording);
+	bool AddLoop();
+
+	void OnHeartbeat(ITransportPtr& transport);
+	void OnTransportStatusChanged(TransportCode previous, TransportCode current);
+	void OnLoopRestart();
+	void OnLoopRecordingChanged();
+	void OnAddLoop();
+	void OnDropRecording(bool continueRecording);
+	void OnSessionRecordingChanged();
 
 	AsioCorePtr m_device;
 	IVstHostPtr m_vstHost;
 	ITransportControlPtr m_transportControl;
+	ILooperEventsPtr m_events;
 	IRecorderPtr m_recorder;
-	bool m_isRecording;
-	IRecorderPtr m_masterRecorder;
+	ProcessingContext* m_context;
+	bool m_isSessionRecording;
+	IRecorderPtr m_sessionRecorder;
 	ISourceJoinerPtr m_joiner;
 	int m_delay;
 	std::wstring m_name;

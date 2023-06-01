@@ -21,3 +21,7 @@ Audio.Asio/TestResults/
 /Audio.Foundation/Audio.Foundation.1.0.0.nupkg
 /Audio.Foundation.Unmanaged/Audio.Foundation.Unmanaged.1.0.0.nupkg
 /Test/RepeatMyself/sessions
+/Test/CrackleHunter/Debug
+/Test/CrackleHunter/Release
+/Test/Test.Audio.Asio.Unmanaged/Debug
+/Test/Test.Audio.Asio.Unmanaged/Release

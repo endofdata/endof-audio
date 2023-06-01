@@ -21,7 +21,7 @@ Looper* Looper::Create(const LooperConfig& config, const wchar_t* pwcszName)
 			throw std::runtime_error("Initialization of ASIO device failed.");
 		}
 
-		device->CreateBuffers(config.InputChannelList, config.InputChannelCount, config.OutputChannelList, config.OutputChannelCount, config.SampleCount, config.OutputSaturation);
+		device->CreateBuffers(config.InputChannelList, config.InputChannelCount, config.OutputChannelList, static_cast<int>(config.OutputChannelCount), config.SampleCount, config.OutputSaturation);
 
 		Looper* pLooper = new Looper(device);
 		pLooper->AddRef();
@@ -35,14 +35,18 @@ Looper* Looper::Create(const LooperConfig& config, const wchar_t* pwcszName)
 	}
 	catch (const AsioCoreException& acx)
 	{
-		std::wcerr << L"Failed to create device. " << acx.Message << L" Error code: 0x" << std::hex << acx.Error << std::dec << std::endl;
+		std::ostringstream builder;
+		builder << "Failed to create device. " << acx.Message << " Error code: 0x" << std::hex << acx.Error << std::dec;
+
+		throw std::runtime_error(builder.str());
 	}
 }
 
 Looper::Looper(AsioCorePtr& device) :
 	m_device(device),
 	m_delay(1000),
-	m_isRecording(false),
+	m_isSessionRecording(false),
+	m_context(nullptr),
 	m_refCount(0)
 {
 }
@@ -132,9 +136,10 @@ void Looper::Run()
 	}
 
 	bool isRecordPressed = false;
+	TransportCode previousStatus = TransportCode::None;
 	TransportCode transportStatus = TransportCode::None;
 	ITransportPtr transport = m_device->ProcessingChain->Transport;
-	ProcessingContext& context = transport->Context;
+	m_context = &transport->Context;
 
 	// start audio device
 	m_device->Start();
@@ -149,65 +154,32 @@ void Looper::Run()
 
 		if (hasControl)
 		{
+			if (previousStatus != transportStatus)
+			{
+				OnTransportStatusChanged(previousStatus, transportStatus);
+				previousStatus = transportStatus;
+			}
+
 			switch (transportStatus)
 			{
 			case TransportCode::Record:
-				if (!context.IsLooping)
+				if (!m_context->IsLooping)
 				{
-					// Initial loop recording
-					if (!m_recorder->IsActive)
-					{
-						// Step 1: press record to start								
-						m_recorder->IsActive = true;
-						m_masterRecorder->IsActive = m_isRecording;
-						transport->Start();
-					}
-					else
-					{
-						// Step 2: press record again to stop recording and begin loop
-						int switchSamplePos = transport->Context.SamplePosition;
-						if (AddTake())
-						{
-							m_masterRecorder->IsActive = false;
-							context.LoopEndSample = switchSamplePos;
-							context.IsLooping = true;
-							AudioTime switchTime = transport->SamplePositionToAudioTime(switchSamplePos);
-						}
-					}
+					ToggleRecording(transport);
 				}
 				else
 				{
-					// Toggle recording start / end with next loop wrap
 					isRecordPressed = !isRecordPressed;
 				}
 				break;
 			case TransportCode::Locate:
+				OnLoopRestart();
+
 				// Triggered by master loop wrap: delayed handling of 'Record' commands
 				if (isRecordPressed)
 				{
 					isRecordPressed = false;
-
-					if (!m_recorder->IsActive)
-					{
-						// Step n: start overdub
-						m_recorder->IsActive = true;
-						m_masterRecorder->IsActive = m_isRecording;
-					}
-					else
-					{
-						// Step n + 1: stop overdub and add loop
-						int switchSamplePos = transport->Context.SamplePosition;
-						if (AddTake())
-						{
-							m_masterRecorder->IsActive = false;
-
-							if (switchSamplePos > transport->Context.LoopEndSample)
-							{
-								transport->Context.LoopEndSample = switchSamplePos;
-							}
-							std::wcout << std::endl;
-						}
-					}
+					ToggleRecording(transport);
 				}
 				break;
 			case TransportCode::Start:
@@ -215,7 +187,7 @@ void Looper::Run()
 				// Drop current recording, stop recording, continue looping
 				if (m_recorder->IsActive)
 				{
-					m_recorder->DropRecording(false);
+					DropRecording(true);
 				}
 			}
 			break;
@@ -225,17 +197,223 @@ void Looper::Run()
 				transport->Stop();
 				if (m_recorder->IsActive)
 				{
-					m_recorder->DropRecording(false);
+					DropRecording(false);
 				}
 				break;
 			default:
 				break;
 			}
 		}
+		OnHeartbeat(transport);
 	}
+	m_context = nullptr;
 	m_device->ProcessingChain->InitShutDown();
 	m_transportControl->IsActive = false;
 	m_device->Stop();
+}
+
+
+
+bool Looper::ToggleRecording(ITransportPtr& transport)
+{
+	if (!m_recorder->IsActive)
+	{
+		m_recorder->IsActive = true;
+		m_sessionRecorder->IsActive = m_isSessionRecording;
+
+		if (!m_context->IsLooping)
+		{
+			transport->Start();
+		}
+	}
+	else
+	{
+		int switchSamplePos = m_context->SamplePosition;
+	
+		m_sessionRecorder->IsActive = false;
+
+		if (AddLoop())
+		{
+			if (m_context->IsLooping)
+			{
+				// TODO: Add threshold to prevent unintentional resize? Does resize work at all?
+				if (switchSamplePos > m_context->LoopEndSample)
+				{
+					m_context->LoopEndSample = switchSamplePos;
+				}
+			}
+			else
+			{
+				m_context->LoopEndSample = switchSamplePos;
+				m_context->IsLooping = true;
+			}
+		}
+	}
+	OnSessionRecordingChanged();
+	OnLoopRecordingChanged();
+
+	return m_recorder->IsActive;
+}
+
+bool Looper::AddLoop()
+{
+	ISampleContainerPtr take = m_recorder->CreateSampleContainer(false, 0, 0);
+
+	if (take != nullptr)
+	{
+		MixParameter mix;
+
+		ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take);
+		takeSource->IsLooping = true;
+		m_joiner->AddSource(takeSource, mix);
+
+		OnAddLoop();
+		return true;
+	}
+	return false;
+}
+
+bool Looper::DropRecording(bool continueRecording)
+{
+	if (m_recorder->IsActive)
+	{
+		m_recorder->DropRecording(continueRecording);
+		OnDropRecording(continueRecording);
+
+		return true;
+	}
+	return false;
+}
+
+void Looper::SaveSession(const wchar_t* pwcszFilenameBase)
+{
+	ISampleContainerPtr container = m_sessionRecorder->CreateSampleContainer(false, 0, 0);
+
+	// TODO: Write WAV format
+	if (container != nullptr)
+	{
+		for (int c = 0; c < container->ChannelCount; c++)
+		{
+			std::wostringstream builder;
+			builder << pwcszFilenameBase << c << L".dat" << std::ends;
+
+			auto filename = builder.str();
+
+			std::ofstream out(filename, std::ios_base::out + std::ios_base::binary + std::ios_base::trunc);
+			auto data = reinterpret_cast<const char*>(container->Channels[c]->SamplePtr);
+
+			out.write(data, container->SampleCount * sizeof(Sample));
+			out.flush();
+		}
+	}
+}
+
+void Looper::OnHeartbeat(ITransportPtr& transport)
+{
+	if (m_events != nullptr)
+	{
+		m_events->Heartbeat(*this, transport);
+	}
+}
+
+void Looper::OnTransportStatusChanged(TransportCode previous, TransportCode current)
+{
+	if (m_events != nullptr)
+	{
+		m_events->TransportStatusChanged(*this, previous, current);
+	}
+}
+
+void Looper::OnLoopRestart()
+{
+	if (m_events != nullptr)
+	{
+		m_events->LoopRestart(*this);
+	}
+}
+
+void Looper::OnLoopRecordingChanged()
+{
+	if (m_events != nullptr)
+	{
+		m_events->LoopRecordingChanged(*this, m_recorder->IsActive);
+	}
+}
+
+void Looper::OnAddLoop()
+{
+	if (m_events != nullptr)
+	{
+		m_events->AddLoop(*this);
+	}
+}
+
+void Looper::OnDropRecording(bool continueRecording)
+{
+	if (m_events != nullptr)
+	{
+		m_events->DropRecording(*this, continueRecording);
+	}
+}
+
+void Looper::OnSessionRecordingChanged()
+{
+	if (m_isSessionRecording && m_events != nullptr)
+	{
+		m_events->SessionRecordingChanged(*this, m_sessionRecorder->IsActive);
+	}
+}
+
+bool Looper::get_IsLooping() const
+{
+	return m_context != nullptr && m_context->IsLooping;
+}
+
+int Looper::get_LoopCount() const
+{
+	return m_joiner->SourceCount;
+}
+
+bool Looper::get_IsLoopRecording() const
+{
+	return m_recorder->IsActive;
+}
+
+bool Looper::get_IsSessionRecording() const
+{
+	return m_isSessionRecording;
+}
+
+void Looper::put_IsSessionRecording(bool value)
+{
+	m_isSessionRecording = value;
+}
+
+const wchar_t* Looper::get_Name() const
+{
+	return m_name.c_str();
+}
+
+void Looper::put_Name(const wchar_t* value)
+{
+	if (value == nullptr)
+	{
+		m_name.clear();
+	}
+	else
+	{
+		m_name = value;
+	}
+}
+
+ILooperEventsPtr Looper::get_LooperEvents()
+{
+	return m_events;
+}
+
+void Looper::put_LooperEvents(ILooperEventsPtr& value)
+{
+	m_events = value;
 }
 
 void Looper::CreateTransportControl(unsigned int midiInput)
@@ -268,9 +446,9 @@ void Looper::CreateProcessingChain()
 	m_recorder->QueryInterface<ISampleProcessor>(&recordingProcessor);
 	recordingProcessor->IsBypassed = true;
 
-	m_masterRecorder = ObjectFactory::CreateRecorder(processingChain->OutputChannelPairCount * 2, samplesPerTenSecs, samplesPerTenSecs);
+	m_sessionRecorder = ObjectFactory::CreateRecorder(processingChain->OutputChannelPairCount * 2, samplesPerTenSecs, samplesPerTenSecs);
 	ISampleProcessorPtr masterRecProcessor = nullptr;
-	m_masterRecorder->QueryInterface<ISampleProcessor>(&masterRecProcessor);
+	m_sessionRecorder->QueryInterface<ISampleProcessor>(&masterRecProcessor);
 	masterRecProcessor->IsBypassed = true;
 
 	m_joiner = ObjectFactory::CreateSourceJoiner();
@@ -298,70 +476,5 @@ void Looper::CreateVstHost()
 	if (m_vstHost == nullptr)
 	{
 		throw std::runtime_error("Initialization of VST host failed.");
-	}
-}
-
-bool Looper::AddTake()
-{
-	ISampleContainerPtr take = m_recorder->CreateSampleContainer(false, 0, 0);
-
-	if (take != nullptr)
-	{
-		MixParameter mix;
-
-		ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take);
-		takeSource->IsLooping = true;
-		m_joiner->AddSource(takeSource, mix);
-		return true;
-	}
-}
-
-void Looper::SaveSession(const wchar_t* pwcszFilenameBase)
-{
-	ISampleContainerPtr container = m_masterRecorder->CreateSampleContainer(false, 0, 0);
-
-	// TODO: Write WAV format
-	if (container != nullptr)
-	{
-		for (int c = 0; c < container->ChannelCount; c++)
-		{
-			std::wostringstream builder;
-			builder << pwcszFilenameBase << c << L".dat" << std::ends;
-
-			auto filename = builder.str();
-
-			std::ofstream out(filename, std::ios_base::out + std::ios_base::binary + std::ios_base::trunc);
-			auto data = reinterpret_cast<const char*>(container->Channels[c]->SamplePtr);
-
-			out.write(data, container->SampleCount * sizeof(Sample));
-			out.flush();
-		}
-	}
-}
-
-bool Looper::get_IsRecording() const
-{
-	return m_isRecording;
-}
-
-void Looper::put_IsRecording(bool value)
-{
-	m_isRecording = value;
-}
-
-const wchar_t* Looper::get_Name() const
-{
-	return m_name.c_str();
-}
-
-void Looper::put_Name(const wchar_t* value)
-{
-	if (value == nullptr)
-	{
-		m_name.clear();
-	}
-	else
-	{
-		m_name = value;
 	}
 }
