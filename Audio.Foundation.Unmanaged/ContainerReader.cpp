@@ -56,7 +56,7 @@ int ContainerReader::ReadSamples(ISampleContainerPtr& container, const MixParame
 				m_samplePosition = 0;
 			}
 
-		} while (m_isLooping && sampleCount < container->SampleCount);
+		} while (m_isLooping && sampleCount < required);
 
 		return sampleCount;
 	}
