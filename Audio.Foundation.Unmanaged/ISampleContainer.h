@@ -48,6 +48,8 @@ namespace Audio
 					/// </summary>
 					_declspec(property(get = get_Channel)) ISampleBufferPtr Channels[];
 
+					virtual void Clear() = 0;
+
 					virtual int WriteTo(ISampleContainerPtr& other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, 
 						int targetSampleOffset, int targetChannelOffset, const MixParameter& mix, bool overdub) const = 0;
 

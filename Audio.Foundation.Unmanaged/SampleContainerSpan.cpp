@@ -92,6 +92,14 @@ ISampleBufferPtr SampleContainerSpan::get_Channel(int index)
 	return m_vecChannels.at(index);
 }
 
+void SampleContainerSpan::Clear()
+{
+	for (int c = 0; c < ChannelCount; c++)
+	{
+		Channels[c]->Clear();
+	}
+}
+
 int SampleContainerSpan::WriteTo(ISampleContainerPtr& other, int sampleOffset, int sampleCount, int channelOffset, int channelCount, 
 	int targetSampleOffset, int targetChannelOffset, const MixParameter& mix, bool overdub) const
 {

@@ -38,22 +38,18 @@ void* ProcessingChain::GetInterface(REFIID iid)
 
 void ProcessingChain::OnNextBuffer(bool writeSecondHalf)
 {
-	const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
-
 	if (!m_shutDownInitiated)
 	{
-		int channel = 0;
+		const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
+
 		bool readSecondHalf = !writeSecondHalf;
 
 		ProcessingContext context = m_transport->Pulse();
 		IHostClockPtr clock = m_transport->HostClock;
 
-		for (int c = 0; c < m_container->ChannelCount; c++)
-		{
-			m_container->Channels[c]->Clear();
-		}
+		m_container->Clear();
 
-		std::for_each(m_inputChannels.begin(), m_inputChannels.end(), [this, readSecondHalf, &channel]
+		std::for_each(m_inputChannels.begin(), m_inputChannels.end(), [this, readSecondHalf]
 		(IInputChannelPtr& input)
 		{
 			input->OnNextBuffer(m_container, readSecondHalf);
@@ -65,7 +61,8 @@ void ProcessingChain::OnNextBuffer(bool writeSecondHalf)
 			item.second->Process(m_container, context);
 		});
 
-		int fadeWidth = m_container->SampleCount / 2;
+		// Fade at loop end / start with 10ms or at least one buffer
+		int fadeWidth = std::min(m_container->SampleCount, (int)(clock->SampleRate / 100));
 		FadeBuffers(context.IsLoopStart? fadeWidth: 0, context.IsLoopEnd? fadeWidth : 0);
 
 		int firstOut = 0;
