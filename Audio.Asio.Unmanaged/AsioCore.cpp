@@ -99,7 +99,7 @@ void AsioCore::Initialize(REFCLSID clsid)
 	else
 	{
 		// clsid is used twice by intention
-		hr = CoCreateInstance(clsid, nullptr, CLSCTX_INPROC_SERVER, clsid, (void**)&pDriver);
+		hr = CoCreateInstance(clsid, nullptr, CLSCTX_INPROC_SERVER | CLSCTX_LOCAL_SERVER, clsid, (void**)&pDriver);
 	}
 
 	// If the error is E_NOINTERFACE (0x80004002), this may be caused by invalid COM initialization
