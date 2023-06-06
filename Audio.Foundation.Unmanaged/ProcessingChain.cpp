@@ -44,10 +44,10 @@ void ProcessingChain::OnNextBuffer(bool writeSecondHalf)
 
 		bool readSecondHalf = !writeSecondHalf;
 
+		m_container->Clear();
+
 		ProcessingContext context = m_transport->Pulse();
 		IHostClockPtr clock = m_transport->HostClock;
-
-		m_container->Clear();
 
 		std::for_each(m_inputChannels.begin(), m_inputChannels.end(), [this, readSecondHalf]
 		(IInputChannelPtr& input)
@@ -148,6 +148,11 @@ void ProcessingChain::AddOutputPair(IOutputChannelPairPtr& output)
 
 int ProcessingChain::AddProcessor(ISampleProcessorPtr& processor)
 {
+	if (processor.GetInterfacePtr() == nullptr)
+	{
+		throw std::invalid_argument("Sample processor pointer cannot be null.");
+	}
+
 	const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
 
 	int nextId = GetNextProcessorId();
