@@ -221,7 +221,7 @@ IProcessingChainPtr ObjectFactory::CreateProcessingChain(ITransportPtr& transpor
 	return new ProcessingChain(transport, container);
 }
 
-ISampleProcessorPtr ObjectFactory::CreateTestOscillator(double sampleRate, double frequency, double amplitude)
+IOscillatorPtr ObjectFactory::CreateTestOscillator(double sampleRate, double frequency, double amplitude)
 {
 	Oscillator* oscillator = new Oscillator(sampleRate);
 	oscillator->Frequency = frequency;

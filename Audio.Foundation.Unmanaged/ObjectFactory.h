@@ -15,6 +15,7 @@
 #include <IProcessingChain.h>
 #include <IMidiInput.h>
 #include <IMidiEvents.h>
+#include <IOscillator.h>
 #include <IRecorder.h>
 #include <ITransport.h>
 #include <ITransportControl.h>
@@ -77,7 +78,7 @@ namespace Audio
 
 				static IProcessingChainPtr CreateProcessingChain(ITransportPtr& transport, ISampleContainerPtr& container);
 
-				static ISampleProcessorPtr CreateTestOscillator(double sampleRate, double frequency, double amplitude);
+				static IOscillatorPtr CreateTestOscillator(double sampleRate, double frequency, double amplitude);
 
 				static IMidiInputPtr CreateMidiInput();
 

@@ -114,6 +114,7 @@
     <ClInclude Include="InputInt24Channel.h" />
     <ClInclude Include="InputInt32Channel.h" />
     <ClInclude Include="InputOfTSampleChannel.h" />
+    <ClInclude Include="IOscillator.h" />
     <ClInclude Include="IOutputChannelPair.h" />
     <ClInclude Include="IProcessingChain.h" />
     <ClInclude Include="IRecorder.h" />
