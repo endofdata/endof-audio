@@ -82,13 +82,13 @@ int main()
 		//ISampleProcessorPtr recordingProcessor = ObjectFactory::CreateToFileProcessor(L"some_test.raw");
 		//processingChain->AddProcessor(recordingProcessor);
 
-		ISampleSourcePtr source = ObjectFactory::CreateRawFileSource(L"some_test.raw", 1);
-		ISampleProcessorPtr fileProcessor = ObjectFactory::CreateFromSourceProcessor(source);
-		processingChain->AddProcessor(fileProcessor);
+		//ISampleSourcePtr source = ObjectFactory::CreateRawFileSource(L"some_test.raw", 1);
+		//ISampleProcessorPtr fileProcessor = ObjectFactory::CreateFromSourceProcessor(source);
+		//processingChain->AddProcessor(fileProcessor);
 
 
 		processingChain->OutputChannelPair[0]->IsActive = true;
-		processingChain->InputChannel[0]->IsActive = false;
+		processingChain->InputChannel[0]->IsActive = true;
 
 
 		asioCore->Start();
