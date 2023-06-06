@@ -74,19 +74,17 @@ int main()
 
 		IProcessingChainPtr processingChain = asioCore->ProcessingChain;
 
-		IOscillatorPtr oscillator = ObjectFactory::CreateTestOscillator(asioCore->SampleRate, 0.0, 0.0);
-		ISampleProcessorPtr oscProcessor = nullptr;
-		oscillator->QueryInterface<ISampleProcessor>(&oscProcessor);
-		processingChain->AddProcessor(oscProcessor);
+		//IOscillatorPtr oscillator = ObjectFactory::CreateTestOscillator(asioCore->SampleRate, 0.0, 0.0);
+		//ISampleProcessorPtr oscProcessor = nullptr;
+		//oscillator->QueryInterface<ISampleProcessor>(&oscProcessor);
+		//processingChain->AddProcessor(oscProcessor);
 
+		//ISampleProcessorPtr recordingProcessor = ObjectFactory::CreateToFileProcessor(L"some_test.raw");
+		//processingChain->AddProcessor(recordingProcessor);
 
-		//ISampleSourcePtr source = ObjectFactory::CreateRawFileSource(L"some_test.raw", 1);
-		//ISampleProcessorPtr fileProcessor = ObjectFactory::CreateFromSourceProcessor(source);
-		//processingChain->AddProcessor(fileProcessor);
-
-
-		ISampleProcessorPtr recordingProcessor = ObjectFactory::CreateToFileProcessor(L"some_test.raw");
-		processingChain->AddProcessor(recordingProcessor);
+		ISampleSourcePtr source = ObjectFactory::CreateRawFileSource(L"some_test.raw", 1);
+		ISampleProcessorPtr fileProcessor = ObjectFactory::CreateFromSourceProcessor(source);
+		processingChain->AddProcessor(fileProcessor);
 
 
 		processingChain->OutputChannelPair[0]->IsActive = true;
@@ -95,7 +93,8 @@ int main()
 
 		asioCore->Start();
 
-		arpeggios(oscillator);
+		//arpeggios(oscillator);
+		Sleep(30000);
 
 		asioCore->Stop();
 	}
