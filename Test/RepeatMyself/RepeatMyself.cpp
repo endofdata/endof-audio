@@ -77,8 +77,11 @@ static void runLooper(const LooperConfig& config)
 			GetSystemTime(&st);
 			builder << L"sessions\\"
 				<< std::setw(4) << st.wYear
-				<< std::setw(2) << std::setfill(L'0') << st.wMonth << st.wDay << L"_"
-				<< std::setw(2) << std::setfill(L'0') << st.wHour << st.wMinute << st.wSecond << L"_";
+				<< std::setw(2) << std::setfill(L'0') << st.wMonth 
+				<< std::setw(2) << std::setfill(L'0') << st.wDay << L"_"
+				<< std::setw(2) << std::setfill(L'0') << st.wHour 
+				<< std::setw(2) << std::setfill(L'0') << st.wMinute 
+				<< std::setw(2) << std::setfill(L'0') << st.wSecond << L"_";
 			std::wstring filenameBase = builder.str();
 
 			std::wcout << L"Writing session to file set '" << filenameBase << L"*'." << std::endl;
