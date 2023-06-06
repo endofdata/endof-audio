@@ -60,6 +60,7 @@ namespace Audio
 							{
 								double factorLeft = m_mix.FactorLeft;
 								double factorRight = m_mix.FactorRight;
+
 								Sample* pDestLeft = container->Channels[0]->SamplePtr;
 								Sample* pDestRight = container->Channels[1]->SamplePtr;
 								
@@ -151,7 +152,7 @@ namespace Audio
 				private:
 					void SelectBufferPointer(bool readSecondHalf, TSample*& pSource)
 					{
-						pSource = readSecondHalf ? m_pBufferB : m_pBufferA;
+						pSource = readSecondHalf ? m_pBufferA : m_pBufferB;
 					}
 
 					virtual Sample ReadSample(TSample*& pSource) = 0;
