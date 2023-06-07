@@ -1,14 +1,14 @@
 #include "pch.h"
 #include "StreamProvider.h"
-#include <ObjectFactory.h>
+#include <FoundationObjectFactory.h>
 
 using namespace Audio::Foundation;
 using namespace Audio::Foundation::Unmanaged;
 
 StreamProvider::StreamProvider(int sampleCount, System::IO::Stream^ wavStream) : m_stream(wavStream)
 {
-	m_pContainer = ObjectFactory::CreateSampleContainer(sampleCount, 2);
-	m_pSharer = ObjectFactory::CreateSampleSharer();
+	m_pContainer = FoundationObjectFactory::CreateSampleContainer(sampleCount, 2);
+	m_pSharer = FoundationObjectFactory::CreateSampleSharer();
 }
 
 StreamProvider::~StreamProvider()
