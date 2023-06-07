@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "SampleContainer.h"
-#include "ObjectFactory.h"
+#include "FoundationObjectFactory.h"
 #include "SampleContainerSpan.h"
 #include "SampleBuffer.h"
 
@@ -52,7 +52,7 @@ void SampleContainer::CreateChannels(int sampleCount, int channelCount)
 		{
 			for (int c = currentChannels; c < channelCount; c++)
 			{
-				m_vecChannels.push_back(ObjectFactory::CreateSampleBuffer(sampleCount));
+				m_vecChannels.push_back(FoundationObjectFactory::CreateSampleBuffer(sampleCount));
 			}
 		}
 		m_sampleCount = sampleCount;

@@ -18,6 +18,15 @@
 #include <algorithm>
 #include <functional>
 #include <vector>
-#include <stdexcept>
 #include <comdef.h>
+#include <ostream>
+#include <stdexcept>
+#include <string>
+#include <istream>
+#include <sstream>
+#include <iomanip>
+#include <ios>
+#include <fstream>
+#include <memory>
+
 #endif //PCH_H

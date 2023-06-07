@@ -30,7 +30,7 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class _AUDIO_FOUNDATION_UNMANAGED_API ObjectFactory
+			class _AUDIO_FOUNDATION_UNMANAGED_API FoundationObjectFactory
 			{
 			public:
 				static ISampleBufferPtr CreateSampleBuffer(int sampleCount);
@@ -85,7 +85,7 @@ namespace Audio
 				static int SelectMidiInputDevice(MidiInCapsHandler handler);
 
 			private:
-				ObjectFactory();
+				FoundationObjectFactory();
 
 				static int NextTakeId();
 

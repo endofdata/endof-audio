@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "ObjectFactory.h"
+#include "FoundationObjectFactory.h"
 #include "MeterChannel.h"
 #include "SampleBuffer.h"
 #include "SampleContainer.h"
@@ -34,89 +34,89 @@
 #include "Oscillator.h"
 #include <stdexcept>
 
-int ObjectFactory::LastTakeId = 0;
+int FoundationObjectFactory::LastTakeId = 0;
 
 using namespace Audio::Foundation::Unmanaged;
 
 
-ISampleBufferPtr ObjectFactory::CreateSampleBuffer(int sampleCount)
+ISampleBufferPtr FoundationObjectFactory::CreateSampleBuffer(int sampleCount)
 {
 	return new SampleBuffer(sampleCount);
 }
 
-ISampleContainerPtr ObjectFactory::CreateSampleContainer(int sampleCount, int channelCount)
+ISampleContainerPtr FoundationObjectFactory::CreateSampleContainer(int sampleCount, int channelCount)
 {
 	return new SampleContainer(sampleCount, channelCount);
 }
 
-ISampleSharerPtr ObjectFactory::CreateSampleSharer()
+ISampleSharerPtr FoundationObjectFactory::CreateSampleSharer()
 {
 	return new SampleSharer();
 }
 
-ISourceJoinerPtr ObjectFactory::CreateSourceJoiner()
+ISourceJoinerPtr FoundationObjectFactory::CreateSourceJoiner()
 {
 	return new SourceJoiner();
 }
 
-IMeterChannelPtr ObjectFactory::CreateMeterChannel(int sampleRate, int channelCount)
+IMeterChannelPtr FoundationObjectFactory::CreateMeterChannel(int sampleRate, int channelCount)
 {
 	return new MeterChannel(sampleRate, channelCount);
 }
 
-ISampleProcessorPtr ObjectFactory::CreateToFileProcessor(const std::wstring& filename)
+ISampleProcessorPtr FoundationObjectFactory::CreateToFileProcessor(const std::wstring& filename)
 {
 	return new FileWriter(filename);
 }
 
-ISampleProcessorPtr ObjectFactory::CreateToStreamProcessor(std::ostream& output)
+ISampleProcessorPtr FoundationObjectFactory::CreateToStreamProcessor(std::ostream& output)
 {
 	return new StreamWriter(output);
 }
 
-ISampleProcessorPtr ObjectFactory::CreateToContainerProcessor(ISampleContainerPtr& target)
+ISampleProcessorPtr FoundationObjectFactory::CreateToContainerProcessor(ISampleContainerPtr& target)
 {
 	return new ContainerWriter(target);
 }
 
-ISpatialPtr ObjectFactory::CreateSpatial(double level, double pan)
+ISpatialPtr FoundationObjectFactory::CreateSpatial(double level, double pan)
 {
 	return new GainProcessor(level, pan);
 }
 
-IRecorderPtr ObjectFactory::CreateRecorder(int channelCount, int initialSize, int growth)
+IRecorderPtr FoundationObjectFactory::CreateRecorder(int channelCount, int initialSize, int growth)
 {
 	return new VectorWriter(channelCount, initialSize, growth);
 }
 
-ISampleSourcePtr ObjectFactory::CreateRawFileSource(const std::wstring& filename, int channelCount)
+ISampleSourcePtr FoundationObjectFactory::CreateRawFileSource(const std::wstring& filename, int channelCount)
 {
 	return FileReader::Create(filename, channelCount);
 }
 
-ISampleSourcePtr ObjectFactory::CreateContainerSource(ISampleContainerPtr& source)
+ISampleSourcePtr FoundationObjectFactory::CreateContainerSource(ISampleContainerPtr& source)
 {
 	return new ContainerReader(source);
 }
 
-ISampleProcessorPtr ObjectFactory::CreateFromSourceProcessor(ISampleSourcePtr& source)
+ISampleProcessorPtr FoundationObjectFactory::CreateFromSourceProcessor(ISampleSourcePtr& source)
 {
 	return new SourceProcessor(source);
 }
 
-ITakePtr ObjectFactory::CreateTake(ISampleContainerPtr& container, AudioTime position, IHostClockPtr& hostClock)
+ITakePtr FoundationObjectFactory::CreateTake(ISampleContainerPtr& container, AudioTime position, IHostClockPtr& hostClock)
 {
 	AudioTime length = AudioTime::FromSeconds(container->SampleCount / hostClock->SampleRate);
 
 	return CreateTake(container, position, length);
 }
 
-ITakePtr ObjectFactory::CreateTake(ISampleContainerPtr& container, AudioTime position, AudioTime length)
+ITakePtr FoundationObjectFactory::CreateTake(ISampleContainerPtr& container, AudioTime position, AudioTime length)
 {
 	return new Take(NextTakeId(), container, position, length);
 }
 
-IHostClockPtr ObjectFactory::CreateHostClock(double sampleRate)
+IHostClockPtr FoundationObjectFactory::CreateHostClock(double sampleRate)
 {	
 	if (sampleRate == 0.0)
 	{
@@ -126,17 +126,17 @@ IHostClockPtr ObjectFactory::CreateHostClock(double sampleRate)
 	return new HostClock(std::max(8000.0, sampleRate));
 }
 
-ITransportPtr ObjectFactory::CreateTransport(IHostClockPtr& hostClock, int sampleCount)
+ITransportPtr FoundationObjectFactory::CreateTransport(IHostClockPtr& hostClock, int sampleCount)
 {
 	ITransportEventsPtr events = new TransportEvents();
 	return new Transport(hostClock, events, sampleCount);
 }
 
-ITransportControlPtr ObjectFactory::CreateMidiTransportControl(ITransportPtr& transport, int midiDevId)
+ITransportControlPtr FoundationObjectFactory::CreateMidiTransportControl(ITransportPtr& transport, int midiDevId)
 {
 	if (midiDevId >= 0)
 	{
-		IMidiInputPtr midiInput = ObjectFactory::CreateMidiInput();
+		IMidiInputPtr midiInput = FoundationObjectFactory::CreateMidiInput();
 
 		if (midiInput->Open(midiDevId))
 		{
@@ -146,12 +146,12 @@ ITransportControlPtr ObjectFactory::CreateMidiTransportControl(ITransportPtr& tr
 	return nullptr;
 }
 
-ITakeSequencePtr ObjectFactory::CreateTakeSequence(ITransportPtr& transport)
+ITakeSequencePtr FoundationObjectFactory::CreateTakeSequence(ITransportPtr& transport)
 {
 	return new TakeSequence(transport);
 }
 
-IInputChannelPtr ObjectFactory::CreateInputChannel(int sampleType, int hwChannelId, void* pHwBufferA, void* pHwBufferB, int sampleCount)
+IInputChannelPtr FoundationObjectFactory::CreateInputChannel(int sampleType, int hwChannelId, void* pHwBufferA, void* pHwBufferB, int sampleCount)
 {
 	switch (sampleType)
 	{
@@ -166,7 +166,7 @@ IInputChannelPtr ObjectFactory::CreateInputChannel(int sampleType, int hwChannel
 	}
 }
 
-IOutputChannelPairPtr ObjectFactory::CreateOutputChannelPair(int sampleType, int hwChannelId1, void* pBufferA1, void* pBufferB1, 
+IOutputChannelPairPtr FoundationObjectFactory::CreateOutputChannelPair(int sampleType, int hwChannelId1, void* pBufferA1, void* pBufferB1, 
 	int hwChannelId2, void* pBufferA2, void* pBufferB2, int sampleCount, float saturation)
 {
 	IOutputChannelPairPtr outputPair = nullptr;
@@ -216,12 +216,12 @@ IOutputChannelPairPtr ObjectFactory::CreateOutputChannelPair(int sampleType, int
 	return outputPair;
 }
 
-IProcessingChainPtr ObjectFactory::CreateProcessingChain(ITransportPtr& transport, ISampleContainerPtr& container)
+IProcessingChainPtr FoundationObjectFactory::CreateProcessingChain(ITransportPtr& transport, ISampleContainerPtr& container)
 {
 	return new ProcessingChain(transport, container);
 }
 
-IOscillatorPtr ObjectFactory::CreateTestOscillator(double sampleRate, double frequency, double amplitude)
+IOscillatorPtr FoundationObjectFactory::CreateTestOscillator(double sampleRate, double frequency, double amplitude)
 {
 	Oscillator* oscillator = new Oscillator(sampleRate);
 	oscillator->Frequency = frequency;
@@ -230,18 +230,18 @@ IOscillatorPtr ObjectFactory::CreateTestOscillator(double sampleRate, double fre
 	return oscillator;
 }
 
-int ObjectFactory::SelectMidiInputDevice(MidiInCapsHandler handler)
+int FoundationObjectFactory::SelectMidiInputDevice(MidiInCapsHandler handler)
 {
 	return MidiInput::ListDevices(handler);
 }
 
-IMidiInputPtr ObjectFactory::CreateMidiInput()
+IMidiInputPtr FoundationObjectFactory::CreateMidiInput()
 {
 	IMidiEventsPtr events = new MidiEvents();
 	return new MidiInput(events);
 }
 
-int ObjectFactory::NextTakeId()
+int FoundationObjectFactory::NextTakeId()
 {
 	// HACK: This could overflow after a few billions of added takes
 	return ++LastTakeId;

@@ -45,6 +45,24 @@
     <ClInclude Include="Audio.Asio.Unmanaged.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ILooper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ILooperConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ILooperEvents.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Looper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LooperConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AsioObjectFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -66,6 +84,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AsioCoreException.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Looper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LooperConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AsioObjectFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

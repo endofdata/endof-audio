@@ -6,9 +6,11 @@
 #define LOOPER_MAX_INPUT_CHANNELS 16
 #define LOOPER_MAX_OUTPUT_CHANNELS 16
 
+using namespace Audio::Asio::Unmanaged::Abstractions;
+
 namespace Audio
 {
-	namespace Foundation
+	namespace Asio
 	{
 		namespace Unmanaged
 		{

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "TakeSequence.h"
 #include <algorithm>
-#include "ObjectFactory.h"
+#include "FoundationObjectFactory.h"
 
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;

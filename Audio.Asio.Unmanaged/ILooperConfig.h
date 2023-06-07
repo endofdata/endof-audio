@@ -1,17 +1,17 @@
 #pragma once
 
-#include <Audio.Foundation.Unmanaged.h>
+#include <Audio.Asio.Unmanaged.h>
 #include <comdef.h>
 
 namespace Audio
 {
-	namespace Foundation
+	namespace Asio
 	{
 		namespace Unmanaged
 		{
 			namespace Abstractions
 			{
-				__interface _AUDIO_FOUNDATION_UNMANAGED_API _declspec(uuid("7bc8271a-2bcb-4adb-a8e8-3b8bd71ea07a")) ILooperConfig : public IUnknown
+				__interface _AUDIO_ASIO_UNMANAGED_API _declspec(uuid("7bc8271a-2bcb-4adb-a8e8-3b8bd71ea07a")) ILooperConfig : public IUnknown
 				{
 					const wchar_t* get_Name() const = 0;
 					void put_Name(const wchar_t* value) = 0;
@@ -60,7 +60,7 @@ namespace Audio
 					void AddOutputChannelList(int idList[], size_t count) = 0;
 				};
 
-				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ILooperConfig, __uuidof(ILooperConfig));
+				_AUDIO_ASIO_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ILooperConfig, __uuidof(ILooperConfig));
 			}
 		}
 	}

@@ -2,6 +2,8 @@
 #include "LooperConfig.h"
 #include <AsioCore.h>
 
+using namespace Audio::Asio::Unmanaged;
+
 LooperConfig::LooperConfig() :
 	m_numInputIds(0),
 	m_numOutputIds(0),

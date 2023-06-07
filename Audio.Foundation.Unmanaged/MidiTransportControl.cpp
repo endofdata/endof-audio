@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "MidiTransportControl.h"
-#include <ObjectFactory.h>
+#include <FoundationObjectFactory.h>
 
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;

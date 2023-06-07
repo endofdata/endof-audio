@@ -14,11 +14,11 @@
 
 using namespace Audio::Asio::Unmanaged;
 using namespace Audio::Vst::Unmanaged::Abstractions;
-using namespace Audio::Foundation::Unmanaged::Abstractions;
+using namespace Audio::Asio::Unmanaged::Abstractions;
 
 namespace Audio
 {
-	namespace Foundation
+	namespace Asio
 	{
 		namespace Unmanaged
 		{

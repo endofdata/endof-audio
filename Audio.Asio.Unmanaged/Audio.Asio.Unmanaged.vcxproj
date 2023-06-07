@@ -44,12 +44,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)Audio.Asio.Unmanaged;$(SolutionDir)\Audio.Foundation.Unmanaged;$(SolutionDir)..\ASIOSDK2\common;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Audio.Vst.Unmanaged;$(SolutionDir)Audio.Asio.Unmanaged;$(SolutionDir)\Audio.Foundation.Unmanaged;$(SolutionDir)..\ASIOSDK2\common;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Configuration)\$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)Audio.Asio.Unmanaged;$(SolutionDir)\Audio.Foundation.Unmanaged;$(SolutionDir)..\ASIOSDK2\common;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Audio.Vst.Unmanaged;$(SolutionDir)Audio.Asio.Unmanaged;$(SolutionDir)\Audio.Foundation.Unmanaged;$(SolutionDir)..\ASIOSDK2\common;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Configuration)\$(Platform)\</IntDir>
   </PropertyGroup>
@@ -103,6 +103,12 @@
     <ClInclude Include="Audio.Asio.Unmanaged.h" />
     <ClInclude Include="DriverDescription.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="ILooper.h" />
+    <ClInclude Include="ILooperConfig.h" />
+    <ClInclude Include="ILooperEvents.h" />
+    <ClInclude Include="Looper.h" />
+    <ClInclude Include="LooperConfig.h" />
+    <ClInclude Include="AsioObjectFactory.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +118,9 @@
     <ClCompile Include="AsioDebugDriver.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="DriverDescription.cpp" />
+    <ClCompile Include="Looper.cpp" />
+    <ClCompile Include="LooperConfig.cpp" />
+    <ClCompile Include="AsioObjectFactory.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -120,6 +129,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Audio.Foundation.Unmanaged\Audio.Foundation.Unmanaged.vcxproj">
       <Project>{c4d38b7d-afa0-4138-bc06-ecb238fe579b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Audio.Vst.Unmanaged\Audio.Vst.Unmanaged.vcxproj">
+      <Project>{5eb4dd08-a21e-48ff-9063-307842e14935}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

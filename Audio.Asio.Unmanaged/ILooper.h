@@ -1,19 +1,19 @@
 #pragma once
 
-#include <Audio.Foundation.Unmanaged.h>
+#include <Audio.Asio.Unmanaged.h>
 #include <ISampleProcessor.h>
 #include <ILooperEvents.h>
 #include <comdef.h>
 
 namespace Audio
 {
-	namespace Foundation
+	namespace Asio
 	{
 		namespace Unmanaged
 		{
 			namespace Abstractions
 			{
-				__interface _AUDIO_FOUNDATION_UNMANAGED_API _declspec(uuid("d446c0dc-4868-4d20-893f-0e432cf4b7ce")) ILooper : public IUnknown
+				__interface _AUDIO_ASIO_UNMANAGED_API _declspec(uuid("d446c0dc-4868-4d20-893f-0e432cf4b7ce")) ILooper : public IUnknown
 				{
 					bool SelectInput(int input, bool isSelected) = 0;
 					bool SelectOutputPair(int outputPair[2], bool isSelected) = 0;
@@ -50,7 +50,7 @@ namespace Audio
 					_declspec(property(get = get_LooperEvents, put = put_LooperEvents)) ILooperEventsPtr LooperEvents;
 				};
 
-				_AUDIO_FOUNDATION_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ILooper, __uuidof(ILooper));
+				_AUDIO_ASIO_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ILooper, __uuidof(ILooper));
 			}
 		}
 	}

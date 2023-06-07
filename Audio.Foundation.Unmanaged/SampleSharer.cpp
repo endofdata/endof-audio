@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <functional>
 #include <stdexcept>
-#include "ObjectFactory.h"
+#include "FoundationObjectFactory.h"
 
 using namespace std;
 using namespace Audio::Foundation::Unmanaged;

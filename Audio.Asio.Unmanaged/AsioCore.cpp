@@ -4,7 +4,7 @@
 #include "AsioError.h"
 #include "AsioDebugDriver.h"
 #include "AsioDebugDriverGuid.h"
-#include <ObjectFactory.h>
+#include <FoundationObjectFactory.h>
 #include <IProcessingChain.h>
 #include <SampleType.h>
 #include <functional>
@@ -292,10 +292,10 @@ void AsioCore::CreateBuffers(const int inputChannelIds[], int numInputIds, const
 
 		try
 		{
-			auto hostClock = ObjectFactory::CreateHostClock(SampleRate);
-			auto transport = ObjectFactory::CreateTransport(hostClock, SampleCount);
-			auto container = ObjectFactory::CreateSampleContainer(SampleCount, std::max<int>(numInputIds, numOutputIds));
-			m_processingChain = ObjectFactory::CreateProcessingChain(transport, container);
+			auto hostClock = FoundationObjectFactory::CreateHostClock(SampleRate);
+			auto transport = FoundationObjectFactory::CreateTransport(hostClock, SampleCount);
+			auto container = FoundationObjectFactory::CreateSampleContainer(SampleCount, std::max<int>(numInputIds, numOutputIds));
+			m_processingChain = FoundationObjectFactory::CreateProcessingChain(transport, container);
 
 			CreateInputChannels(0, numInputIds);
 			CreateOutputChannels(numInputIds, numOutputIds, outputSaturation);
@@ -314,7 +314,7 @@ void AsioCore::CreateInputChannels(int offset, int count)
 	{
 		for (int iIdx = offset; iIdx < offset + count; iIdx++)
 		{
-			IInputChannelPtr input = ObjectFactory::CreateInputChannel(MapSampleType(m_sampleType),
+			IInputChannelPtr input = FoundationObjectFactory::CreateInputChannel(MapSampleType(m_sampleType),
 				m_pHwBufferInfo[iIdx].channelNum,
 				m_pHwBufferInfo[iIdx].buffers[0],
 				m_pHwBufferInfo[iIdx].buffers[1],
@@ -353,7 +353,7 @@ void AsioCore::CreateOutputChannels(int offset, int count, float saturation)
 		{
 			int iIdx = offset + pair * 2;
 
-			IOutputChannelPairPtr outputPair = ObjectFactory::CreateOutputChannelPair(MapSampleType(m_sampleType),
+			IOutputChannelPairPtr outputPair = FoundationObjectFactory::CreateOutputChannelPair(MapSampleType(m_sampleType),
 				m_pHwBufferInfo[iIdx].channelNum,
 				m_pHwBufferInfo[iIdx].buffers[0],
 				m_pHwBufferInfo[iIdx].buffers[1],

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Looper.h"
 #include <ISampleSource.h>
-#include <ObjectFactory.h>
+#include <FoundationObjectFactory.h>
 #include <VstObjectFactory.h>
 #include <AsioCoreException.h>
 
@@ -62,6 +62,10 @@ void* Looper::GetInterface(const IID& iid)
 	if (iid == _uuidof(IUnknown))
 	{
 		return dynamic_cast<IUnknown*>(this);
+	}
+	if (iid == _uuidof(ILooper))
+	{
+		return dynamic_cast<ILooper*>(this);
 	}
 	return nullptr;
 }
@@ -263,7 +267,7 @@ bool Looper::AddLoop()
 	{
 		MixParameter mix;
 
-		ISampleSourcePtr takeSource = ObjectFactory::CreateContainerSource(take);
+		ISampleSourcePtr takeSource = FoundationObjectFactory::CreateContainerSource(take);
 		takeSource->IsLooping = true;
 		m_joiner->AddSource(takeSource, mix);
 
@@ -423,7 +427,7 @@ void Looper::CreateTransportControl(unsigned int midiInput)
 		throw std::runtime_error("ASIO device must be created first.");
 	}
 
-	m_transportControl = ObjectFactory::CreateMidiTransportControl(m_device->ProcessingChain->Transport, midiInput);
+	m_transportControl = FoundationObjectFactory::CreateMidiTransportControl(m_device->ProcessingChain->Transport, midiInput);
 
 	if (m_transportControl == nullptr)
 	{
@@ -441,17 +445,17 @@ void Looper::CreateProcessingChain()
 	IProcessingChainPtr processingChain = m_device->ProcessingChain;
 	int samplesPerTenSecs = static_cast<int>(m_device->SampleRate * 60.0);
 
-	m_recorder = ObjectFactory::CreateRecorder(processingChain->InputChannelCount, samplesPerTenSecs, samplesPerTenSecs);
+	m_recorder = FoundationObjectFactory::CreateRecorder(processingChain->InputChannelCount, samplesPerTenSecs, samplesPerTenSecs);
 	ISampleProcessorPtr recordingProcessor = nullptr;
 	m_recorder->QueryInterface<ISampleProcessor>(&recordingProcessor);
 	recordingProcessor->IsBypassed = true;
 
-	m_sessionRecorder = ObjectFactory::CreateRecorder(processingChain->OutputChannelPairCount * 2, samplesPerTenSecs, samplesPerTenSecs);
+	m_sessionRecorder = FoundationObjectFactory::CreateRecorder(processingChain->OutputChannelPairCount * 2, samplesPerTenSecs, samplesPerTenSecs);
 	ISampleProcessorPtr masterRecProcessor = nullptr;
 	m_sessionRecorder->QueryInterface<ISampleProcessor>(&masterRecProcessor);
 	masterRecProcessor->IsBypassed = true;
 
-	m_joiner = ObjectFactory::CreateSourceJoiner();
+	m_joiner = FoundationObjectFactory::CreateSourceJoiner();
 	ISampleProcessorPtr joiningProcessor = nullptr;
 	m_joiner->QueryInterface<ISampleProcessor>(&joiningProcessor);
 

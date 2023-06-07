@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "SampleContainerSpan.h"
 #include "SampleBuffer.h"
-#include "ObjectFactory.h"
+#include "FoundationObjectFactory.h"
 #include "SampleContainerSpan.h"
 #include "SampleBufferSpan.h"
 #include "SampleConversionUnmanaged.h"
