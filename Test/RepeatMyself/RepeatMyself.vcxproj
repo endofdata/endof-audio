@@ -121,11 +121,6 @@
     <ClCompile Include="SteinbergUrRt2.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ILooper.h" />
-    <ClInclude Include="ILooperEvents.h" />
-    <ClInclude Include="Looper.h" />
-    <ClInclude Include="LooperConfig.h" />
-    <ClInclude Include="LooperEvents.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="SteinbergUrRt2.h" />
   </ItemGroup>

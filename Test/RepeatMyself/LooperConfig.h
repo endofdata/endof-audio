@@ -1,63 +1,71 @@
 #pragma once
+#include <UnknownBase.h>
 #include <comdef.h>
+#include <ILooperConfig.h>
 
 #define LOOPER_MAX_INPUT_CHANNELS 16
 #define LOOPER_MAX_OUTPUT_CHANNELS 16
 
-class LooperConfig
+namespace Audio
 {
-public:
-	LooperConfig();
+	namespace Foundation
+	{
+		namespace Unmanaged
+		{
+			class LooperConfig : public ILooperConfig
+			{
+			public:
+				LooperConfig();
 
-	unsigned int get_MidiInput() const;
-	void put_MidiInput(unsigned int value);
-	_declspec(property(get = get_MidiInput, put = put_MidiInput)) unsigned int& MidiInput;
+				const wchar_t* get_Name() const;
+				void put_Name(const wchar_t* value);
 
-	const IID& get_AsioDevice() const;
-	void put_AsioDevice(const IID& value);
-	_declspec(property(get = get_AsioDevice, put = put_AsioDevice)) const IID& AsioDevice;
+				unsigned int get_MidiInput() const;
+				void put_MidiInput(unsigned int value);
 
-	int get_InputChannel(int index) const;
-	void put_InputChannel(int index, int value);
-	_declspec(property(get = get_InputChannel, put = put_InputChannel)) int InputChannel[];
+				const IID& get_AsioDevice() const;
+				void put_AsioDevice(const IID& value);
 
-	const int* get_InputChannelList() const;
-	_declspec(property(get = get_InputChannelList)) const int* InputChannelList;
+				int get_InputChannel(int index) const;
+				void put_InputChannel(int index, int value);
 
-	size_t get_InputChannelCount() const;
-	_declspec(property(get = get_InputChannelCount)) size_t InputChannelCount;
+				const int* get_InputChannelList() const;
 
-	int get_OutputChannel(int index) const;
-	void put_OutputChannel(int index, int value);
-	_declspec(property(get = get_OutputChannel, put = put_OutputChannel)) int OutputChannel[];
+				size_t get_InputChannelCount() const;
 
-	const int* get_OutputChannelList() const;
-	_declspec(property(get = get_OutputChannelList)) const int* OutputChannelList;
+				int get_OutputChannel(int index) const;
+				void put_OutputChannel(int index, int value);
 
-	size_t get_OutputChannelCount() const;
-	_declspec(property(get = get_OutputChannelCount)) size_t OutputChannelCount;
+				const int* get_OutputChannelList() const;
 
-	int get_SampleCount() const;
-	void put_SampleCount(int value);
-	_declspec(property(get = get_SampleCount, put = put_SampleCount)) int& SampleCount;
+				size_t get_OutputChannelCount() const;
 
-	float get_OutputSaturation() const;
-	void put_OutputSaturation(float value);
-	_declspec(property(get = get_OutputSaturation, put = put_OutputSaturation)) float& OutputSaturation;
+				int get_SampleCount() const;
+				void put_SampleCount(int value);
 
-	void AddInputChannel(int id);
-	void AddOutputChannel(int id);
+				float get_OutputSaturation() const;
+				void put_OutputSaturation(float value);
 
-	void AddInputChannelList(int idList[], size_t count);
-	void AddOutputChannelList(int idList[], size_t count);
+				void AddInputChannel(int id);
+				void AddOutputChannel(int id);
 
-private:
-	unsigned int m_midiInput;
-	IID m_asioDevice;
-	int m_inputChannelIds[LOOPER_MAX_INPUT_CHANNELS];
-	size_t m_numInputIds;
-	int m_outputChannelIds[LOOPER_MAX_OUTPUT_CHANNELS];
-	size_t m_numOutputIds;
-	int m_sampleCount;
-	float m_outputSaturation;
-};
+				void AddInputChannelList(int idList[], size_t count);
+				void AddOutputChannelList(int idList[], size_t count);
+
+				DECLARE_IUNKNOWN
+
+			private:
+				std::wstring m_name;
+				unsigned int m_midiInput;
+				IID m_asioDevice;
+				int m_inputChannelIds[LOOPER_MAX_INPUT_CHANNELS];
+				size_t m_numInputIds;
+				int m_outputChannelIds[LOOPER_MAX_OUTPUT_CHANNELS];
+				size_t m_numOutputIds;
+				int m_sampleCount;
+				float m_outputSaturation;
+			};
+
+		}
+	}
+}

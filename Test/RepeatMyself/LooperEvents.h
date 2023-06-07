@@ -2,30 +2,39 @@
 #include <ILooperEvents.h>
 #include <UnknownBase.h>
 
-class LooperEvents : public ILooperEvents
+namespace Audio
 {
-public:
-	LooperEvents();
-	virtual ~LooperEvents();
+	namespace Foundation
+	{
+		namespace Unmanaged
+		{
+			class LooperEvents : public ILooperEvents
+			{
+			public:
+				LooperEvents();
+				virtual ~LooperEvents();
 
-	void Heartbeat(ILooper& looper, ITransportPtr& transport);
+				void Heartbeat(ILooper& looper, ITransportPtr& transport);
 
-	void TransportStatusChanged(ILooper& looper, TransportCode previous, TransportCode current);
+				void TransportStatusChanged(ILooper& looper, TransportCode previous, TransportCode current);
 
-	void LoopRestart(ILooper& looper);
+				void LoopRestart(ILooper& looper);
 
-	void LoopRecordingChanged(ILooper& looper, bool isLoopRecording);
+				void LoopRecordingChanged(ILooper& looper, bool isLoopRecording);
 
-	void SessionRecordingChanged(ILooper& looper, bool isSessionRecording);
+				void SessionRecordingChanged(ILooper& looper, bool isSessionRecording);
 
-	void AddLoop(ILooper& looper);
+				void AddLoop(ILooper& looper);
 
-	void DropRecording(ILooper& looper, bool continueRecording);
+				void DropRecording(ILooper& looper, bool continueRecording);
 
-	DECLARE_IUNKNOWN
+				DECLARE_IUNKNOWN
 
-private:
-	static const wchar_t* GetTransportCodeString(TransportCode value);
+			private:
+				static const wchar_t* GetTransportCodeString(TransportCode value);
 
-	int m_loopCount;
-};
+				int m_loopCount;
+			};
+		}
+	}
+}

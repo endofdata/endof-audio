@@ -45,7 +45,7 @@ static void addVstFx(Looper* looper)
 
 static void runLooper(const LooperConfig& config)
 {
-	Looper* looper = Looper::Create(config, L"RepeatMyself");
+	Looper* looper = Looper::Create(config);
 	ILooperEventsPtr looperEvents = new LooperEvents();
 
 	try
@@ -131,6 +131,9 @@ int main()
 		{
 			LooperConfig looperConfig;
 
+
+
+			looperConfig.Name = L"RepeatMyself";
 			looperConfig.MidiInput = midiInId;
 			looperConfig.AsioDevice = IID_STEINBERG_UR_RT2;
 			//looperConfig.AsioDevice = CLSID_AsioDebugDriver;

@@ -10,7 +10,7 @@ using namespace Audio::Asio::Unmanaged;
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Vst::Unmanaged;
 
-Looper* Looper::Create(const LooperConfig& config, const wchar_t* pwcszName)
+Looper* Looper::Create(const ILooperConfig& config)
 {
 	try
 	{
@@ -26,7 +26,7 @@ Looper* Looper::Create(const LooperConfig& config, const wchar_t* pwcszName)
 		Looper* pLooper = new Looper(device);
 		pLooper->AddRef();
 
-		pLooper->Name = pwcszName;
+		pLooper->Name = config.Name;
 		pLooper->CreateTransportControl(config.MidiInput);
 		pLooper->CreateVstHost();
 		pLooper->CreateProcessingChain();

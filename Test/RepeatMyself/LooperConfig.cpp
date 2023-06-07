@@ -14,6 +14,21 @@ LooperConfig::LooperConfig() :
 	std::memset(&m_outputChannelIds, 0, sizeof(m_outputChannelIds));
 }
 
+IMPLEMENT_IUNKNOWN(LooperConfig)
+
+void* LooperConfig::GetInterface(const IID& riid)
+{
+	if (riid == _uuidof(IUnknown))
+	{
+		return dynamic_cast<IUnknown*>(this);
+	}
+	if (riid == _uuidof(ILooperConfig))
+	{
+		return dynamic_cast<ILooperConfig*>(this);
+	}
+	return nullptr;
+}
+
 void LooperConfig::AddInputChannel(int id)
 {
 	if (m_numInputIds >= LOOPER_MAX_INPUT_CHANNELS)
@@ -46,6 +61,16 @@ void LooperConfig::AddOutputChannelList(int idList[], size_t count)
 	{
 		AddOutputChannel(idList[i]);
 	}
+}
+
+const wchar_t* LooperConfig::get_Name() const
+{
+	return m_name.c_str();
+}
+
+void LooperConfig::put_Name(const wchar_t* value)
+{
+	m_name.assign(value);
 }
 
 unsigned int LooperConfig::get_MidiInput() const
