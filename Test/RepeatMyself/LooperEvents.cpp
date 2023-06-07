@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "LooperEvents.h"
 
+using namespace RepeatMyself;
+
 const wchar_t* ClearLine = L"\33[2K\r";
 
 LooperEvents::LooperEvents() :

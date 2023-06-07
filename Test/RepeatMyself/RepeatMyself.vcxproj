@@ -110,8 +110,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Looper.cpp" />
-    <ClCompile Include="LooperConfig.cpp" />
     <ClCompile Include="LooperEvents.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -121,6 +119,7 @@
     <ClCompile Include="SteinbergUrRt2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="LooperEvents.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="SteinbergUrRt2.h" />
   </ItemGroup>

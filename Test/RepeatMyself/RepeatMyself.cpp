@@ -2,12 +2,11 @@
 #include <initguid.h>
 #include <AsioDebugDriverGuid.h>
 #include "SteinbergUrRt2.h"
-
-#include <ObjectFactory.h>
+#include <AsioCore.h>
+#include <FoundationObjectFactory.h>
+#include <AsioObjectFactory.h>
 #include <StrConv.h>
 
-#include "Looper.h"
-#include "LooperConfig.h"
 #include "LooperEvents.h"
 
 using namespace Audio::Asio;
@@ -32,7 +31,7 @@ bool onDeviceCaps(unsigned int id, const MIDIINCAPS& devcaps)
 	return isSelected;
 }
 
-static void addVstFx(Looper* looper)
+static void addVstFx(ILooper* looper)
 {
 	const wchar_t* pwcszLibName = L"C:\\Program Files\\Common Files\\VST3\\Unfiltered Audio Indent.vst3";
 	// const wchar_t* pwcszLibName = L"D:\\Gamer I5\\Documents\\Projects\\vst3sdk\\out\\build\\x64-Debug\\VST3\\Debug\\adelay.vst3\\Contents\\x86_64-win\\adelay.vst3";
@@ -43,23 +42,23 @@ static void addVstFx(Looper* looper)
 	looper->InsertFx(pluginIdRaw);
 }
 
-static void runLooper(const LooperConfig& config)
+static void runLooper(const ILooperConfigPtr& config)
 {
-	Looper* looper = Looper::Create(config);
-	ILooperEventsPtr looperEvents = new LooperEvents();
+	ILooperPtr looper = AsioObjectFactory::CreateLooper(config);
+	ILooperEventsPtr looperEvents = new RepeatMyself::LooperEvents();
 
 	try
 	{
 		looper->LooperEvents = looperEvents;
 		addVstFx(looper);
 
-		for (int i = 0; i < static_cast<int>(config.InputChannelCount); i++)
+		for (int i = 0; i < static_cast<int>(config->InputChannelCount); i++)
 		{
-			looper->SelectInput(config.InputChannel[i], true);
+			looper->SelectInput(config->InputChannel[i], true);
 		}
-		for (int i = 0; i < static_cast<int>(config.OutputChannelCount); i += 2)
+		for (int i = 0; i < static_cast<int>(config->OutputChannelCount); i += 2)
 		{
-			int pair[2] = { config.OutputChannel[i], config.OutputChannel[i + 1] };
+			int pair[2] = { config->OutputChannel[i], config->OutputChannel[i + 1] };
 			looper->SelectOutputPair(pair, true);
 		}
 
@@ -121,7 +120,7 @@ int main()
 
 	try
 	{
-		int midiInId = ObjectFactory::SelectMidiInputDevice(onDeviceCaps);
+		int midiInId = FoundationObjectFactory::SelectMidiInputDevice(onDeviceCaps);
 
 		if (midiInId < 0)
 		{
@@ -129,20 +128,18 @@ int main()
 		}
 		else
 		{
-			LooperConfig looperConfig;
+			ILooperConfigPtr looperConfig = AsioObjectFactory::CreateLooperConfiguration();
 
-
-
-			looperConfig.Name = L"RepeatMyself";
-			looperConfig.MidiInput = midiInId;
-			looperConfig.AsioDevice = IID_STEINBERG_UR_RT2;
+			looperConfig->Name = L"RepeatMyself";
+			looperConfig->MidiInput = midiInId;
+			looperConfig->AsioDevice = IID_STEINBERG_UR_RT2;
 			//looperConfig.AsioDevice = CLSID_AsioDebugDriver;
-			looperConfig.AddInputChannelList(selectedInputs, _countof(selectedInputs));
-			looperConfig.AddOutputChannelList(selectedOutputs, _countof(selectedOutputs));
+			looperConfig->AddInputChannelList(selectedInputs, _countof(selectedInputs));
+			looperConfig->AddOutputChannelList(selectedOutputs, _countof(selectedOutputs));
 
 			// optional
-			looperConfig.SampleCount = AsioCore::UsePreferredSize;
-			looperConfig.OutputSaturation = 1.0f;
+			looperConfig->SampleCount = AsioCore::UsePreferredSize;
+			looperConfig->OutputSaturation = 1.0f;
 
 			runLooper(looperConfig);
 
