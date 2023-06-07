@@ -3,7 +3,7 @@
 #include "HelperMethods.h"
 #include "Constants.h"
 #include <ISampleBuffer.h>
-#include <ObjectFactory.h>
+#include <FoundationObjectFactory.h>
 #include <ProcessingContext.h>
 #include <MemCheck.h>
 
@@ -27,7 +27,7 @@ namespace Test
 					{
 						// create a test container and write it repeatedly to a dynamic container
 						ISampleContainerPtr pBufferContainer = HelperMethods::CreateTestContainer(Constants::SampleCount, Constants::ChannelCount);
-						ISampleProcessorPtr pWriter = ObjectFactory::CreateRecorder(Constants::ChannelCount, Constants::SampleCount * 10, Constants::SampleCount * 2);
+						ISampleProcessorPtr pWriter = FoundationObjectFactory::CreateRecorder(Constants::ChannelCount, Constants::SampleCount * 10, Constants::SampleCount * 2);
 
 						ProcessingContext context(Constants::SampleCount);
 
@@ -46,11 +46,11 @@ namespace Test
 						Assert::IsNotNull(pFullDataContainer.GetInterfacePtr(), L"Can create full data container from recorder.");
 
 						// create a source processor from the full-data container 
-						ISampleSourcePtr pSampleSource = ObjectFactory::CreateContainerSource(pFullDataContainer);
-						ISampleProcessorPtr pSourceProcessor = ObjectFactory::CreateFromSourceProcessor(pSampleSource);
+						ISampleSourcePtr pSampleSource = FoundationObjectFactory::CreateContainerSource(pFullDataContainer);
+						ISampleProcessorPtr pSourceProcessor = FoundationObjectFactory::CreateFromSourceProcessor(pSampleSource);
 
 						// create a new target container writer
-						ISampleProcessorPtr pOutputWriter = ObjectFactory::CreateRecorder(Constants::ChannelCount, Constants::SampleCount * 3, Constants::SampleCount * 1);
+						ISampleProcessorPtr pOutputWriter = FoundationObjectFactory::CreateRecorder(Constants::ChannelCount, Constants::SampleCount * 3, Constants::SampleCount * 1);
 
 						for (int i = 0; i < loopsForTenSeconds; i++)
 						{

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "HelperMethods.h"
 #include "CppUnitTest.h"
-#include <ObjectFactory.h>
+#include <FoundationObjectFactory.h>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Audio::Foundation::Unmanaged;
@@ -35,7 +35,7 @@ void HelperMethods::TestSampleContainer(ISampleContainerPtr pContainer, int samp
 
 ISampleContainerPtr HelperMethods::CreateTestContainer(int sampleCount, int channelCount)
 {
-	ISampleContainerPtr container = ObjectFactory::CreateSampleContainer(sampleCount, channelCount);
+	ISampleContainerPtr container = FoundationObjectFactory::CreateSampleContainer(sampleCount, channelCount);
 
 	for (int c = 0; c < channelCount; c++)
 	{

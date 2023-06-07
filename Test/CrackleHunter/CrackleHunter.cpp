@@ -2,7 +2,7 @@
 #include <comdef.h>
 #include <AsioCore.h>
 #include <SteinbergUrRt2.h>
-#include <ObjectFactory.h>
+#include <FoundationObjectFactory.h>
 #include <algorithm>
 #include <array>
 #include <stdexcept>
@@ -74,16 +74,16 @@ int main()
 
 		IProcessingChainPtr processingChain = asioCore->ProcessingChain;
 
-		//IOscillatorPtr oscillator = ObjectFactory::CreateTestOscillator(asioCore->SampleRate, 0.0, 0.0);
+		//IOscillatorPtr oscillator = FoundationObjectFactory::CreateTestOscillator(asioCore->SampleRate, 0.0, 0.0);
 		//ISampleProcessorPtr oscProcessor = nullptr;
 		//oscillator->QueryInterface<ISampleProcessor>(&oscProcessor);
 		//processingChain->AddProcessor(oscProcessor);
 
-		//ISampleProcessorPtr recordingProcessor = ObjectFactory::CreateToFileProcessor(L"some_test.raw");
+		//ISampleProcessorPtr recordingProcessor = FoundationObjectFactory::CreateToFileProcessor(L"some_test.raw");
 		//processingChain->AddProcessor(recordingProcessor);
 
-		//ISampleSourcePtr source = ObjectFactory::CreateRawFileSource(L"some_test.raw", 1);
-		//ISampleProcessorPtr fileProcessor = ObjectFactory::CreateFromSourceProcessor(source);
+		//ISampleSourcePtr source = FoundationObjectFactory::CreateRawFileSource(L"some_test.raw", 1);
+		//ISampleProcessorPtr fileProcessor = FoundationObjectFactory::CreateFromSourceProcessor(source);
 		//processingChain->AddProcessor(fileProcessor);
 
 

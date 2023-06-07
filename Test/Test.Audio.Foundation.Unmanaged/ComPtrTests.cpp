@@ -2,7 +2,7 @@
 #include "CppUnitTest.h"
 #include "Constants.h"
 #include <ISampleBuffer.h>
-#include <ObjectFactory.h>
+#include <FoundationObjectFactory.h>
 #include <MemCheck.h>
 
 using namespace Test::Audio::Common;
@@ -22,7 +22,7 @@ namespace Test
 				public:
 					TEST_METHOD(ByRefOrByValue)
 					{
-						ISampleBufferPtr pSampleBuffer = ObjectFactory::CreateSampleBuffer(Constants::SampleCount);
+						ISampleBufferPtr pSampleBuffer = FoundationObjectFactory::CreateSampleBuffer(Constants::SampleCount);
 
 						// This will call AddRef()
 						CallWithInstance(pSampleBuffer);

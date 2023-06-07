@@ -2,7 +2,7 @@
 #include "CppUnitTest.h"
 #include "Constants.h"
 #include <ISampleBuffer.h>
-#include <ObjectFactory.h>
+#include <FoundationObjectFactory.h>
 #include <MemCheck.h>
 
 using namespace Test::Audio::Common;
@@ -22,15 +22,15 @@ namespace Test
 				public:
 					TEST_METHOD(BasicInitialization)
 					{
-						IMeterChannelPtr pMeterChannel = ObjectFactory::CreateMeterChannel(Constants::SampleRate, Constants::ChannelCount);
+						IMeterChannelPtr pMeterChannel = FoundationObjectFactory::CreateMeterChannel(Constants::SampleRate, Constants::ChannelCount);
 
 						Assert::AreEqual(Constants::ChannelCount, pMeterChannel->ChannelCount, L"Meter channel count is OK");
 					}
 
 					TEST_METHOD(WriteThrough)
 					{
-						IMeterChannelPtr pMeterChannel = ObjectFactory::CreateMeterChannel(Constants::SampleRate, Constants::ChannelCount);
-						ISampleContainerPtr pTestBuffers = ObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
+						IMeterChannelPtr pMeterChannel = FoundationObjectFactory::CreateMeterChannel(Constants::SampleRate, Constants::ChannelCount);
+						ISampleContainerPtr pTestBuffers = FoundationObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
 
 						for (int c = 0; c < Constants::ChannelCount; c++)
 						{
@@ -40,8 +40,8 @@ namespace Test
 							}
 						}
 
-						ISampleContainerPtr pResultBuffers = ObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
-						ISampleProcessorPtr pTarget = ObjectFactory::CreateToContainerProcessor(pResultBuffers);
+						ISampleContainerPtr pResultBuffers = FoundationObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
+						ISampleProcessorPtr pTarget = FoundationObjectFactory::CreateToContainerProcessor(pResultBuffers);
 						
 
 						ISampleProcessorPtr pMeterProcessor = nullptr;

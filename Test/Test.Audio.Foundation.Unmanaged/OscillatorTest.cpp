@@ -3,7 +3,7 @@
 #include "HelperMethods.h"
 #include "Constants.h"
 #include <ISampleBuffer.h>
-#include <ObjectFactory.h>
+#include <FoundationObjectFactory.h>
 #include <MemCheck.h>
 
 using namespace Test::Audio::Common;
@@ -33,10 +33,10 @@ namespace Test
 						UINT unique = (UINT)rand();
 						GetTempFileName(tempPath, L"Torsten", unique, tempFileName);
 
-						ISampleProcessorPtr toFileProcessor = ObjectFactory::CreateToFileProcessor(tempFileName);
+						ISampleProcessorPtr toFileProcessor = FoundationObjectFactory::CreateToFileProcessor(tempFileName);
 
-						ISampleProcessorPtr osc = ObjectFactory::CreateTestOscillator(Constants::SampleRate, 440, 0.5);
-						ISampleContainerPtr buffer = ObjectFactory::CreateSampleContainer(Constants::SampleCount, 1);
+						ISampleProcessorPtr osc = FoundationObjectFactory::CreateTestOscillator(Constants::SampleRate, 440, 0.5);
+						ISampleContainerPtr buffer = FoundationObjectFactory::CreateSampleContainer(Constants::SampleCount, 1);
 						ProcessingContext context(Constants::SampleCount);
 
 						for (int b = 0; b < 1000; b++)

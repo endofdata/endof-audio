@@ -3,7 +3,7 @@
 #include "Constants.h"
 #include "HelperMethods.h"
 #include <ISampleBuffer.h>
-#include <ObjectFactory.h>
+#include <FoundationObjectFactory.h>
 #include <MemCheck.h>
 
 using namespace Test::Audio::Common;
@@ -23,14 +23,14 @@ namespace Test
 				public:
 					TEST_METHOD(BasicInitialization)
 					{
-						ISampleContainerPtr pContainer = ObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
+						ISampleContainerPtr pContainer = FoundationObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
 
 						HelperMethods::TestSampleContainer(pContainer, Constants::SampleCount, Constants::ChannelCount);
 					}
 
 					TEST_METHOD(AddAndRemoveChannels)
 					{
-						ISampleContainerPtr pContainer = ObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
+						ISampleContainerPtr pContainer = FoundationObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
 
 						pContainer->ChannelCount += 2;
 
@@ -43,7 +43,7 @@ namespace Test
 
 					TEST_METHOD(ResizeBuffers)
 					{
-						ISampleContainerPtr pContainer = ObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
+						ISampleContainerPtr pContainer = FoundationObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
 
 						pContainer->SampleCount *= 2;
 

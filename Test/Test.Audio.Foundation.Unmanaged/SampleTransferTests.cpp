@@ -7,7 +7,7 @@
 #include <ISampleSharer.h>
 #include <IInputChannel.h>
 #include <IOutputChannelPair.h>
-#include <ObjectFactory.h>
+#include <FoundationObjectFactory.h>
 #include <SampleType.h>
 #include <memory>
 #include <vector>
@@ -34,20 +34,20 @@ namespace Test
 
 					TEST_METHOD(BasicInitialization)
 					{
-						IHostClockPtr pHostClock = ObjectFactory::CreateHostClock();
-						ITransportPtr pTransport = ObjectFactory::CreateTransport(pHostClock, Constants::SampleCount);
-						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pTransport);
+						IHostClockPtr pHostClock = FoundationObjectFactory::CreateHostClock();
+						ITransportPtr pTransport = FoundationObjectFactory::CreateTransport(pHostClock, Constants::SampleCount);
+						ITakeSequencePtr pTakeSequence = FoundationObjectFactory::CreateTakeSequence(pTransport);
 
 						Assert::AreEqual(0, pTakeSequence->get_TakeCount(), L"New takeSequence has no takes");
 						int sampleRate = Constants::SampleRate;
 						double seconds = 1.0;
 
-						ISampleContainerPtr container = ObjectFactory::CreateSampleContainer((int)(sampleRate * seconds), 2);
+						ISampleContainerPtr container = FoundationObjectFactory::CreateSampleContainer((int)(sampleRate * seconds), 2);
 
 						AudioTime position = 0;
 						AudioTime length = static_cast<long long>(seconds * 1000ul);
 
-						ITakePtr pTake = ObjectFactory::CreateTake(container, position, length);
+						ITakePtr pTake = FoundationObjectFactory::CreateTake(container, position, length);
 
 						int takeId = pTakeSequence->AddTake(pTake);
 
@@ -97,9 +97,9 @@ namespace Test
 						IProcessingChainPtr pProcessingChain = CreateProcessingChain(hwBuffers);
 
 						// Create take sequence
-						IHostClockPtr pHostClock = ObjectFactory::CreateHostClock();
-						ITransportPtr pTransport = ObjectFactory::CreateTransport(pHostClock, Constants::SampleCount);
-						ITakeSequencePtr pTakeSequence = ObjectFactory::CreateTakeSequence(pTransport);
+						IHostClockPtr pHostClock = FoundationObjectFactory::CreateHostClock();
+						ITransportPtr pTransport = FoundationObjectFactory::CreateTransport(pHostClock, Constants::SampleCount);
+						ITakeSequencePtr pTakeSequence = FoundationObjectFactory::CreateTakeSequence(pTransport);
 						Assert::IsNotNull(pTakeSequence.GetInterfacePtr(), L"Can create take sequence");
 
 						// Add take sequence as sample processor
@@ -113,14 +113,14 @@ namespace Test
 						double seconds = 1.0;
 						int channelCount = 2;
 
-						ISampleContainerPtr pContainer = ObjectFactory::CreateSampleContainer((int)(seconds * sampleRate), channelCount);
+						ISampleContainerPtr pContainer = FoundationObjectFactory::CreateSampleContainer((int)(seconds * sampleRate), channelCount);
 						Assert::IsNotNull(pContainer.GetInterfacePtr(), L"Can create sample container");
 
 						InitSampleBuffers(pContainer, -0.16f, -0.32f);
 
 						AudioTime position = 0;
 						AudioTime length = AudioTime::FromSeconds(seconds);
-						ITakePtr pTake = ObjectFactory::CreateTake(pContainer, position, length);
+						ITakePtr pTake = FoundationObjectFactory::CreateTake(pContainer, position, length);
 
 						Assert::IsNotNull(pTake.GetInterfacePtr(), L"Can create audio take");
 
@@ -152,7 +152,7 @@ namespace Test
 						// Create VectorWriter and attach it to input sample source
 						int initialSize = Constants::SampleRate * 5;	// buffer for five seconds
 						int growth = Constants::SampleRate * 2;			// grow for two seconds
-						ISampleProcessorPtr pVectorWriter = ObjectFactory::CreateRecorder(2, initialSize, growth);
+						ISampleProcessorPtr pVectorWriter = FoundationObjectFactory::CreateRecorder(2, initialSize, growth);
 
 						pProcessingChain->AddProcessor(pVectorWriter);
 						
@@ -214,7 +214,7 @@ namespace Test
 
 						IInputChannelPtr CreateInputChannel(int hwChannelId)
 						{
-							IInputChannelPtr pInput = ObjectFactory::CreateInputChannel(Int32LSB,
+							IInputChannelPtr pInput = FoundationObjectFactory::CreateInputChannel(Int32LSB,
 								hwChannelId, _inBufferA.get(), _inBufferB.get(), _sampleCount);
 							Assert::IsNotNull(pInput.GetInterfacePtr(), L"Can create input channel");
 
@@ -223,7 +223,7 @@ namespace Test
 
 						IOutputChannelPairPtr CreateOutputChannelPair(int hwChannelId1, int hwChannelId2)
 						{
-							IOutputChannelPairPtr pOutputPair = ObjectFactory::CreateOutputChannelPair(Int32LSB,
+							IOutputChannelPairPtr pOutputPair = FoundationObjectFactory::CreateOutputChannelPair(Int32LSB,
 								hwChannelId1, _outBufferA1.get(), _outBufferB1.get(),
 								hwChannelId2, _outBufferA2.get(), _outBufferB2.get(), _sampleCount);
 							Assert::IsNotNull(pOutputPair.GetInterfacePtr(), L"Can create output channel pair");
@@ -372,10 +372,10 @@ namespace Test
 						IOutputChannelPairPtr pOutputPair = hwBuffers.CreateOutputChannelPair(0, 1);
 
 						// Create processing chain for the input and output channels
-						IHostClockPtr pHostClock = ObjectFactory::CreateHostClock(Constants::SampleRate);
-						ITransportPtr pTransport = ObjectFactory::CreateTransport(pHostClock, Constants::SampleCount);
-						ISampleContainerPtr pContainer = ObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
-						IProcessingChainPtr pProcessingChain = ObjectFactory::CreateProcessingChain(pTransport, pContainer);
+						IHostClockPtr pHostClock = FoundationObjectFactory::CreateHostClock(Constants::SampleRate);
+						ITransportPtr pTransport = FoundationObjectFactory::CreateTransport(pHostClock, Constants::SampleCount);
+						ISampleContainerPtr pContainer = FoundationObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
+						IProcessingChainPtr pProcessingChain = FoundationObjectFactory::CreateProcessingChain(pTransport, pContainer);
 
 						pProcessingChain->AddInput(pInput);
 						pProcessingChain->AddOutputPair(pOutputPair);

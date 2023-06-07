@@ -3,7 +3,7 @@
 #include "HelperMethods.h"
 #include "Constants.h"
 #include <ISampleBuffer.h>
-#include <ObjectFactory.h>
+#include <FoundationObjectFactory.h>
 #include <MemCheck.h>
 
 using namespace Test::Audio::Common;
@@ -24,7 +24,7 @@ namespace Test
 
 					TEST_METHOD(BasicInitialization)
 					{
-						ISampleBufferPtr pBuffer = ObjectFactory::CreateSampleBuffer(Constants::SampleCount);
+						ISampleBufferPtr pBuffer = FoundationObjectFactory::CreateSampleBuffer(Constants::SampleCount);
 
 						HelperMethods::TestSampleBuffer(pBuffer, Constants::SampleCount);
 					}

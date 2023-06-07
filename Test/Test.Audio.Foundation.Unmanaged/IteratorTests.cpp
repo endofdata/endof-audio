@@ -3,7 +3,7 @@
 #include "CppUnitTest.h"
 #include "Constants.h"
 #include <ITake.h>
-#include <ObjectFactory.h>
+#include <FoundationObjectFactory.h>
 #include <vector>
 #include <functional>
 
@@ -35,8 +35,8 @@ namespace Test
 
 						for (auto iter = takes.begin(); iter!= takes.end(); iter++)
 						{
-							ISampleContainerPtr container = ObjectFactory::CreateSampleContainer(sampleCount, Constants::ChannelCount);
-							ITakePtr take = ObjectFactory::CreateTake(container, takePosition, takeLength);
+							ISampleContainerPtr container = FoundationObjectFactory::CreateSampleContainer(sampleCount, Constants::ChannelCount);
+							ITakePtr take = FoundationObjectFactory::CreateTake(container, takePosition, takeLength);
 							*iter = take;
 							takePosition += takeLength;
 						}
