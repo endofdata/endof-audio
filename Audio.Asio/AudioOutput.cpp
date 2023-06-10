@@ -2,7 +2,7 @@
 #include "AudioInput.h"
 #include "AudioOutput.h"
 #include <SampleConversionUnmanaged.h>
-#include <ObjectFactory.h>
+#include <FoundationObjectFactory.h>
 
 using namespace System;
 using namespace System::Runtime::InteropServices;
@@ -25,7 +25,7 @@ AudioOutput::AudioOutput(int sampleRate, int sampleCount, IOutputChannelPairPtr 
 	m_pOutputChannelPair = pHwChannel.Detach();
 
 	// Create output meter including meter update event handler
-	m_pOutputMeter = ObjectFactory::CreateMeterChannel(sampleRate, 2).Detach();
+	m_pOutputMeter = FoundationObjectFactory::CreateMeterChannel(sampleRate, 2).Detach();
 	m_pOutputMeter->RMSTime = 100;
 	MeterUpdateDelegate^ meterUpdateDelegate = gcnew MeterUpdateDelegate(this, &AudioOutput::OutputMeter_MeterUpdate);
 	m_meterUpdateDelegateHandle = GCHandle::Alloc(meterUpdateDelegate);

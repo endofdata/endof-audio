@@ -3,7 +3,7 @@
 #include "AudioOutput.h"
 #include <vcclr.h>
 #include <ISampleSharer.h>
-#include <ObjectFactory.h>
+#include <FoundationObjectFactory.h>
 #include <SampleConversionUnmanaged.h>
 
 using namespace System;
@@ -26,7 +26,7 @@ AudioInput::AudioInput(int sampleRate, IInputChannelPtr pHwChannel, int id) :
 
 	m_pInputChannel = pHwChannel.Detach();
 
-	m_pInputMeter = Audio::Foundation::Unmanaged::ObjectFactory::CreateMeterChannel(sampleRate, 1).Detach();
+	m_pInputMeter = Audio::Foundation::Unmanaged::FoundationObjectFactory::CreateMeterChannel(sampleRate, 1).Detach();
 	m_pInputMeter->RMSTime = 100;
 	MeterUpdateDelegate^ meterUpdateDelegate = gcnew MeterUpdateDelegate(this, &AudioInput::InputMeter_MeterUpdate);
 	m_meterUpdateDelegateHandle = GCHandle::Alloc(meterUpdateDelegate);
