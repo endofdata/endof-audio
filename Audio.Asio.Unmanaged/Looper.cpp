@@ -14,6 +14,15 @@ Looper* Looper::Create(const ILooperConfig& config)
 {
 	try
 	{
+		if (config.OutputChannelCount == 0)
+		{
+			throw new AsioCoreException("Number of selected output channels cannot be zero.");
+		}
+		if (config.InputChannelCount == 0)
+		{
+			throw new AsioCoreException("Number of selected input channels cannot be zero.");
+		}
+
 		AsioCorePtr device = AsioCore::CreateInstancePtr(config.AsioDevice);
 
 		if (device == nullptr)
@@ -465,8 +474,14 @@ void Looper::CreateProcessingChain()
 	int joinerId = processingChain->AddProcessor(joiningProcessor);
 	processingChain->MixRecorder = masterRecProcessor;
 
-	processingChain->OutputChannelPair[0]->IsActive = true;
-	processingChain->InputChannel[0]->IsActive = true;
+	if (processingChain->OutputChannelPairCount > 0)
+	{
+		processingChain->OutputChannelPair[0]->IsActive = true;
+	}
+	if (processingChain->InputChannelCount > 0)
+	{
+		processingChain->InputChannel[0]->IsActive = true;
+	}
 }
 
 void Looper::CreateVstHost()
