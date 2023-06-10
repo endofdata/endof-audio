@@ -9,7 +9,8 @@ LooperConfig::LooperConfig() :
 	m_numOutputIds(0),
 	m_outputSaturation(0.0),
 	m_sampleCount(Audio::Asio::Unmanaged::AsioCore::UsePreferredSize),
-	m_midiInput(0)
+	m_midiInput(0),
+	m_refCount(0)
 {
 	std::memset(&m_asioDevice, 0, sizeof(m_asioDevice));
 	std::memset(&m_inputChannelIds, 0, sizeof(m_inputChannelIds));
