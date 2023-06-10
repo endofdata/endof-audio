@@ -2,6 +2,7 @@
 #include "AsioDevice.h"
 #include <AsioCore.h>
 #include "DriverRegistry.h"
+#include "GuidConversion.h"
 
 using namespace Audio::Asio;
 using namespace Audio::Asio::Unmanaged;
@@ -16,7 +17,7 @@ using namespace System::Collections::Generic;
 // static 
 AsioDevice^ AsioDevice::CreateFromGuid(Guid guid)
 {
-	AsioCore* pCore = AsioCore::CreateInstance(reinterpret_cast<GUID&>(guid));
+	AsioCore* pCore = AsioCore::CreateInstance(GuidConversion::FromManaged(guid));
 
 	if (pCore == nullptr)
 	{
