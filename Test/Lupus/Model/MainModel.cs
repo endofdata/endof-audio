@@ -1,7 +1,9 @@
 ﻿using Audio.Asio.Interop;
+using Audio.Foundation.Interop;
 using Audio.Foundation.Abstractions;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Lupus.Model
 {
@@ -14,9 +16,9 @@ namespace Lupus.Model
 		private bool _isDisposed;
 
 		/// <summary>
-		/// Gets the <see cref="TapeMachine"/> instance
+		/// Gets the <see cref="Looper"/> instance
 		/// </summary>
-		public TapeMachine TapeMachine
+		public Looper Looper
 		{
 			get;
 		}
@@ -33,89 +35,57 @@ namespace Lupus.Model
 			set => SetValue(ref _selectedOutput, value);
 		}
 
-		/// <summary>
-		/// Creates a new main model using an audio device, whose name matches <paramref name="driverPattern"/>
-		/// </summary>
-		/// <param name="driverPattern">Name pattern for the ASIO audio driver to use as input and output device</param>
-		/// <param name="maxTracks">Maximum number of looper tracks.</param>
-		/// <param name="nameFormat">Format string for track names</param>
-		/// <returns>Instance of <see cref="MainModel"/></returns>
-		/// <exception cref="ArgumentException">Thrown if <paramref name="driverPattern"/> is <see langword="null"/> or empty or <paramref name="maxTracks"/> is less or equal to zero.</exception>
-		/// <seealso cref="AsioDevice.CreateFromNameLike(string)"/>
-		public static MainModel Create(string driverPattern, int maxTracks, string? nameFormat = null)
-		{
-			if (string.IsNullOrEmpty(driverPattern))
-			{
-				throw new ArgumentException($"'{nameof(driverPattern)}' cannot be null or empty.", nameof(driverPattern));
-			}
-			
-			return Create(AsioDevice.CreateFromNameLike(driverPattern), maxTracks, nameFormat);
-		}
-
-		public static MainModel Create(RegisteredDriver driver, int maxTracks, string? nameFormat = null)
+		public static MainModel Create(RegisteredMidiInput midiInput, RegisteredDriver driver, IEnumerable<int> inputChannels, IEnumerable<int> outputChannels)
 		{
 			if (driver is null)
 			{
 				throw new ArgumentNullException(nameof(driver));
 			}
 
-			return Create(AsioDevice.CreateFromGuid(driver.ClsId), maxTracks, nameFormat);
+			return Create(midiInput.Id, driver.ClsId, inputChannels, outputChannels);
 		}
 
-		public static MainModel Create(AsioDevice device, int maxTracks, string? nameFormat = null)
+		public static MainModel Create(uint midiInput, Guid guid, IEnumerable<int> inputChannels, IEnumerable<int> outputChannels)
 		{
-			if (device is null)
+			if (inputChannels?.Any() != true)
 			{
-				throw new ArgumentNullException(nameof(device));
+				throw new ArgumentException("No input channels selected.");
 			}
 
-			if (maxTracks <= 0)
+			if (outputChannels?.Any() != true)
 			{
-				throw new ArgumentException($"'{nameof(maxTracks)}' must be greater than zero.");
+				throw new ArgumentException("No output channels selected.");
 			}
 
-			var inputChannels = device.AvailableInputChannels.Take(2).ToArray();
-
-			foreach (var key in inputChannels.Select(input => input.Key))
+			var config = new LooperConfig
 			{
-				device.SelectInputChannel(key, isSelected: true);
-			}
+				// with SampleCount == 0 the looper will use the device's preferred buffer size
+				Name = "Lupus",
+				MidiInput = midiInput,
+				AsioDevice = guid,
+				OutputSaturation = 0.8f
+			};
+			config.AddInputChannelList(inputChannels);
+			config.AddOutputChannelList(outputChannels);
 
-			var outputChannels = device.AvailableOutputChannels.Take(2).ToArray();
+			return Create(config);
+		}
 
-			foreach (var key in outputChannels.Select(output => output.Key))
-			{
-				device.SelectOutputChannel(key, isSelected: true);
-			}
+		public static MainModel Create(LooperConfig config)
+		{
+			var looper = Looper.Create(config);
 
-			device.ActivateChannels();
-
-			var tapeMachine = new TapeMachine(new AsioRouter(device, device));
-
-			return new MainModel(tapeMachine, maxTracks, nameFormat);
+			return new MainModel(looper);
 		}
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		/// <param name="tapeMachine">A <see cref="TapeMachine"/> that encapsules the ASIO driver access</param>
-		/// <param name="maxTracks">Maximum number of looper tracks</param>
-		/// <param name="nameFormat">Format string for track names. Defaults to <c>TRK {0}</c>, where <c>{0}</c> is replaced by track ID</param>
-		/// <exception cref="ArgumentNullException">Thrown if <paramref name="tapeMachine"/> is <see langword="null"/></exception>
-		private MainModel(TapeMachine tapeMachine, int maxTracks, string? nameFormat = null)
+		/// <param name="looper">A <see cref="Looper"/> that encapsules the ASIO driver access</param>
+		/// <exception cref="ArgumentNullException">Thrown if <paramref name="looper"/> is <see langword="null"/></exception>
+		private MainModel(Looper looper)
 		{
-			TapeMachine = tapeMachine ?? throw new ArgumentNullException(nameof(tapeMachine));
-
-			nameFormat ??= "TRK {0}";
-			var defaultInput = (IAudioSource?)tapeMachine.Router.Inputs.FirstOrDefault();
-
-			for (int i = 0; i < maxTracks; i++)
-			{
-				var audioTrack = tapeMachine.AddTrack();
-				audioTrack.Source = defaultInput;
-				audioTrack.Name = string.Format(nameFormat, i + 1);
-			}
-			SelectedOutput = tapeMachine.Router.Outputs.FirstOrDefault();
+			Looper = looper;
 		}
 
 		protected virtual void Dispose(bool disposing)
@@ -124,12 +94,7 @@ namespace Lupus.Model
 			{
 				if (disposing)
 				{
-					if (TapeMachine != null)
-					{
-						var router = TapeMachine.Router;
-						TapeMachine.Dispose();
-						router?.Dispose();
-					}
+					Looper?.Dispose();
 				}
 				_isDisposed = true;
 			}

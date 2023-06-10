@@ -1,10 +1,10 @@
 ﻿using Audio.Asio.Interop;
+using Audio.Foundation.Interop;
 using Lupus.Model;
 using System;
 using System.ComponentModel;
 using System.Text;
 using System.Windows;
-using System.Windows.Input;
 
 namespace Lupus
 {
@@ -25,39 +25,25 @@ namespace Lupus
 
 		}
 
-		private void Rewind_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-		{
-			var position = Model?.TapeMachine?.Position;
-
-			e.CanExecute = position != null && position != TimeSpan.Zero;
-		}
-
-		private void Rewind_Executed(object sender, ExecutedRoutedEventArgs e)
-		{
-			var tapeMachine = Model?.TapeMachine;
-
-			if (tapeMachine != null)
-			{
-				tapeMachine.IsRunning = false;
-				tapeMachine.Position = TimeSpan.Zero;
-			}
-		}
-
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			//string driverPattern = "Steinberg";
-			int maxTracks = 1;
+			RegisteredMidiInput? selectedMidiInput = null;
 			RegisteredDriver? selectedDriver = null;
 
 			try
 			{
-				var dialog = new DriverSelectionDialog();
+				var dialog = new DeviceSelectionDialog();
 
 				if (dialog.ShowDialog() == true)
 				{
+					selectedMidiInput = dialog.Model.SelectedMidiInput ?? throw new InvalidOperationException();
 					selectedDriver = dialog.Model.SelectedDriver ?? throw new InvalidOperationException();
-					// NFO: If dialog returns true, SelecteDriver must not be null
-					Model = MainModel.Create(selectedDriver, maxTracks);
+
+					// TODO: Allow to select I/O channels
+					var inputChannels = new int[] { 0, 1 };
+					var outputChannels = new int[] { 0, 1 };
+
+					Model = MainModel.Create(selectedMidiInput, selectedDriver, inputChannels, outputChannels);
 				}
 				else
 				{
@@ -65,7 +51,6 @@ namespace Lupus
 					e.Handled = true;
 					return;
 				}
-				//Model = MainModel.Create(driverPattern, maxTracks);
 			}
 			catch (Exception? ex)
 			{
@@ -76,17 +61,13 @@ namespace Lupus
 					ex = ex.InnerException;
 				}
 				
-				MessageBox.Show($"Initialization of ASIO driver '{selectedDriver}' (max. tracks: {maxTracks}) failed. {builder}", 
+				MessageBox.Show($"Initialization of looper with ASIO driver '{selectedDriver}' and MIDI input {selectedMidiInput}) failed. {builder}", 
 					Title, MessageBoxButton.OK, MessageBoxImage.Error);
 
 				Close();
 				e.Handled = true;
 				return;
 			}
-
-			// Configure trace source to write to console
-			TapeMachine.TraceSource.Listeners.Add(new System.Diagnostics.ConsoleTraceListener());
-			TapeMachine.TraceSource.Switch.Level = System.Diagnostics.SourceLevels.All;
 		}
 
 		private void Window_Closing(object sender, CancelEventArgs e)

@@ -9,69 +9,8 @@
         Title="Lupus" Height="450" Width="640"
         Loaded="Window_Loaded" Closing="Window_Closing" >
     <Window.CommandBindings>
-        <CommandBinding Command="{x:Static local:CustomCommands.Rewind}" CanExecute="Rewind_CanExecute" Executed="Rewind_Executed"/>
     </Window.CommandBindings>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0" DataContext="{Binding TapeMachine}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" MinWidth="60"/>
-                <ColumnDefinition Width="Auto" MinWidth="60"/>
-                <ColumnDefinition Width="Auto" MinWidth="60"/>
-                <ColumnDefinition Width="Auto" MinWidth="60"/>
-                <ColumnDefinition Width="Auto" MinWidth="60"/>
-                <ColumnDefinition Width="Auto" MinWidth="60"/>
-                <ColumnDefinition Width="Auto" MinWidth="60"/>
-                <ColumnDefinition Width="Auto" MinWidth="60"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <ctrl:LoopTrack Grid.Column="0"
-                TrackName="{Binding Tracks[0].Name}" Level="{Binding Tracks[0].Level}" DbFS="{Binding Tracks[0].Source.DbFS}" 
-                IsHot="{Binding Tracks[0].IsHot,Mode=TwoWay}" IsSolo="{Binding Tracks[0].IsSolo}" IsMuted="{Binding Tracks[0].IsMuted}"
-                SelectedInput="{Binding Tracks[0].Source}" Inputs="{Binding Router.Inputs}" x:Name="Track0"/>
-            <ctrl:LoopTrack Grid.Column="1" TrackName="Trk 2"/>
-            <ctrl:LoopTrack Grid.Column="2" TrackName="Trk 3"/>
-            <ctrl:LoopTrack Grid.Column="3" TrackName="Trk 4"/>
-            <ctrl:LoopTrack Grid.Column="4" TrackName="Trk 5"/>
-            <ctrl:LoopTrack Grid.Column="5" TrackName="Trk 6"/>
-            <ctrl:LoopTrack Grid.Column="6" TrackName="Trk 7"/>
-            <ctrl:LoopTrack Grid.Column="7" TrackName="Trk 8"/>
-        </Grid>
-        <GroupBox Grid.Column="1" Header="Master">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Label Grid.Row="0" Content="Output"/>
-                <ComboBox Grid.Row="1" ItemsSource="{Binding TapeMachine.Router.Outputs}" SelectedItem="{Binding SelectedOutput}" DisplayMemberPath="ChannelId"/>
-                <Grid Grid.Row="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <ctrl:LevelMeter Grid.Column="1" Value="{Binding SelectedOutput.DbFS.Left}" MinHeight="100" Width="10"/>
-                    <ctrl:LevelMeter Grid.Column="2" Value="{Binding SelectedOutput.DbFS.Right}" MinHeight="100" Width="10"/>
-                </Grid>
-                <Grid Grid.Row="3">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Content="|&lt;" Command="{x:Static local:CustomCommands.Rewind}"/>
-                    <ToggleButton Grid.Column="1" Content="O" IsChecked="{Binding TapeMachine.IsRecording}"/>
-                    <ToggleButton Grid.Column="2" Content="&gt;" IsChecked="{Binding TapeMachine.IsRunning}"/>
-                </Grid>
-                <ToggleButton Grid.Row="4" Content="On / Off" IsChecked="{Binding TapeMachine.Router.IsPoweredOn}"/>
-            </Grid>
-        </GroupBox>
+        
     </Grid>
 </Window>
