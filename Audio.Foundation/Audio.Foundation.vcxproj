@@ -108,7 +108,9 @@
     <ClInclude Include="IAudioTake.h" />
     <ClInclude Include="IAudioTarget.h" />
     <ClInclude Include="Level.h" />
+    <ClInclude Include="MidiInputRegistry.h" />
     <ClInclude Include="ReadOnlyCollection.h" />
+    <ClInclude Include="RegisteredMidiInput.h" />
     <ClInclude Include="SampleConversion.h" />
     <ClInclude Include="StreamAudioTake.h" />
     <ClInclude Include="StreamProvider.h" />
@@ -129,7 +131,9 @@
     <ClCompile Include="FileAudioTake.cpp" />
     <ClCompile Include="FxChannel.cpp" />
     <ClCompile Include="Level.cpp" />
+    <ClCompile Include="MidiInputRegistry.cpp" />
     <ClCompile Include="ReadOnlyCollectionOfInt.cpp" />
+    <ClCompile Include="RegisteredMidiInput.cpp" />
     <ClCompile Include="SampleConversion.cpp" />
     <ClCompile Include="StreamAudioTake.cpp" />
     <ClCompile Include="StreamProvider.cpp" />

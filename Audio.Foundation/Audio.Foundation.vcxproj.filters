@@ -87,6 +87,12 @@
     <ClInclude Include="IAudioBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RegisteredMidiInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MidiInputRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -144,6 +150,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AudioSourceBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RegisteredMidiInput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MidiInputRegistry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
