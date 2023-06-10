@@ -21,7 +21,9 @@ Looper* Looper::Create(const ILooperConfig& config)
 			throw std::runtime_error("Initialization of ASIO device failed.");
 		}
 
-		device->CreateBuffers(config.InputChannelList, config.InputChannelCount, config.OutputChannelList, static_cast<int>(config.OutputChannelCount), config.SampleCount, config.OutputSaturation);
+		int sampleCount = config.SampleCount == 0 ? AsioCore::UsePreferredSize : config.SampleCount;
+
+		device->CreateBuffers(config.InputChannelList, config.InputChannelCount, config.OutputChannelList, static_cast<int>(config.OutputChannelCount), sampleCount, config.OutputSaturation);
 
 		Looper* pLooper = new Looper(device);
 		pLooper->AddRef();
