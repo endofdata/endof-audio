@@ -35,6 +35,21 @@
     <ClCompile Include="AsioRouter.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="LooperConfig.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Looper.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GuidConversion.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="RegisteredDriver.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="LooperEvents.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AsioInteropException.h">
@@ -77,6 +92,21 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="DriverRegistry.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="LooperConfig.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Looper.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GuidConversion.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="RegisteredDriver.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="LooperEvents.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

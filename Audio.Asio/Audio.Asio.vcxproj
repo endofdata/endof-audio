@@ -112,7 +112,12 @@
     <ClInclude Include="AudioTrack.h" />
     <ClInclude Include="AudioTrackCollection.h" />
     <ClInclude Include="DriverRegistry.h" />
+    <ClInclude Include="GuidConversion.h" />
+    <ClInclude Include="Looper.h" />
+    <ClInclude Include="LooperConfig.h" />
+    <ClInclude Include="LooperEvents.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="RegisteredDriver.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="TapeMachine.h" />
   </ItemGroup>
@@ -125,10 +130,15 @@
     <ClCompile Include="AudioTrack.cpp" />
     <ClCompile Include="AudioTrackCollection.cpp" />
     <ClCompile Include="DriverRegistry.cpp" />
+    <ClCompile Include="GuidConversion.cpp" />
+    <ClCompile Include="Looper.cpp" />
+    <ClCompile Include="LooperConfig.cpp" />
+    <ClCompile Include="LooperEvents.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="RegisteredDriver.cpp" />
     <ClCompile Include="TapeMachine.cpp" />
     <ClCompile Include="UsefullStuff.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
