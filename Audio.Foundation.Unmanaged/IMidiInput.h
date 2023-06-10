@@ -17,7 +17,7 @@ namespace Audio
 		{
 			namespace Abstractions
 			{
-				typedef bool (*MidiInCapsHandler)(unsigned int deviceId, const MIDIINCAPS& caps);
+				typedef bool (*MidiInCapsHandler)(unsigned int deviceId, const MIDIINCAPS& caps, void* callbackParam);
 
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("91f6901a-7a86-4754-849b-d3c963750291")) IMidiInput : public IUnknown
 				{

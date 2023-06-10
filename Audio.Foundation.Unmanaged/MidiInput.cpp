@@ -108,7 +108,7 @@ void CALLBACK MidiInput::OnMidiInMsg(HMIDIIN hMidiIn, UINT wMsg, DWORD_PTR dwIns
 	}
 }
 
-int MidiInput::ListDevices(MidiInCapsHandler handler)
+int MidiInput::ListDevices(MidiInCapsHandler handler, void* callbackParam)
 {
 	if (handler == nullptr)
 	{
@@ -122,7 +122,7 @@ int MidiInput::ListDevices(MidiInCapsHandler handler)
 		std::memset(&devCaps, 0, sizeof(MIDIINCAPS));
 		if (MMSYSERR_NOERROR == midiInGetDevCaps(d, &devCaps, sizeof(devCaps)))
 		{
-			if (handler(d, devCaps))
+			if (handler(d, devCaps, callbackParam))
 			{
 				return d;
 			}

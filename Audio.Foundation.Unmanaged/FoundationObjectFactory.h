@@ -82,7 +82,7 @@ namespace Audio
 
 				static IMidiInputPtr CreateMidiInput();
 
-				static int SelectMidiInputDevice(MidiInCapsHandler handler);
+				static int SelectMidiInputDevice(MidiInCapsHandler handler, void* callbackParam = nullptr);
 
 			private:
 				FoundationObjectFactory();

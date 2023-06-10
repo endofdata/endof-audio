@@ -27,7 +27,7 @@ namespace Audio
 
 				IMidiEventsPtr& get_Events();
 
-				static int ListDevices(MidiInCapsHandler handler);
+				static int ListDevices(MidiInCapsHandler handler, void* callbackParam = nullptr);
 
 				DECLARE_IUNKNOWN
 

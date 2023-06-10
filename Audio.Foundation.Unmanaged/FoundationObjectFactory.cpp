@@ -230,9 +230,9 @@ IOscillatorPtr FoundationObjectFactory::CreateTestOscillator(double sampleRate, 
 	return oscillator;
 }
 
-int FoundationObjectFactory::SelectMidiInputDevice(MidiInCapsHandler handler)
+int FoundationObjectFactory::SelectMidiInputDevice(MidiInCapsHandler handler, void* callbackParam)
 {
-	return MidiInput::ListDevices(handler);
+	return MidiInput::ListDevices(handler, callbackParam);
 }
 
 IMidiInputPtr FoundationObjectFactory::CreateMidiInput()
