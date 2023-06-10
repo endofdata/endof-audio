@@ -14,7 +14,7 @@ using namespace Audio::Vst::Unmanaged;
 using namespace Audio::Asio::Unmanaged;
 using namespace Audio::Foundation::Unmanaged;
 
-bool onDeviceCaps(unsigned int id, const MIDIINCAPS& devcaps)
+bool onDeviceCaps(unsigned int id, const MIDIINCAPS& devcaps, void* callbackParam)
 {
 	std::string name = StrConv::ToUtf8(devcaps.szPname);
 
