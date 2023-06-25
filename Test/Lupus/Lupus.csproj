@@ -10,19 +10,21 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Audio.Asio\Audio.Asio.vcxproj" />
-		<ProjectReference Include="..\..\Audio.Foundation\Audio.Foundation.vcxproj" />
+	  <None Remove="Fonts\DSEG\DSEG7Classic-BoldItalic.ttf" />
+	  <None Remove="Fonts\kaum_keras_kepala\kaum keras kepala.ttf" />
 	</ItemGroup>
 
-	<Target Name="CopyDependencies" AfterTargets="Build" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-		<Message Text="Copy dependencies to $(OutDir)" Importance="high" />
-		<ItemGroup>
-			<Dependencies Include="..\..\bin\$(Configuration)\$(PlatformTarget)\Audio.Asio.Unmanaged.dll" />
-			<Dependencies Include="..\..\bin\$(Configuration)\$(PlatformTarget)\Audio.Asio.Unmanaged.pdb" />
-			<Dependencies Include="..\..\bin\$(Configuration)\$(PlatformTarget)\Audio.Foundation.Unmanaged.dll" />
-			<Dependencies Include="..\..\bin\$(Configuration)\$(PlatformTarget)\Audio.Foundation.Unmanaged.pdb" />
-		</ItemGroup>
-		<Copy SourceFiles="@(Dependencies)" DestinationFolder="$(OutputPath)" />
-	</Target>
+	<ItemGroup>
+	  <PackageReference Include="Audio.Asio" Version="1.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\SyntControls\SynthControls.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Fonts\DSEG\DSEG7Classic-BoldItalic.ttf" />
+	  <Resource Include="Fonts\kaum_keras_kepala\kaum keras kepala.ttf" />
+	</ItemGroup>
 
 </Project>
