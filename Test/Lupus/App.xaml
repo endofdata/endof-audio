@@ -4,14 +4,8 @@
 			 xmlns:local="clr-namespace:Lupus"
 			 StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <ResourceDictionary>
-            <SolidColorBrush Color="#0A0A0A" x:Key="BackgroundBrush"/>
-            <SolidColorBrush Color="Orange" x:Key="ForegroundBrush"/>
-            <SolidColorBrush Color="Red" x:Key="AccentBrush1"/>
-            <SolidColorBrush Color="DarkRed" x:Key="AccentBrush2"/>
-            <SolidColorBrush Color="#201A1A" x:Key="DigitBackground"/>
-            <SolidColorBrush Color="#000000" x:Key="ControlBorder"/>
-            <Style TargetType="{x:Type Window}" x:Key="PedalStyle">
+		<ResourceDictionary>
+			<Style TargetType="{x:Type Window}" x:Key="PedalStyle">
                 <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
                 <Setter Property="WindowStyle" Value="None"/>
                 <Setter Property="AllowsTransparency" Value="True"/>
@@ -20,109 +14,104 @@
                 <Setter Property="FontFamily" Value="./fonts/kaum_keras_kepala/#kaum keras kepala"/>
                 <Setter Property="FontSize" Value="24"/>
                 <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
-				<Setter Property="Foreground" Value="{StaticResource AccentBrush2}"/>
+				<Setter Property="Foreground" Value="{StaticResource Accent2}"/>
             </Style>
             <Style TargetType="{x:Type TextBox}">
                 <Setter Property="FontFamily" Value="./fonts/DSEG/#DSEG7 Classic Bold Italic"/>
                 <Setter Property="FontSize" Value="32"/>
-				<Setter Property="Foreground" Value="{StaticResource AccentBrush1}"/>
-                <Setter Property="Background" Value="{StaticResource DigitBackground}"/>
+				<Setter Property="Foreground" Value="{StaticResource Accent1}"/>
+                <Setter Property="Background" Value="{StaticResource Shadow1}"/>
                 <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="Padding" Value="5"/>
             </Style>
             <Style TargetType="{x:Type ProgressBar}">
-                <Setter Property="Background" Value="{StaticResource DigitBackground}"/>
+                <Setter Property="Background" Value="{StaticResource Shadow1}"/>
                 <Setter Property="Height" Value="4"/>
                 <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="Margin" Value="0,1,0,0"/>
-				<Setter Property="Foreground" Value="{StaticResource AccentBrush1}"/>
+				<Setter Property="Foreground" Value="{StaticResource Accent1}"/>
             </Style>
             <Style TargetType="{x:Type Ellipse}">
                 <Setter Property="Width" Value="20"/>
                 <Setter Property="Height" Value="20"/>
-                <Setter Property="Fill" Value="{StaticResource DigitBackground}"/>
-                <Setter Property="Stroke" Value="{StaticResource ControlBorder}"/>
+                <Setter Property="Fill" Value="{StaticResource Shadow2}"/>
+                <Setter Property="Stroke" Value="{StaticResource Shadow1}"/>
                 <Setter Property="StrokeThickness" Value="4"/>
                 <Setter Property="Margin" Value="20,10"/>
             </Style>
             <Style TargetType="{x:Type TextBlock}">
                 <Setter Property="FontFamily" Value="./fonts/kaum_keras_kepala/#kaum keras kepala"/>
-                <Setter Property="FontSize" Value="20"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="FontSize" Value="16"/>
+				<Setter Property="FontWeight" Value="ExtraLight"/>
+				<Setter Property="VerticalAlignment" Value="Center"/>
             </Style>
             <Style TargetType="{x:Type TextBlock}" x:Key="Logo">
                 <Setter Property="FontFamily" Value="./fonts/kaum_keras_kepala/#kaum keras kepala"/>
-				<Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
+				<Setter Property="Foreground" Value="{StaticResource Foreground}"/>
                 <Setter Property="FontSize" Value="48"/>
                 <Setter Property="Padding" Value="32,0"/>
             </Style>
             <Style TargetType="{x:Type Border}">
-                <Setter Property="BorderBrush" Value="{StaticResource ControlBorder}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource Shadow1}"/>
                 <Setter Property="BorderThickness" Value="4"/>
                 <Setter Property="CornerRadius" Value="3"/>
             </Style>
             <Style TargetType="{x:Type Border}" x:Key="Outermost">
                 <Setter Property="Margin" Value="4"/>
-				<Setter Property="BorderBrush" Value="{StaticResource AccentBrush2}"/>
+				<Setter Property="BorderBrush" Value="{StaticResource Accent2}"/>
                 <Setter Property="BorderThickness" Value="4"/>
-                <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+                <Setter Property="Background" Value="{StaticResource Background}"/>
                 <Setter Property="CornerRadius" Value="16"/>
             </Style>
             <Style TargetType="{x:Type Border}" x:Key="ContainerBorder">
                 <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
-				<Setter Property="BorderBrush" Value="{StaticResource AccentBrush2}"/>
+				<Setter Property="BorderBrush" Value="{StaticResource Accent2}"/>
                 <Setter Property="BorderThickness" Value="3"/>
                 <Setter Property="CornerRadius" Value="5"/>
                 <Setter Property="Margin" Value="0"/>
             </Style>
-            <Style TargetType="{x:Type GroupBox}">
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type HeaderedContentControl}">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-								<Label Foreground="{StaticResource AccentBrush2}">
-                                    <ContentPresenter ContentSource="Header" />
-                                </Label>
-                                <Border Grid.Row="1" Style="{StaticResource ContainerBorder}">
-                                    <ContentPresenter ContentSource="Content" />
-                                </Border>
-                            </Grid>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-            <Style TargetType="{x:Type Button}">
-                <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
-                <Setter Property="BorderBrush" Value="{StaticResource AccentBrush2}"/>
-                <Setter Property="BorderThickness" Value="2"/>
-                <Setter Property="Margin" Value="4"/>
-                <Setter Property="Width" Value="24"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
-            </Style>
-            <Style TargetType="{x:Type ListView}">
+			<Style TargetType="{x:Type GroupBox}">
+				<Setter Property="Template">
+					<Setter.Value>
+						<ControlTemplate TargetType="{x:Type HeaderedContentControl}">
+							<Grid>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="Auto"/>
+									<RowDefinition Height="*"/>
+								</Grid.RowDefinitions>
+								<Label Foreground="{StaticResource Accent2}">
+									<ContentPresenter ContentSource="Header" />
+								</Label>
+								<Border Grid.Row="1" Style="{StaticResource ContainerBorder}">
+									<ContentPresenter ContentSource="Content" />
+								</Border>
+							</Grid>
+						</ControlTemplate>
+					</Setter.Value>
+				</Setter>
+			</Style>
+			<Style TargetType="{x:Type ListView}">
                 <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
                 <Setter Property="BorderThickness" Value="0"/>
             </Style>
             <Style TargetType="{x:Type ListViewItem}">
                 <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
-				<Setter Property="BorderBrush" Value="{StaticResource ForegroundBrush}" />
+				<Setter Property="BorderBrush" Value="{StaticResource Foreground}" />
                 <Setter Property="BorderThickness" Value="2" />
                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
             </Style>
             <Style TargetType="{x:Type Slider}">
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
-				<Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
+				<Setter Property="Foreground" Value="{StaticResource Foreground}"/>
                 <Setter Property="TickFrequency" Value="10"/>
                 <Setter Property="TickPlacement" Value="TopLeft"/>
             </Style>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary  Source="pack://application:,,,/SynthControls;component/Themes/Generic.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/SynthControls;component/Themes/Generic.xaml"/>
+				<ResourceDictionary Source="Theme/Colors.xaml"/>
+				<ResourceDictionary Source="Theme/ButtonTemplate.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

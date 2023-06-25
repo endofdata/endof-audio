@@ -8,19 +8,14 @@
 		Style="{StaticResource PedalStyle}"
 		Height="320" Width="500">
 	<Window.Resources>
-		<Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}" x:Key="DialogButton">
-			<Setter Property="MinWidth" Value="90"/>
-			<Setter Property="Margin" Value="2"/>
-			<Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
-		</Style>
 		<Style TargetType="{x:Type GridSplitter}">
-			<Setter Property="Background" Value="{StaticResource ControlBorder}"/>
+			<Setter Property="Background" Value="{StaticResource Shadow2}"/>
 		</Style>
 		<Style TargetType="{x:Type ListViewItem}">
 			<Setter Property="Template">
 				<Setter.Value>
 					<ControlTemplate TargetType="{x:Type ListViewItem}">
-						<Label Foreground="{StaticResource ForegroundBrush}">
+						<Label Foreground="{StaticResource Foreground}">
 							<ContentPresenter/>
 						</Label>
 					</ControlTemplate>
@@ -32,7 +27,7 @@
 		<CommandBinding  Command="{x:Static ApplicationCommands.Save}" CanExecute="CloseDialog_CanExecute" Executed="CloseDialog_Executed"/>
 	</Window.CommandBindings>
 	<Border Style="{StaticResource Outermost}">
-		<Grid Background="{StaticResource BackgroundBrush}" Margin="4">
+		<Grid Background="{StaticResource Background}" Margin="4">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="1*"/>
 				<RowDefinition Height="Auto"/>
@@ -47,8 +42,8 @@
 				<ListView ItemsSource="{Binding RegisteredDrivers, Mode=OneWay}" SelectedItem="{Binding SelectedDriver}" />
 			</GroupBox>
 			<StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
-				<Button Content="Cancel" IsCancel="True" Style="{StaticResource DialogButton}"/>
-				<Button Content="OK" IsDefault="True" Command="{x:Static ApplicationCommands.Save}" Style="{StaticResource DialogButton}"/>
+				<Button Content="Cancel" IsCancel="True"/>
+				<Button Content="OK" IsDefault="True" Command="{x:Static ApplicationCommands.Save}"/>
 			</StackPanel>
 		</Grid>
 	</Border>

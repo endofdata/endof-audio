@@ -26,7 +26,7 @@
 				<ColumnDefinition Width="1*"/>
 			</Grid.ColumnDefinitions>
 			<StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
-                <Ellipse Fill="{StaticResource AccentBrush1}"/>
+                <Ellipse Fill="{StaticResource Accent1}"/>
 				<Border Grid.Row="2" Grid.Column="0">
 					<StackPanel Orientation="Vertical">
 						<TextBox Text="01:47,319"/>
@@ -47,12 +47,12 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-							<TextBlock Grid.Row="0" Grid.Column="0" Text="Loop x" Foreground="{StaticResource ForegroundBrush}"/>
+							<TextBlock Grid.Row="0" Grid.Column="0" Text="Loop x" Foreground="{StaticResource Foreground}"/>
                             <synt:PanDialControl Grid.Row="0" Grid.Column="1"/>
                             <synt:GainDialControl Grid.Row="0" Grid.Column="2"/>
-                            <Button Grid.Row="0" Grid.Column="3" Content="S" Foreground="{StaticResource ForegroundBrush}"/>
-							<Button Grid.Row="0" Grid.Column="4" Content="M" Foreground="{StaticResource AccentBrush2}"/>
-                            <Button Grid.Row="0" Grid.Column="5" Content="X" Foreground="{StaticResource AccentBrush1}"/>
+                            <Button Grid.Row="0" Grid.Column="3" Content="S" Foreground="{StaticResource Foreground}"/>
+							<Button Grid.Row="0" Grid.Column="4" Content="M" Foreground="{StaticResource Accent2}"/>
+                            <Button Grid.Row="0" Grid.Column="5" Content="X" Foreground="{StaticResource Accent1}"/>
                         </Grid>
 					</DataTemplate>
 				</ListView.ItemTemplate>
