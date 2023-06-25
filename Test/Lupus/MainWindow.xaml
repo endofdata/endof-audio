@@ -1,16 +1,65 @@
 ﻿<Window x:Class="Lupus.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Lupus"
-        xmlns:ctrl="clr-namespace:Lupus.Controls"
-        mc:Ignorable="d"
-        Title="Lupus" Height="450" Width="640"
-        Loaded="Window_Loaded" Closing="Window_Closing" >
-    <Window.CommandBindings>
-    </Window.CommandBindings>
-    <Grid>
-        
-    </Grid>
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:local="clr-namespace:Lupus"
+		xmlns:ctrl="clr-namespace:Lupus.Controls"
+        xmlns:synt="clr-namespace:SynthControls;assembly=SynthControls"
+		mc:Ignorable="d"
+		Height="450" Width="640"
+		Style="{StaticResource PedalStyle}"
+		Loaded="Window_Loaded" Closing="Window_Closing">
+    <Window.Resources>
+
+    </Window.Resources>
+	<Border Style="{StaticResource Outermost}">
+		<Grid Margin="15">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="Auto"/>
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="1*"/>
+			</Grid.ColumnDefinitions>
+			<StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                <Ellipse Fill="{StaticResource AccentBrush1}"/>
+				<Border Grid.Row="2" Grid.Column="0">
+					<StackPanel Orientation="Vertical">
+						<TextBox Text="01:47,319"/>
+						<ProgressBar Value="45" Maximum="100"/>
+					</StackPanel>
+				</Border>
+			</StackPanel>
+			<TextBlock Grid.Row="0" Grid.Column="1" Text="Lupus" HorizontalAlignment="Right" Style="{StaticResource Logo}"/>
+			<ListView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+				<ListView.ItemTemplate>
+					<DataTemplate>
+						<Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+							<TextBlock Grid.Row="0" Grid.Column="0" Text="Loop x" Foreground="{StaticResource ForegroundBrush}"/>
+                            <synt:PanDialControl Grid.Row="0" Grid.Column="1"/>
+                            <synt:GainDialControl Grid.Row="0" Grid.Column="2"/>
+                            <Button Grid.Row="0" Grid.Column="3" Content="S" Foreground="{StaticResource ForegroundBrush}"/>
+							<Button Grid.Row="0" Grid.Column="4" Content="M" Foreground="{StaticResource AccentBrush2}"/>
+                            <Button Grid.Row="0" Grid.Column="5" Content="X" Foreground="{StaticResource AccentBrush1}"/>
+                        </Grid>
+					</DataTemplate>
+				</ListView.ItemTemplate>
+                <ListView.Items>
+                    <Rectangle/>
+                </ListView.Items>
+			</ListView>
+		</Grid>
+	</Border>
 </Window>
