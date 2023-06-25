@@ -9,6 +9,7 @@ Function Pack-Project {
 		[Parameter(Mandatory=$True)][String] $ProjectName,
 		[Parameter(Mandatory=$False)][Switch] $NoBuild
 	)
+	Write-Verbose "Packing project '$ProjectName'"
 	If(!$NoBuild) {
 		& msbuild -property:configuration=$Configuration -property:Platform=x64 ".\${ProjectName}\${ProjectName}.vcxproj"
 	}
@@ -20,6 +21,9 @@ Push-Location
 Try {
 	Pack-Project 'Audio.Foundation.Unmanaged' -NoBuild:$NoBuild
 	Pack-Project 'Audio.Foundation' -NoBuild:$NoBuild
+	Pack-Project 'Audio.Vst.Unmanaged' -NoBuild:$NoBuild
+	Pack-Project 'Audio.Asio.Unmanaged' -NoBuild:$NoBuild
+	Pack-Project 'Audio.Asio' -NoBuild:$NoBuild
 }
 Finally {
 	Pop-Location
