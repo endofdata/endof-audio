@@ -32,7 +32,10 @@ namespace Lupus
 
 			try
 			{
-				var dialog = new DeviceSelectionDialog();
+				var dialog = new DeviceSelectionDialog
+				{
+					Owner = this
+				};
 
 				if (dialog.ShowDialog() == true)
 				{
