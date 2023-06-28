@@ -90,17 +90,7 @@
 					</Setter.Value>
 				</Setter>
 			</Style>
-			<Style TargetType="{x:Type ListView}">
-                <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
-                <Setter Property="BorderThickness" Value="0"/>
-            </Style>
-            <Style TargetType="{x:Type ListViewItem}">
-                <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
-				<Setter Property="BorderBrush" Value="{StaticResource Foreground}" />
-                <Setter Property="BorderThickness" Value="2" />
-                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-            </Style>
-            <Style TargetType="{x:Type Slider}">
+			<Style TargetType="{x:Type Slider}">
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
 				<Setter Property="Foreground" Value="{StaticResource Foreground}"/>
@@ -111,6 +101,8 @@
                 <ResourceDictionary Source="pack://application:,,,/SynthControls;component/Themes/Generic.xaml"/>
 				<ResourceDictionary Source="Theme/Colors.xaml"/>
 				<ResourceDictionary Source="Theme/ButtonTemplate.xaml"/>
+				<ResourceDictionary Source="Theme/ListViewTemplate.xaml"/>
+				<ResourceDictionary Source="Theme/ScrollBarTemplate.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

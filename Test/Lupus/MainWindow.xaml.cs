@@ -20,9 +20,8 @@ namespace Lupus
 		}
 
 		public MainWindow()
-		{
+		{			
 			InitializeComponent();
-
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -34,7 +33,7 @@ namespace Lupus
 			{
 				var dialog = new DeviceSelectionDialog
 				{
-					Owner = this
+					Owner = this					
 				};
 
 				if (dialog.ShowDialog() == true)

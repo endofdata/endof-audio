@@ -3,24 +3,17 @@
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:sys="clr-namespace:System;assembly=mscorlib"
 		xmlns:local="clr-namespace:Lupus"
+		xmlns:afi="clr-namespace:Audio.Foundation.Interop;assembly=Audio.Foundation"
+		xmlns:afa="clr-namespace:Audio.Asio.Interop;assembly=Audio.Asio"
 		mc:Ignorable="d"
 		Style="{StaticResource PedalStyle}"
+		WindowStartupLocation="CenterOwner"
 		Height="320" Width="500">
 	<Window.Resources>
 		<Style TargetType="{x:Type GridSplitter}">
 			<Setter Property="Background" Value="{StaticResource Shadow2}"/>
-		</Style>
-		<Style TargetType="{x:Type ListViewItem}">
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="{x:Type ListViewItem}">
-						<Label Foreground="{StaticResource Foreground}">
-							<ContentPresenter/>
-						</Label>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
 		</Style>
 	</Window.Resources>
 	<Window.CommandBindings>
@@ -35,11 +28,23 @@
 				<RowDefinition Height="Auto"/>
 			</Grid.RowDefinitions>
 			<GroupBox Grid.Row="0" Header="MIDI Input Device">
-				<ListView ItemsSource="{Binding RegisteredMidiInputs, Mode=OneWay}" SelectedItem="{Binding SelectedMidiInput}" />
+				<ListView ItemsSource="{Binding RegisteredMidiInputs, Mode=OneWay}" SelectedItem="{Binding SelectedMidiInput}">
+					<ListView.ItemTemplate>
+						<DataTemplate DataType="{x:Type afi:RegisteredMidiInput}">
+							<TextBlock Text="{Binding Name}"/>
+						</DataTemplate>
+					</ListView.ItemTemplate>
+				</ListView>
 			</GroupBox>
 			<GridSplitter Grid.Row="1" Height="6" HorizontalAlignment="Stretch"/>
 			<GroupBox Grid.Row="2" Header="ASIO Audio Device">
-				<ListView ItemsSource="{Binding RegisteredDrivers, Mode=OneWay}" SelectedItem="{Binding SelectedDriver}" />
+				<ListView ItemsSource="{Binding RegisteredDrivers, Mode=OneWay}" SelectedItem="{Binding SelectedDriver}" >
+					<ListView.ItemTemplate>
+						<DataTemplate DataType="{x:Type afa:RegisteredDriver}">
+							<TextBlock Text="{Binding Name}"/>
+						</DataTemplate>
+					</ListView.ItemTemplate>
+				</ListView>
 			</GroupBox>
 			<StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
 				<Button Content="Cancel" IsCancel="True"/>
