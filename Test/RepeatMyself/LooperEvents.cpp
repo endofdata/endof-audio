@@ -60,7 +60,7 @@ void LooperEvents::AddLoop(ILooper& looper)
 	std::wcout << ClearLine << L"Added loop" << std::endl;
 }
 
-void LooperEvents::DropRecording(ILooper& looper, bool continueRecording)
+void LooperEvents::DropRecording(ILooper& looper)
 {
 	std::wcout << ClearLine << L"Dropped recording" << std::endl;
 }
@@ -96,6 +96,8 @@ const wchar_t* LooperEvents::GetRecordingStatusString(RecordingStatusType value)
 		return L"Armed";
 	case RecordingStatusType::Recording:
 		return L"Recording";
+	case RecordingStatusType::Unarmed:
+		return L"Unarmed";
 	default:
 		return L"<unknown>";
 	}

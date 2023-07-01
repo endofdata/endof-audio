@@ -24,7 +24,7 @@ namespace RepeatMyself
 
 		void AddLoop(ILooper& looper);
 
-		void DropRecording(ILooper& looper, bool continueRecording);
+		void DropRecording(ILooper& looper);
 
 		DECLARE_IUNKNOWN
 
