@@ -105,12 +105,15 @@ int SampleContainerSpan::WriteTo(ISampleContainerPtr& other, int sampleOffset, i
 {
 	int sourceChannels = std::min(ChannelCount - channelOffset, channelCount);
 	int done = 0;
-	
-	for (int c = 0; c < channelCount; c++)
+
+	if (sourceChannels > 0)
 	{
-		ISampleBufferPtr pChannel = other->Channels[c + targetChannelOffset];
-		double channelLevel = (c & 1) ? mix.FactorRight : mix.FactorLeft;
-		done = m_vecChannels[(c % sourceChannels) + channelOffset]->WriteTo(pChannel, sampleOffset, sampleCount, targetSampleOffset, channelLevel, overdub);
+		for (int c = 0; c < channelCount; c++)
+		{
+			ISampleBufferPtr pChannel = other->Channels[c + targetChannelOffset];
+			double channelLevel = (c & 1) ? mix.FactorRight : mix.FactorLeft;
+			done = m_vecChannels[static_cast<size_t>(c % sourceChannels) + channelOffset]->WriteTo(pChannel, sampleOffset, sampleCount, targetSampleOffset, channelLevel, overdub);
+		}
 	}
 	return done;
 }
