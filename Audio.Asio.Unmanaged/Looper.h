@@ -69,17 +69,20 @@ namespace Audio
 				void CreateVstHost();
 				void CreateProcessingChain();
 
-				bool ToggleRecording(ITransportPtr& transport);
-				bool DropRecording(bool continueRecording);
+				void ArmRecording();
+				void UnarmRecording();
+				void StartRecording();
+				void StopRecording();
+				bool DropRecording();
 				bool AddLoop();
 
 				void OnHeartbeat(ITransportPtr& transport);
 				void OnRecordingStatusChanged();
-				void OnLoopRestart();
 				void OnIsLoopingChanged();
-				void OnAddLoop();
-				void OnDropRecording(bool continueRecording);
 				void OnIsSessionRecordingChanged();
+				void OnLoopRestart();
+				void OnAddLoop();
+				void OnDropRecording();
 
 				AsioCorePtr m_device;
 				IVstHostPtr m_vstHost;

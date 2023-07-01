@@ -171,30 +171,62 @@ void Looper::Run()
 			switch (controllerCommand)
 			{
 			case ControllerCode::Record:
-				if (!m_context->IsLooping)
+				if (m_context->IsLooping)
 				{
-					ToggleRecording(transport);
+					switch(m_recordingStatus)
+					{
+					case RecordingStatusType::Recording:
+						UnarmRecording();
+						break;
+					case RecordingStatusType::Off:
+						ArmRecording();
+						break;
+					}
 				}
-				else
+				else 
 				{
-					m_recordingStatus = (m_recordingStatus == RecordingStatusType::Off) ? RecordingStatusType::Armed : RecordingStatusType::Off;
-					OnRecordingStatusChanged();
+					switch(m_recordingStatus)
+					{
+					case RecordingStatusType::Recording:
+						StopRecording();
+						break;
+					case RecordingStatusType::Off:
+						StartRecording();
+						transport->Run();
+						break;
+					}
 				}
 				break;
 			case ControllerCode::Locate:
 				OnLoopRestart();
 
 				// Triggered by master loop wrap: delayed handling of 'Record' commands
-				if (m_recordingStatus == RecordingStatusType::Armed)
+				switch(m_recordingStatus)
 				{
-					ToggleRecording(transport);
+				case RecordingStatusType::Armed:
+					StartRecording();
+					break;
+				case RecordingStatusType::Unarmed:
+					StopRecording();
+					break;
 				}
+
 				break;
 			case ControllerCode::Run:
 				// Drop current recording, stop recording, continue looping
-				if (m_recorder->IsActive)
+				switch(m_recordingStatus)
 				{
-					DropRecording(true);
+				case RecordingStatusType::Recording:
+					DropRecording();
+
+					if (IsLooping)
+					{
+						ArmRecording();
+					}
+					break;
+				case RecordingStatusType::Armed:
+					UnarmRecording();
+					break;
 				}
 				break;
 
@@ -203,7 +235,7 @@ void Looper::Run()
 				transport->Stop();
 				if (m_recorder->IsActive)
 				{
-					DropRecording(false);
+					DropRecording();
 				}
 				break;
 			default:
@@ -219,54 +251,78 @@ void Looper::Run()
 }
 
 
-
-bool Looper::ToggleRecording(ITransportPtr& transport)
+void Looper::ArmRecording()
 {
-	if (!m_recorder->IsActive)
+	m_recordingStatus = RecordingStatusType::Armed;
+	OnRecordingStatusChanged();
+}
+
+void Looper::UnarmRecording()
+{
+	if (m_recordingStatus == RecordingStatusType::Armed)
 	{
-		m_recorder->IsActive = true;
-
-		if (m_isSessionRecording)
-		{
-			m_sessionRecorder->IsActive = true;
-			OnIsSessionRecordingChanged();
-		}
-		m_recordingStatus = RecordingStatusType::Recording;
-
-		if (!m_context->IsLooping)
-		{
-			transport->Run();
-		}
+		m_recordingStatus = RecordingStatusType::Off;
 	}
 	else
 	{
-		int switchSamplePos = m_context->SamplePosition;
+		m_recordingStatus = RecordingStatusType::Unarmed;
+	}
+	OnRecordingStatusChanged();
+}
 
-		m_recordingStatus = RecordingStatusType::Off;
+void Looper::StartRecording()
+{
+	m_recorder->IsActive = true;
 
-		if (AddLoop())
+	if (m_isSessionRecording)
+	{
+		m_sessionRecorder->IsActive = true;
+		OnIsSessionRecordingChanged();
+	}
+	m_recordingStatus = RecordingStatusType::Recording;
+
+	OnRecordingStatusChanged();
+}
+
+void Looper::StopRecording()
+{
+	int switchSamplePos = m_context->SamplePosition;
+
+	m_recordingStatus = RecordingStatusType::Off;
+
+	if (AddLoop())
+	{
+		if (m_context->IsLooping)
 		{
-			ProcessingContext& context = transport->Context;
-
-			if (m_context->IsLooping)
-			{
-				// TODO: Add threshold to prevent unintentional resize? Does resize work at all?
-				if (switchSamplePos > m_context->LoopEndSample)
-				{
-					m_context->LoopEndSample = switchSamplePos;
-				}
-			}
-			else
+			// TODO: Add threshold to prevent unintentional resize? Does resize work at all?
+			if (switchSamplePos > m_context->LoopEndSample)
 			{
 				m_context->LoopEndSample = switchSamplePos;
-				m_context->IsLooping = true;
-				OnIsLoopingChanged();
 			}
+		}
+		else
+		{
+			m_context->LoopEndSample = switchSamplePos;
+			m_context->IsLooping = true;
+			OnIsLoopingChanged();
 		}
 	}
 	OnRecordingStatusChanged();
+}
 
-	return m_recorder->IsActive;
+bool Looper::DropRecording()
+{
+	if (m_recorder->IsActive)
+	{
+		m_recorder->DropRecording(false);
+		m_recordingStatus = RecordingStatusType::Off;
+
+		OnDropRecording();
+		OnRecordingStatusChanged();
+
+		return true;
+	}
+	return false;
 }
 
 bool Looper::AddLoop()
@@ -282,22 +338,6 @@ bool Looper::AddLoop()
 		m_joiner->AddSource(takeSource, mix);
 
 		OnAddLoop();
-		return true;
-	}
-	return false;
-}
-
-bool Looper::DropRecording(bool continueRecording)
-{
-	// TODO: different handling required for:
-	// - dropping initial recording: isLooping = false, recording Off or Recording depending on continueRecording
-	// - dropping subsequent recording: recording Off or Armed depending on continueRecording
-	if (m_recorder->IsActive)
-	{
-		m_recorder->DropRecording(continueRecording);
-		OnDropRecording(continueRecording);
-		OnRecordingStatusChanged();
-
 		return true;
 	}
 	return false;
@@ -358,11 +398,11 @@ void Looper::OnAddLoop()
 	}
 }
 
-void Looper::OnDropRecording(bool continueRecording)
+void Looper::OnDropRecording()
 {
 	if (m_events != nullptr)
 	{
-		m_events->DropRecording(*this, continueRecording);
+		m_events->DropRecording(*this);
 	}
 }
 

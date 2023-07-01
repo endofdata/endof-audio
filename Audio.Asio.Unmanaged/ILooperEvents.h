@@ -18,7 +18,8 @@ namespace Audio
 				{
 					Off,
 					Armed,
-					Recording
+					Recording,
+					Unarmed
 				};
 
 				__interface _AUDIO_ASIO_UNMANAGED_API  ILooper;
@@ -37,7 +38,7 @@ namespace Audio
 
 					void AddLoop(ILooper& looper) = 0;
 
-					void DropRecording(ILooper& looper, bool continueRecording) = 0;
+					void DropRecording(ILooper& looper) = 0;
 				};
 
 				_AUDIO_ASIO_UNMANAGED_API  _COM_SMARTPTR_TYPEDEF(ILooperEvents, __uuidof(ILooperEvents));
