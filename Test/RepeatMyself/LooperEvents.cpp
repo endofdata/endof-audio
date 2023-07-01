@@ -35,9 +35,9 @@ void LooperEvents::Heartbeat(ILooper& looper, ITransportPtr& transport)
 	std::wcout << transport->TimePosition.ToString() << L"\r";
 }
 
-void LooperEvents::TransportStatusChanged(ILooper& looper, TransportCode previous, TransportCode current)
+void LooperEvents::RecordingStatusChanged(ILooper& looper, RecordingStatusType recordingStatus)
 {
-	std::wcout << L"Transport status: " << GetTransportCodeString(previous) << L" > " << GetTransportCodeString(current) << std::endl;
+	std::wcout << L"Recording status: " << GetRecordingStatusString(recordingStatus)  << std::endl;
 }
 
 void LooperEvents::LoopRestart(ILooper& looper)
@@ -45,12 +45,12 @@ void LooperEvents::LoopRestart(ILooper& looper)
 	std::wcout << ClearLine << L"Loop " << m_loopCount++ << L"\r";
 }
 
-void LooperEvents::LoopRecordingChanged(ILooper& looper, bool isLoopRecording)
+void LooperEvents::IsLoopingChanged(ILooper& looper, bool isLooping)
 {
-	std::wcout << ClearLine << L"Recording: " << std::boolalpha << isLoopRecording << std::endl;
+	std::wcout << ClearLine << L"Loop recording: " << std::boolalpha << isLooping << std::endl;
 }
 
-void LooperEvents::SessionRecordingChanged(ILooper& looper, bool isSessionRecording)
+void LooperEvents::IsSessionRecordingChanged(ILooper& looper, bool isSessionRecording)
 {
 	//std::wcout << ClearLine << L"Session recording: " << std::boolalpha << isSessionRecording << std::endl;
 }
@@ -65,30 +65,38 @@ void LooperEvents::DropRecording(ILooper& looper, bool continueRecording)
 	std::wcout << ClearLine << L"Dropped recording" << std::endl;
 }
 
-const wchar_t* LooperEvents::GetTransportCodeString(TransportCode value)
+const wchar_t* LooperEvents::GetTransportCodeString(ControllerCode value)
 {
-	const wchar_t* pwcszStatus = nullptr;
-
 	switch (value)
 	{
-	case TransportCode::Start:
-		pwcszStatus = L"Start";
-		break;
-	case TransportCode::Stop:
-		pwcszStatus = L"Stop";
-		break;
-	case TransportCode::Record:
-		pwcszStatus = L"Record";
-		break;
-	case TransportCode::Locate:
-		pwcszStatus = L"Locate";
-		break;
-	case TransportCode::None:
-		pwcszStatus = L"None";
-		break;
+	case ControllerCode::Run:
+		return L"Run";
+	case ControllerCode::Stop:
+		return L"Stop";
+	case ControllerCode::RecordArm:
+		return L"RecordArm";
+	case ControllerCode::Record:
+		return L"Record";
+	case ControllerCode::Locate:
+		return L"Locate";
+	case ControllerCode::None:
+		return L"None";
 	default:
-		pwcszStatus = L"<unknown>";
-		break;
+		return L"<unknown>";
 	}
-	return pwcszStatus;
+}
+
+const wchar_t* LooperEvents::GetRecordingStatusString(RecordingStatusType value)
+{
+	switch (value)
+	{
+	case RecordingStatusType::Off:
+		return L"Off";
+	case RecordingStatusType::Armed:
+		return L"Armed";
+	case RecordingStatusType::Recording:
+		return L"Recording";
+	default:
+		return L"<unknown>";
+	}
 }
