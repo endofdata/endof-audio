@@ -1,7 +1,7 @@
 #pragma once
 
 #include <AsioCore.h>
-#include <ITransportControl.h>
+#include <IController.h>
 #include <IRecorder.h>
 #include <ILooperConfig.h>
 #include <ISampleProcessor.h>
@@ -46,7 +46,7 @@ namespace Audio
 
 				int get_LoopCount() const;
 
-				bool get_IsLoopRecording() const;
+				RecordingStatusType get_RecordingStatus() const;
 
 				bool get_IsSessionRecording() const;
 				void put_IsSessionRecording(bool value);
@@ -57,12 +57,15 @@ namespace Audio
 				ILooperEventsPtr get_LooperEvents();
 				void put_LooperEvents(ILooperEventsPtr& value);
 
+				IControllerPtr get_Controller();
+				void put_Controller(IControllerPtr& value);
+
 				DECLARE_IUNKNOWN
 
 			private:
 				Looper(AsioCorePtr& device);
 
-				void CreateTransportControl(unsigned int midiInput);
+				void CreateController(unsigned int midiInput);
 				void CreateVstHost();
 				void CreateProcessingChain();
 
@@ -71,18 +74,19 @@ namespace Audio
 				bool AddLoop();
 
 				void OnHeartbeat(ITransportPtr& transport);
-				void OnTransportStatusChanged(TransportCode previous, TransportCode current);
+				void OnRecordingStatusChanged();
 				void OnLoopRestart();
-				void OnLoopRecordingChanged();
+				void OnIsLoopingChanged();
 				void OnAddLoop();
 				void OnDropRecording(bool continueRecording);
-				void OnSessionRecordingChanged();
+				void OnIsSessionRecordingChanged();
 
 				AsioCorePtr m_device;
 				IVstHostPtr m_vstHost;
-				ITransportControlPtr m_transportControl;
+				IControllerPtr m_controller;
 				ILooperEventsPtr m_events;
 				IRecorderPtr m_recorder;
+				RecordingStatusType m_recordingStatus;
 				ProcessingContext* m_context;
 				bool m_isSessionRecording;
 				IRecorderPtr m_sessionRecorder;

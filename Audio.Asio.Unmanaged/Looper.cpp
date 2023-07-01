@@ -38,7 +38,7 @@ Looper* Looper::Create(const ILooperConfig& config)
 		pLooper->AddRef();
 
 		pLooper->Name = config.Name;
-		pLooper->CreateTransportControl(config.MidiInput);
+		pLooper->CreateController(config.MidiInput);
 		pLooper->CreateVstHost();
 		pLooper->CreateProcessingChain();
 
@@ -55,6 +55,7 @@ Looper* Looper::Create(const ILooperConfig& config)
 
 Looper::Looper(AsioCorePtr& device) :
 	m_device(device),
+	m_vstHost(nullptr),
 	m_delay(1000),
 	m_isSessionRecording(false),
 	m_context(nullptr),
@@ -145,14 +146,12 @@ bool Looper::RemoveFx(int id)
 
 void Looper::Run()
 {
-	if (m_transportControl == nullptr)
+	if (m_controller == nullptr)
 	{
-		throw std::runtime_error("Property 'TransportControl' must be set before running the looper.");
+		throw std::runtime_error("Property 'Controller' must be set before running the looper.");
 	}
 
-	bool isRecordPressed = false;
-	TransportCode previousStatus = TransportCode::None;
-	TransportCode transportStatus = TransportCode::None;
+	ControllerCode controllerCommand = ControllerCode::None;
 	ITransportPtr transport = m_device->ProcessingChain->Transport;
 	m_context = &transport->Context;
 
@@ -160,54 +159,46 @@ void Looper::Run()
 	m_device->Start();
 
 	// activate processing
-	m_transportControl->IsActive = true;
+	m_controller->IsActive = true;
 
-	while (transportStatus != TransportCode::Stop)
+	while (controllerCommand != ControllerCode::Stop)
 	{
 		// check for control input (MIDI)
-		bool hasControl = m_transportControl->GetNext(m_delay, transportStatus);
+		bool hasControl = m_controller->GetNext(m_delay, controllerCommand);
 
 		if (hasControl)
 		{
-			if (previousStatus != transportStatus)
+			switch (controllerCommand)
 			{
-				OnTransportStatusChanged(previousStatus, transportStatus);
-				previousStatus = transportStatus;
-			}
-
-			switch (transportStatus)
-			{
-			case TransportCode::Record:
+			case ControllerCode::Record:
 				if (!m_context->IsLooping)
 				{
 					ToggleRecording(transport);
 				}
 				else
 				{
-					isRecordPressed = !isRecordPressed;
+					m_recordingStatus = (m_recordingStatus == RecordingStatusType::Off) ? RecordingStatusType::Armed : RecordingStatusType::Off;
+					OnRecordingStatusChanged();
 				}
 				break;
-			case TransportCode::Locate:
+			case ControllerCode::Locate:
 				OnLoopRestart();
 
 				// Triggered by master loop wrap: delayed handling of 'Record' commands
-				if (isRecordPressed)
+				if (m_recordingStatus == RecordingStatusType::Armed)
 				{
-					isRecordPressed = false;
 					ToggleRecording(transport);
 				}
 				break;
-			case TransportCode::Start:
-			{
+			case ControllerCode::Run:
 				// Drop current recording, stop recording, continue looping
 				if (m_recorder->IsActive)
 				{
 					DropRecording(true);
 				}
-			}
-			break;
+				break;
 
-			case TransportCode::Stop:
+			case ControllerCode::Stop:
 				// Drop current recording, stop recording, exit looping
 				transport->Stop();
 				if (m_recorder->IsActive)
@@ -223,7 +214,7 @@ void Looper::Run()
 	}
 	m_context = nullptr;
 	m_device->ProcessingChain->InitShutDown();
-	m_transportControl->IsActive = false;
+	m_controller->IsActive = false;
 	m_device->Stop();
 }
 
@@ -234,21 +225,29 @@ bool Looper::ToggleRecording(ITransportPtr& transport)
 	if (!m_recorder->IsActive)
 	{
 		m_recorder->IsActive = true;
-		m_sessionRecorder->IsActive = m_isSessionRecording;
+
+		if (m_isSessionRecording)
+		{
+			m_sessionRecorder->IsActive = true;
+			OnIsSessionRecordingChanged();
+		}
+		m_recordingStatus = RecordingStatusType::Recording;
 
 		if (!m_context->IsLooping)
 		{
-			transport->Start();
+			transport->Run();
 		}
 	}
 	else
 	{
 		int switchSamplePos = m_context->SamplePosition;
-	
-		m_sessionRecorder->IsActive = false;
+
+		m_recordingStatus = RecordingStatusType::Off;
 
 		if (AddLoop())
 		{
+			ProcessingContext& context = transport->Context;
+
 			if (m_context->IsLooping)
 			{
 				// TODO: Add threshold to prevent unintentional resize? Does resize work at all?
@@ -261,11 +260,11 @@ bool Looper::ToggleRecording(ITransportPtr& transport)
 			{
 				m_context->LoopEndSample = switchSamplePos;
 				m_context->IsLooping = true;
+				OnIsLoopingChanged();
 			}
 		}
 	}
-	OnSessionRecordingChanged();
-	OnLoopRecordingChanged();
+	OnRecordingStatusChanged();
 
 	return m_recorder->IsActive;
 }
@@ -290,10 +289,14 @@ bool Looper::AddLoop()
 
 bool Looper::DropRecording(bool continueRecording)
 {
+	// TODO: different handling required for:
+	// - dropping initial recording: isLooping = false, recording Off or Recording depending on continueRecording
+	// - dropping subsequent recording: recording Off or Armed depending on continueRecording
 	if (m_recorder->IsActive)
 	{
 		m_recorder->DropRecording(continueRecording);
 		OnDropRecording(continueRecording);
+		OnRecordingStatusChanged();
 
 		return true;
 	}
@@ -331,14 +334,6 @@ void Looper::OnHeartbeat(ITransportPtr& transport)
 	}
 }
 
-void Looper::OnTransportStatusChanged(TransportCode previous, TransportCode current)
-{
-	if (m_events != nullptr)
-	{
-		m_events->TransportStatusChanged(*this, previous, current);
-	}
-}
-
 void Looper::OnLoopRestart()
 {
 	if (m_events != nullptr)
@@ -347,11 +342,11 @@ void Looper::OnLoopRestart()
 	}
 }
 
-void Looper::OnLoopRecordingChanged()
+void Looper::OnIsLoopingChanged()
 {
 	if (m_events != nullptr)
 	{
-		m_events->LoopRecordingChanged(*this, m_recorder->IsActive);
+		m_events->IsLoopingChanged(*this, m_context->IsLooping);
 	}
 }
 
@@ -371,11 +366,19 @@ void Looper::OnDropRecording(bool continueRecording)
 	}
 }
 
-void Looper::OnSessionRecordingChanged()
+void Looper::OnIsSessionRecordingChanged()
 {
 	if (m_isSessionRecording && m_events != nullptr)
 	{
-		m_events->SessionRecordingChanged(*this, m_sessionRecorder->IsActive);
+		m_events->IsSessionRecordingChanged(*this, m_sessionRecorder->IsActive);
+	}
+}
+
+void Looper::OnRecordingStatusChanged()
+{
+	if (m_events != nullptr)
+	{
+		m_events->RecordingStatusChanged(*this, m_recordingStatus);
 	}
 }
 
@@ -389,9 +392,9 @@ int Looper::get_LoopCount() const
 	return m_joiner->SourceCount;
 }
 
-bool Looper::get_IsLoopRecording() const
+RecordingStatusType Looper::get_RecordingStatus() const
 {
-	return m_recorder->IsActive;
+	return m_recordingStatus;
 }
 
 bool Looper::get_IsSessionRecording() const
@@ -431,18 +434,32 @@ void Looper::put_LooperEvents(ILooperEventsPtr& value)
 	m_events = value;
 }
 
-void Looper::CreateTransportControl(unsigned int midiInput)
+IControllerPtr Looper::get_Controller()
+{
+	return m_controller;
+}
+
+void Looper::put_Controller(IControllerPtr& value)
+{
+	if (m_controller != nullptr && m_controller->IsActive)
+	{
+		throw std::runtime_error("Controller cannot be changed while looper is running.");
+	}
+	m_controller = value;
+}
+
+void Looper::CreateController(unsigned int midiInput)
 {
 	if (m_device == nullptr)
 	{
 		throw std::runtime_error("ASIO device must be created first.");
 	}
 
-	m_transportControl = FoundationObjectFactory::CreateMidiTransportControl(m_device->ProcessingChain->Transport, midiInput);
+	m_controller = FoundationObjectFactory::CreateMidiTransportControl(m_device->ProcessingChain->Transport, midiInput);
 
-	if (m_transportControl == nullptr)
+	if (m_controller == nullptr)
 	{
-		throw std::runtime_error("Initialization of TransportControl failed.");
+		throw std::runtime_error("Initialization of Controller failed.");
 	}
 }
 

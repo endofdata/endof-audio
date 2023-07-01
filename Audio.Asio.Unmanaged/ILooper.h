@@ -3,6 +3,7 @@
 #include <Audio.Asio.Unmanaged.h>
 #include <ISampleProcessor.h>
 #include <ILooperEvents.h>
+#include <IController.h>
 #include <comdef.h>
 
 namespace Audio
@@ -34,8 +35,8 @@ namespace Audio
 					int get_LoopCount() const = 0;
 					_declspec(property(get = get_LoopCount)) int LoopCount;
 
-					bool get_IsLoopRecording() const = 0;
-					_declspec(property(get = get_IsLoopRecording)) bool IsLoopRecording;
+					RecordingStatusType get_RecordingStatus() const = 0;
+					_declspec(property(get = get_RecordingStatus)) RecordingStatusType RecordingStatus;
 
 					bool get_IsSessionRecording() const = 0;
 					void put_IsSessionRecording(bool value) = 0;
@@ -48,6 +49,10 @@ namespace Audio
 					ILooperEventsPtr get_LooperEvents() = 0;
 					void put_LooperEvents(ILooperEventsPtr& value) = 0;
 					_declspec(property(get = get_LooperEvents, put = put_LooperEvents)) ILooperEventsPtr LooperEvents;
+
+					IControllerPtr get_Controller() = 0;
+					void put_Controller(IControllerPtr& value) = 0;
+					_declspec(property(get = get_Controller, put = put_Controller)) IControllerPtr Controller;
 				};
 
 				_AUDIO_ASIO_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ILooper, __uuidof(ILooper));

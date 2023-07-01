@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Audio.Asio.Unmanaged.h>
-#include <ITransportEvents.h>
+#include <IControllerEvents.h>
 #include <ITransport.h>
 #include <comdef.h>
 
@@ -14,19 +14,26 @@ namespace Audio
 		{
 			namespace Abstractions
 			{
+				enum class _AUDIO_ASIO_UNMANAGED_API RecordingStatusType
+				{
+					Off,
+					Armed,
+					Recording
+				};
+
 				__interface _AUDIO_ASIO_UNMANAGED_API  ILooper;
 
 				__interface _AUDIO_ASIO_UNMANAGED_API  _declspec(uuid("98bd51b8-8ab7-4a58-825b-70f77c447675")) ILooperEvents : public IUnknown
 				{
 					void Heartbeat(ILooper& looper, ITransportPtr& transport) = 0;
 
-					void TransportStatusChanged(ILooper& looper, TransportCode previous, TransportCode current) = 0;
+					void RecordingStatusChanged(ILooper& looper, RecordingStatusType recordingStatus) = 0;
 
 					void LoopRestart(ILooper& looper) = 0;
 
-					void LoopRecordingChanged(ILooper& looper, bool isLoopRecording) = 0;
+					void IsLoopingChanged(ILooper& looper, bool isLooping) = 0;
 
-					void SessionRecordingChanged(ILooper& looper, bool isSessionRecording) = 0;
+					void IsSessionRecordingChanged(ILooper& looper, bool isSessionRecording) = 0;
 
 					void AddLoop(ILooper& looper) = 0;
 
