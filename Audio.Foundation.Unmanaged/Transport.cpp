@@ -4,7 +4,7 @@
 using namespace Audio::Foundation::Unmanaged;
 
 
-Transport::Transport(IHostClockPtr& hostClock, ITransportEventsPtr& events, int sampleCount) :
+Transport::Transport(IHostClockPtr& hostClock, IControllerEventsPtr& events, int sampleCount) :
 	m_hostClock(hostClock),
 	m_context(sampleCount),
 	m_events(events),
@@ -32,17 +32,17 @@ void* Transport::GetInterface(REFIID iid)
 	return nullptr;
 }
 
-void Transport::Start()
+void Transport::Run()
 {
 	m_hostClock->Start();
 	m_context.SamplePosition = AudioTimeToSamplePosition(m_hostClock->CurrentTime);
-	m_events->Transport(TransportCode::Start);
+	m_events->ControllerCommand(ControllerCode::Run);
 }
 
 void Transport::Stop()
 {
 	m_hostClock->Stop();
-	m_events->Transport(TransportCode::Stop);
+	m_events->ControllerCommand(ControllerCode::Stop);
 }
 
 ProcessingContext& Transport::Pulse()
@@ -54,7 +54,7 @@ ProcessingContext& Transport::Pulse()
 		if (m_context.IsLoopStart)
 		{
 			m_hostClock->CurrentTime = LoopStartTime;
-			m_events->Transport(TransportCode::Locate);
+			m_events->ControllerCommand(ControllerCode::Locate);
 		}
 	}
 	return m_context;
@@ -100,7 +100,7 @@ IHostClockPtr& Transport::get_HostClock()
 	return m_hostClock;
 }
 
-ITransportEventsPtr& Transport::get_Events()
+IControllerEventsPtr& Transport::get_Events()
 {
 	return m_events;
 }

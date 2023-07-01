@@ -42,6 +42,9 @@ namespace Audio
 				void put_LoopEndSample(int value);
 				_declspec(property(get = get_LoopEndSample, put = put_LoopEndSample)) int LoopEndSample;
 
+				float get_LoopPositionPct();
+				_declspec(property(get = get_LoopPositionPct)) float LoopPositionPct;
+
 			private:
 				int m_samplePosition;
 				bool m_isLoopStart;

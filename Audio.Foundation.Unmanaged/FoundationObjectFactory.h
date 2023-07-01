@@ -18,7 +18,7 @@
 #include <IOscillator.h>
 #include <IRecorder.h>
 #include <ITransport.h>
-#include <ITransportControl.h>
+#include <IController.h>
 #include <ISpatial.h>
 #include <string>
 
@@ -67,7 +67,7 @@ namespace Audio
 
 				static ITransportPtr CreateTransport(IHostClockPtr& hostClock, int sampleCount);
 
-				static ITransportControlPtr CreateMidiTransportControl(ITransportPtr& transport, int midiDevId);
+				static IControllerPtr CreateMidiTransportControl(ITransportPtr& transport, int midiDevId);
 
 				static ITakeSequencePtr CreateTakeSequence(ITransportPtr& transport);
 

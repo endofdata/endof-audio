@@ -28,7 +28,7 @@
 #include "MidiInput.h"
 #include "MidiEvents.h"
 #include "Transport.h"
-#include "TransportEvents.h"
+#include "ControllerEvents.h"
 #include "MidiTransportControl.h"
 #include "GainProcessor.h"
 #include "Oscillator.h"
@@ -128,11 +128,11 @@ IHostClockPtr FoundationObjectFactory::CreateHostClock(double sampleRate)
 
 ITransportPtr FoundationObjectFactory::CreateTransport(IHostClockPtr& hostClock, int sampleCount)
 {
-	ITransportEventsPtr events = new TransportEvents();
+	IControllerEventsPtr events = new ControllerEvents();
 	return new Transport(hostClock, events, sampleCount);
 }
 
-ITransportControlPtr FoundationObjectFactory::CreateMidiTransportControl(ITransportPtr& transport, int midiDevId)
+IControllerPtr FoundationObjectFactory::CreateMidiTransportControl(ITransportPtr& transport, int midiDevId)
 {
 	if (midiDevId >= 0)
 	{
@@ -140,7 +140,7 @@ ITransportControlPtr FoundationObjectFactory::CreateMidiTransportControl(ITransp
 
 		if (midiInput->Open(midiDevId))
 		{
-			return ITransportControlPtr(new MidiTransportControl(midiInput, transport));
+			return IControllerPtr(new MidiTransportControl(midiInput, transport));
 		}
 	}
 	return nullptr;

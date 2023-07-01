@@ -16,10 +16,10 @@ namespace Audio
 			class Transport : public ITransport
 			{
 			public:
-				Transport(IHostClockPtr& hostClock, ITransportEventsPtr& events, int sampleCount);
+				Transport(IHostClockPtr& hostClock, IControllerEventsPtr& events, int sampleCount);
 				virtual ~Transport();
 
-				void Start();
+				void Run();
 				void Stop();
 
 				ProcessingContext& Pulse();
@@ -37,7 +37,7 @@ namespace Audio
 
 				IHostClockPtr& get_HostClock();
 
-				ITransportEventsPtr& get_Events();
+				IControllerEventsPtr& get_Events();
 
 				int AudioTimeToSamplePosition(const AudioTime& value) const;
 				AudioTime SamplePositionToAudioTime(int value) const;
@@ -46,7 +46,7 @@ namespace Audio
 
 			private:
 				IHostClockPtr m_hostClock;
-				ITransportEventsPtr m_events;
+				IControllerEventsPtr m_events;
 				ProcessingContext m_context;
 			};
 		}

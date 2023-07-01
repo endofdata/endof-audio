@@ -111,3 +111,14 @@ void ProcessingContext::put_LoopEndSample(int value)
 	}
 	SamplePosition = m_samplePosition;
 }
+
+float ProcessingContext::get_LoopPositionPct()
+{
+	float sampleCount = m_loopEndSample - m_loopStartSample;
+
+	if (sampleCount <= 0)
+	{
+		return 0.0f;
+	}
+	return (m_samplePosition - m_loopStartSample) / sampleCount;
+}

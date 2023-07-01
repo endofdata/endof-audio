@@ -4,7 +4,7 @@
 #include <AudioTime.h>
 #include <comdef.h>
 #include <IHostClock.h>
-#include <ITransportEvents.h>
+#include <IControllerEvents.h>
 #include <ProcessingContext.h>
 
 using namespace Audio::Foundation::Unmanaged;
@@ -23,7 +23,7 @@ namespace Audio
 				/// </summary>
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("de08d184-41e0-4d70-ac8a-5f8a3228fa4b")) ITransport : public IUnknown
 				{
-					void Start() = 0;
+					void Run() = 0;
 					void Stop() = 0;
 
 					ProcessingContext& Pulse() = 0;
@@ -46,8 +46,8 @@ namespace Audio
 					IHostClockPtr& get_HostClock() = 0;
 					_declspec(property(get = get_HostClock)) IHostClockPtr HostClock;
 
-					ITransportEventsPtr& get_Events() = 0;
-					_declspec(property(get = get_Events)) ITransportEventsPtr& Events;
+					IControllerEventsPtr& get_Events() = 0;
+					_declspec(property(get = get_Events)) IControllerEventsPtr& Events;
 
 					int AudioTimeToSamplePosition(const AudioTime& value) const = 0;
 					AudioTime SamplePositionToAudioTime(int value) const = 0;

@@ -1,7 +1,7 @@
 #pragma once
 #include <IMidiInput.h>
 #include <ITransport.h>
-#include <ITransportControl.h>
+#include <IController.h>
 #include <memory>
 #include "UnknownBase.h"
 
@@ -13,7 +13,7 @@ namespace Audio
 	{
 		namespace Unmanaged
 		{
-			class MidiTransportControl : public ITransportControl
+			class MidiTransportControl : public IController
 			{
 			public:
 
@@ -24,18 +24,18 @@ namespace Audio
 				void put_IsActive(bool value);
 				_declspec(property(get = get_IsActive, put = put_IsActive)) bool IsActive;
 
-				bool GetNext(unsigned int timeout, TransportCode& code);
+				bool GetNext(unsigned int timeout, ControllerCode& code);
 
 				DECLARE_IUNKNOWN
 
 			private:
 				static void OnData(void* pContext, const MidiMessage& msg, unsigned int timeStamp);
-				static void OnTransport(void* pContext, TransportCode code);
+				static void OnCommand(void* pContext, ControllerCode code);
 
 				IMidiInputPtr m_input;
 				ITransportPtr m_transport;
 				HANDLE m_eventHandle;
-				TransportCode m_code;
+				ControllerCode m_code;
 				bool m_isActive;
 			};
 		}

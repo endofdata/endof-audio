@@ -186,10 +186,10 @@
     <ClInclude Include="Transport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ITransportEvents.h">
+    <ClInclude Include="IControllerEvents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TransportEvents.h">
+    <ClInclude Include="ControllerEvents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ProcessingContext.h">
@@ -219,7 +219,7 @@
     <ClInclude Include="MidiTransportControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ITransportControl.h">
+    <ClInclude Include="IController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IOscillator.h">
@@ -311,7 +311,7 @@
     <ClCompile Include="Transport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TransportEvents.cpp">
+    <ClCompile Include="ControllerEvents.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ProcessingContext.cpp">
