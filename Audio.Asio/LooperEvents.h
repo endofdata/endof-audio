@@ -20,13 +20,13 @@ namespace Audio
 
 				void Heartbeat(ILooper& looper, ITransportPtr& transport);
 
-				void TransportStatusChanged(ILooper& looper, TransportCode previous, TransportCode current);
+				void RecordingStatusChanged(ILooper& looper, RecordingStatusType recordingStatus);
 
 				void LoopRestart(ILooper& looper);
 
-				void LoopRecordingChanged(ILooper& looper, bool isLoopRecording);
+				void IsLoopingChanged(ILooper& looper, bool isLooping);
 
-				void SessionRecordingChanged(ILooper& looper, bool isSessionRecording);
+				void IsSessionRecordingChanged(ILooper& looper, bool isSessionRecording);
 
 				void AddLoop(ILooper& looper);
 

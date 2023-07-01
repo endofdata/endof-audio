@@ -9,18 +9,23 @@ namespace Audio
 	{
 		namespace Interop
 		{
+			public enum class RecordingMode
+			{
+				Off,
+				Armed,
+				Recording
+			};
+
 			public ref class Looper sealed : public System::ComponentModel::INotifyPropertyChanged
 			{
 			public:
 				static initonly System::String^ IsLoopingProperty = gcnew System::String("IsLooping");
-				static initonly System::String^ IsLoopRecordingProperty = gcnew System::String("IsLoopRecording");
+				static initonly System::String^ RecordingStatusProperty = gcnew System::String("RecordingStatus");
 				static initonly System::String^ IsSessionRecordingProperty = gcnew System::String("IsSessionRecording");
 				static initonly System::String^ LoopCountProperty = gcnew System::String("LoopCount");
 				static initonly System::String^ LoopLengthProperty = gcnew System::String("LoopLength");
 				static initonly System::String^ LoopPositionProperty = gcnew System::String("LoopPosition");
 				static initonly System::String^ NameProperty = gcnew System::String("Name");
-				static initonly System::String^ TransportStatusProperty = gcnew System::String("TransportStatus");
-				static initonly System::String^ PreviousTransportStatusProperty = gcnew System::String("PreviousTransportStatus");
 
 				virtual event System::ComponentModel::PropertyChangedEventHandler^ PropertyChanged
 				{
@@ -66,56 +71,32 @@ namespace Audio
 				property bool IsLooping
 				{
 					bool get();
-				internal:
-					void set(bool value);
+				}
+
+				property RecordingMode RecordingStatus
+				{
+					RecordingMode get();
 				}
 
 				property float LoopPosition
 				{
 					float get();
-				internal:
-					void set(float value);
 				}
 
 				property int LoopLength
 				{
 					int get();
-				internal:
-					void set(int value);
 				}
 
 				property int LoopCount
 				{
 					int get();
-				internal:
-					void set(int value);
-				}
-
-				property bool IsLoopRecording
-				{
-					bool get();
-				internal:
-					void set(bool value);
 				}
 
 				property bool IsSessionRecording
 				{
 					bool get();
 					void set(bool value);
-				}
-
-				property TransportCode TransportStatus
-				{
-					TransportCode get();
-				internal:
-					void set(TransportCode value);
-				}
-
-				property TransportCode PreviousTransportStatus
-				{
-					TransportCode get();
-				internal:
-					void set(TransportCode value);
 				}
 
 				property System::String^ Name
@@ -127,7 +108,7 @@ namespace Audio
 			internal:
 				Looper(Audio::Asio::Unmanaged::Abstractions::ILooper* inner);
 
-				void OnTransportStatusChanged(TransportCode previous, TransportCode current);
+				void OnRecordingStatusChanged(RecordingMode value);
 				void OnLoopRestart();
 
 			private:
@@ -137,8 +118,6 @@ namespace Audio
 				Audio::Asio::Unmanaged::Abstractions::ILooper* _unmanaged;
 				float _loopPosition;
 				int _loopLength;
-				TransportCode _previousTransportStatus;
-				TransportCode _transportStatus;
 			};
 		}
 	}

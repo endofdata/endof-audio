@@ -101,23 +101,9 @@ bool Looper::IsLooping::get()
 	return _unmanaged->IsLooping;
 }
 
-void Looper::IsLooping::set(bool value)
-{
-	OnPropertyChanged(IsLoopingProperty);
-}
-
 float Looper::LoopPosition::get()
 {
 	return _loopPosition;
-}
-
-void Looper::LoopPosition::set(float value)
-{
-	if (value != _loopPosition)
-	{
-		_loopPosition = value;
-		OnPropertyChanged(LoopPositionProperty);
-	}
 }
 
 int Looper::LoopLength::get()
@@ -125,33 +111,24 @@ int Looper::LoopLength::get()
 	return _loopLength;
 }
 
-void Looper::LoopLength::set(int value)
-{
-	if (value != _loopLength)
-	{
-		_loopLength = value;
-		OnPropertyChanged(LoopLengthProperty);
-	}
-}
-
 int Looper::LoopCount::get()
 {
 	return _unmanaged->LoopCount;
 }
 
-void Looper::LoopCount::set(int value)
+RecordingMode Looper::RecordingStatus::get()
 {
-	OnPropertyChanged(LoopCountProperty);
-}
-
-bool Looper::IsLoopRecording::get()
-{
-	return _unmanaged->IsLoopRecording;
-}
-
-void Looper::IsLoopRecording::set(bool value)
-{
-	OnPropertyChanged(IsLoopRecordingProperty);
+	switch (_unmanaged->RecordingStatus)
+	{
+	case RecordingStatusType::Off:
+		return RecordingMode::Off;
+	case RecordingStatusType::Armed:
+		return RecordingMode::Armed;
+	case RecordingStatusType::Recording:
+		return RecordingMode::Recording;
+	default:
+		throw gcnew NotImplementedException("Unknown RecordingStatusType.");
+	}
 }
 
 bool Looper::IsSessionRecording::get()
@@ -187,51 +164,15 @@ void Looper::Name::set(String^ value)
 	OnPropertyChanged(NameProperty);
 }
 
-TransportCode Looper::TransportStatus::get()
-{
-	return _transportStatus;
-}
-
-void Looper::TransportStatus::set(TransportCode value)
-{
-	if (_transportStatus != value)
-	{
-		if (_transportStatus != _previousTransportStatus)
-		{
-			PreviousTransportStatus = _transportStatus;
-		}
-		_transportStatus = value;
-		OnPropertyChanged(TransportStatusProperty);
-	}
-}
-
-TransportCode Looper::PreviousTransportStatus::get()
-{
-	return _previousTransportStatus;
-}
-
-void Looper::PreviousTransportStatus::set(TransportCode value)
-{
-	if (value != _previousTransportStatus)
-	{
-		OnPropertyChanged(PreviousTransportStatusProperty);
-	}
-}
-
 void Looper::OnPropertyChanged(System::String^ propertyName)
 {
 	PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(propertyName));
 }
 
 
-void Looper::OnTransportStatusChanged(TransportCode previous, TransportCode current)
+void Looper::OnRecordingStatusChanged(RecordingMode recordingMode)
 {
-	if (previous != _transportStatus)
-	{
-		TransportStatus = previous;
-	}
-	TransportStatus = current;
-
+	OnPropertyChanged(RecordingStatusProperty);
 }
 
 void Looper::OnLoopRestart()

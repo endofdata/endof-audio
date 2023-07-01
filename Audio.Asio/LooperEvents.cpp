@@ -31,40 +31,29 @@ void* LooperEvents::GetInterface(REFIID iid)
 
 void LooperEvents::Heartbeat(ILooper& looper, ITransportPtr& transport)
 {
-	ProcessingContext& context = transport->Context;
 
-	int loopSamples = context.LoopEndSample - context.LoopStartSample;
-
-	m_looper->LoopLength = loopSamples;
-	m_looper->LoopPosition = loopSamples != 0 ? ((float)context.SamplePosition / (float)loopSamples) : 0.0f;
 }
 
-void LooperEvents::TransportStatusChanged(ILooper& looper, TransportCode previous, TransportCode current)
+void LooperEvents::RecordingStatusChanged(ILooper& looper, RecordingStatusType recordingStatus)
 {
-	m_looper->OnTransportStatusChanged(previous, current);
 }
 
 void LooperEvents::LoopRestart(ILooper& looper)
 {
-	m_looper->OnLoopRestart();
 }
 
-void LooperEvents::LoopRecordingChanged(ILooper& looper, bool isLoopRecording)
+void LooperEvents::IsLoopingChanged(ILooper& looper, bool isLooping)
 {
-	m_looper->IsLoopRecording = isLoopRecording;
 }
 
-void LooperEvents::SessionRecordingChanged(ILooper& looper, bool isSessionRecording)
+void LooperEvents::IsSessionRecordingChanged(ILooper& looper, bool isSessionRecording)
 {
-	m_looper->IsSessionRecording = isSessionRecording;
 }
 
 void LooperEvents::AddLoop(ILooper& looper)
 {
-	m_looper->LoopCount += 1;
 }
 
 void LooperEvents::DropRecording(ILooper& looper, bool continueRecording)
 {
-	m_looper->LoopCount -= 1;
 }
