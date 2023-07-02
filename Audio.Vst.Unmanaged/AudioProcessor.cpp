@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "AudioProcessor.h"
 #include <ipluginbase.h>
+#include <stdexcept>
 
 using namespace Audio::Vst::Unmanaged;
 using namespace Steinberg::Vst;
@@ -86,6 +87,11 @@ void AudioProcessor::Initialize(int sampleCount, int sampleRate)
 
 	bool acceptBusArrangment = ConfigureBusArrangements();
 
+	if (!acceptBusArrangment)
+	{
+		throw std::runtime_error("Failed to configure bus arrangement of AudioProcessor.");
+	}
+
 	InitProcessData(sampleCount, sampleRate);
 
 	ProcessSetup defaultSetup
@@ -93,7 +99,7 @@ void AudioProcessor::Initialize(int sampleCount, int sampleRate)
 		kRealtime,
 		m_canProcess64Bit ? kSample64 : kSample32,
 		sampleCount,
-		sampleRate
+		static_cast<SampleRate>(sampleRate)
 	};
 
 	m_processor->setupProcessing(defaultSetup);
