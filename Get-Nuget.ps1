@@ -4,26 +4,28 @@ Param(
 	[Parameter(Mandatory=$False)][Switch] $NoBuild = $False
 )
 
-Function Pack-Project {
+$ErrorActionPreference = 'Stop'
+
+Function Get-Package {
 	Param(
 		[Parameter(Mandatory=$True)][String] $ProjectName,
 		[Parameter(Mandatory=$False)][Switch] $NoBuild
 	)
 	Write-Verbose "Packing project '$ProjectName'"
 	If(!$NoBuild) {
-		& msbuild -property:configuration=$Configuration -property:Platform=x64 ".\${ProjectName}\${ProjectName}.vcxproj"
+		& msbuild -property:configuration=$Configuration -property:Platform=x64 -property:SolutionDir="$PSScriptRoot\"  ".\${ProjectName}\${ProjectName}.vcxproj"
 	}
-	& nuget pack ".\${ProjectName}\${ProjectName}.nuspec" -OutputDirectory ".\${ProjectName}\bin\${Configuration}" -BasePath ".\${ProjectName}" -Properties configuration=$Configuration
+	& nuget pack ".\${ProjectName}\${ProjectName}.nuspec" -OutputDirectory ".\${ProjectName}\bin\${Configuration}" -BasePath ".\${ProjectName}" -Properties "Configuration=$Configuration;Platform=x64"
 	Copy-Item ".\${ProjectName}\bin\${Configuration}\*.nupkg" '..\NugetPackages'
 }
 Push-Location
 
 Try {
-	Pack-Project 'Audio.Foundation.Unmanaged' -NoBuild:$NoBuild
-	Pack-Project 'Audio.Foundation' -NoBuild:$NoBuild
-	Pack-Project 'Audio.Vst.Unmanaged' -NoBuild:$NoBuild
-	Pack-Project 'Audio.Asio.Unmanaged' -NoBuild:$NoBuild
-	Pack-Project 'Audio.Asio' -NoBuild:$NoBuild
+	Get-Package 'Audio.Foundation.Unmanaged' -NoBuild:$NoBuild
+	Get-Package 'Audio.Foundation' -NoBuild:$NoBuild
+	Get-Package 'Audio.Vst.Unmanaged' -NoBuild:$NoBuild
+	Get-Package 'Audio.Asio.Unmanaged' -NoBuild:$NoBuild
+	Get-Package 'Audio.Asio' -NoBuild:$NoBuild
 }
 Finally {
 	Pop-Location
