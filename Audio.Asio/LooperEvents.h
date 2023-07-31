@@ -1,7 +1,6 @@
 #pragma once
 #include <ILooperEvents.h>
 #include <UnknownBase.h>
-#include "Looper.h"
 
 using namespace Audio::Asio::Unmanaged;
 using namespace Audio::Asio::Unmanaged::Abstractions;
@@ -12,6 +11,8 @@ namespace Audio
 	{
 		namespace Interop
 		{
+			ref class Looper;
+
 			class LooperEvents : public ILooperEvents
 			{
 			public:
@@ -30,7 +31,7 @@ namespace Audio
 
 				void AddLoop(ILooper& looper);
 
-				void DropRecording(ILooper& looper, bool continueRecording);
+				void DropRecording(ILooper& looper);
 
 				DECLARE_IUNKNOWN
 

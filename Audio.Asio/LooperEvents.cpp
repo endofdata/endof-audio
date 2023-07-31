@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "LooperEvents.h"
+#include "Looper.h"
 
 using namespace Audio::Asio::Interop;
 
@@ -31,29 +32,35 @@ void* LooperEvents::GetInterface(REFIID iid)
 
 void LooperEvents::Heartbeat(ILooper& looper, ITransportPtr& transport)
 {
-
+	m_looper->OnPropertyChanged(Looper::LoopPositionProperty);
 }
 
 void LooperEvents::RecordingStatusChanged(ILooper& looper, RecordingStatusType recordingStatus)
 {
+	m_looper->OnPropertyChanged(Looper::RecordingStatusProperty);
 }
 
 void LooperEvents::LoopRestart(ILooper& looper)
 {
+	m_looper->OnPropertyChanged(Looper::LoopPositionProperty);
 }
 
 void LooperEvents::IsLoopingChanged(ILooper& looper, bool isLooping)
 {
+	m_looper->OnPropertyChanged(Looper::IsLoopingProperty);
 }
 
 void LooperEvents::IsSessionRecordingChanged(ILooper& looper, bool isSessionRecording)
 {
+	m_looper->OnPropertyChanged(Looper::IsSessionRecordingProperty);
 }
 
 void LooperEvents::AddLoop(ILooper& looper)
 {
+	m_looper->OnPropertyChanged(Looper::LoopCountProperty);
 }
 
-void LooperEvents::DropRecording(ILooper& looper, bool continueRecording)
+void LooperEvents::DropRecording(ILooper& looper)
 {
+	m_looper->OnPropertyChanged(Looper::LoopCountProperty);
 }

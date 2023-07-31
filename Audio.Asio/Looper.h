@@ -2,6 +2,7 @@
 
 #include "LooperConfig.h"
 #include <ILooper.h>
+#include "LooperEvents.h"
 
 namespace Audio
 {
@@ -13,7 +14,8 @@ namespace Audio
 			{
 				Off,
 				Armed,
-				Recording
+				Recording,
+				Unarmed
 			};
 
 			public ref class Looper sealed : public System::ComponentModel::INotifyPropertyChanged
@@ -34,12 +36,12 @@ namespace Audio
 						m_propertyChangedEventHandler = static_cast<System::ComponentModel::PropertyChangedEventHandler^>(System::Delegate::Combine(m_propertyChangedEventHandler, value));
 					}
 
-						void remove(System::ComponentModel::PropertyChangedEventHandler^ value) sealed = INotifyPropertyChanged::PropertyChanged::remove
+					void remove(System::ComponentModel::PropertyChangedEventHandler^ value) sealed = INotifyPropertyChanged::PropertyChanged::remove
 					{
 						m_propertyChangedEventHandler = static_cast<System::ComponentModel::PropertyChangedEventHandler^>(System::Delegate::Remove(m_propertyChangedEventHandler, value));
 					}
 
-						void raise(System::Object^ sender, System::ComponentModel::PropertyChangedEventArgs^ e)
+					void raise(System::Object^ sender, System::ComponentModel::PropertyChangedEventArgs^ e)
 					{
 						System::ComponentModel::PropertyChangedEventHandler^ handler = m_propertyChangedEventHandler;
 
@@ -68,11 +70,6 @@ namespace Audio
 				//int InsertFx(ISampleProcessorPtr effect);
 				//bool RemoveFx(int id);
 
-				property bool IsLooping
-				{
-					bool get();
-				}
-
 				property RecordingMode RecordingStatus
 				{
 					RecordingMode get();
@@ -93,6 +90,11 @@ namespace Audio
 					int get();
 				}
 
+				property bool IsLooping
+				{
+					bool get();
+				}
+
 				property bool IsSessionRecording
 				{
 					bool get();
@@ -108,14 +110,13 @@ namespace Audio
 			internal:
 				Looper(Audio::Asio::Unmanaged::Abstractions::ILooper* inner);
 
-				void OnRecordingStatusChanged(RecordingMode value);
-				void OnLoopRestart();
+				void OnPropertyChanged(System::String^ propertyName);
 
 			private:
-				void OnPropertyChanged(System::String^ propertyName);
 
 				System::ComponentModel::PropertyChangedEventHandler^ m_propertyChangedEventHandler;
 				Audio::Asio::Unmanaged::Abstractions::ILooper* _unmanaged;
+				LooperEvents* _events;
 				float _loopPosition;
 				int _loopLength;
 			};

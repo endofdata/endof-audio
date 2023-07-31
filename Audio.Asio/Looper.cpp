@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "GuidConversion.h"
 #include "Looper.h"
+#include "LooperEvents.h"
 #include <AsioObjectFactory.h>
 
 using namespace System;
@@ -45,11 +46,17 @@ Looper::Looper(ILooper* inner)
 		throw gcnew ArgumentNullException("inner");
 	}
 	inner->AddRef();
+
+	_events = new LooperEvents(this);
+	_events->AddRef();
+	inner->LooperEvents = ILooperEventsPtr(_events);
+
 	_unmanaged = inner;
 }
 
 Looper::~Looper()
 {
+	_events->Release();
 	_unmanaged->Release();
 }
 
@@ -126,6 +133,8 @@ RecordingMode Looper::RecordingStatus::get()
 		return RecordingMode::Armed;
 	case RecordingStatusType::Recording:
 		return RecordingMode::Recording;
+	case RecordingStatusType::Unarmed:
+		return RecordingMode::Unarmed;
 	default:
 		throw gcnew NotImplementedException("Unknown RecordingStatusType.");
 	}
@@ -167,14 +176,4 @@ void Looper::Name::set(String^ value)
 void Looper::OnPropertyChanged(System::String^ propertyName)
 {
 	PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(propertyName));
-}
-
-
-void Looper::OnRecordingStatusChanged(RecordingMode recordingMode)
-{
-	OnPropertyChanged(RecordingStatusProperty);
-}
-
-void Looper::OnLoopRestart()
-{
 }
