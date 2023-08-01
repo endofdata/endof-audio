@@ -23,6 +23,13 @@ namespace Lupus.Model
 			get;
 		}
 
+
+		public LooperStatus Status
+		{
+			get;
+		}
+
+
 		/// <summary>
 		/// Gets or sets the current output
 		/// </summary>
@@ -85,7 +92,15 @@ namespace Lupus.Model
 		/// <exception cref="ArgumentNullException">Thrown if <paramref name="looper"/> is <see langword="null"/></exception>
 		private MainModel(Looper looper)
 		{
-			Looper = looper;
+			Looper = looper ?? throw new ArgumentNullException(nameof(looper));
+			Status = new LooperStatus(looper);
+
+			Looper.PropertyChanged += Looper_PropertyChanged;
+		}
+
+		private void Looper_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+		{
+			
 		}
 
 		protected virtual void Dispose(bool disposing)

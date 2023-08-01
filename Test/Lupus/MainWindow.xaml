@@ -5,6 +5,7 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:Lupus"
 		xmlns:ctrl="clr-namespace:Lupus.Controls"
+		xmlns:conv="clr-namespace:Lupus.Converters"
         xmlns:synt="clr-namespace:SynthControls;assembly=SynthControls"
 		mc:Ignorable="d"
 		Height="450" Width="640"
@@ -12,7 +13,45 @@
 		WindowState="Maximized"
 		Loaded="Window_Loaded" Closing="Window_Closing">
     <Window.Resources>
-
+		<Style TargetType="{x:Type synt:PanDialControl}">
+			<Setter Property="KnobBrush" Value="{StaticResource Accent2}"/>
+			<Setter Property="ThumbStroke" Value="{StaticResource Foreground}"/>
+		</Style>
+		<conv:IsTransitiveConverter x:Key="IsTransitive"/>
+		<Style TargetType="{x:Type Ellipse}" x:Key="StatusLight">
+			<Style.Triggers>
+				<DataTrigger Binding="{Binding RecordingStatus,Mode=OneWay,Converter={StaticResource IsTransitive}}" Value="True">
+					<DataTrigger.EnterActions>
+						<BeginStoryboard Name="Flash">
+							<BeginStoryboard.Storyboard>
+								<Storyboard>
+									<DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" AutoReverse="True" Duration="0:0:0.5" RepeatBehavior="Forever" />
+								</Storyboard>
+							</BeginStoryboard.Storyboard>
+						</BeginStoryboard>
+					</DataTrigger.EnterActions>
+					<DataTrigger.ExitActions>
+						<StopStoryboard BeginStoryboardName="Flash"/>
+					</DataTrigger.ExitActions>
+				</DataTrigger>
+				<DataTrigger Binding="{Binding RecordingStatus}" Value="Unarmed">
+					<Setter Property="Fill" Value="{StaticResource Foreground}"/>
+				</DataTrigger>
+				<DataTrigger Binding="{Binding RecordingStatus}" Value="Armed">
+					<Setter Property="Fill" Value="{StaticResource Accent1}"/>
+				</DataTrigger>
+				<DataTrigger Binding="{Binding RecordingStatus}" Value="Recording">
+					<Setter Property="Fill" Value="{StaticResource Accent1}"/>
+				</DataTrigger>
+			</Style.Triggers>
+			<Setter Property="Fill" Value="{StaticResource Shadow2}"/>
+			<Setter Property="Stroke" Value="{StaticResource Shadow1}"/>
+			<Setter Property="ToolTip" Value="{Binding RecordingStatus}"/>
+			<Setter Property="StrokeThickness" Value="4"/>
+			<Setter Property="Margin" Value="4"/>
+			<Setter Property="Width" Value="28"/>
+			<Setter Property="Height" Value="28"/>
+		</Style>
     </Window.Resources>
 	<Border Style="{StaticResource Outermost}">
 		<Grid Margin="15">
@@ -26,40 +65,37 @@
 				<ColumnDefinition Width="Auto"/>
 				<ColumnDefinition Width="1*"/>
 			</Grid.ColumnDefinitions>
-			<StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
-                <Ellipse Fill="{StaticResource Accent1}"/>
+			<StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" DataContext="{Binding Looper}">
+                <Ellipse Style="{StaticResource StatusLight}"/>
 				<Border Grid.Row="2" Grid.Column="0">
 					<StackPanel Orientation="Vertical">
-						<TextBox Text="01:47,319"/>
+						<TextBox Text="{Binding LoopPosition, Mode=OneWay}" d:Text="03:19,124" Width="220"/>
 						<ProgressBar Value="45" Maximum="100"/>
 					</StackPanel>
 				</Border>
 			</StackPanel>
-			<TextBlock Grid.Row="0" Grid.Column="1" Text="Lupus" HorizontalAlignment="Right" Style="{StaticResource Logo}"/>
-			<ListView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+			<TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Text="Lupus" Style="{StaticResource Logo}"/>
+			<ListView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Status.Tracks}">
 				<ListView.ItemTemplate>
 					<DataTemplate>
 						<Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-							<TextBlock Grid.Row="0" Grid.Column="0" Text="Loop x" Foreground="{StaticResource Foreground}"/>
-                            <synt:PanDialControl Grid.Row="0" Grid.Column="1"/>
-                            <synt:GainDialControl Grid.Row="0" Grid.Column="2"/>
-                            <Button Grid.Row="0" Grid.Column="3" Content="S" Foreground="{StaticResource Foreground}"/>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*"/>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Name}" Foreground="{StaticResource Foreground}"/>
+							<synt:PanDialControl Grid.Row="0" Grid.Column="1" Value="{Binding Pan}"/>
+							<synt:GainDialControl Grid.Row="0" Grid.Column="2" Value="{Binding Gain}"/>
+							<Button Grid.Row="0" Grid.Column="3" Content="S" Foreground="{StaticResource Foreground}"/>
 							<Button Grid.Row="0" Grid.Column="4" Content="M" Foreground="{StaticResource Accent2}"/>
-                            <Button Grid.Row="0" Grid.Column="5" Content="X" Foreground="{StaticResource Accent1}"/>
-                        </Grid>
+							<Button Grid.Row="0" Grid.Column="5" Content="X" Foreground="{StaticResource Accent1}"/>
+						</Grid>
 					</DataTemplate>
 				</ListView.ItemTemplate>
-                <ListView.Items>
-                    <Rectangle/>
-                </ListView.Items>
 			</ListView>
 		</Grid>
 	</Border>

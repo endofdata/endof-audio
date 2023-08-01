@@ -4,6 +4,8 @@ using Lupus.Model;
 using System;
 using System.ComponentModel;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace Lupus
@@ -13,6 +15,9 @@ namespace Lupus
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		private Task? _looperTask;
+		private CancellationTokenSource _tokenSource = new();
+
 		internal MainModel? Model
 		{
 			get => (MainModel?)DataContext;
@@ -46,6 +51,10 @@ namespace Lupus
 					var outputChannels = new int[] { 0, 1 };
 
 					Model = MainModel.Create(selectedMidiInput, selectedDriver, inputChannels, outputChannels);
+
+					var looper = Model.Looper;
+
+					_looperTask = Task.Run(() => looper.Run(), _tokenSource.Token);
 				}
 				else
 				{
@@ -74,8 +83,13 @@ namespace Lupus
 
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
+			if (_looperTask != null)
+			{
+				_tokenSource.Cancel();
+				_looperTask.GetAwaiter().GetResult();
+			}
 			Model?.Dispose();
 			Model = null;
 		}
-	}
+    }
 }

@@ -2,7 +2,13 @@
   "profiles": {
     "Lupus": {
       "commandName": "Project",
-      "nativeDebugging": true
+      "environmentVariables": {
+        "COREHOST_TRACE": "1",
+        "COREHOST_TRACE_VERBOSITY": "4",
+        "COREHOST_TRACEFILE": ".\\corehost_trace.log"
+      },
+      "nativeDebugging": true,
+      "hotReloadEnabled": false
     }
   }
 }
