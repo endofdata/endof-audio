@@ -99,6 +99,7 @@
     <ClInclude Include="AudioSourceBase.h" />
     <ClInclude Include="AudioTakeBase.h" />
     <ClInclude Include="AudioTargetBase.h" />
+    <ClInclude Include="ManagedAudioTime.h" />
     <ClInclude Include="ExceptionExtensions.h" />
     <ClInclude Include="FileAudioTake.h" />
     <ClInclude Include="IAudioBuffer.h" />
@@ -131,6 +132,7 @@
     <ClCompile Include="FileAudioTake.cpp" />
     <ClCompile Include="FxChannel.cpp" />
     <ClCompile Include="Level.cpp" />
+    <ClCompile Include="ManagedAudioTime.cpp" />
     <ClCompile Include="MidiInputRegistry.cpp" />
     <ClCompile Include="ReadOnlyCollectionOfInt.cpp" />
     <ClCompile Include="RegisteredMidiInput.cpp" />
