@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "GuidConversion.h"
-#include "Looper.h"
+#include "ManagedLooper.h"
 #include "LooperEvents.h"
 #include <AsioObjectFactory.h>
 
@@ -9,9 +9,9 @@ using namespace System;
 using namespace Audio::Asio::Interop;
 using namespace Audio::Asio::Unmanaged;
 using namespace Audio::Asio::Unmanaged::Abstractions;
+using namespace Audio::Foundation::Interop;
 
-
-Looper^ Looper::Create(LooperConfig^ config)
+ManagedLooper^ ManagedLooper::Create(ManagedLooperConfig^ config)
 {
 	ILooperConfigPtr unmanagedConfig = AsioObjectFactory::CreateLooperConfiguration();
 
@@ -36,10 +36,10 @@ Looper^ Looper::Create(LooperConfig^ config)
 
 	ILooper* unmanagedLooper = AsioObjectFactory::CreateLooper(unmanagedConfig).Detach();
 
-	return gcnew Looper(unmanagedLooper);
+	return gcnew ManagedLooper(unmanagedLooper);
 }
 
-Looper::Looper(ILooper* inner)
+ManagedLooper::ManagedLooper(ILooper* inner)
 {
 	if (inner == nullptr)
 	{
@@ -54,37 +54,37 @@ Looper::Looper(ILooper* inner)
 	_unmanaged = inner;
 }
 
-Looper::~Looper()
+ManagedLooper::~ManagedLooper()
 {
 	_events->Release();
 	_unmanaged->Release();
 }
 
-bool Looper::SelectInput(int input, bool isSelected)
+bool ManagedLooper::SelectInput(int input, bool isSelected)
 {
 	return _unmanaged->SelectInput(input, isSelected);
 }
 
-bool Looper::SelectOutputPair(int left, int right, bool isSelected)
+bool ManagedLooper::SelectOutputPair(int left, int right, bool isSelected)
 {
 	int pair[] = { left, right };
 
 	return _unmanaged->SelectOutputPair(pair, isSelected);
 }
 
-void Looper::Run()
+void ManagedLooper::Run()
 {
 	_unmanaged->Run();
 }
 
-void Looper::SaveSession(String^ filenameBase)
+void ManagedLooper::SaveSession(String^ filenameBase)
 {
 	pin_ptr<const wchar_t> wchars = PtrToStringChars(filenameBase);
 
 	_unmanaged->SaveSession(wchars);
 }
 
-String^ Looper::AddVstPlugin(String^ vstLibrary)
+String^ ManagedLooper::AddVstPlugin(String^ vstLibrary)
 {
 	pin_ptr<const wchar_t> wchars = PtrToStringChars(vstLibrary);
 
@@ -93,7 +93,7 @@ String^ Looper::AddVstPlugin(String^ vstLibrary)
 	return gcnew String(pluginId);
 }
 
-int Looper::InsertFx(String^ pluginId)
+int ManagedLooper::InsertFx(String^ pluginId)
 {
 	pin_ptr<const wchar_t> wchars = PtrToStringChars(pluginId);
 
@@ -103,27 +103,38 @@ int Looper::InsertFx(String^ pluginId)
 //int InsertFx(ISampleProcessorPtr effect);
 //bool RemoveFx(int id);
 
-bool Looper::IsLooping::get()
+bool ManagedLooper::IsLooping::get()
 {
 	return _unmanaged->IsLooping;
 }
 
-float Looper::LoopPosition::get()
+float ManagedLooper::LoopPosition::get()
 {
 	return _loopPosition;
 }
 
-int Looper::LoopLength::get()
+int ManagedLooper::LoopLength::get()
 {
 	return _loopLength;
 }
 
-int Looper::LoopCount::get()
+int ManagedLooper::LoopCount::get()
 {
 	return _unmanaged->LoopCount;
 }
 
-RecordingMode Looper::RecordingStatus::get()
+ManagedAudioTime^ ManagedLooper::TransportPosition::get()
+{
+	return _transportPosition;
+}
+
+void ManagedLooper::TransportPosition::set(ManagedAudioTime^ value)
+{
+	_transportPosition = value;
+	OnPropertyChanged(TransportPositionProperty);
+}
+
+RecordingMode ManagedLooper::RecordingStatus::get()
 {
 	switch (_unmanaged->RecordingStatus)
 	{
@@ -140,12 +151,12 @@ RecordingMode Looper::RecordingStatus::get()
 	}
 }
 
-bool Looper::IsSessionRecording::get()
+bool ManagedLooper::IsSessionRecording::get()
 {
 	return _unmanaged->IsSessionRecording;
 }
 
-void Looper::IsSessionRecording::set(bool value)
+void ManagedLooper::IsSessionRecording::set(bool value)
 {
 	if (value != _unmanaged->IsSessionRecording)
 	{
@@ -154,12 +165,12 @@ void Looper::IsSessionRecording::set(bool value)
 	}
 }
 
-String^ Looper::Name::get()
+String^ ManagedLooper::Name::get()
 {
 	return gcnew String(_unmanaged->Name);
 }
 
-void Looper::Name::set(String^ value)
+void ManagedLooper::Name::set(String^ value)
 {
 	if (value != nullptr)
 	{
@@ -173,7 +184,7 @@ void Looper::Name::set(String^ value)
 	OnPropertyChanged(NameProperty);
 }
 
-void Looper::OnPropertyChanged(System::String^ propertyName)
+void ManagedLooper::OnPropertyChanged(System::String^ propertyName)
 {
 	PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(propertyName));
 }

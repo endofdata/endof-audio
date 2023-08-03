@@ -35,10 +35,10 @@
     <ClCompile Include="AsioRouter.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="LooperConfig.cpp">
+    <ClCompile Include="ManagedLooperConfig.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Looper.cpp">
+    <ClCompile Include="ManagedLooper.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="GuidConversion.cpp">
@@ -94,10 +94,10 @@
     <ClInclude Include="DriverRegistry.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="LooperConfig.h">
+    <ClInclude Include="ManagedLooperConfig.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Looper.h">
+    <ClInclude Include="ManagedLooper.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="GuidConversion.h">

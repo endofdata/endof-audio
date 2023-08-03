@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "LooperConfig.h"
+#include "ManagedLooperConfig.h"
 
 
 using namespace System;
@@ -8,23 +8,23 @@ using namespace System::Linq;
 using namespace Audio::Asio::Interop;
 
 
-LooperConfig::LooperConfig()
+ManagedLooperConfig::ManagedLooperConfig()
 {
 	_inputChannelList = gcnew List<int>();
 	_outputChannelList = gcnew List<int>();
 }
 
-IEnumerable<int>^ LooperConfig::InputChannelList::get()
+IEnumerable<int>^ ManagedLooperConfig::InputChannelList::get()
 {
 	return _inputChannelList;
 }
 
-IEnumerable<int>^ LooperConfig::OutputChannelList::get()
+IEnumerable<int>^ ManagedLooperConfig::OutputChannelList::get()
 {
 	return _outputChannelList;
 }
 
-void LooperConfig::AddInputChannelList(IEnumerable<int>^ selectedChannels)
+void ManagedLooperConfig::AddInputChannelList(IEnumerable<int>^ selectedChannels)
 {
 	if (selectedChannels == nullptr)
 	{
@@ -33,7 +33,7 @@ void LooperConfig::AddInputChannelList(IEnumerable<int>^ selectedChannels)
 	_inputChannelList->AddRange(Enumerable::Except(selectedChannels, _inputChannelList));
 }
 
-void LooperConfig::AddOutputChannelList(IEnumerable<int>^ selectedChannels)
+void ManagedLooperConfig::AddOutputChannelList(IEnumerable<int>^ selectedChannels)
 {
 	if (selectedChannels == nullptr)
 	{

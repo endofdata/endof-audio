@@ -6,10 +6,10 @@ namespace Audio
 	{
 		namespace Interop
 		{
-			public ref class LooperConfig sealed
+			public ref class ManagedLooperConfig sealed
 			{
 			public:
-				LooperConfig();
+				ManagedLooperConfig();
 
 				property System::String^ Name;
 

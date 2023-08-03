@@ -1,10 +1,11 @@
 #include "pch.h"
 #include "LooperEvents.h"
-#include "Looper.h"
+#include "ManagedLooper.h"
 
+using namespace Audio::Asio;
 using namespace Audio::Asio::Interop;
 
-LooperEvents::LooperEvents(Looper^ looper) :
+LooperEvents::LooperEvents(ManagedLooper^ looper) :
 	m_looper(looper),
 	m_refCount(0)
 {
@@ -32,35 +33,35 @@ void* LooperEvents::GetInterface(REFIID iid)
 
 void LooperEvents::Heartbeat(ILooper& looper, ITransportPtr& transport)
 {
-	m_looper->OnPropertyChanged(Looper::LoopPositionProperty);
+	m_looper->TransportPosition->Value = transport->TimePosition.Value;
 }
 
 void LooperEvents::RecordingStatusChanged(ILooper& looper, RecordingStatusType recordingStatus)
 {
-	m_looper->OnPropertyChanged(Looper::RecordingStatusProperty);
+	m_looper->OnPropertyChanged(ManagedLooper::RecordingStatusProperty);
 }
 
 void LooperEvents::LoopRestart(ILooper& looper)
 {
-	m_looper->OnPropertyChanged(Looper::LoopPositionProperty);
+	m_looper->OnPropertyChanged(ManagedLooper::LoopPositionProperty);
 }
 
 void LooperEvents::IsLoopingChanged(ILooper& looper, bool isLooping)
 {
-	m_looper->OnPropertyChanged(Looper::IsLoopingProperty);
+	m_looper->OnPropertyChanged(ManagedLooper::IsLoopingProperty);
 }
 
 void LooperEvents::IsSessionRecordingChanged(ILooper& looper, bool isSessionRecording)
 {
-	m_looper->OnPropertyChanged(Looper::IsSessionRecordingProperty);
+	m_looper->OnPropertyChanged(ManagedLooper::IsSessionRecordingProperty);
 }
 
 void LooperEvents::AddLoop(ILooper& looper)
 {
-	m_looper->OnPropertyChanged(Looper::LoopCountProperty);
+	m_looper->OnPropertyChanged(ManagedLooper::LoopCountProperty);
 }
 
 void LooperEvents::DropRecording(ILooper& looper)
 {
-	m_looper->OnPropertyChanged(Looper::LoopCountProperty);
+	m_looper->OnPropertyChanged(ManagedLooper::LoopCountProperty);
 }

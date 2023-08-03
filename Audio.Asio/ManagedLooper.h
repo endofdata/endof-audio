@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LooperConfig.h"
+#include "ManagedLooperConfig.h"
 #include <ILooper.h>
 #include "LooperEvents.h"
 
@@ -18,7 +18,7 @@ namespace Audio
 				Unarmed
 			};
 
-			public ref class Looper sealed : public System::ComponentModel::INotifyPropertyChanged
+			public ref class ManagedLooper sealed : public System::ComponentModel::INotifyPropertyChanged
 			{
 			public:
 				static initonly System::String^ IsLoopingProperty = gcnew System::String("IsLooping");
@@ -27,6 +27,7 @@ namespace Audio
 				static initonly System::String^ LoopCountProperty = gcnew System::String("LoopCount");
 				static initonly System::String^ LoopLengthProperty = gcnew System::String("LoopLength");
 				static initonly System::String^ LoopPositionProperty = gcnew System::String("LoopPosition");
+				static initonly System::String^ TransportPositionProperty = gcnew System::String("TransportPosition");
 				static initonly System::String^ NameProperty = gcnew System::String("Name");
 
 				virtual event System::ComponentModel::PropertyChangedEventHandler^ PropertyChanged
@@ -52,9 +53,9 @@ namespace Audio
 					}
 				}
 
-				static Looper^ Create(LooperConfig^ config);
+				static ManagedLooper^ Create(ManagedLooperConfig^ config);
 
-				~Looper();
+				~ManagedLooper();
 
 				bool SelectInput(int input, bool isSelected);
 				bool SelectOutputPair(int left, int right, bool isSelected);
@@ -107,8 +108,14 @@ namespace Audio
 					void set(System::String^ value);
 				}
 
+				property Audio::Foundation::Interop::ManagedAudioTime^ TransportPosition
+				{
+					Audio::Foundation::Interop::ManagedAudioTime^ get();
+					void set(Audio::Foundation::Interop::ManagedAudioTime^ value);
+				}
+
 			internal:
-				Looper(Audio::Asio::Unmanaged::Abstractions::ILooper* inner);
+				ManagedLooper(Audio::Asio::Unmanaged::Abstractions::ILooper* inner);
 
 				void OnPropertyChanged(System::String^ propertyName);
 
@@ -117,8 +124,9 @@ namespace Audio
 				System::ComponentModel::PropertyChangedEventHandler^ m_propertyChangedEventHandler;
 				Audio::Asio::Unmanaged::Abstractions::ILooper* _unmanaged;
 				LooperEvents* _events;
-				float _loopPosition;
 				int _loopLength;
+				float _loopPosition;
+				Audio::Foundation::Interop::ManagedAudioTime^ _transportPosition;
 			};
 		}
 	}
