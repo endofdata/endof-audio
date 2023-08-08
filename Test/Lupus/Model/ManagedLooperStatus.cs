@@ -1,22 +1,21 @@
 ﻿using Audio.Asio.Interop;
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 
 namespace Lupus.Model
 {
-	class LooperStatus : NotifyPropertyChangedBase
+	class ManagedLooperStatus : NotifyPropertyChangedBase
     {
-		private readonly Looper _looper;
+		private readonly ManagedLooper _looper;
 
         public TimeSpan Position => TimeSpan.FromMilliseconds(_looper.LoopPosition * _looper.LoopLength);
 
-		public ObservableCollection<LooperTrackStatus> Tracks
+		public ObservableCollection<ManagedLooperTrackStatus> Tracks
         {
             get;
-        } = new ObservableCollection<LooperTrackStatus>();
+        } = new ObservableCollection<ManagedLooperTrackStatus>();
 
-        public LooperStatus(Looper looper)
+        public ManagedLooperStatus(ManagedLooper looper)
         {
             _looper = looper ?? throw new ArgumentNullException(nameof(looper));
         }

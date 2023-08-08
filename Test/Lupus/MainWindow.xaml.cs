@@ -54,7 +54,7 @@ namespace Lupus
 
 					var looper = Model.Looper;
 
-					_looperTask = Task.Run(() => looper.Run(), _tokenSource.Token);
+					_looperTask = looper.RunAsync(_tokenSource.Token);
 				}
 				else
 				{

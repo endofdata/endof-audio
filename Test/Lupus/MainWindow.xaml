@@ -18,6 +18,7 @@
 			<Setter Property="ThumbStroke" Value="{StaticResource Foreground}"/>
 		</Style>
 		<conv:IsTransitiveConverter x:Key="IsTransitive"/>
+		<conv:TimeStringConverter x:Key="TimeString"/>
 		<Style TargetType="{x:Type Ellipse}" x:Key="StatusLight">
 			<Style.Triggers>
 				<DataTrigger Binding="{Binding RecordingStatus,Mode=OneWay,Converter={StaticResource IsTransitive}}" Value="True">
@@ -69,7 +70,7 @@
                 <Ellipse Style="{StaticResource StatusLight}"/>
 				<Border Grid.Row="2" Grid.Column="0">
 					<StackPanel Orientation="Vertical">
-						<TextBox Text="{Binding LoopPosition, Mode=OneWay}" d:Text="03:19,124" Width="220"/>
+						<TextBox Text="{Binding TransportPosition, Mode=OneWay, Converter={StaticResource TimeString}}" d:Text="03:19,124" Width="220"/>
 						<ProgressBar Value="45" Maximum="100"/>
 					</StackPanel>
 				</Border>

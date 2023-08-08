@@ -18,13 +18,13 @@ namespace Lupus.Model
 		/// <summary>
 		/// Gets the <see cref="Looper"/> instance
 		/// </summary>
-		public Looper Looper
+		public ManagedLooper Looper
 		{
 			get;
 		}
 
 
-		public LooperStatus Status
+		public ManagedLooperStatus Status
 		{
 			get;
 		}
@@ -64,7 +64,7 @@ namespace Lupus.Model
 				throw new ArgumentException("No output channels selected.");
 			}
 
-			var config = new LooperConfig
+			var config = new ManagedLooperConfig
 			{
 				// with SampleCount == 0 the looper will use the device's preferred buffer size
 				Name = "Lupus",
@@ -78,9 +78,9 @@ namespace Lupus.Model
 			return Create(config);
 		}
 
-		public static MainModel Create(LooperConfig config)
+		public static MainModel Create(ManagedLooperConfig config)
 		{
-			var looper = Looper.Create(config);
+			var looper = ManagedLooper.Create(config);
 
 			return new MainModel(looper);
 		}
@@ -90,17 +90,22 @@ namespace Lupus.Model
 		/// </summary>
 		/// <param name="looper">A <see cref="Looper"/> that encapsules the ASIO driver access</param>
 		/// <exception cref="ArgumentNullException">Thrown if <paramref name="looper"/> is <see langword="null"/></exception>
-		private MainModel(Looper looper)
+		private MainModel(ManagedLooper looper)
 		{
 			Looper = looper ?? throw new ArgumentNullException(nameof(looper));
-			Status = new LooperStatus(looper);
+			Status = new ManagedLooperStatus(looper);
 
 			Looper.PropertyChanged += Looper_PropertyChanged;
 		}
 
 		private void Looper_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
-			
+			bool goo = false;
+
+			if (e.PropertyName == nameof(Looper.TransportPosition))
+			{
+				goo = true;	
+			}
 		}
 
 		protected virtual void Dispose(bool disposing)

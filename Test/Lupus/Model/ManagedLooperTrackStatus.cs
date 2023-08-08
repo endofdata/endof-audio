@@ -1,6 +1,6 @@
 ﻿namespace Lupus.Model
 {
-	class LooperTrackStatus : NotifyPropertyChangedBase
+	class ManagedLooperTrackStatus : NotifyPropertyChangedBase
     {
 		private string? _name;
 		private float _pan;
