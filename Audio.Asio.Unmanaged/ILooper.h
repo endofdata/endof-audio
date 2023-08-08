@@ -20,6 +20,7 @@ namespace Audio
 					bool SelectOutputPair(int outputPair[2], bool isSelected) = 0;
 
 					void Run() = 0;
+					void Stop() = 0;
 
 					void SaveSession(const wchar_t* pwcszFilenameBase) = 0;
 

@@ -33,6 +33,7 @@ namespace Audio
 				bool SelectOutputPair(int outputPair[2], bool isSelected);
 
 				void Run();
+				void Stop();
 
 				void SaveSession(const wchar_t* pwcszFilenameBase);
 
@@ -95,6 +96,7 @@ namespace Audio
 				IRecorderPtr m_sessionRecorder;
 				ISourceJoinerPtr m_joiner;
 				int m_delay;
+				bool m_stopCalled;
 				std::wstring m_name;
 
 			};

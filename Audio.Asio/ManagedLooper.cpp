@@ -5,6 +5,8 @@
 #include <AsioObjectFactory.h>
 
 using namespace System;
+using namespace System::Threading;
+using namespace System::Threading::Tasks;
 
 using namespace Audio::Asio::Interop;
 using namespace Audio::Asio::Unmanaged;
@@ -47,8 +49,10 @@ ManagedLooper::ManagedLooper(ILooper* inner)
 	}
 	inner->AddRef();
 
+	_transportPosition = gcnew ManagedAudioTime();
 	_events = new LooperEvents(this);
 	_events->AddRef();
+
 	inner->LooperEvents = ILooperEventsPtr(_events);
 
 	_unmanaged = inner;
@@ -72,9 +76,29 @@ bool ManagedLooper::SelectOutputPair(int left, int right, bool isSelected)
 	return _unmanaged->SelectOutputPair(pair, isSelected);
 }
 
+void CancelIt(Object^ state, CancellationToken token)
+{
+	ManagedLooper^ self = dynamic_cast<ManagedLooper^>(state);
+	self->Stop();
+}
+
 void ManagedLooper::Run()
 {
 	_unmanaged->Run();
+}
+
+void ManagedLooper::Stop()
+{
+	_unmanaged->Stop();
+}
+
+Task^ ManagedLooper::RunAsync(CancellationToken token)
+{
+	// don't mind the intelli-sense squirrels here, it's fine
+	token.Register(gcnew Action<Object^, CancellationToken>(CancelIt), dynamic_cast<Object^>(this));
+
+	Action^ runAction = gcnew Action(this, &ManagedLooper::Run);
+	return Task::Run(runAction, token);
 }
 
 void ManagedLooper::SaveSession(String^ filenameBase)

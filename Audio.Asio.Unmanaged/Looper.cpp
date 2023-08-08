@@ -59,6 +59,7 @@ Looper::Looper(AsioCorePtr& device) :
 	m_delay(1000),
 	m_isSessionRecording(false),
 	m_context(nullptr),
+	m_stopCalled(false),
 	m_refCount(0)
 {
 }
@@ -151,6 +152,8 @@ void Looper::Run()
 		throw std::runtime_error("Property 'Controller' must be set before running the looper.");
 	}
 
+	m_stopCalled = false;
+
 	ControllerCode controllerCommand = ControllerCode::None;
 	ITransportPtr transport = m_device->ProcessingChain->Transport;
 	m_context = &transport->Context;
@@ -166,6 +169,11 @@ void Looper::Run()
 		// check for control input (MIDI)
 		bool hasControl = m_controller->GetNext(m_delay, controllerCommand);
 
+		if (m_stopCalled)
+		{
+			hasControl = true;
+			controllerCommand = ControllerCode::Stop;
+		}
 		if (hasControl)
 		{
 			switch (controllerCommand)
@@ -250,6 +258,10 @@ void Looper::Run()
 	m_device->Stop();
 }
 
+void Looper::Stop()
+{
+	m_stopCalled = true;
+}
 
 void Looper::ArmRecording()
 {
