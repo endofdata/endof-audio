@@ -34,6 +34,7 @@ void* LooperEvents::GetInterface(REFIID iid)
 void LooperEvents::Heartbeat(ILooper& looper, ITransportPtr& transport)
 {
 	m_looper->TransportPosition->Value = transport->TimePosition.Value;
+	m_looper->OnPropertyChanged(ManagedLooper::TransportPositionProperty);
 }
 
 void LooperEvents::RecordingStatusChanged(ILooper& looper, RecordingStatusType recordingStatus)
