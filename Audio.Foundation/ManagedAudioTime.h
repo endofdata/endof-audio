@@ -42,7 +42,9 @@ namespace Audio
 				}
 
 			private:
-				long long _micros;
+				System::ValueTuple<long long, long long> _upper;
+				System::ValueTuple<long long, long long> _lower;
+				long long _ticks;
 			};
 		}
 	}

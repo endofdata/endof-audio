@@ -11,87 +11,91 @@ AudioTime AudioTime::FromSeconds(double seconds)
 	return AudioTime(static_cast<long long>(seconds * 1000000.0));
 }
 
-AudioTime::AudioTime()
+AudioTime::AudioTime() :
+	m_lower(),
+	m_upper(),
+	m_ticks(0)
 {
-	m_micros = 0;
 }
 
-AudioTime::AudioTime(const std::chrono::microseconds& micros)
+AudioTime::AudioTime(const std::chrono::microseconds& micros) :
+	m_lower(),
+	m_upper(),
+	m_ticks(micros.count())
 {
-	m_micros = micros.count();
 }
 
-AudioTime::AudioTime(const long long value)
+AudioTime::AudioTime(const long long value) :
+	m_lower(),
+	m_upper(),
+	m_ticks(value)
 {
-	m_micros = value;
 }
 
 AudioTime::operator long long() const
 {
-	return m_micros;
+	return m_ticks;
 }
 
 AudioTime& AudioTime::operator + (const AudioTime& other)
 {
-	m_micros += other.m_micros;
+	Value += other.m_ticks;
 	return *this;
 }
 
 AudioTime& AudioTime::operator - (const AudioTime& other)
 {
-	m_micros += other.m_micros;
+	Value += other.m_ticks;
 	return *this;
 }
 
 AudioTime& AudioTime::operator += (const AudioTime& other)
 {
-	m_micros += other.m_micros;
+	Value += other.m_ticks;
 	return *this;
 }
 
 AudioTime& AudioTime::operator -= (const AudioTime& other)
 {
-	m_micros -= other.m_micros;
+	Value -= other.m_ticks;
 	return *this;
 }
 
 bool AudioTime::operator == (const AudioTime& other) const
 {
-	return m_micros == other.m_micros;
+	return m_ticks == other.m_ticks;
 }
 
 bool AudioTime::operator != (const AudioTime& other) const
 {
-	return m_micros != other.m_micros;
+	return m_ticks != other.m_ticks;
 }
 
 bool AudioTime::operator > (const AudioTime& other) const
 {
-	return m_micros > other.m_micros;
+	return m_ticks > other.m_ticks;
 }
 
 bool AudioTime::operator < (const AudioTime& other) const
 {
-	return m_micros < other.m_micros;
+	return m_ticks < other.m_ticks;
 }
 
 bool AudioTime::operator >= (const AudioTime& other) const
 {
-	return m_micros >= other.m_micros;
+	return m_ticks >= other.m_ticks;
 }
 
 bool AudioTime::operator <= (const AudioTime& other) const
 {
-	return m_micros <= other.m_micros;
+	return m_ticks <= other.m_ticks;
 }
 
 std::wstring AudioTime::ToString() const
 {
-	auto minutes = std::lldiv(m_micros, 60000000);
-	auto seconds = std::lldiv(minutes.rem, 1000000);
 	std::wostringstream oss;
 	oss << std::setfill(L'0') << std::setw(2)
-		<< minutes.quot << L':' << seconds.quot << L',' << std::setw(3) << seconds.rem
+		<< m_upper.quot << L':' << m_lower.quot << L',' << std::setw(3) << m_lower.rem
 		<< std::setfill(L' ') << std::setw(0) << std::ends;
 
 	return oss.str();
@@ -99,27 +103,31 @@ std::wstring AudioTime::ToString() const
 
 int AudioTime::get_Minutes() const
 {
-	return static_cast<int>(std::lldiv(m_micros, 60000000).quot);
+	return static_cast<int>(m_upper.quot);
 }
 
 int AudioTime::get_Seconds() const
 {
-	return static_cast<int>(std::lldiv(std::lldiv(m_micros, 60000000).rem, 1000).quot);
+	return static_cast<int>(m_lower.quot);
 }
 
 int AudioTime::get_Milliseconds() const
 {
-	return static_cast<int>(std::lldiv(std::lldiv(m_micros, 60000000).rem, 1000).rem);
+	return static_cast<int>(m_lower.rem);
 }
 
 long long AudioTime::get_Value() const
 {
-	return m_micros;
+	return m_ticks;
 }
 
 void AudioTime::put_Value(long long value)
 {
-	m_micros = value;
+	m_ticks = value;
+	long long disp = m_ticks / 1000ll;
+
+	m_upper = std::lldiv(m_ticks, 60000ll);
+	m_lower = std::lldiv(m_upper.rem, 1000ll);
 }
 
 

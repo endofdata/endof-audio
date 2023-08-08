@@ -49,7 +49,9 @@ namespace Audio
 				bool operator <= (const AudioTime& other) const;
 
 			private:
-				long long m_micros;
+				std::lldiv_t m_upper;
+				std::lldiv_t m_lower;
+				long long m_ticks;
 			};
 
 		}
