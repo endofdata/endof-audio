@@ -57,8 +57,9 @@ void LooperEvents::IsSessionRecordingChanged(ILooper& looper, bool isSessionReco
 	m_looper->OnPropertyChanged(ManagedLooper::IsSessionRecordingProperty);
 }
 
-void LooperEvents::AddLoop(ILooper& looper)
+void LooperEvents::AddLoop(ILooper& looper, int channelCount, int samplePosition, int sampleCount)
 {
+	m_looper->OnAddLoop(channelCount, samplePosition, sampleCount);
 	m_looper->OnPropertyChanged(ManagedLooper::LoopCountProperty);
 }
 

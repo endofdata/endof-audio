@@ -212,3 +212,8 @@ void ManagedLooper::OnPropertyChanged(System::String^ propertyName)
 {
 	PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(propertyName));
 }
+
+void ManagedLooper::OnAddLoop(int channelCount, int samplePosition, int sampleCount)
+{
+	LoopAdded(this, gcnew LoopEventArgs(channelCount, samplePosition, sampleCount));
+}

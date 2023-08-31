@@ -18,6 +18,23 @@ namespace Audio
 				Unarmed
 			};
 
+			public ref class LoopEventArgs : public System::EventArgs
+			{
+			public:
+				property int ChannelCount;
+				property int SamplePosition;
+				property int SampleCount;
+
+				LoopEventArgs(int channelCount, int samplePosition, int sampleCount)
+				{
+					ChannelCount = channelCount;
+					SamplePosition = samplePosition;
+					SampleCount = sampleCount;
+				}
+			};
+
+			public delegate void LoopEventHandler(System::Object^ sender, LoopEventArgs^ e);
+
 			public ref class ManagedLooper sealed : public System::ComponentModel::INotifyPropertyChanged
 			{
 			public:
@@ -45,6 +62,29 @@ namespace Audio
 					void raise(System::Object^ sender, System::ComponentModel::PropertyChangedEventArgs^ e)
 					{
 						System::ComponentModel::PropertyChangedEventHandler^ handler = m_propertyChangedEventHandler;
+
+						if (handler != nullptr)
+						{
+							handler->Invoke(sender, e);
+						}
+					}
+				}
+
+				virtual event LoopEventHandler^ LoopAdded
+				{
+					void add(LoopEventHandler^ value) sealed
+					{
+						m_addLoopEventHandler = static_cast<LoopEventHandler^>(System::Delegate::Combine(m_addLoopEventHandler, value));
+					}
+
+					void remove(LoopEventHandler^ value) sealed
+					{
+						m_addLoopEventHandler = static_cast<LoopEventHandler^>(System::Delegate::Remove(m_addLoopEventHandler, value));
+					}
+
+					void raise(System::Object^ sender, LoopEventArgs^ e)
+					{
+						LoopEventHandler^ handler = m_addLoopEventHandler;
 
 						if (handler != nullptr)
 						{
@@ -121,10 +161,12 @@ namespace Audio
 				ManagedLooper(Audio::Asio::Unmanaged::Abstractions::ILooper* inner);
 
 				void OnPropertyChanged(System::String^ propertyName);
+				void OnAddLoop(int channelCount, int samplePosition, int sampleCount);
 
 			private:
 
 				System::ComponentModel::PropertyChangedEventHandler^ m_propertyChangedEventHandler;
+				LoopEventHandler^ m_addLoopEventHandler;
 				Audio::Asio::Unmanaged::Abstractions::ILooper* _unmanaged;
 				LooperEvents* _events;
 				int _loopLength;

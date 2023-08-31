@@ -82,7 +82,7 @@ namespace Audio
 				void OnIsLoopingChanged();
 				void OnIsSessionRecordingChanged();
 				void OnLoopRestart();
-				void OnAddLoop();
+				void OnAddLoop(int channelCount, int samplePosition, int sampleCount);
 				void OnDropRecording();
 
 				AsioCorePtr m_device;

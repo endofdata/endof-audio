@@ -349,7 +349,7 @@ bool Looper::AddLoop()
 		takeSource->IsLooping = true;
 		m_joiner->AddSource(takeSource, mix);
 
-		OnAddLoop();
+		OnAddLoop(take->ChannelCount, takeSource->SamplePosition, take->SampleCount);
 		return true;
 	}
 	return false;
@@ -402,11 +402,11 @@ void Looper::OnIsLoopingChanged()
 	}
 }
 
-void Looper::OnAddLoop()
+void Looper::OnAddLoop(int channelCount, int samplePosition, int sampleCount)
 {
 	if (m_events != nullptr)
 	{
-		m_events->AddLoop(*this);
+		m_events->AddLoop(*this, channelCount, samplePosition, sampleCount);
 	}
 }
 
