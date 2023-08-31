@@ -4,6 +4,9 @@ using Audio.Foundation.Abstractions;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Windows.Threading;
 
 namespace Lupus.Model
 {
@@ -12,8 +15,11 @@ namespace Lupus.Model
 	/// </summary>
 	internal class MainModel : NotifyPropertyChangedBase, IDisposable
 	{
+		private Task? _looperTask;
+		private CancellationTokenSource _tokenSource = new();
 		private IAudioOutput? _selectedOutput;
 		private bool _isDisposed;
+		private readonly Dispatcher _dispatcher;
 
 		/// <summary>
 		/// Gets the <see cref="Looper"/> instance
@@ -42,17 +48,17 @@ namespace Lupus.Model
 			set => SetValue(ref _selectedOutput, value);
 		}
 
-		public static MainModel Create(RegisteredMidiInput midiInput, RegisteredDriver driver, IEnumerable<int> inputChannels, IEnumerable<int> outputChannels)
+		public static MainModel Create(Dispatcher dispatcher, RegisteredMidiInput midiInput, RegisteredDriver driver, IEnumerable<int> inputChannels, IEnumerable<int> outputChannels)
 		{
 			if (driver is null)
 			{
 				throw new ArgumentNullException(nameof(driver));
 			}
 
-			return Create(midiInput.Id, driver.ClsId, inputChannels, outputChannels);
+			return Create(dispatcher, midiInput.Id, driver.ClsId, inputChannels, outputChannels);
 		}
 
-		public static MainModel Create(uint midiInput, Guid guid, IEnumerable<int> inputChannels, IEnumerable<int> outputChannels)
+		public static MainModel Create(Dispatcher dispatcher, uint midiInput, Guid guid, IEnumerable<int> inputChannels, IEnumerable<int> outputChannels)
 		{
 			if (inputChannels?.Any() != true)
 			{
@@ -75,14 +81,14 @@ namespace Lupus.Model
 			config.AddInputChannelList(inputChannels);
 			config.AddOutputChannelList(outputChannels);
 
-			return Create(config);
+			return Create(dispatcher, config);
 		}
 
-		public static MainModel Create(ManagedLooperConfig config)
+		public static MainModel Create(Dispatcher dispatcher, ManagedLooperConfig config)
 		{
 			var looper = ManagedLooper.Create(config);
 
-			return new MainModel(looper);
+			return new MainModel(dispatcher, looper);
 		}
 
 		/// <summary>
@@ -90,12 +96,33 @@ namespace Lupus.Model
 		/// </summary>
 		/// <param name="looper">A <see cref="Looper"/> that encapsules the ASIO driver access</param>
 		/// <exception cref="ArgumentNullException">Thrown if <paramref name="looper"/> is <see langword="null"/></exception>
-		private MainModel(ManagedLooper looper)
+		private MainModel(Dispatcher dispatcher, ManagedLooper looper)
 		{
+			_dispatcher = dispatcher;
+
 			Looper = looper ?? throw new ArgumentNullException(nameof(looper));
 			Status = new ManagedLooperStatus(looper);
 
-			Looper.PropertyChanged += Looper_PropertyChanged;
+			//Looper.PropertyChanged += Looper_PropertyChanged;
+			Looper.LoopAdded += Looper_LoopAdded;
+		}
+
+		public void RunLooper()
+		{
+			if (_looperTask == null)
+			{
+				_looperTask = Looper.RunAsync(_tokenSource.Token);
+			}
+		}
+
+		public void StopLooper()
+		{
+			if (_looperTask != null)
+			{
+				_tokenSource.Cancel();
+				_looperTask.GetAwaiter().GetResult();
+				_looperTask = null;
+			}
 		}
 
 		private void Looper_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -108,12 +135,29 @@ namespace Lupus.Model
 			}
 		}
 
+		private void Looper_LoopAdded(object? sender, LoopEventArgs e)
+		{
+			_dispatcher.InvokeAsync(() =>
+			{
+				Status.Tracks.Add(new ManagedLooperTrackStatus
+				{
+					Name = $"Loop {Status.Tracks.Count + 1}",
+					Gain = 0.8f,
+					Pan = 0.5f,
+					ChannelCount = e.ChannelCount,
+					SamplePosition = e.SamplePosition,
+					SampleCount = e.SampleCount
+				});
+			});
+		}
+
 		protected virtual void Dispose(bool disposing)
 		{
 			if (!_isDisposed)
 			{
 				if (disposing)
 				{
+					StopLooper();
 					Looper?.Dispose();
 				}
 				_isDisposed = true;
