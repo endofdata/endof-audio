@@ -23,5 +23,20 @@
             get => _gain;
             set => SetValue(ref _gain, value);
         }
-    }
+		public int ChannelCount
+		{
+			get;
+			internal set;
+		}
+		public int SamplePosition
+		{
+			get;
+			internal set;
+		}
+		public int SampleCount
+		{
+			get;
+			internal set;
+		}
+	}
 }
