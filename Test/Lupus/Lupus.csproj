@@ -10,21 +10,25 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="Fonts\DSEG\DSEG7Classic-BoldItalic.ttf" />
-	  <None Remove="Fonts\kaum_keras_kepala\kaum keras kepala.ttf" />
+		<None Remove="Fonts\abeatbykai\abeatbyKaiRegular.otf" />
+		<None Remove="Fonts\DSEG\DSEG7Classic-BoldItalic.ttf" />
+		<None Remove="Fonts\kaum_keras_kepala\kaum keras kepala.ttf" />
+		<None Remove="Fonts\storytype\RADIO A TREQER.otf" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Audio.Asio" Version="1.0.0" />
+		<PackageReference Include="Audio.Asio" Version="1.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\SyntControls\SynthControls.csproj" />
+		<ProjectReference Include="..\..\..\SyntControls\SynthControls.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Resource Include="Fonts\DSEG\DSEG7Classic-BoldItalic.ttf" />
-	  <Resource Include="Fonts\kaum_keras_kepala\kaum keras kepala.ttf" />
+		<Resource Include="Fonts\abeatbykai\abeatbyKaiRegular.otf" />
+		<Resource Include="Fonts\DSEG\DSEG7Classic-BoldItalic.ttf" />
+		<Resource Include="Fonts\kaum_keras_kepala\kaum keras kepala.ttf" />
+		<Resource Include="Fonts\storytype\RADIO A TREQER.otf" />
 	</ItemGroup>
 
 </Project>

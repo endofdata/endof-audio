@@ -5,19 +5,24 @@
 			 StartupUri="MainWindow.xaml">
     <Application.Resources>
 		<ResourceDictionary>
+			<!--<FontFamily x:Key="MainFont">./fonts/kaum_keras_kepala/#kaum keras kepala</FontFamily>-->
+			<!--<FontFamily x:Key="MainFont">fonts/storytype/#RADIO A TREQER</FontFamily>-->
+			<FontFamily x:Key="MainFont">fonts/abeatbykai/#abeatbyKai</FontFamily>
+			<FontFamily x:Key="DigitsFont">./fonts/DSEG/#DSEG7 Classic Bold Italic</FontFamily>
 			<Style TargetType="{x:Type Window}" x:Key="PedalStyle">
                 <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
                 <Setter Property="WindowStyle" Value="None"/>
                 <Setter Property="AllowsTransparency" Value="True"/>
-            </Style>
+				<Setter Property="FontFamily" Value="{StaticResource MainFont}"/>
+			</Style>
             <Style TargetType="{x:Type Label}">
-                <Setter Property="FontFamily" Value="./fonts/kaum_keras_kepala/#kaum keras kepala"/>
-                <Setter Property="FontSize" Value="24"/>
+				<Setter Property="FontFamily" Value="{StaticResource MainFont}"/>
+				<Setter Property="FontSize" Value="24"/>
                 <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
 				<Setter Property="Foreground" Value="{StaticResource Accent2}"/>
             </Style>
             <Style TargetType="{x:Type TextBox}">
-                <Setter Property="FontFamily" Value="./fonts/DSEG/#DSEG7 Classic Bold Italic"/>
+				<Setter Property="FontFamily" Value="{StaticResource DigitsFont}"/>
                 <Setter Property="FontSize" Value="32"/>
 				<Setter Property="Foreground" Value="{StaticResource Accent1}"/>
                 <Setter Property="Background" Value="{StaticResource Shadow1}"/>
@@ -40,13 +45,11 @@
                 <Setter Property="Margin" Value="20,10"/>
             </Style>
             <Style TargetType="{x:Type TextBlock}">
-                <Setter Property="FontFamily" Value="./fonts/kaum_keras_kepala/#kaum keras kepala"/>
                 <Setter Property="FontSize" Value="16"/>
 				<Setter Property="FontWeight" Value="ExtraLight"/>
 				<Setter Property="VerticalAlignment" Value="Center"/>
             </Style>
             <Style TargetType="{x:Type TextBlock}" x:Key="Logo">
-                <Setter Property="FontFamily" Value="./fonts/kaum_keras_kepala/#kaum keras kepala"/>
 				<Setter Property="Foreground" Value="{StaticResource Foreground}"/>
                 <Setter Property="FontSize" Value="48"/>
                 <Setter Property="Padding" Value="32,0"/>
