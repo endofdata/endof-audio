@@ -16,12 +16,14 @@ namespace Audio
 			class StreamReader : public ISampleSource
 			{
 			public:
-				StreamReader(std::istream& input, int channelCount);
+				StreamReader(const GUID& id, std::istream& input, int channelCount);
 				virtual ~StreamReader();
+
+				const GUID& get_Id() const;
 
 				int ReadSamples(ISampleContainerPtr& container, const MixParameter& mix, bool overdub);
 
-				bool get_IsLooping();
+				bool get_IsLooping() const;
 				void put_IsLooping(bool value);
 
 				int get_SamplePosition() const;
@@ -33,6 +35,7 @@ namespace Audio
 				DECLARE_IUNKNOWN
 
 			private:
+				GUID m_id;
 				int m_channelCount;
 				std::istream& m_input;
 				std::streampos m_initialPos;

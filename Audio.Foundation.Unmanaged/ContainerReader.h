@@ -17,12 +17,14 @@ namespace Audio
 			class ContainerReader : public ISampleSource
 			{
 			public:
-				ContainerReader(ISampleContainerPtr& source);
+				ContainerReader(const GUID& id, ISampleContainerPtr& source);
 				virtual ~ContainerReader();
+
+				const GUID& get_Id() const;
 
 				int ReadSamples(ISampleContainerPtr& container, const MixParameter& mix, bool overdub);
 
-				bool get_IsLooping();
+				bool get_IsLooping() const;
 				void put_IsLooping(bool value);
 
 				int get_SamplePosition() const;
@@ -34,6 +36,7 @@ namespace Audio
 				DECLARE_IUNKNOWN
 
 			private:
+				GUID m_id;
 				ISampleContainerPtr m_container;
 				int m_samplePosition;
 				SampleContainerSpan m_span;

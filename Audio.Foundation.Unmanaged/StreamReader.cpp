@@ -4,7 +4,8 @@
 
 using namespace Audio::Foundation::Unmanaged;
 
-StreamReader::StreamReader(std::istream& input, int channelCount) :
+StreamReader::StreamReader(const GUID& id, std::istream& input, int channelCount) :
+	m_id(id),
 	m_input(input),
 	m_initialPos(input.tellg()),
 	m_channelCount(channelCount),
@@ -95,7 +96,12 @@ int StreamReader::ReadSamples(ISampleContainerPtr& container, const MixParameter
 	return samples;
 }
 
-bool StreamReader::get_IsLooping()
+const GUID& StreamReader::get_Id() const
+{
+	return m_id;
+}
+
+bool StreamReader::get_IsLooping() const
 {
 	return m_isLooping;
 }

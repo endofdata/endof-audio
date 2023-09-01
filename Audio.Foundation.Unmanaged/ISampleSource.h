@@ -18,9 +18,12 @@ namespace Audio
 				/// </summary>
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("f897a276-8567-40c9-91e6-cfd6205f4205")) ISampleSource : public IUnknown
 				{
+					const GUID& get_Id() const = 0;
+					_declspec(property(get = get_Id)) const GUID& Id;
+
 					int ReadSamples(ISampleContainerPtr& container, const MixParameter& mix, bool overdub) = 0;
 
-					bool get_IsLooping() = 0;
+					bool get_IsLooping() const = 0;
 					void put_IsLooping(bool value) = 0;
 					_declspec(property(get = get_IsLooping, put = put_IsLooping)) bool IsLooping;
 

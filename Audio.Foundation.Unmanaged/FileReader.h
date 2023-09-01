@@ -14,7 +14,7 @@ namespace Audio
 			class FileReader : public StreamReader
 			{
 			public:
-				static FileReader* Create(const std::wstring& filename, int channelCount);
+				static FileReader* Create(const GUID& id, const std::wstring& filename, int channelCount);
 
 				virtual ~FileReader();
 
@@ -23,7 +23,7 @@ namespace Audio
 				_declspec(property(get = get_Filename)) const std::wstring& Filename;
 
 			private:
-				FileReader(const std::wstring& filename, std::ifstream& ifstream, int channelCount);
+				FileReader(const GUID& id, const std::wstring& filename, std::ifstream& ifstream, int channelCount);
 
 				const std::wstring& m_filename;
 				std::ifstream& m_ifStream;

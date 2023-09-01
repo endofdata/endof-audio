@@ -4,12 +4,13 @@
 
 using namespace Audio::Foundation::Unmanaged;
 
-ContainerReader::ContainerReader(ISampleContainerPtr& source) :
+ContainerReader::ContainerReader(const GUID& id, ISampleContainerPtr& source) :
 	m_container(source),
 	m_samplePosition(0),
 	m_isLooping(false),
 	m_refCount(0),
-	m_span(source)
+	m_span(source),
+	m_id(id)
 {
 	if (source == nullptr)
 	{
@@ -63,7 +64,12 @@ int ContainerReader::ReadSamples(ISampleContainerPtr& container, const MixParame
 	return 0;
 }
 
-bool ContainerReader::get_IsLooping()
+const GUID& ContainerReader::get_Id() const
+{
+	return m_id;
+}
+
+bool ContainerReader::get_IsLooping() const
 {
 	return m_isLooping;
 }

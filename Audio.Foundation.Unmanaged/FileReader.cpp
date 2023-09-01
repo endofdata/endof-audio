@@ -5,15 +5,15 @@
 
 using namespace Audio::Foundation::Unmanaged;
 
-FileReader* FileReader::Create(const std::wstring& filename, int channelCount)
+FileReader* FileReader::Create(const GUID& id, const std::wstring& filename, int channelCount)
 {
 	auto stream = new std::ifstream(filename, std::ios::binary);
 
-	return new FileReader(filename, *stream, channelCount);
+	return new FileReader(id, filename, *stream, channelCount);
 }
 
-FileReader::FileReader(const std::wstring& filename, std::ifstream& ifstream, int channelCount) :
-	StreamReader((std::istream&)ifstream, channelCount),
+FileReader::FileReader(const GUID& id, const std::wstring& filename, std::ifstream& ifstream, int channelCount) :
+	StreamReader(id, (std::istream&)ifstream, channelCount),
 	m_ifStream(ifstream),
 	m_filename(filename)
 {

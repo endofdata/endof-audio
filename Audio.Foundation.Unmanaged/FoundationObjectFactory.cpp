@@ -91,12 +91,16 @@ IRecorderPtr FoundationObjectFactory::CreateRecorder(int channelCount, int initi
 
 ISampleSourcePtr FoundationObjectFactory::CreateRawFileSource(const std::wstring& filename, int channelCount)
 {
-	return FileReader::Create(filename, channelCount);
+	GUID id = CreateId();
+
+	return FileReader::Create(id, filename, channelCount);
 }
 
 ISampleSourcePtr FoundationObjectFactory::CreateContainerSource(ISampleContainerPtr& source)
 {
-	return new ContainerReader(source);
+	GUID id = CreateId();
+
+	return new ContainerReader(id, source);
 }
 
 ISampleProcessorPtr FoundationObjectFactory::CreateFromSourceProcessor(ISampleSourcePtr& source)
@@ -245,4 +249,12 @@ int FoundationObjectFactory::NextTakeId()
 {
 	// HACK: This could overflow after a few billions of added takes
 	return ++LastTakeId;
+}
+
+GUID FoundationObjectFactory::CreateId()
+{
+	GUID guid;
+	UuidCreate(&guid);
+
+	return guid;
 }

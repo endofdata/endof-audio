@@ -90,6 +90,8 @@ namespace Audio
 				static int NextTakeId();
 
 				static int LastTakeId;
+
+				static GUID CreateId();
 			};
 		}
 	}
