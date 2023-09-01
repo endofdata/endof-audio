@@ -21,9 +21,11 @@ namespace Audio
 				SourceJoiner();
 				virtual ~SourceJoiner();
 
-				ISampleSourcePtr& get_Source(int index);
 				int get_SourceCount() const;
-				MixParameter& get_MixParameter(int index);
+
+				ISampleSourcePtr& get_Source(const GUID& id);
+
+				MixParameter& get_MixParameter(const GUID& id);
 
 				void AddSource(ISampleSourcePtr& source, const MixParameter& mix);
 

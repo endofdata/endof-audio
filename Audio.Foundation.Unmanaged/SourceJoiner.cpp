@@ -87,19 +87,29 @@ void SourceJoiner::RemoveAllSources()
 	m_vecSources.clear();
 }
 
-ISampleSourcePtr& SourceJoiner::get_Source(int index)
-{
-	return m_vecSources.at(index).first;
-}
-
-MixParameter& SourceJoiner::get_MixParameter(int index)
-{
-	return m_vecSources.at(index).second;
-}
-
 int SourceJoiner::get_SourceCount() const
 {
 	return static_cast<int>(m_vecSources.size());
+}
+
+ISampleSourcePtr& SourceJoiner::get_Source(const GUID& id)
+{
+	auto found = std::find_if(m_vecSources.begin(), m_vecSources.end(), [id](std::pair<ISampleSourcePtr, MixParameter>& item)
+	{
+		return item.first->Id == id;
+	});
+
+	return found->first;
+}
+
+MixParameter& SourceJoiner::get_MixParameter(const GUID& id)
+{
+	auto found = std::find_if(m_vecSources.begin(), m_vecSources.end(), [id](std::pair<ISampleSourcePtr, MixParameter>& item)
+	{
+		return item.first->Id == id;
+	});
+
+	return found->second;
 }
 
 int SourceJoiner::Process(ISampleContainerPtr& container, const ProcessingContext& context)

@@ -18,22 +18,15 @@ namespace Audio
 			{				
 				__interface _AUDIO_FOUNDATION_UNMANAGED_API __declspec(uuid("519e9d40-db0b-42c4-b435-90d7ec67206a")) ISourceJoiner : public IUnknown
 				{
-					/// <summary>
-					/// Gets one item from the <see cref="Sources"/> collection at the given <paramref name="index"/>
-					/// </summary>
-					/// <param name="index">Index of the requested item</param>
-					/// <returns>The <see cref="ISampleSource"/> or <see langword="null"/> if <paramref name="index"/> is out of range.</returns>
-					ISampleSourcePtr& get_Source(int index) = 0;
-
-					/// <summary>
-					/// Gets sources as defined by previous calls to <see cref="AddSource"/>
-					/// </summary>
-					_declspec(property(get = get_Source)) ISampleSourcePtr Sources[];
 
 					int get_SourceCount() const;
 					_declspec(property(get = get_SourceCount)) int SourceCount;
 
-					MixParameter& get_MixParameter(int index) = 0;
+					ISampleSourcePtr& get_Source(const GUID& id) = 0;
+
+					_declspec(property(get = get_Source)) ISampleSourcePtr Sources[];
+
+					MixParameter& get_MixParameter(const GUID& id) = 0;
 
 
 					/// <summary>
