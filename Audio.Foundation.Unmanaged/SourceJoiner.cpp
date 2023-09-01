@@ -44,18 +44,42 @@ void SourceJoiner::AddSource(ISampleSourcePtr& source, const MixParameter& mix)
 	m_vecSources.push_back(std::pair<ISampleSourcePtr, MixParameter>(source, mix));
 }
 
-void SourceJoiner::RemoveSource(ISampleSourcePtr& source)
+bool SourceJoiner::RemoveSource(ISampleSourcePtr& source)
 {
+	bool isRemoved = false;
+
 	auto newEnd =
-		remove_if(m_vecSources.begin(), m_vecSources.end(), [&source](std::pair<ISampleSourcePtr, MixParameter>& item)
+		remove_if(m_vecSources.begin(), m_vecSources.end(), [source, &isRemoved](std::pair<ISampleSourcePtr, MixParameter>& item)
 	{
 		if (item.first == source)
 		{
+			isRemoved = true;
 			return true;
 		}
 		return false;
 	});
 	m_vecSources.erase(newEnd, m_vecSources.end());
+
+	return isRemoved;
+}
+
+bool SourceJoiner::RemoveSource(const GUID& id)
+{
+	bool isRemoved = false;
+
+	auto newEnd =
+		remove_if(m_vecSources.begin(), m_vecSources.end(), [id, &isRemoved](std::pair<ISampleSourcePtr, MixParameter>& item)
+	{
+		if (item.first->Id == id)
+		{
+			isRemoved = true;
+			return true;
+		}
+		return false;
+	});
+	m_vecSources.erase(newEnd, m_vecSources.end());
+
+	return isRemoved;
 }
 
 void SourceJoiner::RemoveAllSources()

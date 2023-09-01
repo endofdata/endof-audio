@@ -21,12 +21,14 @@ namespace Audio
 			public ref class LoopEventArgs : public System::EventArgs
 			{
 			public:
+				property System::Guid Id;
 				property int ChannelCount;
 				property int SamplePosition;
 				property int SampleCount;
 
-				LoopEventArgs(int channelCount, int samplePosition, int sampleCount)
+				LoopEventArgs(System::Guid id, int channelCount, int samplePosition, int sampleCount)
 				{
+					Id = id;
 					ChannelCount = channelCount;
 					SamplePosition = samplePosition;
 					SampleCount = sampleCount;
@@ -114,6 +116,8 @@ namespace Audio
 				//int InsertFx(ISampleProcessorPtr effect);
 				//bool RemoveFx(int id);
 
+				bool RemoveLoop(System::Guid id);
+
 				property RecordingMode RecordingStatus
 				{
 					RecordingMode get();
@@ -161,7 +165,7 @@ namespace Audio
 				ManagedLooper(Audio::Asio::Unmanaged::Abstractions::ILooper* inner);
 
 				void OnPropertyChanged(System::String^ propertyName);
-				void OnAddLoop(int channelCount, int samplePosition, int sampleCount);
+				void OnAddLoop(System::Guid id, int channelCount, int samplePosition, int sampleCount);
 
 			private:
 

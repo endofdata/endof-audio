@@ -61,6 +61,8 @@ namespace Audio
 				IControllerPtr get_Controller();
 				void put_Controller(IControllerPtr& value);
 
+				bool RemoveLoop(const GUID& id);
+
 				DECLARE_IUNKNOWN
 
 			private:
@@ -82,7 +84,7 @@ namespace Audio
 				void OnIsLoopingChanged();
 				void OnIsSessionRecordingChanged();
 				void OnLoopRestart();
-				void OnAddLoop(int channelCount, int samplePosition, int sampleCount);
+				void OnAddLoop(const GUID& id, int channelCount, int samplePosition, int sampleCount);
 				void OnDropRecording();
 
 				AsioCorePtr m_device;

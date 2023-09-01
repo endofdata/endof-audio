@@ -54,6 +54,8 @@ namespace Audio
 					IControllerPtr get_Controller() = 0;
 					void put_Controller(IControllerPtr& value) = 0;
 					_declspec(property(get = get_Controller, put = put_Controller)) IControllerPtr Controller;
+
+					bool RemoveLoop(const GUID& id) = 0;
 				};
 
 				_AUDIO_ASIO_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ILooper, __uuidof(ILooper));

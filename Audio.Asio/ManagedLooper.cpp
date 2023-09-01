@@ -127,6 +127,14 @@ int ManagedLooper::InsertFx(String^ pluginId)
 //int InsertFx(ISampleProcessorPtr effect);
 //bool RemoveFx(int id);
 
+bool ManagedLooper::RemoveLoop(Guid id)
+{
+	array<Byte>^ guidData = id.ToByteArray();
+	pin_ptr<Byte> data = &(guidData[0]);
+
+	return _unmanaged->RemoveLoop(*(_GUID*)data);
+}
+
 bool ManagedLooper::IsLooping::get()
 {
 	return _unmanaged->IsLooping;
@@ -213,7 +221,7 @@ void ManagedLooper::OnPropertyChanged(System::String^ propertyName)
 	PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(propertyName));
 }
 
-void ManagedLooper::OnAddLoop(int channelCount, int samplePosition, int sampleCount)
+void ManagedLooper::OnAddLoop(Guid id, int channelCount, int samplePosition, int sampleCount)
 {
-	LoopAdded(this, gcnew LoopEventArgs(channelCount, samplePosition, sampleCount));
+	LoopAdded(this, gcnew LoopEventArgs(id, channelCount, samplePosition, sampleCount));
 }

@@ -349,10 +349,15 @@ bool Looper::AddLoop()
 		takeSource->IsLooping = true;
 		m_joiner->AddSource(takeSource, mix);
 
-		OnAddLoop(take->ChannelCount, takeSource->SamplePosition, take->SampleCount);
+		OnAddLoop(takeSource->Id, take->ChannelCount, takeSource->SamplePosition, take->SampleCount);
 		return true;
 	}
 	return false;
+}
+
+bool Looper::RemoveLoop(const GUID& id)
+{
+	return m_joiner->RemoveSource(id);
 }
 
 void Looper::SaveSession(const wchar_t* pwcszFilenameBase)
@@ -402,11 +407,11 @@ void Looper::OnIsLoopingChanged()
 	}
 }
 
-void Looper::OnAddLoop(int channelCount, int samplePosition, int sampleCount)
+void Looper::OnAddLoop(const GUID& id, int channelCount, int samplePosition, int sampleCount)
 {
 	if (m_events != nullptr)
 	{
-		m_events->AddLoop(*this, channelCount, samplePosition, sampleCount);
+		m_events->AddLoop(*this, id, channelCount, samplePosition, sampleCount);
 	}
 }
 

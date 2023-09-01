@@ -46,7 +46,10 @@ namespace Audio
 					/// Removes an item from the <see cref="Sources"/> collection
 					/// </summary>
 					/// <param name="source">Source to remove</param>
-					void RemoveSource(ISampleSourcePtr& source) = 0;
+					bool RemoveSource(ISampleSourcePtr& source) = 0;
+
+
+					bool RemoveSource(const GUID& id) = 0;
 
 					/// <summary>
 					/// Clears the <see cref="Sources"/> collection

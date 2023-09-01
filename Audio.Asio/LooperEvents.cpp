@@ -57,9 +57,16 @@ void LooperEvents::IsSessionRecordingChanged(ILooper& looper, bool isSessionReco
 	m_looper->OnPropertyChanged(ManagedLooper::IsSessionRecordingProperty);
 }
 
-void LooperEvents::AddLoop(ILooper& looper, int channelCount, int samplePosition, int sampleCount)
+void LooperEvents::AddLoop(ILooper& looper, const GUID& id, int channelCount, int samplePosition, int sampleCount)
 {
-	m_looper->OnAddLoop(channelCount, samplePosition, sampleCount);
+	auto managed = System::Guid(
+		id.Data1, id.Data2, id.Data3,
+		id.Data4[0], id.Data4[1],
+		id.Data4[2], id.Data4[3],
+		id.Data4[4], id.Data4[5],
+		id.Data4[6], id.Data4[7]);
+
+	m_looper->OnAddLoop(managed, channelCount, samplePosition, sampleCount);
 	m_looper->OnPropertyChanged(ManagedLooper::LoopCountProperty);
 }
 

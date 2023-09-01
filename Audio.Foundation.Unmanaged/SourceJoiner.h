@@ -27,7 +27,9 @@ namespace Audio
 
 				void AddSource(ISampleSourcePtr& source, const MixParameter& mix);
 
-				void RemoveSource(ISampleSourcePtr& source);
+				bool RemoveSource(ISampleSourcePtr& source);
+
+				bool RemoveSource(const GUID& id);
 
 				void RemoveAllSources();
 

@@ -36,7 +36,7 @@ namespace Audio
 
 					void IsSessionRecordingChanged(ILooper& looper, bool isSessionRecording) = 0;
 
-					void AddLoop(ILooper& looper, int channelCount, int samplePosition, int sampleCount) = 0;
+					void AddLoop(ILooper& looper, const GUID& id, int channelCount, int samplePosition, int sampleCount) = 0;
 
 					void DropRecording(ILooper& looper) = 0;
 				};
