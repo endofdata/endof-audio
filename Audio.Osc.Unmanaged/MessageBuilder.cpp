@@ -118,7 +118,52 @@ void MessageBuilder::SetAllParameters(std::istream& istr)
 	if (m_parametersSize > 0 && m_parameters != nullptr)
 	{
 		istr.read(m_parameters.get(), m_parametersSize);
+		m_parametersWritten = m_parameterTypes.size();
 	}
+}
+
+void MessageBuilder::GetNextParameter(TypeTag& tag, const void*& value, int& size)
+{
+	if (ParameterCount <= m_parametersWritten)
+	{
+		throw std::runtime_error("No more parameters available.");
+	}
+
+	tag = ParameterType[m_parametersWritten++];
+
+	if (IsVariantSize(tag))
+	{
+		if (m_variantSizesWritten >= m_variantSizes.size())
+		{
+			throw std::runtime_error("No more variant size parameters expected.");
+		}
+		else
+		{
+			size = m_variantSizes[m_variantSizesWritten++];
+			value = m_parametersWritePos;
+			m_parametersWritePos += OscString::GetPaddedStringSize(size);
+		}
+	}
+	else
+	{
+		size = GetParameterSize(tag);
+		value = m_parametersWritePos;
+		m_parametersWritePos += size;
+	}
+}
+
+int MessageBuilder::get_ParameterCount() const
+{
+	return m_parameterTypes.size();
+}
+
+const TypeTag MessageBuilder::get_ParameterType(int idx) const
+{
+	if (idx < 0 || idx >= ParameterCount)
+	{
+		throw std::invalid_argument("Index out of range.");
+	}
+	return m_parameterTypes[idx];
 }
 
 int MessageBuilder::get_Size() const
@@ -232,7 +277,7 @@ std::shared_ptr<MessageBuilder> MessageBuilder::Create(std::istream& istr)
 	std::vector<int> varSizes;
 
 	const char* begin = typeTags.get() + 1;
-	const char* end = begin + typeTags.Size;
+	const char* end = begin + typeTags.Size - 1;
 
 	builder->m_parametersSize = 0;
 
@@ -255,6 +300,7 @@ std::shared_ptr<MessageBuilder> MessageBuilder::Create(std::istream& istr)
 			{
 				OscString value;
 				istr >> value;
+				builder->m_variantSizes.push_back(value.Size);
 				size = value.PaddedSize;
 			}
 			break;
@@ -262,12 +308,12 @@ std::shared_ptr<MessageBuilder> MessageBuilder::Create(std::istream& istr)
 				int blobSize;
 				istr >> blobSize;
 				size = sizeof(blobSize) + blobSize;
+				builder->m_variantSizes.push_back(size);
 				istr.seekg(blobSize, std::ios_base::cur);
 				break;
 			default:
 				throw std::runtime_error("Unsupported type tag.");
 			}
-			builder->m_variantSizes.push_back(size);
 		}
 		else
 		{
@@ -279,6 +325,10 @@ std::shared_ptr<MessageBuilder> MessageBuilder::Create(std::istream& istr)
 	});
 
 	builder->m_parameters = std::make_unique<char[]>(builder->m_parametersSize);
+	builder->m_parametersWritePos = builder->m_parameters.get();
+	builder->m_parametersWritten = 0;
+	builder->m_variantSizesWritten = 0;
+
 	istr.seekg(startPos);
 	istr.read(builder->m_parameters.get(), builder->m_parametersSize);
 

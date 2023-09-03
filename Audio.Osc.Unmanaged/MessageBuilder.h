@@ -32,6 +32,14 @@ namespace Audio
 				void SetNextParameter(const TypeTag tag, const void* value);
 				void SetAllParameters(std::istream& istr);
 
+				void GetNextParameter(TypeTag& tag, const void*& value, int& size);
+
+				int get_ParameterCount() const;
+				_declspec(property(get = get_ParameterCount)) int ParameterCount;
+
+				const TypeTag  get_ParameterType(int idx) const;
+				_declspec(property(get = get_ParameterType)) TypeTag ParameterType[];
+
 				virtual int get_Size() const;
 				_declspec(property(get = get_Size)) int Size;
 
