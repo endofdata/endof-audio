@@ -16,6 +16,8 @@ namespace Audio
 				_declspec(property(get = get_Size)) int Size;
 
 				virtual std::ostream& Write(std::ostream& ostr) const = 0;
+
+				
 			};
 		}
 	}

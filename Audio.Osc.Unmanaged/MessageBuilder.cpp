@@ -1,8 +1,7 @@
 #include "pch.h"
-#include "Message.h"
+#include "MessageBuilder.h"
 #include <stdexcept>
 #include <algorithm>
-#include "OscString.h"
 
 using namespace Audio::Osc::Unmanaged;
 
@@ -15,12 +14,16 @@ MessageBuilder::MessageBuilder() :
 {
 }
 
+const char* MessageBuilder::get_AddressPattern() const
+{
+	return m_addressPattern;
+}
 
 void MessageBuilder::put_AddressPattern(const char* address)
 {
 	if (address == nullptr)
 	{
-		m_addressPattern.clear();
+		m_addressPattern.Clear();
 	}
 	else
 	{
@@ -31,11 +34,6 @@ void MessageBuilder::put_AddressPattern(const char* address)
 
 		m_addressPattern = address;
 	}
-}
-
-const char* MessageBuilder::get_AddressPattern() const
-{
-	return m_addressPattern.c_str();
 }
 
 void MessageBuilder::AllocParameters(const TypeTag tags[], int count)
@@ -80,13 +78,13 @@ void MessageBuilder::AllocParameters(const TypeTag tags[], int count, int varSiz
 	}
 	if (parametersSize > 0)
 	{
-		m_parameters = new char[parametersSize];
+		m_parameters = std::make_unique<char[]>(parametersSize);
 		m_parametersSize = parametersSize;
-		m_parametersWritePos = m_parameters;
+		m_parametersWritePos = m_parameters.get();
 	}
 }
 
-void MessageBuilder::WriteParameter(const TypeTag tag, const void* value)
+void MessageBuilder::SetNextParameter(const TypeTag tag, const void* value)
 {
 	if (m_parametersWritten >= m_parameterTypes.size())
 	{
@@ -114,26 +112,33 @@ void MessageBuilder::WriteParameter(const TypeTag tag, const void* value)
 	}
 }
 
+void MessageBuilder::SetAllParameters(std::istream& istr)
+{
+	if (m_parametersSize > 0 && m_parameters != nullptr)
+	{
+		istr.read(m_parameters.get(), m_parametersSize);
+	}
+}
+
 int MessageBuilder::get_Size() const
 {
 	return
-		OscString::GetPaddedSize(m_addressPattern) +
-		OscString::GetPaddedSize(static_cast<int>(m_parameterTypes.size() + 1)) +
+		m_addressPattern.PaddedSize +
+		OscString::CalculatePaddedSize(1 + static_cast<int>(m_parameterTypes.size())) +
 		m_parametersSize;
 }
 
 std::ostream& MessageBuilder::Write(std::ostream& ostr) const
 {
-	int size = get_Size();
+	int size = Size;
 	ostr.write(reinterpret_cast<const char*>(&size), sizeof(size));
 
 	return ostr << *this;
 }
 
-
 std::ostream& Audio::Osc::Unmanaged::operator << (std::ostream& ostr, const MessageBuilder& it)
 {
-	if (it.m_addressPattern.length() < 1)
+	if (it.m_addressPattern.Size < 1)
 	{
 		throw std::runtime_error("Address pattern must be specified before sending the message.");
 	}
@@ -142,12 +147,12 @@ std::ostream& Audio::Osc::Unmanaged::operator << (std::ostream& ostr, const Mess
 		throw std::runtime_error("All allocated parameters must be written before sending the message.");
 	}
 
-	OscString::WritePadded(ostr, it.m_addressPattern);
+	ostr << it.m_addressPattern;
 
 	ostr << ',';
 	std::for_each(it.m_parameterTypes.begin(), it.m_parameterTypes.end(), [&ostr](const TypeTag t) { ostr << static_cast<char>(t); });
 
-	ostr.write(it.m_parameters, it.m_parametersSize);
+	ostr.write(it.m_parameters.get(), it.m_parametersSize);
 
 	return ostr;
 }
@@ -200,4 +205,77 @@ int MessageBuilder::GetParameterSize(const TypeTag tag)
 		}
 		throw std::runtime_error("Unsupported type tag.");
 	}
+}
+
+std::shared_ptr<MessageBuilder> MessageBuilder::Create(std::istream& istr)
+{
+	auto builder = std::make_shared<MessageBuilder>();
+
+	istr >> builder->m_addressPattern;
+
+	char nextChar = istr.peek();
+
+	if (nextChar != ',')
+	{
+		throw std::runtime_error("Expected type tag string.");
+	}
+
+	OscString typeTags;
+	istr >> typeTags;
+
+	auto startPos = istr.tellg();
+	std::vector<int> varSizes;
+
+	const char* begin = typeTags.get() + 1;
+	const char* end = begin + typeTags.Size;
+
+	builder->m_parametersSize = 0;
+
+	std::for_each(begin, end, [&builder, &istr](char t)
+	{
+		if (!istr.good())
+		{
+			throw std::runtime_error("Failed to calculate parameter size.");
+		}
+
+		TypeTag tag = static_cast<TypeTag>(t);
+		int size = 0;
+
+		if (IsVariantSize(tag))
+		{
+			switch (tag)
+			{
+			case TypeTag::String:
+			case TypeTag::Symbol:
+			{
+				OscString value;
+				istr >> value;
+				size = value.PaddedSize;
+			}
+			break;
+			case TypeTag::Blob:
+				int blobSize;
+				istr >> blobSize;
+				size = sizeof(blobSize) + blobSize;
+				istr.seekg(blobSize, std::ios_base::cur);
+				break;
+			default:
+				throw std::runtime_error("Unsupported type tag.");
+			}
+			builder->m_variantSizes.push_back(size);
+		}
+		else
+		{
+			size = GetParameterSize(tag);
+			istr.seekg(size, std::ios_base::cur);
+		}
+		builder->m_parameterTypes.push_back(tag);
+		builder->m_parametersSize += size;
+	});
+
+	builder->m_parameters = std::make_unique<char[]>(builder->m_parametersSize);
+	istr.seekg(startPos);
+	istr.read(builder->m_parameters.get(), builder->m_parametersSize);
+
+	return builder;
 }

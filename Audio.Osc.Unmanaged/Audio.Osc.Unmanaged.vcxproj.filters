@@ -7,13 +7,19 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Message.cpp">
+    <ClCompile Include="MessageBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OscString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BundleBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OscReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -24,7 +30,7 @@
     <ClInclude Include="framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Message.h">
+    <ClInclude Include="MessageBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pch.h">
@@ -40,6 +46,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BundleBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OscReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

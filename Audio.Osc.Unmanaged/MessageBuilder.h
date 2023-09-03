@@ -3,6 +3,7 @@
 #include "Audio.Osc.Unamanged.h"
 #include "TypeTag.h"
 #include "PacketBase.h"
+#include "OscString.h"
 
 #include <string>
 #include <vector>
@@ -18,30 +19,35 @@ namespace Audio
 			class _AUDIO_OSC_UNMANAGED_API MessageBuilder : public PacketBase
 			{
 			public:
+				static std::shared_ptr<MessageBuilder> Create(std::istream& istr);
+
 				MessageBuilder();
 
-				void put_AddressPattern(const char* address);
 				const char* get_AddressPattern() const;
+				void put_AddressPattern(const char* address);
+				_declspec(property(get = get_AddressPattern, put = put_AddressPattern)) const char* AddressPattern;
 
 				void AllocParameters(const TypeTag tags[], int count);
 				void AllocParameters(const TypeTag tags[], int count, int varSize[], int varSizeCount);
-				void WriteParameter(const TypeTag tag, const void* value);
+				void SetNextParameter(const TypeTag tag, const void* value);
+				void SetAllParameters(std::istream& istr);
 
 				int get_Size() const;
 
 				std::ostream& Write(std::ostream& ostr) const;
 
-				friend std::ostream& operator << (std::ostream& ostr, const MessageBuilder& it);
-				
-			private:
-				int GetParameterSize(const TypeTag tag);
-				bool IsVariantSize(const TypeTag tag);
+				static int GetParameterSize(const TypeTag tag);
+				static bool IsVariantSize(const TypeTag tag);
 
-				std::string m_addressPattern;
+				friend std::ostream& operator << (std::ostream& ostr, const MessageBuilder& it);
+
+			private:
+
+				OscString m_addressPattern;
 				std::vector<TypeTag> m_parameterTypes;
 				std::vector<int> m_variantSizes;
+				std::unique_ptr<char[]> m_parameters;
 
-				char* m_parameters;
 				int m_parametersSize;
 				char* m_parametersWritePos;
 				int m_parametersWritten;

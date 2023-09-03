@@ -13,15 +13,40 @@ namespace Audio
 			class _AUDIO_OSC_UNMANAGED_API OscString
 			{
 			public:
-				static int GetPaddedSize(const std::string& value);
-				static int GetPaddedSize(int count);
+				OscString();
+				OscString(const char* value, int count);
+				OscString(std::string& value);
 
-				static std::ostream& WritePadded(std::ostream& ostr, const std::string& value);
-				static std::ostream& WritePadded(std::ostream& ostr, const char* value, int count);
+				const char* get() const;
+				
+				int get_Size() const;
+				_declspec(property(get = get_Size)) int Size;
+
+				int get_PaddedSize() const;
+				_declspec(property(get = get_PaddedSize)) int PaddedSize;
+
+				bool IsEqualTo(const char* value, int count);
+				void Set(const char* value, int count);
+				void Clear();
+
+				OscString& operator = (const char* value);
+				bool operator == (const char* value);
+				bool operator != (const char* value);
+
+				operator const char* () const;
+
+				std::ostream& Write(std::ostream& ostr) const;
+				std::istream& Read(std::istream& istr);
+
+				static int CalculatePaddedSize(int count);
 
 			private:
-				OscString();
+				std::unique_ptr<char[]> m_value;
+				int m_size;
 			};
+
+			_AUDIO_OSC_UNMANAGED_API std::ostream& operator << (std::ostream& ostr, const OscString& it);
+			_AUDIO_OSC_UNMANAGED_API std::istream& operator >> (std::istream& istr, OscString& it);
 		}
 	}
 }
