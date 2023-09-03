@@ -55,7 +55,7 @@ void LooperEvents::IsSessionRecordingChanged(ILooper& looper, bool isSessionReco
 	//std::wcout << ClearLine << L"Session recording: " << std::boolalpha << isSessionRecording << std::endl;
 }
 
-void LooperEvents::AddLoop(ILooper& looper, int channelCount, int samplePosition, int sampleCount)
+void LooperEvents::AddLoop(ILooper& looper, const GUID& id,  int channelCount, int samplePosition, int sampleCount)
 {
 	std::wcout << ClearLine << L"Added loop (channels: " << channelCount << L", pos: " << samplePosition << L", len: " << sampleCount << L")" << std::endl;
 }

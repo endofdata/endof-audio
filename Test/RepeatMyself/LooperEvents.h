@@ -22,7 +22,7 @@ namespace RepeatMyself
 
 		void IsSessionRecordingChanged(ILooper& looper, bool isSessionRecording);
 
-		void AddLoop(ILooper& looper, int channelCount, int samplePosition, int sampleCount);
+		void AddLoop(ILooper& looper, const GUID& id, int channelCount, int samplePosition, int sampleCount);
 
 		void DropRecording(ILooper& looper);
 
