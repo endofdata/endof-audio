@@ -32,14 +32,15 @@ namespace Audio
 				void SetNextParameter(const TypeTag tag, const void* value);
 				void SetAllParameters(std::istream& istr);
 
-				int get_Size() const;
+				virtual int get_Size() const;
+				_declspec(property(get = get_Size)) int Size;
 
 				std::ostream& Write(std::ostream& ostr) const;
 
 				static int GetParameterSize(const TypeTag tag);
 				static bool IsVariantSize(const TypeTag tag);
 
-				friend std::ostream& operator << (std::ostream& ostr, const MessageBuilder& it);
+				friend _AUDIO_OSC_UNMANAGED_API std::ostream& operator << (std::ostream& ostr, const MessageBuilder& it);
 
 			private:
 

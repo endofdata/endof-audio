@@ -110,6 +110,7 @@ void MessageBuilder::SetNextParameter(const TypeTag tag, const void* value)
 		std::memcpy(m_parametersWritePos, value, size);
 		m_parametersWritePos += size;
 	}
+	m_parametersWritten++;
 }
 
 void MessageBuilder::SetAllParameters(std::istream& istr)
@@ -124,7 +125,7 @@ int MessageBuilder::get_Size() const
 {
 	return
 		m_addressPattern.PaddedSize +
-		OscString::CalculatePaddedSize(1 + static_cast<int>(m_parameterTypes.size())) +
+		OscString::GetPaddedStringSize(1 + static_cast<int>(m_parameterTypes.size())) +
 		m_parametersSize;
 }
 
@@ -151,6 +152,10 @@ std::ostream& Audio::Osc::Unmanaged::operator << (std::ostream& ostr, const Mess
 
 	ostr << ',';
 	std::for_each(it.m_parameterTypes.begin(), it.m_parameterTypes.end(), [&ostr](const TypeTag t) { ostr << static_cast<char>(t); });
+
+	int padSize = OscString::GetPadSize(it.m_parameterTypes.size() + 1);
+	int padBytes = 0;
+	ostr.write(reinterpret_cast<char*>(&padBytes), padSize);
 
 	ostr.write(it.m_parameters.get(), it.m_parametersSize);
 

@@ -14,6 +14,7 @@ namespace Audio
 			{
 			public:
 				OscString();
+				OscString(const char* value);
 				OscString(const char* value, int count);
 				OscString(std::string& value);
 
@@ -38,7 +39,8 @@ namespace Audio
 				std::ostream& Write(std::ostream& ostr) const;
 				std::istream& Read(std::istream& istr);
 
-				static int CalculatePaddedSize(int count);
+				inline static int GetPaddedStringSize(int count);
+				inline static int GetPadSize(int count);
 
 			private:
 				std::unique_ptr<char[]> m_value;

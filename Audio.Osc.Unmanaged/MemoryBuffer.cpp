@@ -5,7 +5,7 @@ using namespace Audio::Osc::Unmanaged;
 
 
 MemoryBuffer::MemoryBuffer(std::istream& istr, size_t size) :
-	m_buffer(std::make_unique<char>(size)),
+	m_buffer(std::make_unique<char[]>(size)),
 	m_size(size)
 {
 	char* buffer = m_buffer.get();

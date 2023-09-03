@@ -13,12 +13,17 @@ OscString::OscString() :
 {
 }
 
+OscString::OscString(const char* value)
+{
+	*this = value;
+}
+
 OscString::OscString(const char* value, int count)
 {
 	Set(value, count);
 }
 
-OscString::OscString(std::string& value) : OscString(value.c_str(), value.length())
+OscString::OscString(std::string& value) : OscString(value.c_str(), static_cast<int>(value.length()))
 {
 }
 
@@ -34,7 +39,7 @@ int OscString::get_Size() const
 
 int OscString::get_PaddedSize() const
 {
-	return CalculatePaddedSize(m_size);
+	return GetPaddedStringSize(m_size);
 }
 
 OscString::operator const char* () const
@@ -46,7 +51,7 @@ OscString& OscString::operator = (const char* value)
 {
 	if (value != nullptr)
 	{
-		Set(value, strlen(value));
+		Set(value, static_cast<int>(strlen(value)));
 	}
 	else
 	{
@@ -57,7 +62,7 @@ OscString& OscString::operator = (const char* value)
 
 bool OscString::operator ==(const char* value)
 {
-	return IsEqualTo(value, value == nullptr ? 0 : strlen(value));
+	return IsEqualTo(value, value == nullptr ? 0 : static_cast<int>(strlen(value)));
 }
 
 bool OscString::operator !=(const char* value)
@@ -111,7 +116,7 @@ std::istream& OscString::Read(std::istream& istr)
 	while (istr.good())
 	{
 		istr.get(fourChars, sizeof(fourChars), '\0');
-		int read = std::strlen(fourChars);
+		int read = static_cast<int>(std::strlen(fourChars));
 
 		size += read;
 
@@ -140,11 +145,14 @@ std::istream& OscString::Read(std::istream& istr)
 	return istr;
 }
 
-int OscString::CalculatePaddedSize(int count)
+int OscString::GetPaddedStringSize(int count)
 {
-	int pad = 4 - (count % 4);
+	return count + GetPadSize(count);
+}
 
-	return count + pad;
+int OscString::GetPadSize(int count)
+{
+	return 4 - (count % 4);
 }
 
 std::ostream& Audio::Osc::Unmanaged::operator << (std::ostream& ostr, const OscString& it)
