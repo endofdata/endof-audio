@@ -110,6 +110,7 @@
     <ClCompile Include="SampleBufferTests.cpp" />
     <ClCompile Include="SampleContainerTests.cpp" />
     <ClCompile Include="SampleTransferTests.cpp" />
+    <ClCompile Include="NetPeerServerTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Constants.h" />
