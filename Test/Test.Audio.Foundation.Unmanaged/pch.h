@@ -8,5 +8,13 @@
 #define PCH_H
 
 // add headers that you want to pre-compile here
+#define NOMINMAX
+
+#include <vector>
+#include <functional>
+#include <memory>
+#include <vector>
+#include <algorithm>
+#include <iomanip>
 
 #endif //PCH_H

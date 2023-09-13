@@ -9,11 +9,7 @@
 #include <IOutputChannelPair.h>
 #include <FoundationObjectFactory.h>
 #include <SampleType.h>
-#include <memory>
-#include <vector>
-#include <algorithm>
 #include <SampleConversionUnmanaged.h>
-#include <iomanip>
 #include <MemCheck.h>
 
 using namespace Test::Audio::Common;

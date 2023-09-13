@@ -4,8 +4,7 @@
 #include "Constants.h"
 #include <ITake.h>
 #include <FoundationObjectFactory.h>
-#include <vector>
-#include <functional>
+
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Audio::Foundation::Unmanaged;
