@@ -102,7 +102,7 @@ ISampleSourcePtr& SourceJoiner::get_Source(const GUID& id)
 	return found->first;
 }
 
-MixParameter& SourceJoiner::get_MixParameter(const GUID& id)
+MixParameter& SourceJoiner::get_Parameter(const GUID& id)
 {
 	auto found = std::find_if(m_vecSources.begin(), m_vecSources.end(), [id](std::pair<ISampleSourcePtr, MixParameter>& item)
 	{

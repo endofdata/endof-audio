@@ -25,7 +25,7 @@ namespace Audio
 
 				ISampleSourcePtr& get_Source(const GUID& id);
 
-				MixParameter& get_MixParameter(const GUID& id);
+				MixParameter& get_Parameter(const GUID& id);
 
 				void AddSource(ISampleSourcePtr& source, const MixParameter& mix);
 
