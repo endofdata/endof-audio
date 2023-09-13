@@ -8,6 +8,8 @@
 #endif
 #endif
 
+
+
 namespace Audio
 {
 	namespace Foundation
@@ -15,6 +17,12 @@ namespace Audio
 		namespace Unmanaged
 		{
 			typedef float Sample;
+
+			class _AUDIO_FOUNDATION_UNMANAGED_API Constants
+			{
+			public:
+				static const int DefaultNetBufferSize = 4096;
+			};			
 		}
 	}
 }

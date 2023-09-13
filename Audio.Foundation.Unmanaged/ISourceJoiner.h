@@ -23,11 +23,10 @@ namespace Audio
 					_declspec(property(get = get_SourceCount)) int SourceCount;
 
 					ISampleSourcePtr& get_Source(const GUID& id) = 0;
-
 					_declspec(property(get = get_Source)) ISampleSourcePtr Sources[];
 
-					MixParameter& get_MixParameter(const GUID& id) = 0;
-
+					MixParameter& get_Parameter(const GUID& id) = 0;
+					_declspec(property(get = get_Parameter)) MixParameter Parameter[];
 
 					/// <summary>
 					/// Adds a new item to the <see cref="Sources"/> collection

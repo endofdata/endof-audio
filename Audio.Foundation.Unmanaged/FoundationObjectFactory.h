@@ -20,6 +20,10 @@
 #include <ITransport.h>
 #include <IController.h>
 #include <ISpatial.h>
+#include <IServerEvents.h>
+#include <INetPeerServer.h>
+#include <INetClient.h>
+
 #include <string>
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
@@ -81,6 +85,12 @@ namespace Audio
 				static IOscillatorPtr CreateTestOscillator(double sampleRate, double frequency, double amplitude);
 
 				static IMidiInputPtr CreateMidiInput();
+
+				static IServerEventsPtr CreateServerEvents();
+
+				static INetPeerServerPtr CreateNetPeerServer(IServerEventsPtr& events, int bufferSize = Constants::DefaultNetBufferSize, bool isUDP = false, bool isIPv6 = false);
+
+				static INetClientPtr CreateNetClient(int bufferSize = Constants::DefaultNetBufferSize, bool isUDP = false, bool isIPv6 = false);
 
 				static int SelectMidiInputDevice(MidiInCapsHandler handler, void* callbackParam = nullptr);
 

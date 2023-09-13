@@ -32,6 +32,10 @@
 #include "MidiTransportControl.h"
 #include "GainProcessor.h"
 #include "Oscillator.h"
+#include "ServerEvents.h"
+#include "NetPeerServer.h"
+#include "NetClient.h"
+
 #include <stdexcept>
 
 int FoundationObjectFactory::LastTakeId = 0;
@@ -234,6 +238,21 @@ IOscillatorPtr FoundationObjectFactory::CreateTestOscillator(double sampleRate, 
 	return oscillator;
 }
 
+IServerEventsPtr FoundationObjectFactory::CreateServerEvents()
+{
+	return new ServerEvents();
+}
+
+INetPeerServerPtr FoundationObjectFactory::CreateNetPeerServer(IServerEventsPtr& events, int bufferSize, bool isUDP, bool isIPv6)
+{
+	return new NetPeerServer(events, bufferSize, isUDP, isIPv6);
+}
+
+INetClientPtr FoundationObjectFactory::CreateNetClient(int bufferSize, bool isUDP, bool isIPv6)
+{
+	return new NetClient(bufferSize, isUDP, isIPv6);
+}
+
 int FoundationObjectFactory::SelectMidiInputDevice(MidiInCapsHandler handler, void* callbackParam)
 {
 	return MidiInput::ListDevices(handler, callbackParam);
@@ -254,7 +273,11 @@ int FoundationObjectFactory::NextTakeId()
 GUID FoundationObjectFactory::CreateId()
 {
 	GUID guid;
-	UuidCreate(&guid);
+	auto status = UuidCreate(&guid);
 
+	if (status != 0)
+	{
+		throw std::runtime_error("Failed to create GUID.");
+	}
 	return guid;
 }

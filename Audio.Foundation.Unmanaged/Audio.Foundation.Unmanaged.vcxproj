@@ -47,11 +47,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Configuration)\$(Platform)\</IntDir>
+    <IncludePath>$(SolutionDir)Audio.Vst.Unmanaged;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Configuration)\$(Platform)\</IntDir>
+    <IncludePath>$(SolutionDir)Audio.Vst.Unmanaged;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -69,7 +71,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>rpcrt4.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Ws2_32.lib;rpcrt4.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)bin\$(Configuration)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -93,18 +95,23 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>rpcrt4.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Ws2_32.lib;rpcrt4.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)bin\$(Configuration)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Audio.Foundation.Unmanaged.h" />
     <ClInclude Include="AudioFoundationException.h" />
+    <ClInclude Include="INetClient.h" />
+    <ClInclude Include="INetEndpoint.h" />
+    <ClInclude Include="INetPeerServer.h" />
+    <ClInclude Include="ServerEvents.h" />
     <ClInclude Include="ContainerWriter.h" />
     <ClInclude Include="FileReader.h" />
     <ClInclude Include="FileWriter.h" />
     <ClInclude Include="GainProcessor.h" />
     <ClInclude Include="HostClock.h" />
+    <ClInclude Include="IServerEvents.h" />
     <ClInclude Include="IHostClock.h" />
     <ClInclude Include="IInputChannel.h" />
     <ClInclude Include="IMeterChannel.h" />
@@ -136,6 +143,7 @@
     <ClInclude Include="MidiMessage.h" />
     <ClInclude Include="MixParameter.h" />
     <ClInclude Include="FoundationObjectFactory.h" />
+    <ClInclude Include="OscControl.h" />
     <ClInclude Include="Oscillator.h" />
     <ClInclude Include="OutputFloat32ChannelPair.h" />
     <ClInclude Include="OutputInt24ChannelPair.h" />
@@ -162,16 +170,21 @@
     <ClInclude Include="Take.h" />
     <ClInclude Include="TakeSequence.h" />
     <ClInclude Include="AudioTime.h" />
+    <ClInclude Include="NetClient.h" />
+    <ClInclude Include="NetEndpoint.h" />
+    <ClInclude Include="NetPeerServer.h" />
     <ClInclude Include="Transport.h" />
     <ClInclude Include="MidiTransportControl.h" />
     <ClInclude Include="ControllerEvents.h" />
     <ClInclude Include="UnknownBase.h" />
     <ClInclude Include="ContainerReader.h" />
     <ClInclude Include="VectorWriter.h" />
+    <ClInclude Include="WinsockLifetime.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioFoundationException.cpp" />
     <ClCompile Include="AudioTime.cpp" />
+    <ClCompile Include="ServerEvents.cpp" />
     <ClCompile Include="ContainerReader.cpp" />
     <ClCompile Include="ContainerWriter.cpp" />
     <ClCompile Include="FileReader.cpp" />
@@ -183,6 +196,7 @@
     <ClCompile Include="MidiInput.cpp" />
     <ClCompile Include="MidiMessage.cpp" />
     <ClCompile Include="FoundationObjectFactory.cpp" />
+    <ClCompile Include="OscControl.cpp" />
     <ClCompile Include="Oscillator.cpp" />
     <ClCompile Include="ProcessingChain.cpp" />
     <ClCompile Include="ProcessingContext.cpp" />
@@ -202,10 +216,14 @@
     <ClCompile Include="StreamWriter.cpp" />
     <ClCompile Include="Take.cpp" />
     <ClCompile Include="TakeSequence.cpp" />
+    <ClCompile Include="NetClient.cpp" />
+    <ClCompile Include="NetEndpoint.cpp" />
+    <ClCompile Include="NetPeerServer.cpp" />
     <ClCompile Include="Transport.cpp" />
     <ClCompile Include="MidiTransportControl.cpp" />
     <ClCompile Include="ControllerEvents.cpp" />
     <ClCompile Include="VectorWriter.cpp" />
+    <ClCompile Include="WinsockLifetime.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

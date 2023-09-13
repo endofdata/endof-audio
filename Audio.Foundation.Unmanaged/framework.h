@@ -5,3 +5,5 @@
 // Windows Header Files
 #include <windows.h>
 #include <mmeapi.h>
+#include <WinSock2.h>
+#include <WS2tcpip.h>
