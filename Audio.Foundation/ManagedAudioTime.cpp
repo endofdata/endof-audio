@@ -29,17 +29,17 @@ ManagedAudioTime::~ManagedAudioTime()
 
 int ManagedAudioTime::Minutes::get()
 {
-	return _upper.Item1;
+	return static_cast<int>(_upper.Item1);
 }
 
 int ManagedAudioTime::Seconds::get()
 {
-	return _lower.Item1;
+	return static_cast<int>(_lower.Item1);
 }
 
 int ManagedAudioTime::MilliSeconds::get()
 {
-	return _lower.Item2;
+	return static_cast<int>(_lower.Item2);
 }
 
 long long ManagedAudioTime::Value::get()
