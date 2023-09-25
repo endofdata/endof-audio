@@ -521,7 +521,7 @@ int WaveFile::WriteSamples(Stream^ source, int count)
 			for (int s = 0; s < count; s++)
 			{
 				// This must match the typedef of sample
-				Sample value = reader->ReadDouble();
+				Sample value = reader->ReadSingle();
 				m_sampleWriter(value);
 				done++;
 			}
