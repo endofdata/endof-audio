@@ -18,7 +18,7 @@ namespace TestAudioVst
 		{
 			const wchar_t* pwcszLibName = L"C:\\Program Files\\Common Files\\VST3\\Unfiltered Audio Indent.vst3";
 
-			IVstHostPtr host = VstObjectFactory::CreateVstHost(L"Ludger", Constants::SampleCount, Constants::SampleRate);
+			IVstHostPtr host = VstObjectFactory::CreateVstHost(L"Ludger", Test::Audio::Vst::Unmanaged::Constants::SampleCount, Test::Audio::Vst::Unmanaged::Constants::SampleRate);
 
 			std::wstring pluginId = host->AddLibrary(pwcszLibName);
 
