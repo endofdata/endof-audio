@@ -8,7 +8,7 @@
 		<owners>endofdata</owners>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>Unmanaged ASIO (tm) classes for audio development</description>
-		<copyright>Copyright endofdata 2023</copyright>
+		<copyright>Copyright endofdata 2024</copyright>
 		<tags>audio native ASIO</tags>
 		<dependencies>
 			<dependency id="Audio.Foundation.Unmanaged" version="1.0.0" />
