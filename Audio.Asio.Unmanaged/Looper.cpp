@@ -58,6 +58,7 @@ Looper::Looper(AsioCorePtr& device) :
 	m_vstHost(nullptr),
 	m_delay(1000),
 	m_isSessionRecording(false),
+	m_recordingStatus(RecordingStatusType::Off),
 	m_context(nullptr),
 	m_stopCalled(false),
 	m_refCount(0)
@@ -353,6 +354,11 @@ bool Looper::AddLoop()
 		return true;
 	}
 	return false;
+}
+
+MixParameter& Looper::get_LoopParameter(const GUID& id)
+{
+	return m_joiner->Parameter[id];
 }
 
 bool Looper::RemoveLoop(const GUID& id)

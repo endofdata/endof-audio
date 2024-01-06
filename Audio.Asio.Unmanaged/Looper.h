@@ -61,6 +61,8 @@ namespace Audio
 				IControllerPtr get_Controller();
 				void put_Controller(IControllerPtr& value);
 
+				MixParameter& get_LoopParameter(const GUID& id);
+
 				bool RemoveLoop(const GUID& id);
 
 				DECLARE_IUNKNOWN

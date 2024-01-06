@@ -55,6 +55,9 @@ namespace Audio
 					void put_Controller(IControllerPtr& value) = 0;
 					_declspec(property(get = get_Controller, put = put_Controller)) IControllerPtr Controller;
 
+					MixParameter& get_LoopParameter(const GUID& id) = 0;
+					_declspec(property(get = get_LoopParameter)) MixParameter LoopParameter[];
+
 					bool RemoveLoop(const GUID& id) = 0;
 				};
 
