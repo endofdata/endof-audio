@@ -1,4 +1,5 @@
 ﻿using Lupus.Model;
+using System;
 using System.Windows;
 using System.Windows.Input;
 
@@ -12,10 +13,15 @@ namespace Lupus
 			private set => DataContext = value;
 		}
 
-		internal DeviceSelectionDialog()
+		internal DeviceSelectionDialog(DeviceSelectionModel model)
 		{
+			if (model is null)
+			{
+				throw new ArgumentNullException(nameof(model));
+			}
+
 			InitializeComponent();
-			Model = new DeviceSelectionModel();
+			Model = model;
 		}
 
 		private void CloseDialog_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = Model?.SelectedDriver != null;

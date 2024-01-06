@@ -1,6 +1,8 @@
 ﻿using Audio.Asio.Interop;
 using Audio.Foundation.Interop;
 using Lupus.Model;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -20,6 +22,8 @@ namespace Lupus
 			set => DataContext = value;
 		}
 
+		internal IServiceProvider AppServices => ((App)Application.Current).Services;
+
 		public MainWindow()
 		{			
 			InitializeComponent();
@@ -32,15 +36,27 @@ namespace Lupus
 
 			try
 			{
-				var dialog = new DeviceSelectionDialog
-				{
-					Owner = this					
-				};
+				var appSettingsMonitor = AppServices.GetRequiredService<IOptionsMonitor<AppSettings>>();				
+				var appSettings = appSettingsMonitor.CurrentValue;
+				var selectionModel = appSettings.GetDeviceSelectionModel();
 
-				if (dialog.ShowDialog() == true)
+				if (!appSettings.HasDevices)
 				{
-					selectedMidiInput = dialog.Model.SelectedMidiInput ?? throw new InvalidOperationException();
-					selectedDriver = dialog.Model.SelectedDriver ?? throw new InvalidOperationException();
+					var dialog = new DeviceSelectionDialog(selectionModel)
+					{
+						Owner = this
+					};
+					if(dialog.ShowDialog() == true)
+					{
+						appSettingsMonitor.OnChange(s => appSettings = s);
+						((App)Application.Current).UpdateConfig(selectionModel);
+					}
+				}
+
+				if(appSettings.HasDevices == true)
+				{
+					selectedMidiInput = selectionModel.SelectedMidiInput ?? throw new InvalidOperationException();
+					selectedDriver = selectionModel.SelectedDriver ?? throw new InvalidOperationException();
 
 					// TODO: Allow to select I/O channels
 					var inputChannels = new int[] { 0, 1 };
@@ -123,5 +139,5 @@ namespace Lupus
 			}
 			return track != null;
 		}
-    }
+	}
 }

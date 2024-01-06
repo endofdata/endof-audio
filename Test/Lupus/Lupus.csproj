@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net6.0-windows</TargetFramework>
+		<TargetFramework>net8.0-windows</TargetFramework>
 		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
 		<RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
@@ -18,6 +18,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="Audio.Asio" Version="1.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -29,6 +33,12 @@
 		<Resource Include="Fonts\DSEG\DSEG7Classic-BoldItalic.ttf" />
 		<Resource Include="Fonts\kaum_keras_kepala\kaum keras kepala.ttf" />
 		<Resource Include="Fonts\storytype\RADIO A TREQER.otf" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="appsettings.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>

@@ -5,7 +5,8 @@
       "environmentVariables": {
         "COREHOST_TRACE": "1",
         "COREHOST_TRACE_VERBOSITY": "4",
-        "COREHOST_TRACEFILE": ".\\corehost_trace.log"
+        "COREHOST_TRACEFILE": ".\\corehost_trace.log",
+        "DOTNET_ENVIRONMENT": "Development"
       },
       "nativeDebugging": true,
       "hotReloadEnabled": false
