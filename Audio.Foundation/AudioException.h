@@ -12,9 +12,6 @@ namespace Audio
 				AudioException();
 				AudioException(System::String^ message);
 				AudioException(System::String^ message, int code);
-				AudioException(System::Runtime::Serialization::SerializationInfo^ info, System::Runtime::Serialization::StreamingContext context);
-
-				void GetObjectData(System::Runtime::Serialization::SerializationInfo^ info, System::Runtime::Serialization::StreamingContext context) override;
 
 				property int Error
 				{

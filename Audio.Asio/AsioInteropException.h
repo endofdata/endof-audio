@@ -8,7 +8,6 @@ namespace Audio
 	{
 		namespace Interop
 		{
-			[System::Serializable]
 			public ref class AsioInteropException : public System::Exception, public System::Runtime::Serialization::ISerializable
 			{
 			public:
@@ -16,18 +15,11 @@ namespace Audio
 
 				AsioInteropException(System::String^ message, int iErrorCode);
 
-				[System::Security::SecurityCriticalAttribute()]
-				virtual void GetObjectData(System::Runtime::Serialization::SerializationInfo^ info, 
-					System::Runtime::Serialization::StreamingContext context) override;
-
 				property Unmanaged::AsioError ASIOError
 				{
 					Unmanaged::AsioError get();
 				}
 			private:
-				AsioInteropException(System::Runtime::Serialization::SerializationInfo^ info, 
-					System::Runtime::Serialization::StreamingContext context);
-
 				void GetAsioErrorFromInt(int iErrorCode);
 
 				Unmanaged::AsioError m_asioError;

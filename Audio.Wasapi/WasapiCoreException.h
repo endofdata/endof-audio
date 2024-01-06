@@ -10,9 +10,6 @@ namespace Audio
 			WasapiCoreException();
 			WasapiCoreException(System::String^ message);
 			WasapiCoreException(System::String^ message, int code);
-			WasapiCoreException(System::Runtime::Serialization::SerializationInfo^ info, System::Runtime::Serialization::StreamingContext context);
-
-			void GetObjectData(System::Runtime::Serialization::SerializationInfo^ info, System::Runtime::Serialization::StreamingContext context) override;
 
 			property int Error
 			{

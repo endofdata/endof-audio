@@ -20,18 +20,6 @@ WasapiCoreException::WasapiCoreException(String^ message, int code) : Exception(
 	m_error = code;
 }
 
-WasapiCoreException::WasapiCoreException(SerializationInfo^ info, StreamingContext context) : Exception(info, context)
-{
-	m_error = info->GetInt32("error");
-}
-
-void WasapiCoreException::GetObjectData(SerializationInfo^ info, StreamingContext context)
-{
-	Exception::GetObjectData(info, context);
-
-	info->AddValue("error", static_cast<Int32>(m_error));
-}
-
 int WasapiCoreException::Error::get()
 {
 	return m_error;
