@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ManagedLooperConfig.h"
+#include "ManagedLooperTrack.h"
 #include <ILooper.h>
 #include "LooperEvents.h"
 
@@ -160,6 +161,8 @@ namespace Audio
 					Audio::Foundation::Interop::ManagedAudioTime^ get();
 					void set(Audio::Foundation::Interop::ManagedAudioTime^ value);
 				}
+
+				ManagedLooperTrack^ GetTrack(System::Guid id);
 
 			internal:
 				ManagedLooper(Audio::Asio::Unmanaged::Abstractions::ILooper* inner);

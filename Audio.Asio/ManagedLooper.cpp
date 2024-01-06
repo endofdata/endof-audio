@@ -129,10 +129,12 @@ int ManagedLooper::InsertFx(String^ pluginId)
 
 bool ManagedLooper::RemoveLoop(Guid id)
 {
-	array<Byte>^ guidData = id.ToByteArray();
-	pin_ptr<Byte> data = &(guidData[0]);
+	return _unmanaged->RemoveLoop(GuidConversion::FromManaged(id));
+}
 
-	return _unmanaged->RemoveLoop(*(_GUID*)data);
+ManagedLooperTrack^ ManagedLooper::GetTrack(Guid id)
+{
+	return gcnew ManagedLooperTrack(id, _unmanaged->LoopParameter[GuidConversion::FromManaged(id)]);
 }
 
 bool ManagedLooper::IsLooping::get()
