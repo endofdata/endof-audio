@@ -124,7 +124,7 @@ namespace Test.Audio.Asio
 			{
 				var track = tapeMachine.AddTrack();
 
-				Assert.IsNotNull(track, $"Track ID {takeList.Key} can be added.");
+				Assert.That(track, Is.Not.Null, $"Track ID {takeList.Key} can be added.");
 
 				foreach (var take in takeList)
 				{

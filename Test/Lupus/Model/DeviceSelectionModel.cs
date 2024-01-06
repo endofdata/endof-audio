@@ -6,7 +6,7 @@ namespace Lupus.Model
 {
 	internal class DeviceSelectionModel
 	{
-		internal DeviceSelectionModel()
+		public DeviceSelectionModel()
 		{
 			var drivers = DriverRegistry.FromRegistry();
 
@@ -26,12 +26,12 @@ namespace Lupus.Model
 		public ObservableCollection<RegisteredDriver> RegisteredDrivers
 		{
 			get;
-		} = new ObservableCollection<RegisteredDriver>();
+		} = [];
 
 		public ObservableCollection<RegisteredMidiInput> RegisteredMidiInputs
 		{
 			get;
-		} = new ObservableCollection<RegisteredMidiInput>();
+		} = [];
 
 		public RegisteredDriver? SelectedDriver
 		{

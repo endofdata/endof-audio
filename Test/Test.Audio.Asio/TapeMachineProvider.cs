@@ -118,7 +118,7 @@ namespace Test.Audio.Asio
 				Assert.That(tapeMachine, Is.Not.Null, "TapeMachine is not null.");
 
 				// null-forgiving operator: tapeMachine is Not.Null asserted before
-				Assert.IsFalse(tapeMachine!.Tracks.Any(), "New tape machine has no tracks.");
+				Assert.That(tapeMachine!.Tracks.Any(), Is.False, "New tape machine has no tracks.");
 			}
 			catch (Exception)
 			{
