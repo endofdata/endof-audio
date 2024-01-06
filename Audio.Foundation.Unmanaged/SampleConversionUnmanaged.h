@@ -45,7 +45,7 @@ namespace Audio
 				/// <param name="factorRight">Receives the factor for the right channel</param>
 				static inline void LevelAndPanFactor(double level, double pan, double& factorLeft, double& factorRight, double panLaw = PanLaw4Dot5dB)
 				{
-					factorLeft = level * pow((1.0 - pan), panLaw);
+					factorLeft = level * pow(PanRight - pan, panLaw);
 					factorRight = level * pow(pan, panLaw);
 				}
 
