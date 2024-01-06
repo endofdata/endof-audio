@@ -8,17 +8,17 @@
 		<owners>endofdata</owners>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>ASIO classes for audio development in .NET</description>
-		<copyright>Copyright endofdata 2023</copyright>
+		<copyright>Copyright endofdata 2025</copyright>
 		<tags>audio C++/CLI</tags>
 		<dependencies>
-			<group targetFramework="net6.0">
+			<group targetFramework="net8.0">
 				<dependency id="Audio.Asio.Unmanaged" version="1.0.0" exclude="Build,Analyzers"/>
 				<dependency id="Audio.Foundation" version="1.0.0" />
 			</group>
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="..\bin\$configuration$\x64\Audio.Asio.dll" target="lib\net6.0\Audio.Asio.dll"/>
-		<file src="..\bin\$configuration$\x64\ijwhost.dll" target="lib\net6.0\ijwhost.dll"/>
+		<file src="..\bin\$configuration$\x64\Audio.Asio.dll" target="lib\net8.0\Audio.Asio.dll"/>
+		<file src="..\bin\$configuration$\x64\ijwhost.dll" target="lib\net8.0\ijwhost.dll"/>
 	</files>
 </package>

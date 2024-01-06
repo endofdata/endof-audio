@@ -8,16 +8,16 @@
 		<owners>endofdata</owners>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>Foundation classes for audio development in .NET</description>
-		<copyright>Copyright endofdata 2023</copyright>
+		<copyright>Copyright endofdata 2024</copyright>
 		<tags>audio C++/CLI</tags>
 		<dependencies>
-			<group targetFramework="net6.0">
+			<group targetFramework="net8.0">
 				<dependency id="Audio.Foundation.Unmanaged" version="1.0.0" exclude="Build,Analyzers"/>
 			</group>
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="..\bin\$configuration$\x64\Audio.Foundation.dll" target="lib\net6.0\Audio.Foundation.dll"/>
-		<file src="..\bin\$configuration$\x64\ijwhost.dll" target="lib\net6.0\ijwhost.dll"/>
+		<file src="..\bin\$configuration$\x64\Audio.Foundation.dll" target="lib\net8.0\Audio.Foundation.dll"/>
+		<file src="..\bin\$configuration$\x64\ijwhost.dll" target="lib\net8.0\ijwhost.dll"/>
 	</files>
 </package>

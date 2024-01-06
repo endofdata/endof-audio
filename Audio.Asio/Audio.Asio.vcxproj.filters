@@ -50,6 +50,7 @@
     <ClCompile Include="LooperEvents.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="ManagedLooperTrack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AsioInteropException.h">
@@ -107,6 +108,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="LooperEvents.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ManagedLooperTrack.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
