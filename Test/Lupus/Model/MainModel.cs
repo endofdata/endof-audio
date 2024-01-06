@@ -139,15 +139,18 @@ namespace Lupus.Model
 		{
 			_dispatcher.InvokeAsync(() =>
 			{
-				Status.Tracks.Add(new ManagedLooperTrackStatus
+				var track = new ManagedLooperTrackStatus
 				{
-					Name = $"Loop {Status.Tracks.Count + 1}",
+					Id = e.Id,
+					Name = $"Loop {Status.GetNextLoopNumber()}",
 					Gain = 0.8f,
 					Pan = 0.5f,
 					ChannelCount = e.ChannelCount,
 					SamplePosition = e.SamplePosition,
 					SampleCount = e.SampleCount
-				});
+				};
+				Status.Tracks.Add(track);
+				Status.SelectedTrack = track;
 			});
 		}
 

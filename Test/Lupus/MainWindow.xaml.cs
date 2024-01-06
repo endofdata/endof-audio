@@ -3,6 +3,7 @@ using Audio.Foundation.Interop;
 using Lupus.Model;
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Windows;
 
@@ -78,6 +79,49 @@ namespace Lupus
 		{
 			Model?.Dispose();
 			Model = null;
+		}
+
+		private void SoloTrack_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e) => e.CanExecute = Model?.Status.SelectedTrack != null;
+
+		private void SoloTrack_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+		{
+			if (TryGetSelectedTrack(out var track))
+			{
+				Model!.Status.ToggleTrackSolo(track);
+			}
+		}
+
+
+		private void MuteTrack_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e) => e.CanExecute = Model?.Status.SelectedTrack != null;
+
+		private void MuteTrack_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+		{
+			if (TryGetSelectedTrack(out var track))
+			{
+				Model!.Status.ToggleTrackMute(track);
+			}
+		}
+
+		private void DeleteTrack_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e) => e.CanExecute = Model?.Status.SelectedTrack != null;
+
+
+		private void DeleteTrack_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+		{
+			if (TryGetSelectedTrack(out var track))
+			{
+				Model!.Looper.RemoveLoop(track.Id);
+			}
+		}
+
+		private bool TryGetSelectedTrack([NotNullWhen(true)] out ManagedLooperTrackStatus? track)
+		{
+			track = Model?.Status.SelectedTrack;
+
+			if (track == null)
+			{
+				MessageBox.Show("No track selected.");
+			}
+			return track != null;
 		}
     }
 }

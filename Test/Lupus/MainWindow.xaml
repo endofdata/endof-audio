@@ -54,6 +54,11 @@
 			<Setter Property="Height" Value="28"/>
 		</Style>
     </Window.Resources>
+	<Window.CommandBindings>
+		<CommandBinding Command="{x:Static local:CustomCommands.SoloTrack}" CanExecute="SoloTrack_CanExecute" Executed="SoloTrack_Executed"/>
+		<CommandBinding Command="{x:Static local:CustomCommands.MuteTrack}" CanExecute="MuteTrack_CanExecute" Executed="MuteTrack_Executed"/>
+		<CommandBinding Command="{x:Static local:CustomCommands.DeleteTrack}" CanExecute="DeleteTrack_CanExecute" Executed="DeleteTrack_Executed"/>
+	</Window.CommandBindings>
 	<Border Style="{StaticResource Outermost}">
 		<Grid Margin="15">
 			<Grid.RowDefinitions>
@@ -76,7 +81,7 @@
 				</Border>
 			</StackPanel>
 			<TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Text="Lupus" Style="{StaticResource Logo}"/>
-			<ListView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Status.Tracks}">
+			<ListView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Status.Tracks}" SelectedItem="{Binding Status.SelectedTrack}">
 				<ListView.ItemTemplate>
 					<DataTemplate>
 						<Grid>
@@ -91,9 +96,12 @@
 							<TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Name}" Foreground="{StaticResource Foreground}"/>
 							<synt:PanDialControl Grid.Row="0" Grid.Column="1" Value="{Binding Pan}"/>
 							<synt:GainDialControl Grid.Row="0" Grid.Column="2" Value="{Binding Gain}"/>
-							<Button Grid.Row="0" Grid.Column="3" Content="S" Foreground="{StaticResource Foreground}"/>
-							<Button Grid.Row="0" Grid.Column="4" Content="M" Foreground="{StaticResource Accent2}"/>
-							<Button Grid.Row="0" Grid.Column="5" Content="X" Foreground="{StaticResource Accent1}"/>
+							<Button Grid.Row="0" Grid.Column="3" Command="{x:Static local:CustomCommands.SoloTrack}" CommandParameter="{Binding}"
+								Content="S" Foreground="{StaticResource Foreground}"/>
+							<Button Grid.Row="0" Grid.Column="4" Command="{x:Static local:CustomCommands.MuteTrack}" 
+								Content="M" Foreground="{StaticResource Accent2}"/>
+							<Button Grid.Row="0" Grid.Column="5" Command="{x:Static local:CustomCommands.DeleteTrack}"
+								Content="X" Foreground="{StaticResource Accent1}"/>
 						</Grid>
 					</DataTemplate>
 				</ListView.ItemTemplate>
