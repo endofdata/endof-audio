@@ -8,7 +8,7 @@
 			<Setter.Value>
 				<ControlTemplate>
 					<Border>
-						<Rectangle Margin="2" StrokeThickness="1" Stroke="{StaticResource ForegroundBrush}" StrokeDashArray="1 2" />
+						<Rectangle Margin="2" StrokeThickness="1" Stroke="{StaticResource Foreground}" StrokeDashArray="1 2" />
 					</Border>
 				</ControlTemplate>
 			</Setter.Value>
