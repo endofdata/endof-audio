@@ -19,34 +19,27 @@ namespace Lupus
 
 		private IServiceProvider? _services;
 
+
 		public IServiceProvider Services
 		{
 			get => _services ?? throw new InvalidOperationException($"'{typeof(App)}.{nameof(Services)}' are not available before {nameof(OnStartup)} has run.");
 			private set => _services = value;
 		}
 
-		internal void UpdateConfig(DeviceSelectionModel model)
+		internal void WriteAppSettings(AppSettings appSettings)
 		{
 			try
 			{
 				var appBase = GetAppBase();
 				var envSpecific = Path.Combine(appBase, EnvironmentSpecificSettingsName);
 				var settingsName = File.Exists(envSpecific) ? envSpecific : Path.Combine(appBase, PrimarySettingsName);
-
+				var serializerOptions = Services.GetRequiredService<JsonSerializerOptions>();
 				using var stream = new FileStream(settingsName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-
-				var appSettings = JsonSerializer.Deserialize<AppSettings>(stream) ?? new AppSettings();
-
-				appSettings.UpdateDeviceSettings(model);
 
 				stream.Position = 0;
 				stream.SetLength(0);
 
-				JsonSerializer.Serialize(stream, appSettings, new JsonSerializerOptions
-				{
-					WriteIndented = true,
-					PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-				});
+				JsonSerializer.Serialize(stream, appSettings, serializerOptions);
 
 				stream.Flush();
 				Services.GetRequiredService<IConfigurationRoot>().Reload();
@@ -54,7 +47,7 @@ namespace Lupus
 			catch (Exception ex) when
 			(
 				ex is IOException ||
-				ex is UnauthorizedAccessException || 
+				ex is UnauthorizedAccessException ||
 				ex is NotSupportedException ||
 				ex is JsonException
 			)
@@ -86,15 +79,19 @@ namespace Lupus
 		{
 			var config = new ConfigurationBuilder()
 				.SetBasePath(GetAppBase())
-				.AddJsonFile(PrimarySettingsName, optional: false, reloadOnChange: false)
+				.AddJsonFile(PrimarySettingsName, optional: true, reloadOnChange: false)
 				.AddJsonFile(EnvironmentSpecificSettingsName, optional: true, reloadOnChange: false)
 				.Build();
-			
+
 			var services = new ServiceCollection();
 
 			services
 				.AddSingleton(config)
-				//.AddOptions<AppSettings>().BindConfiguration("");
+				.AddSingleton(serviceProvider => new JsonSerializerOptions
+				{
+					WriteIndented = true,
+					PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+				})
 				.Configure<AppSettings>(config);
 
 			return services.BuildServiceProvider();

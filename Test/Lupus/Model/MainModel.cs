@@ -15,6 +15,7 @@ namespace Lupus.Model
 	/// </summary>
 	internal class MainModel : NotifyPropertyChangedBase, IDisposable
 	{
+		private ManagedLooper? _looper;
 		private Task? _looperTask;
 		private CancellationTokenSource _tokenSource = new();
 		private IAudioOutput? _selectedOutput;
@@ -24,15 +25,51 @@ namespace Lupus.Model
 		/// <summary>
 		/// Gets the <see cref="Looper"/> instance
 		/// </summary>
-		public ManagedLooper Looper
+		public ManagedLooper? Looper
 		{
-			get;
+			get => _looper;
+
+			private set
+			{
+				if (value != _looper)
+				{
+					if (_looper != null)
+					{
+						_looper.Stop();
+						_looper.PropertyChanged -= Looper_PropertyChanged;
+						_looper.LoopAdded -= Looper_LoopAdded;
+						Status = null;
+						_looper.Dispose();
+						_looper = null;
+					}
+
+					_looper = value;
+
+					if (_looper != null)
+					{
+						Status = new ManagedLooperStatus(_looper);
+
+						//_looper.PropertyChanged += Looper_PropertyChanged;
+						_looper.LoopAdded += Looper_LoopAdded;
+					}
+				}
+
+			}
 		}
 
-
-		public ManagedLooperStatus Status
+		public string? DriverName
 		{
-			get;
+			get; private set;
+		}
+
+		public string? MidiInputName
+		{
+			get; private set;
+		}
+
+		public ManagedLooperStatus? Status
+		{
+			get; private set;
 		}
 
 
@@ -48,18 +85,22 @@ namespace Lupus.Model
 			set => SetValue(ref _selectedOutput, value);
 		}
 
-		public static MainModel Create(Dispatcher dispatcher, RegisteredMidiInput midiInput, RegisteredDriver driver, IEnumerable<int> inputChannels, IEnumerable<int> outputChannels)
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <exception cref="ArgumentNullException">Thrown if <paramref name="looper"/> is <see langword="null"/></exception>
+		public MainModel(Dispatcher dispatcher)
+		{
+			_dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+		}
+
+		public void CreateLooper(RegisteredMidiInput midiInput, RegisteredDriver driver, IEnumerable<int> inputChannels, IEnumerable<int> outputChannels)
 		{
 			if (driver is null)
 			{
 				throw new ArgumentNullException(nameof(driver));
 			}
 
-			return Create(dispatcher, midiInput.Id, driver.ClsId, inputChannels, outputChannels);
-		}
-
-		public static MainModel Create(Dispatcher dispatcher, uint midiInput, Guid guid, IEnumerable<int> inputChannels, IEnumerable<int> outputChannels)
-		{
 			if (inputChannels?.Any() != true)
 			{
 				throw new ArgumentException("No input channels selected.");
@@ -70,46 +111,28 @@ namespace Lupus.Model
 				throw new ArgumentException("No output channels selected.");
 			}
 
+			Looper = null;
+
 			var config = new ManagedLooperConfig
 			{
 				// with SampleCount == 0 the looper will use the device's preferred buffer size
 				Name = "Lupus",
-				MidiInput = midiInput,
-				AsioDevice = guid,
+				MidiInput = midiInput.Id,
+				AsioDevice = driver.ClsId,
 				OutputSaturation = 0.8f
 			};
 			config.AddInputChannelList(inputChannels);
 			config.AddOutputChannelList(outputChannels);
 
-			return Create(dispatcher, config);
-		}
+			Looper = ManagedLooper.Create(config);
 
-		public static MainModel Create(Dispatcher dispatcher, ManagedLooperConfig config)
-		{
-			var looper = ManagedLooper.Create(config);
-
-			return new MainModel(dispatcher, looper);
-		}
-
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		/// <param name="looper">A <see cref="Looper"/> that encapsules the ASIO driver access</param>
-		/// <exception cref="ArgumentNullException">Thrown if <paramref name="looper"/> is <see langword="null"/></exception>
-		private MainModel(Dispatcher dispatcher, ManagedLooper looper)
-		{
-			_dispatcher = dispatcher;
-
-			Looper = looper ?? throw new ArgumentNullException(nameof(looper));
-			Status = new ManagedLooperStatus(looper);
-
-			//Looper.PropertyChanged += Looper_PropertyChanged;
-			Looper.LoopAdded += Looper_LoopAdded;
+			DriverName = driver.Name;
+			MidiInputName = midiInput.Name;
 		}
 
 		public void RunLooper()
 		{
-			if (_looperTask == null)
+			if (_looperTask == null && Looper != null)
 			{
 				_looperTask = Looper.RunAsync(_tokenSource.Token);
 			}
@@ -131,12 +154,16 @@ namespace Lupus.Model
 
 			if (e.PropertyName == nameof(Looper.TransportPosition))
 			{
-				goo = true;	
+				goo = true;
 			}
 		}
 
 		private void Looper_LoopAdded(object? sender, LoopEventArgs e)
 		{
+			if (Status == null)
+			{
+				throw new InvalidOperationException("Looper intiialization incomplete");
+			}
 			_dispatcher.InvokeAsync(() =>
 			{
 				var track = new ManagedLooperTrackStatus
@@ -160,8 +187,8 @@ namespace Lupus.Model
 			{
 				if (disposing)
 				{
-					StopLooper();
-					Looper?.Dispose();
+					// Stops and disposes current looper, if any
+					Looper = null;
 				}
 				_isDisposed = true;
 			}

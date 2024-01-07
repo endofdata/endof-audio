@@ -44,7 +44,7 @@ namespace Lupus.Model
 			}
 		}
 
-		public DeviceSelectionModel GetDeviceSelectionModel()
+		public DeviceSelectionModel GetDeviceSettings()
 		{
 			var model = new DeviceSelectionModel();
 

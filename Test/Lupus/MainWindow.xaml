@@ -58,13 +58,13 @@
 		<CommandBinding Command="{x:Static local:CustomCommands.SoloTrack}" CanExecute="SoloTrack_CanExecute" Executed="SoloTrack_Executed"/>
 		<CommandBinding Command="{x:Static local:CustomCommands.MuteTrack}" CanExecute="MuteTrack_CanExecute" Executed="MuteTrack_Executed"/>
 		<CommandBinding Command="{x:Static local:CustomCommands.DeleteTrack}" CanExecute="DeleteTrack_CanExecute" Executed="DeleteTrack_Executed"/>
-	</Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:CustomCommands.Configure}" CanExecute="Configure_CanExecute" Executed="Configure_Executed"/>
+    </Window.CommandBindings>
 	<Border Style="{StaticResource Outermost}">
-		<Grid Margin="15">
+		<Grid Margin="15,15,15,4">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="Auto"/>
 				<RowDefinition Height="*"/>
-				<RowDefinition Height="Auto"/>
 				<RowDefinition Height="Auto"/>
 			</Grid.RowDefinitions>
 			<Grid.ColumnDefinitions>
@@ -106,6 +106,16 @@
 					</DataTemplate>
 				</ListView.ItemTemplate>
 			</ListView>
+            <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding DriverName}" Foreground="{StaticResource Accent2}"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding MidiInputName}" Foreground="{StaticResource Accent2}"/>
+                <Button Grid.Row="0" Grid.Column="2" Content="Settings" Command="{x:Static local:CustomCommands.Configure}"/>
+            </Grid>
 		</Grid>
 	</Border>
 </Window>

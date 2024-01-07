@@ -25,52 +25,42 @@ namespace Lupus
 		internal IServiceProvider AppServices => ((App)Application.Current).Services;
 
 		public MainWindow()
-		{			
+		{
 			InitializeComponent();
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			RegisteredMidiInput? selectedMidiInput = null;
-			RegisteredDriver? selectedDriver = null;
+			Model = new MainModel(Dispatcher);
 
+			var appSettings = AppServices.GetRequiredService<IOptions<AppSettings>>().Value;
+
+			if (appSettings.HasDevices == true)
+			{
+				var selectionModel = appSettings.GetDeviceSettings();
+				TryStartLooper(selectionModel);
+			}
+			e.Handled = true;
+		}
+
+		private bool TryStartLooper(DeviceSelectionModel selectionModel)
+		{
 			try
 			{
-				var appSettingsMonitor = AppServices.GetRequiredService<IOptionsMonitor<AppSettings>>();				
-				var appSettings = appSettingsMonitor.CurrentValue;
-				var selectionModel = appSettings.GetDeviceSelectionModel();
-
-				if (!appSettings.HasDevices)
+				if (Model != null)
 				{
-					var dialog = new DeviceSelectionDialog(selectionModel)
+					if (selectionModel.SelectedMidiInput is RegisteredMidiInput selectedMidiInput &&
+						selectionModel.SelectedDriver is RegisteredDriver selectedDriver)
 					{
-						Owner = this
-					};
-					if(dialog.ShowDialog() == true)
-					{
-						appSettingsMonitor.OnChange(s => appSettings = s);
-						((App)Application.Current).UpdateConfig(selectionModel);
+						// TODO: Allow to select I/O channels
+						var inputChannels = new int[] { 0, 1 };
+						var outputChannels = new int[] { 0, 1 };
+
+						Model.CreateLooper(selectedMidiInput, selectedDriver, inputChannels, outputChannels);
+						Model.RunLooper();
+
+						return true;
 					}
-				}
-
-				if(appSettings.HasDevices == true)
-				{
-					selectedMidiInput = selectionModel.SelectedMidiInput ?? throw new InvalidOperationException();
-					selectedDriver = selectionModel.SelectedDriver ?? throw new InvalidOperationException();
-
-					// TODO: Allow to select I/O channels
-					var inputChannels = new int[] { 0, 1 };
-					var outputChannels = new int[] { 0, 1 };
-
-					Model = MainModel.Create(Dispatcher, selectedMidiInput, selectedDriver, inputChannels, outputChannels);
-
-					Model.RunLooper();
-				}
-				else
-				{
-					Close();
-					e.Handled = true;
-					return;
 				}
 			}
 			catch (Exception? ex)
@@ -81,14 +71,10 @@ namespace Lupus
 					builder.AppendLine(ex.Message);
 					ex = ex.InnerException;
 				}
-				
-				MessageBox.Show($"Initialization of looper with ASIO driver '{selectedDriver}' and MIDI input {selectedMidiInput}) failed. {builder}", 
-					Title, MessageBoxButton.OK, MessageBoxImage.Error);
 
-				Close();
-				e.Handled = true;
-				return;
+				MessageBox.Show($"Initialization failed. {builder}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
 			}
+			return false;
 		}
 
 		private void Window_Closing(object sender, CancelEventArgs e)
@@ -97,47 +83,75 @@ namespace Lupus
 			Model = null;
 		}
 
-		private void SoloTrack_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e) => e.CanExecute = Model?.Status.SelectedTrack != null;
+		private void SoloTrack_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e) => e.CanExecute = Model?.Status?.SelectedTrack != null;
 
 		private void SoloTrack_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
 		{
 			if (TryGetSelectedTrack(out var track))
 			{
-				Model!.Status.ToggleTrackSolo(track);
+				Model!.Status!.ToggleTrackSolo(track);
 			}
 		}
 
 
-		private void MuteTrack_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e) => e.CanExecute = Model?.Status.SelectedTrack != null;
+		private void MuteTrack_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e) => e.CanExecute = Model?.Status?.SelectedTrack != null;
 
 		private void MuteTrack_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
 		{
 			if (TryGetSelectedTrack(out var track))
 			{
-				Model!.Status.ToggleTrackMute(track);
+				Model!.Status!.ToggleTrackMute(track);
 			}
 		}
 
-		private void DeleteTrack_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e) => e.CanExecute = Model?.Status.SelectedTrack != null;
+		private void DeleteTrack_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e) => e.CanExecute = Model?.Status?.SelectedTrack != null;
 
 
 		private void DeleteTrack_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
 		{
 			if (TryGetSelectedTrack(out var track))
 			{
-				Model!.Looper.RemoveLoop(track.Id);
+				Model!.Looper!.RemoveLoop(track.Id);
 			}
 		}
 
 		private bool TryGetSelectedTrack([NotNullWhen(true)] out ManagedLooperTrackStatus? track)
 		{
-			track = Model?.Status.SelectedTrack;
+			track = Model?.Status?.SelectedTrack;
 
 			if (track == null)
 			{
 				MessageBox.Show("No track selected.");
 			}
 			return track != null;
+		}
+
+		private void Configure_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e) => e.CanExecute = Model != null;
+
+
+		private void Configure_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+		{
+			if (Model == null)
+			{
+				throw new InvalidOperationException($"'{nameof(Model)}' cannot be null when executing command '{nameof(CustomCommands.Configure)}'.");
+			}
+
+			Model.StopLooper();
+
+			var appSettings = AppServices.GetRequiredService<IOptions<AppSettings>>().Value;
+			var selectionModel = appSettings.GetDeviceSettings();
+
+			var dialog = new DeviceSelectionDialog(selectionModel)
+			{
+				Owner = this
+			};
+			if (dialog.ShowDialog() == true)
+			{
+				appSettings.UpdateDeviceSettings(selectionModel);
+				((App)Application.Current).WriteAppSettings(appSettings);
+
+			}
+			TryStartLooper(selectionModel);
 		}
 	}
 }
