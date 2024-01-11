@@ -26,3 +26,9 @@ Audio.Asio/TestResults/
 /Test/Test.Audio.Asio.Unmanaged/Debug
 /Test/Test.Audio.Asio.Unmanaged/Release
 /Audio.Osc.Unmanaged/x64/Debug
+/Audio.Osc.Unmanaged/Debug
+/Audio.Osc.Unmanaged/Release
+/Debug
+/Release
+/Test/Test.Audio.Osc.Unmanaged/Debug
+/Test/Test.Audio.Osc.Unmanaged/Release
