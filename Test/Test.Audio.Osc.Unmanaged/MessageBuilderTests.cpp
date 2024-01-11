@@ -48,19 +48,19 @@ namespace TestAudioOscUnmanaged
 			};
 
 			int par1 = 42;
-			float par2 = 0.12;
+			float par2 = 0.12f;
 			std::string par3 = "Something wonderful may happen";
 
-			int varSizes[] = { par3.length() };
+			int varSizes[] = { static_cast<int>(par3.length()) };
 
 			builder.AllocParameters(parameterTypes, _countof(parameterTypes), varSizes, _countof(varSizes));
 
 			Assert::AreEqual(static_cast<int>(
-				OscString::GetPaddedStringSize(address.length()) + 
+				OscString::GetPaddedStringSize(static_cast<int>(address.length())) + 
 				OscString::GetPaddedStringSize(_countof(parameterTypes) + 1) + 
 				sizeof(int) + 
 				sizeof(float) + 
-				OscString::GetPaddedStringSize(par3.length()) + 
+				OscString::GetPaddedStringSize(static_cast<int>(par3.length())) + 
 				0), 
 				builder.Size, L"Size of formatted message is ok.");
 
@@ -73,7 +73,7 @@ namespace TestAudioOscUnmanaged
 
 			buffer << builder;
 
-			const char* expectedResult = "/some/test/address\0\0,ifsT\0\0\0\x2A\0\0\0\x8f\xc2\xf5\x3d\Something wonderful may happen\0\0";
+			const char* expectedResult = "/some/test/address\0\0,ifsT\0\0\0\x2A\0\0\0\x8f\xc2\xf5\x3dSomething wonderful may happen\0\0";
 
 			Assert::IsTrue(std::memcmp(expectedResult, buffer.str().c_str(), builder.Size) == 0, L"Formatted message is ok.");
 		}
@@ -90,7 +90,7 @@ namespace TestAudioOscUnmanaged
 				TypeTag::True
 			};
 
-			source.write("/some/test/address\0\0,ifsT\0\0\0\x2A\0\0\0\x8f\xc2\xf5\x3d\Something wonderful may happen\0\0", 68);
+			source.write("/some/test/address\0\0,ifsT\0\0\0\x2A\0\0\0\x8f\xc2\xf5\x3dSomething wonderful may happen\0\0", 68);
 
 			auto builder = MessageBuilder::Create(source);
 
