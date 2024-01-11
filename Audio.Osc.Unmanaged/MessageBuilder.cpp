@@ -118,7 +118,7 @@ void MessageBuilder::SetAllParameters(std::istream& istr)
 	if (m_parametersSize > 0 && m_parameters != nullptr)
 	{
 		istr.read(m_parameters.get(), m_parametersSize);
-		m_parametersWritten = m_parameterTypes.size();
+		m_parametersWritten = static_cast<int>(m_parameterTypes.size());
 	}
 }
 
@@ -154,7 +154,7 @@ void MessageBuilder::GetNextParameter(TypeTag& tag, const void*& value, int& siz
 
 int MessageBuilder::get_ParameterCount() const
 {
-	return m_parameterTypes.size();
+	return static_cast<int>(m_parameterTypes.size());
 }
 
 const TypeTag MessageBuilder::get_ParameterType(int idx) const
@@ -198,7 +198,7 @@ std::ostream& Audio::Osc::Unmanaged::operator << (std::ostream& ostr, const Mess
 	ostr << ',';
 	std::for_each(it.m_parameterTypes.begin(), it.m_parameterTypes.end(), [&ostr](const TypeTag t) { ostr << static_cast<char>(t); });
 
-	int padSize = OscString::GetPadSize(it.m_parameterTypes.size() + 1);
+	int padSize = OscString::GetPadSize(static_cast<int>(it.m_parameterTypes.size() + 1));
 	int padBytes = 0;
 	ostr.write(reinterpret_cast<char*>(&padBytes), padSize);
 
