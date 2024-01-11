@@ -244,17 +244,17 @@ namespace Test
 								// input buffer A + pMixedInLeft -> output buffers B1
 								AssertBufferEquals(_inBufferA, _outBufferB1, ioTolerance, pMixedInLeft);
 								// (input buffer B or cleared) + pMixedInRight -> output buffer B2 
-								AssertBufferValue(_outBufferB2, pMixedInRight != nullptr? *pMixedInRight : 0.0);
+								AssertBufferValue(_outBufferB2, pMixedInRight != nullptr? *pMixedInRight : 0.0f);
 								// output buffers A1 and A2 are not modified
-								AssertBufferValue(_outBufferA1, 0.04);
-								AssertBufferValue(_outBufferA2, 0.16);
+								AssertBufferValue(_outBufferA1, 0.04f);
+								AssertBufferValue(_outBufferA2, 0.16f);
 							}
 							else
 							{
 								// input buffer B + pMixedInLeft -> output buffers A1
 								AssertBufferEquals(_inBufferB, _outBufferA1, ioTolerance, pMixedInLeft);
 								// (input bufer A or cleared) + pMixedInRight -> output buffer A2
-								AssertBufferValue(_outBufferA2, pMixedInRight != nullptr ? *pMixedInRight : 0.0);
+								AssertBufferValue(_outBufferA2, pMixedInRight != nullptr ? *pMixedInRight : 0.0f);
 								// Output buffers B1 and B2 are not modified
 								AssertBufferValue(_outBufferB1, 0.08f);
 								AssertBufferValue(_outBufferB2, 0.32f);
