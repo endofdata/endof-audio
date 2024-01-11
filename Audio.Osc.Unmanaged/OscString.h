@@ -39,8 +39,8 @@ namespace Audio
 				std::ostream& Write(std::ostream& ostr) const;
 				std::istream& Read(std::istream& istr);
 
-				inline static int GetPaddedStringSize(int count);
-				inline static int GetPadSize(int count);
+				static int GetPaddedStringSize(int count);
+				static int GetPadSize(int count);
 
 			private:
 				std::unique_ptr<char[]> m_value;
