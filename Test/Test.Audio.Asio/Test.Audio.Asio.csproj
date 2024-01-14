@@ -10,6 +10,18 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Content Include="..\..\bin\Debug\x64\Audio.Asio.Unmanaged.dll" Link="Audio.Asio.Unmanaged.dll">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="..\..\bin\Debug\x64\Audio.Foundation.Unmanaged.dll" Link="Audio.Foundation.Unmanaged.dll">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+		<Content Include="..\..\bin\Debug\x64\Audio.Vst.Unmanaged.dll" Link="Audio.Vst.Unmanaged.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
 		<PackageReference Include="NUnit" Version="4.0.1" />
 		<PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
@@ -20,10 +32,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Audio.Asio\Audio.Asio.vcxproj">
-			<CopyLocal>True</CopyLocal>
-			<CopyLocalSatelliteAssemblies>True</CopyLocalSatelliteAssemblies>
-		</ProjectReference>
+		<ProjectReference Include="..\..\Audio.Asio\Audio.Asio.vcxproj" />
 		<ProjectReference Include="..\..\Audio.Foundation\Audio.Foundation.vcxproj" />
 	</ItemGroup>
 	
