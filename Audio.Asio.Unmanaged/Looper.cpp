@@ -36,7 +36,6 @@ Looper* Looper::Create(const ILooperConfig& config)
 			config.OutputChannelList, static_cast<int>(config.OutputChannelCount), sampleCount, config.OutputSaturation);
 
 		Looper* pLooper = new Looper(device);
-		pLooper->AddRef();
 
 		pLooper->Name = config.Name;
 		pLooper->CreateController(config.MidiInput);

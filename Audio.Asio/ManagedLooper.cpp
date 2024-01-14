@@ -17,9 +17,11 @@ ManagedLooper^ ManagedLooper::Create(ManagedLooperConfig^ config)
 {
 	ILooperConfigPtr unmanagedConfig = AsioObjectFactory::CreateLooperConfiguration();
 
-	pin_ptr<const wchar_t> pName = PtrToStringChars(config->Name);
-
-	unmanagedConfig->Name = pName;
+	if (config->Name != nullptr)
+	{
+		pin_ptr<const wchar_t> pName = PtrToStringChars(config->Name);
+		unmanagedConfig->Name = pName;
+	}
 	unmanagedConfig->MidiInput = config->MidiInput;
 	unmanagedConfig->AsioDevice = GuidConversion::FromManaged(config->AsioDevice);
 
@@ -38,7 +40,11 @@ ManagedLooper^ ManagedLooper::Create(ManagedLooperConfig^ config)
 
 	ILooper* unmanagedLooper = AsioObjectFactory::CreateLooper(unmanagedConfig).Detach();
 
-	return gcnew ManagedLooper(unmanagedLooper);
+	ManagedLooper^ result = gcnew ManagedLooper(unmanagedLooper);
+
+	unmanagedLooper->Release();
+
+	return result;
 }
 
 ManagedLooper::ManagedLooper(ILooper* inner)
