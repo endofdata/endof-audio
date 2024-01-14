@@ -13,7 +13,7 @@ namespace TestAudioAsioUnmanaged
 	{
 	public:
 		
-		TEST_METHOD(TestMethod1)
+		TEST_METHOD(Run30SecondsAsioCoreIO)
 		{
 			bool isPrioritySet = SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 
