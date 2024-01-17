@@ -104,7 +104,8 @@ Task^ ManagedLooper::RunAsync(CancellationToken token)
 	token.Register(gcnew Action<Object^, CancellationToken>(CancelIt), dynamic_cast<Object^>(this));
 
 	Action^ runAction = gcnew Action(this, &ManagedLooper::Run);
-	return Task::Run(runAction, token);
+	// do not pass the cancellation token to the Task, so that the looper's runloop is terminated only by calling Stop
+	return Task::Run(runAction);
 }
 
 void ManagedLooper::SaveSession(String^ filenameBase)
