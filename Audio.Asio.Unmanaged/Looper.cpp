@@ -363,7 +363,12 @@ MixParameter& Looper::get_LoopParameter(const GUID& id)
 
 bool Looper::RemoveLoop(const GUID& id)
 {
-	return m_joiner->RemoveSource(id);
+	if (m_joiner->RemoveSource(id))
+	{
+		OnRemoveLoop(id);
+		return true;
+	}
+	return false;
 }
 
 void Looper::SaveSession(const wchar_t* pwcszFilenameBase)
@@ -418,6 +423,14 @@ void Looper::OnAddLoop(const GUID& id, int channelCount, int samplePosition, int
 	if (m_events != nullptr)
 	{
 		m_events->AddLoop(*this, id, channelCount, samplePosition, sampleCount);
+	}
+}
+
+void Looper::OnRemoveLoop(const GUID& id)
+{
+	if (m_events != nullptr)
+	{
+		m_events->RemoveLoop(*this, id);
 	}
 }
 

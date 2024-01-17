@@ -87,6 +87,7 @@ namespace Audio
 				void OnIsSessionRecordingChanged();
 				void OnLoopRestart();
 				void OnAddLoop(const GUID& id, int channelCount, int samplePosition, int sampleCount);
+				void OnRemoveLoop(const GUID& id);
 				void OnDropRecording();
 
 				AsioCorePtr m_device;
