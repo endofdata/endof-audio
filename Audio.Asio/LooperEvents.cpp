@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "LooperEvents.h"
 #include "ManagedLooper.h"
+#include "GuidConversion.h"
 
 using namespace Audio::Asio;
 using namespace Audio::Asio::Interop;
@@ -59,14 +60,17 @@ void LooperEvents::IsSessionRecordingChanged(ILooper& looper, bool isSessionReco
 
 void LooperEvents::AddLoop(ILooper& looper, const GUID& id, int channelCount, int samplePosition, int sampleCount)
 {
-	auto managed = System::Guid(
-		id.Data1, id.Data2, id.Data3,
-		id.Data4[0], id.Data4[1],
-		id.Data4[2], id.Data4[3],
-		id.Data4[4], id.Data4[5],
-		id.Data4[6], id.Data4[7]);
+	auto managed = GuidConversion::FromNative(id);
 
 	m_looper->OnAddLoop(managed, channelCount, samplePosition, sampleCount);
+	m_looper->OnPropertyChanged(ManagedLooper::LoopCountProperty);
+}
+
+void LooperEvents::RemoveLoop(ILooper& looper, const GUID& id)
+{
+	auto managed = GuidConversion::FromNative(id);
+
+	m_looper->OnRemoveLoop(managed);
 	m_looper->OnPropertyChanged(ManagedLooper::LoopCountProperty);
 }
 

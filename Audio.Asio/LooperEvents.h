@@ -32,6 +32,8 @@ namespace Audio
 
 			void AddLoop(ILooper& looper, const GUID& id, int channelCount, int samplePosition, int sampleCount);
 
+			void RemoveLoop(ILooper& looper, const GUID& id);
+
 			void DropRecording(ILooper& looper);
 
 			DECLARE_IUNKNOWN

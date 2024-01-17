@@ -234,3 +234,8 @@ void ManagedLooper::OnAddLoop(Guid id, int channelCount, int samplePosition, int
 {
 	LoopAdded(this, gcnew LoopEventArgs(id, channelCount, samplePosition, sampleCount));
 }
+
+void ManagedLooper::OnRemoveLoop(Guid id)
+{
+	LoopRemoved(this, gcnew LoopEventArgs(id, 0, 0, 0));
+}

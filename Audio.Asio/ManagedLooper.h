@@ -96,6 +96,29 @@ namespace Audio
 					}
 				}
 
+				virtual event LoopEventHandler^ LoopRemoved
+				{
+					void add(LoopEventHandler^ value) sealed
+					{
+						m_removeLoopEventHandler = static_cast<LoopEventHandler^>(System::Delegate::Combine(m_removeLoopEventHandler, value));
+					}
+
+					void remove(LoopEventHandler^ value) sealed
+					{
+						m_removeLoopEventHandler = static_cast<LoopEventHandler^>(System::Delegate::Remove(m_removeLoopEventHandler, value));
+					}
+
+					void raise(System::Object^ sender, LoopEventArgs^ e)
+					{
+						LoopEventHandler^ handler = m_removeLoopEventHandler;
+
+						if (handler != nullptr)
+						{
+							handler->Invoke(sender, e);
+						}
+					}
+				}
+
 				static ManagedLooper^ Create(ManagedLooperConfig^ config);
 
 				~ManagedLooper();
@@ -169,11 +192,13 @@ namespace Audio
 
 				void OnPropertyChanged(System::String^ propertyName);
 				void OnAddLoop(System::Guid id, int channelCount, int samplePosition, int sampleCount);
+				void OnRemoveLoop(System::Guid id);
 
 			private:
 
 				System::ComponentModel::PropertyChangedEventHandler^ m_propertyChangedEventHandler;
 				LoopEventHandler^ m_addLoopEventHandler;
+				LoopEventHandler^ m_removeLoopEventHandler;
 				Audio::Asio::Unmanaged::Abstractions::ILooper* _unmanaged;
 				LooperEvents* _events;
 				int _loopLength;
