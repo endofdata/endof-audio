@@ -22,7 +22,7 @@ namespace Lupus.Model
 		public ObservableCollection<ManagedLooperTrackStatus> Tracks
 		{
 			get;
-		} = new ObservableCollection<ManagedLooperTrackStatus>();
+		} = [];
 
 		public ManagedLooperStatus(ManagedLooper looper)
 		{
