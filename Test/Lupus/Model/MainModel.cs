@@ -41,6 +41,7 @@ namespace Lupus.Model
 						StopLooperTask();
 						//_looper.PropertyChanged -= Looper_PropertyChanged;
 						_looper.LoopAdded -= Looper_LoopAdded;
+						_looper.LoopRemoved -= Looper_LoopRemoved;
 						Status = null;
 						_looper.Dispose();
 					}
@@ -52,6 +53,7 @@ namespace Lupus.Model
 						Status = new ManagedLooperStatus(_looper);
 
 						//_looper.PropertyChanged += Looper_PropertyChanged;
+						_looper.LoopRemoved += Looper_LoopRemoved;
 						_looper.LoopAdded += Looper_LoopAdded;
 					}
 					OnPropertyChange();
@@ -194,6 +196,25 @@ namespace Lupus.Model
 				};
 				Status.Tracks.Add(track);
 				Status.SelectedTrack = track;
+			});
+		}
+
+		private void Looper_LoopRemoved(object? sender, LoopEventArgs e)
+		{
+			if (Status == null)
+			{
+				throw new InvalidOperationException("Looper intiialization incomplete");
+			}
+			_dispatcher.InvokeAsync(() =>
+			{
+				if (Status.Tracks.FirstOrDefault(t => t.Id == e.Id) is ManagedLooperTrackStatus track)
+				{
+					if (Status.SelectedTrack == track)
+					{
+						Status.SelectedTrack = null;
+					}
+					Status.Tracks.Remove(track);
+				}
 			});
 		}
 
