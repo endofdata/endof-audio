@@ -40,7 +40,10 @@ namespace Audio
 					/// <param name="source">Source to remove</param>
 					bool RemoveSource(ISampleSourcePtr& source) = 0;
 
-
+					/// <summary>
+					/// Removes the item with the specified <paramref name="id"/> from the <see cref="Sources"/> collection
+					/// </summary>
+					/// <param name="id">Id of source to remove</param>
 					bool RemoveSource(const GUID& id) = 0;
 
 					/// <summary>
