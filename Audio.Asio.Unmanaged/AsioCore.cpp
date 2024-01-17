@@ -183,10 +183,12 @@ void AsioCore::CleanUp()
 void AsioCore::Start()
 {
 	ThrowIfFailed(m_pDriver->start());
+	m_processingChain->IsActive = true;
 }
 
 void AsioCore::Stop()
 {
+	m_processingChain->IsActive = false;
 	ThrowIfFailed(m_pDriver->stop());
 }
 
