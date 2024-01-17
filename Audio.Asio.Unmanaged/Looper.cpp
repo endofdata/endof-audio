@@ -162,8 +162,9 @@ void Looper::Run()
 	// start audio device
 	m_device->Start();
 
-	// activate processing
+	// activate controller
 	m_controller->IsActive = true;
+
 
 	while (controllerCommand != ControllerCode::Stop)
 	{
@@ -254,7 +255,6 @@ void Looper::Run()
 		OnHeartbeat(transport);
 	}
 	m_context = nullptr;
-	m_device->ProcessingChain->InitShutDown();
 	m_controller->IsActive = false;
 	m_device->Stop();
 }
