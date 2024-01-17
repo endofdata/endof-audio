@@ -98,9 +98,9 @@
 							<synt:GainDialControl Grid.Row="0" Grid.Column="2" Value="{Binding Gain}"/>
 							<Button Grid.Row="0" Grid.Column="3" Command="{x:Static local:CustomCommands.SoloTrack}" CommandParameter="{Binding}"
 								Content="S" Foreground="{StaticResource Foreground}"/>
-							<Button Grid.Row="0" Grid.Column="4" Command="{x:Static local:CustomCommands.MuteTrack}" 
+                            <Button Grid.Row="0" Grid.Column="4" Command="{x:Static local:CustomCommands.MuteTrack}" CommandParameter="{Binding}" 
 								Content="M" Foreground="{StaticResource Accent2}"/>
-							<Button Grid.Row="0" Grid.Column="5" Command="{x:Static local:CustomCommands.DeleteTrack}"
+                            <Button Grid.Row="0" Grid.Column="5" Command="{x:Static local:CustomCommands.DeleteTrack}" CommandParameter="{Binding}"
 								Content="X" Foreground="{StaticResource Accent1}"/>
 						</Grid>
 					</DataTemplate>

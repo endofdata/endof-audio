@@ -87,7 +87,7 @@ namespace Lupus
 
 		private void SoloTrack_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
 		{
-			if (TryGetSelectedTrack(out var track))
+			if (e.Parameter is ManagedLooperTrackStatus track)
 			{
 				Model!.Status!.ToggleTrackSolo(track);
 			}
@@ -98,7 +98,7 @@ namespace Lupus
 
 		private void MuteTrack_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
 		{
-			if (TryGetSelectedTrack(out var track))
+			if (e.Parameter is ManagedLooperTrackStatus track)
 			{
 				Model!.Status!.ToggleTrackMute(track);
 			}
@@ -109,21 +109,10 @@ namespace Lupus
 
 		private void DeleteTrack_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
 		{
-			if (TryGetSelectedTrack(out var track))
+			if (e.Parameter is ManagedLooperTrackStatus track)
 			{
 				Model!.Looper!.RemoveLoop(track.Id);
 			}
-		}
-
-		private bool TryGetSelectedTrack([NotNullWhen(true)] out ManagedLooperTrackStatus? track)
-		{
-			track = Model?.Status?.SelectedTrack;
-
-			if (track == null)
-			{
-				MessageBox.Show("No track selected.");
-			}
-			return track != null;
 		}
 
 		private void Configure_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e) => e.CanExecute = Model != null;
