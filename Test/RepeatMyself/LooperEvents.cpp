@@ -60,6 +60,11 @@ void LooperEvents::AddLoop(ILooper& looper, const GUID& id,  int channelCount, i
 	std::wcout << ClearLine << L"Added loop (channels: " << channelCount << L", pos: " << samplePosition << L", len: " << sampleCount << L")" << std::endl;
 }
 
+void LooperEvents::RemoveLoop(ILooper& looper, const GUID& id)
+{
+	std::wcout << ClearLine << L"Removed loop" << std::endl;
+}
+
 void LooperEvents::DropRecording(ILooper& looper)
 {
 	std::wcout << ClearLine << L"Dropped recording" << std::endl;
