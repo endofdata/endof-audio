@@ -49,6 +49,9 @@ namespace Audio
 
 				bool RemoveProcessor(int processorId);
 
+				bool get_IsActive();
+				void put_IsActive(bool value);
+
 				ISampleProcessorPtr get_Processor(int processorId);
 
 				int get_InputChannelCount();
@@ -81,7 +84,7 @@ namespace Audio
 				std::vector<IInputChannelPtr> m_inputChannels;
 				std::vector<IOutputChannelPairPtr> m_outputChannelPairs;
 				int m_currentMonitorInputId;
-				bool m_shutDownInitiated;
+				bool m_isActive;
 			};
 		}
 	}

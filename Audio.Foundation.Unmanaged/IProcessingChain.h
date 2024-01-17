@@ -28,7 +28,7 @@ namespace Audio
 					void AddOutputPair(IOutputChannelPairPtr& output) = 0;
 
 					void SetInputMonitoring(int inputId, int outputId) = 0;
-					
+
 					IInputChannelPtr FindInput(int inputId) = 0;
 
 					IOutputChannelPairPtr FindOutput(int outputId) = 0;
@@ -44,6 +44,10 @@ namespace Audio
 					int InsertProcessorBefore(ISampleProcessorPtr& processor, int processorId) = 0;
 
 					bool RemoveProcessor(int processorId) = 0;
+
+					bool get_IsActive() = 0;
+					void put_IsActive(bool value) = 0;
+					_declspec(property(get = get_IsActive, put = put_IsActive)) bool IsActive;
 
 					ISampleProcessorPtr get_Processor(int processorId) = 0;
 					_declspec(property(get = get_Processor)) ISampleProcessorPtr Processor[];

@@ -10,7 +10,7 @@ ProcessingChain::ProcessingChain(ITransportPtr& transport, ISampleContainerPtr& 
 	m_transport(transport),
 	m_container(sampleContainer),
 	m_currentMonitorInputId(-1),
-	m_shutDownInitiated(false),
+	m_isActive(false),
 	m_refCount(0)
 {
 }
@@ -38,7 +38,7 @@ void* ProcessingChain::GetInterface(REFIID iid)
 
 void ProcessingChain::OnNextBuffer(bool writeSecondHalf)
 {
-	if (!m_shutDownInitiated)
+	if (m_isActive)
 	{
 		const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
 
@@ -119,7 +119,7 @@ void ProcessingChain::FadeBuffers(int fadeIn, int fadeOut)
 void ProcessingChain::InitShutDown()
 {
 	const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
-	m_shutDownInitiated = true;
+	m_isActive = false;
 	RemoveAllProcessors();
 	RemoveAllInputChannels();
 	RemoveAllOutputChannels();
@@ -275,6 +275,16 @@ void ProcessingChain::SetInputMonitoring(int inputChannelId, int outputChannelPa
 			newInput->DirectMonitor = newOutput;
 		}
 	}
+}
+
+bool ProcessingChain::get_IsActive()
+{
+	return m_isActive;
+}
+
+void ProcessingChain::put_IsActive(bool value)
+{
+	m_isActive = value;
 }
 
 int ProcessingChain::get_InputChannelCount()
