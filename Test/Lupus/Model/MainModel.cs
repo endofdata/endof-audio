@@ -15,12 +15,15 @@ namespace Lupus.Model
 	/// </summary>
 	internal class MainModel : NotifyPropertyChangedBase, IDisposable
 	{
+		private readonly Dispatcher _dispatcher;
 		private ManagedLooper? _looper;
 		private Task? _looperTask;
-		private CancellationTokenSource _tokenSource = new();
+		private CancellationTokenSource? _tokenSource;
 		private IAudioOutput? _selectedOutput;
 		private bool _isDisposed;
-		private readonly Dispatcher _dispatcher;
+		private string? _driverName;
+		private string? _midiInputName;
+		private ManagedLooperStatus? _status;
 
 		/// <summary>
 		/// Gets the <see cref="Looper"/> instance
@@ -35,12 +38,11 @@ namespace Lupus.Model
 				{
 					if (_looper != null)
 					{
-						_looper.Stop();
-						_looper.PropertyChanged -= Looper_PropertyChanged;
+						StopLooperTask();
+						//_looper.PropertyChanged -= Looper_PropertyChanged;
 						_looper.LoopAdded -= Looper_LoopAdded;
 						Status = null;
 						_looper.Dispose();
-						_looper = null;
 					}
 
 					_looper = value;
@@ -52,26 +54,28 @@ namespace Lupus.Model
 						//_looper.PropertyChanged += Looper_PropertyChanged;
 						_looper.LoopAdded += Looper_LoopAdded;
 					}
+					OnPropertyChange();
 				}
-
 			}
 		}
 
 		public string? DriverName
 		{
-			get; private set;
+			get => _driverName;
+			set => SetValue(ref _driverName, value);
 		}
 
 		public string? MidiInputName
 		{
-			get; private set;
+			get => _midiInputName;
+			set => SetValue(ref _midiInputName, value);
 		}
 
 		public ManagedLooperStatus? Status
 		{
-			get; private set;
+			get => _status;
+			set => SetValue(ref _status, value);
 		}
-
 
 		/// <summary>
 		/// Gets or sets the current output
@@ -130,21 +134,33 @@ namespace Lupus.Model
 			MidiInputName = midiInput.Name;
 		}
 
-		public void RunLooper()
+		public void StartLooperTask()
 		{
 			if (_looperTask == null && Looper != null)
 			{
+				_tokenSource = new CancellationTokenSource();
 				_looperTask = Looper.RunAsync(_tokenSource.Token);
 			}
 		}
 
-		public void StopLooper()
+		public void StopLooperTask()
 		{
-			if (_looperTask != null)
+			if (_tokenSource != null)
 			{
 				_tokenSource.Cancel();
-				_looperTask.GetAwaiter().GetResult();
-				_looperTask = null;
+				if (_looperTask != null)
+				{
+					try
+					{
+						_looperTask.GetAwaiter().GetResult();
+					}
+					catch (TaskCanceledException)
+					{
+					}
+					_looperTask = null;
+				}
+				_tokenSource.Dispose();
+				_tokenSource = null;
 			}
 		}
 

@@ -19,7 +19,6 @@ namespace Lupus
 
 		private IServiceProvider? _services;
 
-
 		public IServiceProvider Services
 		{
 			get => _services ?? throw new InvalidOperationException($"'{typeof(App)}.{nameof(Services)}' are not available before {nameof(OnStartup)} has run.");

@@ -38,12 +38,13 @@ namespace Lupus
 			if (appSettings.HasDevices == true)
 			{
 				var selectionModel = appSettings.GetDeviceSettings();
-				TryStartLooper(selectionModel);
+				TryCreateLooper(selectionModel);
+				Model.StartLooperTask();
 			}
 			e.Handled = true;
 		}
 
-		private bool TryStartLooper(DeviceSelectionModel selectionModel)
+		private bool TryCreateLooper(DeviceSelectionModel selectionModel)
 		{
 			try
 			{
@@ -57,7 +58,6 @@ namespace Lupus
 						var outputChannels = new int[] { 0, 1 };
 
 						Model.CreateLooper(selectedMidiInput, selectedDriver, inputChannels, outputChannels);
-						Model.RunLooper();
 
 						return true;
 					}
@@ -136,7 +136,7 @@ namespace Lupus
 				throw new InvalidOperationException($"'{nameof(Model)}' cannot be null when executing command '{nameof(CustomCommands.Configure)}'.");
 			}
 
-			Model.StopLooper();
+			Model.StopLooperTask();
 
 			var appSettings = AppServices.GetRequiredService<IOptions<AppSettings>>().Value;
 			var selectionModel = appSettings.GetDeviceSettings();
@@ -149,9 +149,9 @@ namespace Lupus
 			{
 				appSettings.UpdateDeviceSettings(selectionModel);
 				((App)Application.Current).WriteAppSettings(appSettings);
-
+				TryCreateLooper(selectionModel);
 			}
-			TryStartLooper(selectionModel);
+			Model.StartLooperTask();
 		}
 	}
 }
