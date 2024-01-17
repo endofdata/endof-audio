@@ -6,6 +6,7 @@
 #include "ISourceJoiner.h"
 #include "ISampleSource.h"
 #include <vector>
+#include <mutex>
 
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
@@ -43,6 +44,7 @@ namespace Audio
 				DECLARE_IUNKNOWN
 
 			private:
+				std::recursive_mutex m_processing_mutex;
 				std::vector<std::pair<ISampleSourcePtr, MixParameter>> m_vecSources;
 				bool m_isBypassed;
 			};

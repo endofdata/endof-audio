@@ -38,6 +38,8 @@ void* SourceJoiner::GetInterface(REFIID iid)
 
 void SourceJoiner::AddSource(ISampleSourcePtr& source, const MixParameter& mix)
 {
+	const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
+
 	// do not allow two sends to the same destination
 	RemoveSource(source);
 
@@ -47,6 +49,8 @@ void SourceJoiner::AddSource(ISampleSourcePtr& source, const MixParameter& mix)
 bool SourceJoiner::RemoveSource(ISampleSourcePtr& source)
 {
 	bool isRemoved = false;
+
+	const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
 
 	auto newEnd =
 		remove_if(m_vecSources.begin(), m_vecSources.end(), [source, &isRemoved](std::pair<ISampleSourcePtr, MixParameter>& item)
@@ -67,6 +71,8 @@ bool SourceJoiner::RemoveSource(const GUID& id)
 {
 	bool isRemoved = false;
 
+	const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
+
 	auto newEnd =
 		remove_if(m_vecSources.begin(), m_vecSources.end(), [id, &isRemoved](std::pair<ISampleSourcePtr, MixParameter>& item)
 	{
@@ -84,6 +90,8 @@ bool SourceJoiner::RemoveSource(const GUID& id)
 
 void SourceJoiner::RemoveAllSources()
 {
+	const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
+
 	m_vecSources.clear();
 }
 
@@ -116,6 +124,8 @@ int SourceJoiner::Process(ISampleContainerPtr& container, const ProcessingContex
 {
 	if (!m_isBypassed)
 	{
+		const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
+
 		int targetChannelCount = container->ChannelCount;
 
 		if (targetChannelCount > 0)
