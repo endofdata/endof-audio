@@ -2,7 +2,6 @@
 
 #include "CppUnitTest.h"
 #include <ITake.h>
-#include <format>
 #include <sstream>
 #include <AudioTime.h>
 

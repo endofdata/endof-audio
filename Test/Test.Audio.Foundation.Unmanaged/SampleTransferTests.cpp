@@ -241,8 +241,8 @@ namespace Test
 							
 							if (writeSecondHalf)
 							{								
-								// input buffer A + pMixedInLeft -> output buffers B1
-								AssertBufferEquals(_inBufferA, _outBufferB1, ioTolerance, pMixedInLeft);
+								// input buffer B + pMixedInLeft -> output buffers B1
+								AssertBufferEquals(_inBufferB, _outBufferB1, ioTolerance, pMixedInLeft);
 								// (input buffer B or cleared) + pMixedInRight -> output buffer B2 
 								AssertBufferValue(_outBufferB2, pMixedInRight != nullptr? *pMixedInRight : 0.0f);
 								// output buffers A1 and A2 are not modified
@@ -251,8 +251,8 @@ namespace Test
 							}
 							else
 							{
-								// input buffer B + pMixedInLeft -> output buffers A1
-								AssertBufferEquals(_inBufferB, _outBufferA1, ioTolerance, pMixedInLeft);
+								// input buffer A + pMixedInLeft -> output buffers A1
+								AssertBufferEquals(_inBufferA, _outBufferA1, ioTolerance, pMixedInLeft);
 								// (input bufer A or cleared) + pMixedInRight -> output buffer A2
 								AssertBufferValue(_outBufferA2, pMixedInRight != nullptr ? *pMixedInRight : 0.0f);
 								// Output buffers B1 and B2 are not modified
@@ -330,10 +330,11 @@ namespace Test
 						void InitInt32Buffer(std::unique_ptr<int>& buffer, Sample initialValue = 0.0)
 						{
 							int* writePos = buffer.get();
+							int sampleValue = SampleConversion::SampleToInt32(initialValue);
 
 							for (int i = 0; i < _sampleCount; i++)
 							{
-								*writePos++ = SampleConversion::SampleToInt32(initialValue);
+								*writePos++ = sampleValue;
 							}
 						}
 
@@ -377,6 +378,7 @@ namespace Test
 						pProcessingChain->AddOutputPair(pOutputPair);
 						pInput->IsActive = true;
 						pOutputPair->IsActive = true;
+						pProcessingChain->IsActive = true;
 
 						return pProcessingChain;
 					}
