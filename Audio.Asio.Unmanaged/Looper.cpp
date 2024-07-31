@@ -38,7 +38,23 @@ Looper* Looper::Create(const ILooperConfig& config)
 		Looper* pLooper = new Looper(device);
 
 		pLooper->Name = config.Name;
-		pLooper->CreateController(config.MidiInput);
+
+		if (config.ControlResolution > 0)
+		{
+			pLooper->m_delay = config.ControlResolution;
+		}
+
+		if (config.ControllerFactory != nullptr)
+		{
+			// TODO: Use InterfacePtr only where required!!
+			IControllerPtr customController(config.ControllerFactory(device->ProcessingChain->Transport));
+			pLooper->Controller = customController;
+		}
+		else if (config.MidiInput != static_cast<unsigned int>(-1))
+		{
+			pLooper->CreateController(config.MidiInput);
+		}
+
 		pLooper->CreateVstHost();
 		pLooper->CreateProcessingChain();
 
@@ -153,8 +169,6 @@ void Looper::Run()
 		throw std::runtime_error("Property 'Controller' must be set before running the looper.");
 	}
 
-	m_stopCalled = false;
-
 	ControllerCode controllerCommand = ControllerCode::None;
 	ITransportPtr transport = m_device->ProcessingChain->Transport;
 	m_context = &transport->Context;
@@ -165,7 +179,6 @@ void Looper::Run()
 	// activate controller
 	m_controller->IsActive = true;
 
-
 	while (controllerCommand != ControllerCode::Stop)
 	{
 		// check for control input (MIDI)
@@ -173,6 +186,7 @@ void Looper::Run()
 
 		if (m_stopCalled)
 		{
+			m_stopCalled = false;
 			hasControl = true;
 			controllerCommand = ControllerCode::Stop;
 		}

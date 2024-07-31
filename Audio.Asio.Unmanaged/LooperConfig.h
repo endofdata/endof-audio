@@ -25,6 +25,9 @@ namespace Audio
 				unsigned int get_MidiInput() const;
 				void put_MidiInput(unsigned int value);
 
+				ControllerFactoryFunc get_ControllerFactory() const;
+				void put_ControllerFactory(ControllerFactoryFunc value);
+
 				const IID& get_AsioDevice() const;
 				void put_AsioDevice(const IID& value);
 
@@ -48,6 +51,9 @@ namespace Audio
 				float get_OutputSaturation() const;
 				void put_OutputSaturation(float value);
 
+				int get_ControlResolution() const;
+				void put_ControlResolution(int value);
+
 				void AddInputChannel(int id);
 				void AddOutputChannel(int id);
 
@@ -59,6 +65,7 @@ namespace Audio
 			private:
 				std::wstring m_name;
 				unsigned int m_midiInput;
+				ControllerFactoryFunc m_controllerFactory;
 				IID m_asioDevice;
 				int m_inputChannelIds[LOOPER_MAX_INPUT_CHANNELS];
 				size_t m_numInputIds;
@@ -66,6 +73,7 @@ namespace Audio
 				size_t m_numOutputIds;
 				int m_sampleCount;
 				float m_outputSaturation;
+				int m_controlResolution;
 			};
 
 		}
