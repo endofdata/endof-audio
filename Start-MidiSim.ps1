@@ -9,7 +9,9 @@ Param(
 	[Parameter(Mandatory=$False)][Switch] $StopNow = $False
 )
 
-$midiTool = 'D:\Gamer I5\Documents\Projects\Rust\miditool\target\debug\miditool.exe'
+# For message values refer to
+# .\Audio.Foundation.Unmanaged\MidiTransportControl.cpp
+$midiTool = "$PSScriptRoot\..\Rust\miditool\target\debug\miditool.exe"
 $deviceParam = "--device=$DeviceId"
 
 If(!$StopNow) {
