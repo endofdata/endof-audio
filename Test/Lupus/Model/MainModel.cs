@@ -13,9 +13,13 @@ namespace Lupus.Model
 	/// <summary>
 	/// Main model for Lupus
 	/// </summary>
-	internal class MainModel : NotifyPropertyChangedBase, IDisposable
+	/// <remarks>
+	/// Constructor
+	/// </remarks>
+	/// <exception cref="ArgumentNullException">Thrown if <paramref name="looper"/> is <see langword="null"/></exception>
+	internal class MainModel(Dispatcher dispatcher) : NotifyPropertyChangedBase, IDisposable
 	{
-		private readonly Dispatcher _dispatcher;
+		private readonly Dispatcher _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 		private ManagedLooper? _looper;
 		private Task? _looperTask;
 		private CancellationTokenSource? _tokenSource;
@@ -91,21 +95,9 @@ namespace Lupus.Model
 			set => SetValue(ref _selectedOutput, value);
 		}
 
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		/// <exception cref="ArgumentNullException">Thrown if <paramref name="looper"/> is <see langword="null"/></exception>
-		public MainModel(Dispatcher dispatcher)
-		{
-			_dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
-		}
-
 		public void CreateLooper(RegisteredMidiInput midiInput, RegisteredDriver driver, IEnumerable<int> inputChannels, IEnumerable<int> outputChannels)
 		{
-			if (driver is null)
-			{
-				throw new ArgumentNullException(nameof(driver));
-			}
+			ArgumentNullException.ThrowIfNull(driver);
 
 			if (inputChannels?.Any() != true)
 			{

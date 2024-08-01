@@ -4,12 +4,12 @@ using System.Collections.ObjectModel;
 
 namespace Lupus.Model
 {
-	class ManagedLooperStatus : NotifyPropertyChangedBase
+	class ManagedLooperStatus(ManagedLooper looper) : NotifyPropertyChangedBase
 	{
-		private readonly ManagedLooper _looper;
+		private readonly ManagedLooper _looper = looper ?? throw new ArgumentNullException(nameof(looper));
 		private int _nextLoopNumber;
 		private ManagedLooperTrackStatus? _selectedTrack;
-		private Collection<ManagedLooperTrackStatus> _soloTracks = new();
+		private readonly Collection<ManagedLooperTrackStatus> _soloTracks = [];
 
 		public TimeSpan Position => TimeSpan.FromMilliseconds(_looper.LoopPosition * _looper.LoopLength);
 
@@ -24,19 +24,11 @@ namespace Lupus.Model
 			get;
 		} = [];
 
-		public ManagedLooperStatus(ManagedLooper looper)
-		{
-			_looper = looper ?? throw new ArgumentNullException(nameof(looper));
-		}
-
 		public int GetNextLoopNumber() => ++_nextLoopNumber;
 
 		public void ToggleTrackSolo(ManagedLooperTrackStatus track)
 		{
-			if (track is null)
-			{
-				throw new ArgumentNullException(nameof(track));
-			}
+			ArgumentNullException.ThrowIfNull(track);
 
 			track.IsSolo = !track.IsSolo;
 
@@ -79,10 +71,7 @@ namespace Lupus.Model
 
 		public void ToggleTrackMute(ManagedLooperTrackStatus track)
 		{
-			if (track is null)
-			{
-				throw new ArgumentNullException(nameof(track));
-			}
+			ArgumentNullException.ThrowIfNull(track);
 
 			track.IsMute = !track.IsMute;
 			_looper.GetTrack(track.Id).Level = track.IsMute ? 0.0 : track.Gain;

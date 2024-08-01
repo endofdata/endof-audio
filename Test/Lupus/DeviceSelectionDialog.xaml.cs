@@ -15,10 +15,7 @@ namespace Lupus
 
 		internal DeviceSelectionDialog(DeviceSelectionModel model)
 		{
-			if (model is null)
-			{
-				throw new ArgumentNullException(nameof(model));
-			}
+			ArgumentNullException.ThrowIfNull(model);
 
 			InitializeComponent();
 			Model = model;
