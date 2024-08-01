@@ -71,6 +71,10 @@ namespace Lupus
 
 		protected override void OnExit(ExitEventArgs e)
 		{
+			if (_services is IDisposable disposable)
+			{
+				disposable.Dispose();
+			}
 			base.OnExit(e);
 		}
 
