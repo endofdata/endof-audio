@@ -113,7 +113,7 @@
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding RecordingStatus}" Foreground="{StaticResource Accent2}"/>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Looper.RecordingStatus}" Foreground="{StaticResource Accent2}"/>
                 <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding DriverName}" Foreground="{StaticResource Accent2}"/>
                 <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding MidiInputName}" Foreground="{StaticResource Accent2}"/>
                 <Button Grid.Row="0" Grid.Column="3" Content="Settings" Command="{x:Static local:CustomCommands.Configure}"/>
