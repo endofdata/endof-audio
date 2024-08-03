@@ -78,10 +78,10 @@ const wchar_t* LooperEvents::GetTransportCodeString(ControllerCode value)
 		return L"Run";
 	case ControllerCode::Stop:
 		return L"Stop";
-	case ControllerCode::RecordArm:
-		return L"RecordArm";
 	case ControllerCode::Record:
 		return L"Record";
+	case ControllerCode::Cancel:
+		return L"Cancel";
 	case ControllerCode::Locate:
 		return L"Locate";
 	case ControllerCode::None:

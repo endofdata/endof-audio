@@ -15,12 +15,30 @@ namespace Audio
 			{
 				enum class _AUDIO_FOUNDATION_UNMANAGED_API ControllerCode
 				{
+					/// <summary>
+					/// No effect
+					/// </summary>
 					None,
-					Stop,
+					/// <summary>
+					/// Start looping
+					/// </summary>
 					Run,
+					/// <summary>
+					/// Delayed handling of 'Record' commands, triggered by master loop wrap
+					/// </summary>
 					Locate,
-					RecordArm,
-					Record					
+					/// <summary>
+					/// Toggle recording, for subsequent loops sync'ed with next 'Locate' command
+					/// </summary>
+					Record,
+					/// <summary>
+					/// Drop current recording, stop recording, continue looping
+					/// </summary>
+					Cancel,
+					/// <summary>
+					/// Drop current recording, stop recording, exit looping
+					/// </summary>
+					Stop
 				};
 
 				typedef void (*ControllerEventHandler)(void* pContext, ControllerCode code);

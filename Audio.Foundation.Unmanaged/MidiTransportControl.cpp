@@ -89,8 +89,11 @@ void MidiTransportControl::OnData(void* pContext, const MidiMessage& msg, unsign
 		case 71:
 			code = ControllerCode::Stop;
 			break;
-		case 73:
+		case 72:
 			code = ControllerCode::Run;
+			break;
+		case 73:
+			code = ControllerCode::Cancel;
 			break;
 		case 74:
 			code = ControllerCode::Record;
