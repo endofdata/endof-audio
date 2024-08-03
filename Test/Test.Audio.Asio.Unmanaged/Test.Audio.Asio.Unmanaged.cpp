@@ -62,6 +62,88 @@ namespace Test
 
 					TEST_METHOD(LooperControl)
 					{
+						RunLooperTest([](ILooperPtr& looper, DebugController& debugController, int loopLength, int controlResolution)
+						{
+							// start loop recording after 1s
+							Sleep(1000);
+							debugController.PutNext(ControllerCode::Record);
+
+							// stop loop recording to set loop length
+							Sleep(loopLength);
+							Assert::AreEqual(RecordingStatusType::Recording, looper->RecordingStatus, L"looper is recording");
+							debugController.PutNext(ControllerCode::Record);
+
+							// start overdubbing after half a loop
+							Sleep(loopLength >> 1);
+							debugController.PutNext(ControllerCode::Record);
+
+							// short delay to process controller
+							Sleep(2 * controlResolution);
+							Assert::AreEqual(RecordingStatusType::Armed, looper->RecordingStatus, L"looper starts recording at next start of loop");
+
+							// stop recording short before end of 3rd loop
+							Sleep(3 * loopLength - 5 * controlResolution);
+							Assert::AreEqual(RecordingStatusType::Recording, looper->RecordingStatus, L"looper is recording");
+							debugController.PutNext(ControllerCode::Record);
+
+							// short delay to process controller
+							Sleep(2 * controlResolution);
+							Assert::AreEqual(RecordingStatusType::Unarmed, looper->RecordingStatus, L"looper stops recoding at next end of loop");
+
+							// wait until loop wrapped around
+							Sleep(loopLength);
+							Assert::AreEqual(RecordingStatusType::Off, looper->RecordingStatus, L"looper stopped recording");
+						});
+					}
+
+					TEST_METHOD(LooperRestart)
+					{
+						RunLooperTest([](ILooperPtr& looper, DebugController& debugController, int loopLength, int controlResolution)
+						{
+							for (int pass = 0; pass < 2; pass++)
+							{
+								Assert::IsTrue(looper->IsRunning, L"looper is running");
+								Assert::IsTrue(debugController.IsActive, L"controller is active");
+
+								// stop looper after 1s
+								Sleep(1000);
+								debugController.PutNext(ControllerCode::Stop);
+
+								Sleep(2 * controlResolution);
+
+								Assert::AreEqual(false, debugController.IsActive, L"controller is inactive");
+								Assert::AreEqual(false, looper->IsRunning, L"looper is stopped");
+
+								if (pass == 0)
+								{
+									looper->Start();
+								}
+							}
+						});
+					}
+
+					
+
+					TEST_METHOD_INITIALIZE(Init)
+					{
+						m_memCheck.BeginCheck();
+					}
+
+					TEST_METHOD_CLEANUP(CleanUp)
+					{
+						if (m_looper != nullptr)
+						{
+							m_looper->Stop(INFINITE);
+							m_looper = nullptr;
+						}
+						m_memCheck.EndCheck();
+					}
+				private:
+					MemCheck m_memCheck;
+					ILooperPtr m_looper;
+
+					void RunLooperTest(std::function<void(ILooperPtr&, DebugController&, int, int)> looperTest)
+					{
 						ILooperConfigPtr config = AsioObjectFactory::CreateLooperConfiguration();
 
 						config->AsioDevice = CLSID_AsioDebugDriver;
@@ -73,87 +155,16 @@ namespace Test
 						config->ControlResolution = 100;
 						config->SampleCount = 512;
 
-						ILooperPtr looper = AsioObjectFactory::CreateLooper(config);
-						DebugController* debugController = dynamic_cast<DebugController*>(looper->Controller.GetInterfacePtr());
+						m_looper = AsioObjectFactory::CreateLooper(config);
+						DebugController* debugController = dynamic_cast<DebugController*>(m_looper->Controller.GetInterfacePtr());
 
-						DWORD looperThreadId;
-						HANDLE looperThread = CreateThread(NULL, 0, LooperThread, looper.GetInterfacePtr(), 0, &looperThreadId);
+						// looperThread invokes ILooper::Run() and blocks until looper is stopped
+						m_looper->Start();
 						int loopLength = 2000;
+						Assert::AreEqual(RecordingStatusType::Off, m_looper->RecordingStatus);
 
-						if (looperThread != NULL)
-						{
-							try
-							{
-								// run looper
-								Assert::AreEqual(RecordingStatusType::Off, looper->RecordingStatus);
-								debugController->PutNext(ControllerCode::Run);
-								Assert::AreEqual(RecordingStatusType::Off, looper->RecordingStatus);
-
-								// start loop recording after 1s
-								Sleep(1000);
-								debugController->PutNext(ControllerCode::Record);
-
-								// stop loop recording to set loop length
-								Sleep(loopLength);
-								Assert::AreEqual(RecordingStatusType::Recording, looper->RecordingStatus);
-								debugController->PutNext(ControllerCode::Record);
-
-								// start overdubbing after half a loop
-								Sleep(loopLength >> 1);
-								debugController->PutNext(ControllerCode::Record);
-
-								// short delay to process controller
-								Sleep(2 * config->ControlResolution);
-								Assert::AreEqual(RecordingStatusType::Armed, looper->RecordingStatus);
-
-								// stop recording short before end of 3rd loop
-								Sleep(3 * loopLength - 5 * config->ControlResolution);
-								Assert::AreEqual(RecordingStatusType::Recording, looper->RecordingStatus);
-								debugController->PutNext(ControllerCode::Record);
-
-								// short delay to process controller
-								Sleep(2 * config->ControlResolution);
-								Assert::AreEqual(RecordingStatusType::Unarmed, looper->RecordingStatus);
-
-								// wait until loop wrapped around
-								Sleep(loopLength);
-								Assert::AreEqual(RecordingStatusType::Off, looper->RecordingStatus);
-
-								// stop the looper
-								debugController->PutNext(ControllerCode::Stop);
-								Assert::AreEqual(WAIT_OBJECT_0, WaitForSingleObject(looperThread, loopLength));
-
-								CloseHandle(looperThread);
-							}
-							catch (...)
-							{
-								looper->Stop();
-								WaitForSingleObject(looperThread, INFINITE);
-								CloseHandle(looperThread);
-								throw;
-							}
-						}
-
-					}
-
-					TEST_METHOD_INITIALIZE(Init)
-					{
-						m_memCheck.BeginCheck();
-					}
-
-					TEST_METHOD_CLEANUP(CleanUp)
-					{
-						m_memCheck.EndCheck();
-					}
-				private:
-					MemCheck m_memCheck;
-
-					static DWORD LooperThread(LPVOID param)
-					{
-						ILooperPtr looper = static_cast<ILooper*>(param);
-						looper->Run();
-
-						return 0;
+						// run specific test
+						looperTest(m_looper, *debugController, loopLength, config->ControlResolution);
 					}
 				};
 			}
