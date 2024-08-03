@@ -21,8 +21,8 @@ namespace Test
 					DebugController(ITransportPtr& transport);
 					virtual ~DebugController();
 
-					virtual bool get_IsActive() const;
-					virtual void put_IsActive(bool value);
+					bool get_IsActive() const;
+					void put_IsActive(bool value);
 
 					bool GetNext(unsigned int timeout, ControllerCode& code);
 

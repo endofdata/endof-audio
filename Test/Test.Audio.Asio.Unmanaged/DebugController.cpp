@@ -84,6 +84,8 @@ bool DebugController::GetNext(unsigned int timeout, ControllerCode& code)
 	m_queue.pop();
 
 	ResetEvent(m_eventHandle);
+
+	return true;
 }
 
 void DebugController::PutNext(ControllerCode code)
