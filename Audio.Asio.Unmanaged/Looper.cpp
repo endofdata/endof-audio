@@ -77,12 +77,15 @@ Looper::Looper(AsioCorePtr& device) :
 	m_recordingStatus(RecordingStatusType::Off),
 	m_context(nullptr),
 	m_stopCalled(false),
+	m_controlThread(nullptr),
+	m_controlThreadId(0),
 	m_refCount(0)
 {
 }
 
 Looper::~Looper()
 {
+	Stop(INFINITE);
 }
 
 IMPLEMENT_IUNKNOWN(Looper)
@@ -195,6 +198,7 @@ void Looper::Run()
 			switch (controllerCommand)
 			{
 			case ControllerCode::Record:
+				// Toggle recording, for subsequent loops sync'ed with next 'Locate' command
 				if (m_context->IsLooping)
 				{
 					switch(m_recordingStatus)
@@ -236,7 +240,7 @@ void Looper::Run()
 				}
 
 				break;
-			case ControllerCode::Run:
+			case ControllerCode::Cancel:
 				// Drop current recording, stop recording, continue looping
 				switch(m_recordingStatus)
 				{
@@ -273,9 +277,68 @@ void Looper::Run()
 	m_device->Stop();
 }
 
-void Looper::Stop()
+DWORD Looper::ControlThreadEntry(LPVOID param)
 {
-	m_stopCalled = true;
+	Looper* looper = static_cast<Looper*>(param);
+
+	try
+	{
+		looper->Run();
+		looper->ControlThreadExit();
+	}
+	catch (const std::exception&)
+	{
+		looper->ControlThreadExit();
+	}
+
+	return 0;
+}
+
+void Looper::ControlThreadExit()
+{
+	HANDLE controlThread = static_cast<HANDLE>(InterlockedExchangePointer(&m_controlThread, nullptr));
+
+	if (controlThread != nullptr)
+	{
+		CloseHandle(controlThread);
+		m_controlThreadId = 0;
+		Release();
+	}
+}
+
+void Looper::Start()
+{
+	if (IsRunning)
+	{
+		throw std::runtime_error("Looper is already running.");
+	}
+
+	// One reference to be dropped by control thread
+	AddRef();
+	m_controlThread = CreateThread(NULL, 0, Looper::ControlThreadEntry, this, 0, &m_controlThreadId);
+
+	if (!IsRunning)
+	{
+		Release();
+		throw std::runtime_error("Failed to create looper control thread.");
+	}
+	do
+	{
+		if (m_context != nullptr)
+		{
+			break;
+		}
+	} while (WAIT_TIMEOUT == WaitForSingleObject(m_controlThread, m_delay));
+}
+
+bool Looper::Stop(DWORD waitTimeout)
+{
+	if (IsRunning)
+	{
+		m_stopCalled = true;
+		return WAIT_OBJECT_0 == WaitForSingleObject(m_controlThread, waitTimeout);
+	}
+	return true;
 }
 
 void Looper::ArmRecording()
@@ -470,6 +533,11 @@ void Looper::OnRecordingStatusChanged()
 	{
 		m_events->RecordingStatusChanged(*this, m_recordingStatus);
 	}
+}
+
+bool Looper::get_IsRunning() const
+{
+	return m_controlThread != nullptr;
 }
 
 bool Looper::get_IsLooping() const

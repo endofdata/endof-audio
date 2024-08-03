@@ -19,8 +19,9 @@ namespace Audio
 					bool SelectInput(int input, bool isSelected) = 0;
 					bool SelectOutputPair(int outputPair[2], bool isSelected) = 0;
 
+					void Start() = 0;
+					bool Stop(DWORD waitTimeout) = 0;
 					void Run() = 0;
-					void Stop() = 0;
 
 					void SaveSession(const wchar_t* pwcszFilenameBase) = 0;
 
@@ -29,6 +30,9 @@ namespace Audio
 					int InsertFx(const wchar_t* pwcszPluginId) = 0;
 					int InsertFx(ISampleProcessorPtr effect) = 0;
 					bool RemoveFx(int id) = 0;
+
+					bool get_IsRunning() const = 0;
+					_declspec(property(get = get_IsRunning)) bool IsRunning;
 
 					bool get_IsLooping() const = 0;
 					_declspec(property(get = get_IsLooping)) bool IsLooping;

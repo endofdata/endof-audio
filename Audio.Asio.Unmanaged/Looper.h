@@ -32,8 +32,9 @@ namespace Audio
 				bool SelectInput(int input, bool isSelected);
 				bool SelectOutputPair(int outputPair[2], bool isSelected);
 
+				void Start();
+				bool Stop(DWORD waitTimeout);
 				void Run();
-				void Stop();
 
 				void SaveSession(const wchar_t* pwcszFilenameBase);
 
@@ -42,6 +43,8 @@ namespace Audio
 				int InsertFx(const wchar_t* pwcszPluginId);
 				int InsertFx(ISampleProcessorPtr effect);
 				bool RemoveFx(int id);
+
+				bool get_IsRunning() const;
 
 				bool get_IsLooping() const;
 
@@ -89,6 +92,12 @@ namespace Audio
 				void OnAddLoop(const GUID& id, int channelCount, int samplePosition, int sampleCount);
 				void OnRemoveLoop(const GUID& id);
 				void OnDropRecording();
+
+				static DWORD ControlThreadEntry(LPVOID param);
+				void ControlThreadExit();
+
+				HANDLE m_controlThread;
+				DWORD m_controlThreadId;
 
 				AsioCorePtr m_device;
 				IVstHostPtr m_vstHost;
