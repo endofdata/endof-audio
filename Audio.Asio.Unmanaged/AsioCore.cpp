@@ -322,7 +322,7 @@ void AsioCore::CreateInputChannels(int offset, int count)
 				m_pHwBufferInfo[iIdx].buffers[1],
 				SampleCount);
 
-			if (nullptr == input.GetInterfacePtr())
+			if (input == nullptr)
 				throw AsioCoreException("AsioCore: Failed to create InputChannel instance.", E_OUTOFMEMORY);
 
 			m_processingChain->AddInput(input);
@@ -365,7 +365,7 @@ void AsioCore::CreateOutputChannels(int offset, int count, float saturation)
 				SampleCount,
 				saturation);
 
-			if (outputPair.GetInterfacePtr() == nullptr)
+			if (outputPair == nullptr)
 				throw AsioCoreException("AsioCore: Failed to create OutputChannelPair instance.", E_OUTOFMEMORY);
 
 			m_processingChain->AddOutputPair(outputPair);

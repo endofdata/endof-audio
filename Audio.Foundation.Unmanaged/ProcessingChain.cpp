@@ -127,7 +127,7 @@ void ProcessingChain::InitShutDown()
 
 void ProcessingChain::AddInput(IInputChannelPtr& input)
 {
-	if (input.GetInterfacePtr() != nullptr)
+	if (input != nullptr)
 	{
 		const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
 
@@ -137,7 +137,7 @@ void ProcessingChain::AddInput(IInputChannelPtr& input)
 
 void ProcessingChain::AddOutputPair(IOutputChannelPairPtr& output)
 {
-	if (output.GetInterfacePtr() != nullptr)
+	if (output != nullptr)
 	{
 		const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
 
@@ -148,7 +148,7 @@ void ProcessingChain::AddOutputPair(IOutputChannelPairPtr& output)
 
 int ProcessingChain::AddProcessor(ISampleProcessorPtr& processor)
 {
-	if (processor.GetInterfacePtr() == nullptr)
+	if (processor == nullptr)
 	{
 		throw std::invalid_argument("Sample processor pointer cannot be null.");
 	}
