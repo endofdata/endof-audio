@@ -10,10 +10,15 @@ using namespace Audio::Asio::Unmanaged;
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Vst::Unmanaged;
 
+
 Looper* Looper::Create(const ILooperConfig& config)
 {
+	LooperEventLog eventLog;
+
 	try
 	{
+		eventLog.Status("creating looper instance");
+
 		if (config.OutputChannelCount == 0)
 		{
 			throw new AsioCoreException("Number of selected output channels cannot be zero.");
@@ -58,6 +63,8 @@ Looper* Looper::Create(const ILooperConfig& config)
 		pLooper->CreateVstHost();
 		pLooper->CreateProcessingChain();
 
+		eventLog.Status("looper instance created.");
+
 		return pLooper;
 	}
 	catch (const AsioCoreException& acx)
@@ -65,7 +72,11 @@ Looper* Looper::Create(const ILooperConfig& config)
 		std::ostringstream builder;
 		builder << "Failed to create device. " << acx.Message << " Error code: 0x" << std::hex << acx.Error << std::dec;
 
-		throw std::runtime_error(builder.str());
+		std::string message = builder.str();
+
+		eventLog.Status(message.c_str());
+
+		throw std::runtime_error(message);
 	}
 }
 
@@ -81,10 +92,12 @@ Looper::Looper(AsioCorePtr& device) :
 	m_controlThreadId(0),
 	m_refCount(0)
 {
+	m_eventLog.Status("new looper instance");
 }
 
 Looper::~Looper()
 {
+	m_eventLog.Status("drop looper instance");
 	Stop(INFINITE);
 }
 
@@ -172,6 +185,8 @@ void Looper::Run()
 		throw std::runtime_error("Property 'Controller' must be set before running the looper.");
 	}
 
+	m_eventLog.Status("running");
+
 	ControllerCode controllerCommand = ControllerCode::None;
 	ITransportPtr transport = m_device->ProcessingChain->Transport;
 	m_context = &transport->Context;
@@ -195,6 +210,8 @@ void Looper::Run()
 		}
 		if (hasControl)
 		{
+			m_eventLog.ControlCode(controllerCommand);
+
 			switch (controllerCommand)
 			{
 			case ControllerCode::Record:
@@ -275,6 +292,8 @@ void Looper::Run()
 	m_context = nullptr;
 	m_controller->IsActive = false;
 	m_device->Stop();
+
+	m_eventLog.Status("stopped");
 }
 
 DWORD Looper::ControlThreadEntry(LPVOID param)
@@ -313,6 +332,8 @@ void Looper::Start()
 		throw std::runtime_error("Looper is already running.");
 	}
 
+	m_eventLog.Status("starting");
+
 	// One reference to be dropped by control thread
 	AddRef();
 	m_controlThread = CreateThread(NULL, 0, Looper::ControlThreadEntry, this, 0, &m_controlThreadId);
@@ -328,13 +349,15 @@ void Looper::Start()
 		{
 			break;
 		}
-	} while (WAIT_TIMEOUT == WaitForSingleObject(m_controlThread, m_delay));
+	} while (m_controlThread != nullptr && WAIT_TIMEOUT == WaitForSingleObject(m_controlThread, m_delay));
 }
 
 bool Looper::Stop(DWORD waitTimeout)
 {
 	if (IsRunning)
 	{
+		m_eventLog.Status("stopping");
+
 		m_stopCalled = true;
 		return WAIT_OBJECT_0 == WaitForSingleObject(m_controlThread, waitTimeout);
 	}
@@ -529,6 +552,8 @@ void Looper::OnIsSessionRecordingChanged()
 
 void Looper::OnRecordingStatusChanged()
 {
+	m_eventLog.RecordingStatus(m_recordingStatus);
+
 	if (m_events != nullptr)
 	{
 		m_events->RecordingStatusChanged(*this, m_recordingStatus);

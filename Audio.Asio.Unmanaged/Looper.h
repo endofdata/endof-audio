@@ -10,6 +10,7 @@
 #include <ILooper.h>
 #include <ILooperEvents.h>
 #include <LooperConfig.h>
+#include <LooperEventLog.h>
 #include <UnknownBase.h>
 
 using namespace Audio::Asio::Unmanaged;
@@ -109,10 +110,11 @@ namespace Audio
 				bool m_isSessionRecording;
 				IRecorderPtr m_sessionRecorder;
 				ISourceJoinerPtr m_joiner;
+				LooperEventLog m_eventLog;
+
 				int m_delay;
 				bool m_stopCalled;
 				std::wstring m_name;
-
 			};
 		}
 	}

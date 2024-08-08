@@ -28,5 +28,6 @@
 #include <ios>
 #include <fstream>
 #include <memory>
-
+#include <locale>
+#include <codecvt>
 #endif //PCH_H
