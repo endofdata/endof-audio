@@ -95,7 +95,7 @@ void ManagedLooper::Run()
 
 void ManagedLooper::Stop()
 {
-	_unmanaged->Stop();
+	_unmanaged->Stop(INFINITE);
 }
 
 Task^ ManagedLooper::RunAsync(CancellationToken token)
