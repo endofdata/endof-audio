@@ -107,6 +107,11 @@ ISampleSourcePtr& SourceJoiner::get_Source(const GUID& id)
 		return item.first->Id == id;
 	});
 
+	if (found >= m_vecSources.end())
+	{
+		throw std::invalid_argument("invalid sample source id.");
+	}
+
 	return found->first;
 }
 
@@ -116,6 +121,11 @@ MixParameter& SourceJoiner::get_Parameter(const GUID& id)
 	{
 		return item.first->Id == id;
 	});
+
+	if (found >= m_vecSources.end())
+	{
+		throw std::invalid_argument("invalid sample source id.");
+	}
 
 	return found->second;
 }
