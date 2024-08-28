@@ -82,30 +82,15 @@ bool ManagedLooper::SelectOutputPair(int left, int right, bool isSelected)
 	return _unmanaged->SelectOutputPair(pair, isSelected);
 }
 
-void CancelIt(Object^ state, CancellationToken token)
+void ManagedLooper::Start()
 {
-	ManagedLooper^ self = dynamic_cast<ManagedLooper^>(state);
-	self->Stop();
+	_unmanaged->Start();
 }
 
-void ManagedLooper::Run()
+void ManagedLooper::Stop(Nullable<TimeSpan> timeout)
 {
-	_unmanaged->Run();
-}
-
-void ManagedLooper::Stop()
-{
-	_unmanaged->Stop(INFINITE);
-}
-
-Task^ ManagedLooper::RunAsync(CancellationToken token)
-{
-	// don't mind the intelli-sense squirrels here, it's fine
-	token.Register(gcnew Action<Object^, CancellationToken>(CancelIt), dynamic_cast<Object^>(this));
-
-	Action^ runAction = gcnew Action(this, &ManagedLooper::Run);
-	// do not pass the cancellation token to the Task, so that the looper's runloop is terminated only by calling Stop
-	return Task::Run(runAction);
+	UInt32 milliSeconds = timeout.HasValue ? (UInt32)timeout.Value.TotalMilliseconds : INFINITE;
+	_unmanaged->Stop(milliSeconds);
 }
 
 void ManagedLooper::SaveSession(String^ filenameBase)

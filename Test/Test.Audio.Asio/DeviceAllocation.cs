@@ -70,7 +70,7 @@ namespace Test.Audio.Asio
 			UseLooper(config);
 		}
 
-		private async void UseLooper(ManagedLooperConfig config)
+		private static void UseLooper(ManagedLooperConfig config)
 		{
 			ManagedLooper? maybeLooper = null;
 
@@ -79,24 +79,13 @@ namespace Test.Audio.Asio
 			Assert.That(maybeLooper, Is.Not.Null, "Managed looper instance is not null.");
 
 			var looper = maybeLooper!;
-			using var tokenSource = new CancellationTokenSource();
 
 			TestContext.WriteLine("Starting looper task for one second.");
-			Task? maybeLooperTask = looper.RunAsync(tokenSource.Token);
-			Assert.That(maybeLooperTask, Is.Not.Null, "Looper task instance is not null.");
+			looper.Start();
 
-			tokenSource.CancelAfter(1000);
-			var looperTask = maybeLooperTask!;
-
-			try
-			{
-				TestContext.WriteLine("Awaiting looper task.");
-				await looperTask.ConfigureAwait(false);
-			}
-			catch (TaskCanceledException)
-			{
-				TestContext.WriteLine("Task cancelled.");
-			}
+			System.Threading.Thread.Sleep(1000);
+			looper.Stop(null);
+			
 			Assert.That(() => looper.Dispose(), Throws.Nothing, "Can dispose looper.");
 		}
 	}

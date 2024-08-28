@@ -126,10 +126,8 @@ namespace Audio
 				bool SelectInput(int input, bool isSelected);
 				bool SelectOutputPair(int left, int right, bool isSelected);
 
-				System::Threading::Tasks::Task^ RunAsync(System::Threading::CancellationToken cancellationToken);
-
-				void Stop();
-				void Run();
+				void Start();
+				void Stop(System::Nullable<System::TimeSpan> timeout);
 
 				void SaveSession(System::String^ filenameBase);
 
