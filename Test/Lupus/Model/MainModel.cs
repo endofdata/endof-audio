@@ -1,11 +1,9 @@
 ﻿using Audio.Asio.Interop;
-using Audio.Foundation.Interop;
 using Audio.Foundation.Abstractions;
+using Audio.Foundation.Interop;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Threading;
+using System.Linq;
 using System.Windows.Threading;
 
 namespace Lupus.Model
@@ -21,8 +19,6 @@ namespace Lupus.Model
 	{
 		private readonly Dispatcher _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 		private ManagedLooper? _looper;
-		private Task? _looperTask;
-		private CancellationTokenSource? _tokenSource;
 		private IAudioOutput? _selectedOutput;
 		private bool _isDisposed;
 		private string? _driverName;
@@ -42,7 +38,7 @@ namespace Lupus.Model
 				{
 					if (_looper != null)
 					{
-						StopLooperTask();
+						_looper.Stop(null);
 						//_looper.PropertyChanged -= Looper_PropertyChanged;
 						_looper.LoopAdded -= Looper_LoopAdded;
 						_looper.LoopRemoved -= Looper_LoopRemoved;
@@ -59,6 +55,7 @@ namespace Lupus.Model
 						//_looper.PropertyChanged += Looper_PropertyChanged;
 						_looper.LoopRemoved += Looper_LoopRemoved;
 						_looper.LoopAdded += Looper_LoopAdded;
+						_looper.Start();
 					}
 					OnPropertyChange();
 				}
@@ -126,36 +123,6 @@ namespace Lupus.Model
 
 			DriverName = driver.Name;
 			MidiInputName = midiInput.Name;
-		}
-
-		public void StartLooperTask()
-		{
-			if (_looperTask == null && Looper != null)
-			{
-				_tokenSource = new CancellationTokenSource();
-				_looperTask = Looper.RunAsync(_tokenSource.Token);
-			}
-		}
-
-		public void StopLooperTask()
-		{
-			if (_tokenSource != null)
-			{
-				_tokenSource.Cancel();
-				if (_looperTask != null)
-				{
-					try
-					{
-						_looperTask.GetAwaiter().GetResult();
-					}
-					catch (TaskCanceledException)
-					{
-					}
-					_looperTask = null;
-				}
-				_tokenSource.Dispose();
-				_tokenSource = null;
-			}
 		}
 
 		private void Looper_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
