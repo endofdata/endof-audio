@@ -32,14 +32,16 @@ namespace Lupus
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
 			Model = new MainModel(Dispatcher);
-
 			var appSettings = AppServices.GetRequiredService<IOptions<AppSettings>>().Value;
 
-			if (appSettings.HasDevices == true)
+			if (!appSettings.HasDevices)
+			{
+				ShowConfigurationDialog();
+			}
+			if (appSettings.HasDevices)
 			{
 				var selectionModel = appSettings.GetDeviceSettings();
 				TryCreateLooper(selectionModel);
-				Model.StartLooperTask();
 			}
 			e.Handled = true;
 		}
@@ -59,6 +61,8 @@ namespace Lupus
 
 						Model.CreateLooper(selectedMidiInput, selectedDriver, inputChannels, outputChannels);
 
+#if DEBUG
+#endif
 						return true;
 					}
 				}
@@ -73,6 +77,24 @@ namespace Lupus
 				}
 
 				MessageBox.Show($"Initialization failed. {builder}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+			return false;
+		}
+
+		private bool ShowConfigurationDialog()
+		{
+			var appSettings = AppServices.GetRequiredService<IOptions<AppSettings>>().Value;
+			var selectionModel = appSettings.GetDeviceSettings();
+
+			var dialog = new DeviceSelectionDialog(selectionModel)
+			{
+				Owner = this
+			};
+			if (dialog.ShowDialog() == true)
+			{
+				appSettings.UpdateDeviceSettings(selectionModel);
+				((App)Application.Current).WriteAppSettings(appSettings);
+				return TryCreateLooper(selectionModel);
 			}
 			return false;
 		}
@@ -125,22 +147,9 @@ namespace Lupus
 				throw new InvalidOperationException($"'{nameof(Model)}' cannot be null when executing command '{nameof(CustomCommands.Configure)}'.");
 			}
 
-			Model.StopLooperTask();
+			Model.Looper?.Stop(null);
 
-			var appSettings = AppServices.GetRequiredService<IOptions<AppSettings>>().Value;
-			var selectionModel = appSettings.GetDeviceSettings();
-
-			var dialog = new DeviceSelectionDialog(selectionModel)
-			{
-				Owner = this
-			};
-			if (dialog.ShowDialog() == true)
-			{
-				appSettings.UpdateDeviceSettings(selectionModel);
-				((App)Application.Current).WriteAppSettings(appSettings);
-				TryCreateLooper(selectionModel);
-			}
-			Model.StartLooperTask();
+			ShowConfigurationDialog();
 		}
 	}
 }
