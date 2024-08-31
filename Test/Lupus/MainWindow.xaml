@@ -6,106 +6,102 @@
 		xmlns:local="clr-namespace:Lupus"
 		xmlns:ctrl="clr-namespace:Lupus.Controls"
 		xmlns:conv="clr-namespace:Lupus.Converters"
-        xmlns:synt="clr-namespace:SynthControls;assembly=SynthControls"
+        xmlns:synt="clr-namespace:EndOfData.SynthControls;assembly=EndOfData.SynthControls"
 		mc:Ignorable="d"
 		Height="450" Width="640"
 		Style="{StaticResource PedalStyle}"
 		WindowState="Maximized"
 		Loaded="Window_Loaded" Closing="Window_Closing">
     <Window.Resources>
-		<Style TargetType="{x:Type synt:PanDialControl}">
-			<Setter Property="KnobBrush" Value="{StaticResource Accent2}"/>
-			<Setter Property="ThumbStroke" Value="{StaticResource Foreground}"/>
-		</Style>
-		<conv:IsTransitiveConverter x:Key="IsTransitive"/>
-		<conv:TimeStringConverter x:Key="TimeString"/>
-		<Style TargetType="{x:Type Ellipse}" x:Key="StatusLight">
-			<Style.Triggers>
-				<DataTrigger Binding="{Binding RecordingStatus,Mode=OneWay,Converter={StaticResource IsTransitive}}" Value="True">
-					<DataTrigger.EnterActions>
-						<BeginStoryboard Name="Flash">
-							<BeginStoryboard.Storyboard>
-								<Storyboard>
-									<DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" AutoReverse="True" Duration="0:0:0.5" RepeatBehavior="Forever" />
-								</Storyboard>
-							</BeginStoryboard.Storyboard>
-						</BeginStoryboard>
-					</DataTrigger.EnterActions>
-					<DataTrigger.ExitActions>
-						<StopStoryboard BeginStoryboardName="Flash"/>
-					</DataTrigger.ExitActions>
-				</DataTrigger>
-				<DataTrigger Binding="{Binding RecordingStatus}" Value="Unarmed">
-					<Setter Property="Fill" Value="{StaticResource Foreground}"/>
-				</DataTrigger>
-				<DataTrigger Binding="{Binding RecordingStatus}" Value="Armed">
-					<Setter Property="Fill" Value="{StaticResource Accent1}"/>
-				</DataTrigger>
-				<DataTrigger Binding="{Binding RecordingStatus}" Value="Recording">
-					<Setter Property="Fill" Value="{StaticResource Accent1}"/>
-				</DataTrigger>
-			</Style.Triggers>
-			<Setter Property="Fill" Value="{StaticResource Shadow2}"/>
-			<Setter Property="Stroke" Value="{StaticResource Shadow1}"/>
-			<Setter Property="ToolTip" Value="{Binding RecordingStatus}"/>
-			<Setter Property="StrokeThickness" Value="4"/>
-			<Setter Property="Margin" Value="4"/>
-			<Setter Property="Width" Value="28"/>
-			<Setter Property="Height" Value="28"/>
-		</Style>
+        <conv:IsTransitiveConverter x:Key="IsTransitive"/>
+        <conv:TimeStringConverter x:Key="TimeString"/>
+        <Style TargetType="{x:Type Ellipse}" x:Key="StatusLight">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RecordingStatus,Mode=OneWay,Converter={StaticResource IsTransitive}}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Name="Flash">
+                            <BeginStoryboard.Storyboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" AutoReverse="True" Duration="0:0:0.5" RepeatBehavior="Forever" />
+                                </Storyboard>
+                            </BeginStoryboard.Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <StopStoryboard BeginStoryboardName="Flash"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding RecordingStatus}" Value="Unarmed">
+                    <Setter Property="Fill" Value="{StaticResource Foreground}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding RecordingStatus}" Value="Armed">
+                    <Setter Property="Fill" Value="{StaticResource Accent1}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding RecordingStatus}" Value="Recording">
+                    <Setter Property="Fill" Value="{StaticResource Accent1}"/>
+                </DataTrigger>
+            </Style.Triggers>
+            <Setter Property="Fill" Value="{StaticResource Shadow2}"/>
+            <Setter Property="Stroke" Value="{StaticResource Shadow1}"/>
+            <Setter Property="ToolTip" Value="{Binding RecordingStatus}"/>
+            <Setter Property="StrokeThickness" Value="4"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="28"/>
+        </Style>
     </Window.Resources>
-	<Window.CommandBindings>
-		<CommandBinding Command="{x:Static local:CustomCommands.SoloTrack}" CanExecute="SoloTrack_CanExecute" Executed="SoloTrack_Executed"/>
-		<CommandBinding Command="{x:Static local:CustomCommands.MuteTrack}" CanExecute="MuteTrack_CanExecute" Executed="MuteTrack_Executed"/>
-		<CommandBinding Command="{x:Static local:CustomCommands.DeleteTrack}" CanExecute="DeleteTrack_CanExecute" Executed="DeleteTrack_Executed"/>
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:CustomCommands.SoloTrack}" CanExecute="SoloTrack_CanExecute" Executed="SoloTrack_Executed"/>
+        <CommandBinding Command="{x:Static local:CustomCommands.MuteTrack}" CanExecute="MuteTrack_CanExecute" Executed="MuteTrack_Executed"/>
+        <CommandBinding Command="{x:Static local:CustomCommands.DeleteTrack}" CanExecute="DeleteTrack_CanExecute" Executed="DeleteTrack_Executed"/>
         <CommandBinding Command="{x:Static local:CustomCommands.Configure}" CanExecute="Configure_CanExecute" Executed="Configure_Executed"/>
     </Window.CommandBindings>
-	<Border Style="{StaticResource Outermost}">
-		<Grid Margin="15,15,15,4">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="Auto"/>
-				<RowDefinition Height="*"/>
-				<RowDefinition Height="Auto"/>
-			</Grid.RowDefinitions>
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="Auto"/>
-				<ColumnDefinition Width="1*"/>
-			</Grid.ColumnDefinitions>
-			<StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" DataContext="{Binding Looper}">
+    <Border Style="{StaticResource Outermost}">
+        <Grid Margin="15,15,15,4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" DataContext="{Binding Looper}">
                 <Ellipse Style="{StaticResource StatusLight}"/>
-				<Border Grid.Row="2" Grid.Column="0">
-					<StackPanel Orientation="Vertical">
-						<TextBox Text="{Binding TransportPosition, Mode=OneWay, Converter={StaticResource TimeString}}" d:Text="03:19,124" Width="220"/>
-						<ProgressBar Value="45" Maximum="100"/>
-					</StackPanel>
-				</Border>
-			</StackPanel>
-			<TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Text="Lupus" Style="{StaticResource Logo}"/>
-			<ListView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Status.Tracks}" SelectedItem="{Binding Status.SelectedTrack}">
-				<ListView.ItemTemplate>
-					<DataTemplate>
-						<Grid>
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="*"/>
-								<ColumnDefinition Width="Auto"/>
-								<ColumnDefinition Width="Auto"/>
-								<ColumnDefinition Width="Auto"/>
-								<ColumnDefinition Width="Auto"/>
-								<ColumnDefinition Width="Auto"/>
-							</Grid.ColumnDefinitions>
-							<TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Name}" Foreground="{StaticResource Foreground}"/>
-							<synt:PanDialControl Grid.Row="0" Grid.Column="1" Value="{Binding Pan}"/>
-							<synt:GainDialControl Grid.Row="0" Grid.Column="2" Value="{Binding Gain}"/>
-							<Button Grid.Row="0" Grid.Column="3" Command="{x:Static local:CustomCommands.SoloTrack}" CommandParameter="{Binding}"
+                <Border Grid.Row="2" Grid.Column="0">
+                    <StackPanel Orientation="Vertical">
+                        <TextBox Text="{Binding TransportPosition, Mode=OneWay, Converter={StaticResource TimeString}}" d:Text="03:19,124" Width="220"/>
+                        <ProgressBar Value="45" Maximum="100"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+            <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Text="Lupus" Style="{StaticResource Logo}"/>
+            <ListView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Status.Tracks}" SelectedItem="{Binding Status.SelectedTrack}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Name}" Foreground="{StaticResource Foreground}" Margin="20,0"/>
+                            <synt:PanDialControl Grid.Row="0" Grid.Column="1" Value="{Binding Pan}"/>
+                            <synt:GainDialControl Grid.Row="0" Grid.Column="2" Value="{Binding Gain}"/>
+                            <Button Grid.Row="0" Grid.Column="3" Command="{x:Static local:CustomCommands.SoloTrack}" CommandParameter="{Binding}"
 								Content="S" Foreground="{StaticResource Foreground}"/>
                             <Button Grid.Row="0" Grid.Column="4" Command="{x:Static local:CustomCommands.MuteTrack}" CommandParameter="{Binding}" 
 								Content="M" Foreground="{StaticResource Accent2}"/>
                             <Button Grid.Row="0" Grid.Column="5" Command="{x:Static local:CustomCommands.DeleteTrack}" CommandParameter="{Binding}"
 								Content="X" Foreground="{StaticResource Accent1}"/>
-						</Grid>
-					</DataTemplate>
-				</ListView.ItemTemplate>
-			</ListView>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
             <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
@@ -118,6 +114,6 @@
                 <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding MidiInputName}" Foreground="{StaticResource Accent2}"/>
                 <Button Grid.Row="0" Grid.Column="3" Content="Settings" Command="{x:Static local:CustomCommands.Configure}"/>
             </Grid>
-		</Grid>
-	</Border>
+        </Grid>
+    </Border>
 </Window>
