@@ -40,13 +40,13 @@ namespace Lupus.Model
 					{
 						if (item.Id != track.Id)
 						{
-							_looper.GetTrack(item.Id).Level = 0.0;
+							WithTrack(item.Id, t => t.Level = 0.0);
 						}
 					}
 				}
 
 				_soloTracks.Add(track);
-				_looper.GetTrack(track.Id).Level = track.Gain;
+				WithTrack(track.Id, t => t.Level = track.Gain);
 			}
 			else
 			{
@@ -58,13 +58,13 @@ namespace Lupus.Model
 					{
 						if (item.Id != track.Id)
 						{
-							_looper.GetTrack(item.Id).Level = item.Gain;
+							WithTrack(item.Id, t => t.Level = item.Gain);
 						}
 					}
 				}
 				else
 				{
-					_looper.GetTrack(track.Id).Level = 0.0;
+					WithTrack(track.Id, t=> t.Level = 0.0);
 				}
 			}
 		}
@@ -74,7 +74,17 @@ namespace Lupus.Model
 			ArgumentNullException.ThrowIfNull(track);
 
 			track.IsMute = !track.IsMute;
-			_looper.GetTrack(track.Id).Level = track.IsMute ? 0.0 : track.Gain;
+			WithTrack(track.Id, t => t.Level = track.IsMute ? 0.0 : track.Gain);
+		}
+
+		private ManagedLooperTrack? GetTrack(Guid id) => id == Guid.Empty ? null : _looper.GetTrack(id);
+
+		private void WithTrack(Guid id, Action<ManagedLooperTrack> action)
+		{
+			if (GetTrack(id) is ManagedLooperTrack track)
+			{
+				action(track);
+			}
 		}
 	}
 }
