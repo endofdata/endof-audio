@@ -7,8 +7,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{EC809D6F-5
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lupus", "Test\Lupus\Lupus.csproj", "{55BB491B-9563-458A-80C3-A3684965120D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SynthControls", "..\SyntControls\SynthControls.csproj", "{95B0CE23-0C96-4C87-8290-ED5C21883541}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -19,17 +17,12 @@ Global
 		{55BB491B-9563-458A-80C3-A3684965120D}.Debug|x64.Build.0 = Debug|x64
 		{55BB491B-9563-458A-80C3-A3684965120D}.Release|x64.ActiveCfg = Release|x64
 		{55BB491B-9563-458A-80C3-A3684965120D}.Release|x64.Build.0 = Release|x64
-		{95B0CE23-0C96-4C87-8290-ED5C21883541}.Debug|x64.ActiveCfg = Debug|x64
-		{95B0CE23-0C96-4C87-8290-ED5C21883541}.Debug|x64.Build.0 = Debug|x64
-		{95B0CE23-0C96-4C87-8290-ED5C21883541}.Release|x64.ActiveCfg = Release|x64
-		{95B0CE23-0C96-4C87-8290-ED5C21883541}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{55BB491B-9563-458A-80C3-A3684965120D} = {EC809D6F-537C-4250-93D7-1CB420C2725C}
-		{95B0CE23-0C96-4C87-8290-ED5C21883541} = {EC809D6F-537C-4250-93D7-1CB420C2725C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BE4EAD97-60D3-4148-9E99-86326E46254E}
