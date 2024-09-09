@@ -8,7 +8,7 @@ using namespace Audio::Foundation::Unmanaged;
 
 AudioTime AudioTime::FromSeconds(double seconds)
 {
-	return AudioTime(static_cast<long long>(seconds * 1000000.0));
+	return AudioTime(static_cast<long long>(seconds * 100000000.0));
 }
 
 AudioTime::AudioTime() :
@@ -20,16 +20,16 @@ AudioTime::AudioTime() :
 
 AudioTime::AudioTime(const std::chrono::microseconds& micros) :
 	m_lower(),
-	m_upper(),
-	m_ticks(micros.count())
+	m_upper()
 {
+	Value = micros.count();
 }
 
 AudioTime::AudioTime(const long long value) :
 	m_lower(),
-	m_upper(),
-	m_ticks(value)
+	m_upper()
 {
+	Value = value;
 }
 
 AudioTime::operator long long() const
@@ -94,9 +94,11 @@ bool AudioTime::operator <= (const AudioTime& other) const
 std::wstring AudioTime::ToString() const
 {
 	std::wostringstream oss;
-	oss << std::setfill(L'0') << std::setw(2)
-		<< m_upper.quot << L':' << m_lower.quot << L',' << std::setw(3) << m_lower.rem
-		<< std::setfill(L' ') << std::setw(0) << std::ends;
+	oss 
+		<< std::setfill(L'0') << std::setw(2) << m_upper.quot << L':' 
+		<< std::setfill(L'0') << std::setw(2) << m_lower.quot << L',' 
+		<< std::setw(3) << m_lower.rem
+		<< std::ends;
 
 	return oss.str();
 }
@@ -124,10 +126,8 @@ long long AudioTime::get_Value() const
 void AudioTime::put_Value(long long value)
 {
 	m_ticks = value;
-	long long disp = m_ticks / 1000ll;
-
-	m_upper = std::lldiv(m_ticks, 60000ll);
-	m_lower = std::lldiv(m_upper.rem, 1000ll);
+	m_upper = std::lldiv(m_ticks, 600000000ll);
+	m_lower = std::lldiv(m_upper.rem, 10000000ll);
 }
 
 
