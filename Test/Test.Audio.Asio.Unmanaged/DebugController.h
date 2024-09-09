@@ -24,6 +24,7 @@ namespace Test
 					bool get_IsActive() const;
 					void put_IsActive(bool value);
 
+					void ConfigureMappings(const ControllerMapping mappings[], size_t count);
 					bool GetNext(unsigned int timeout, ControllerCode& code);
 
 					void PutNext(ControllerCode code);

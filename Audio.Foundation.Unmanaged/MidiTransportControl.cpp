@@ -38,6 +38,17 @@ void* MidiTransportControl::GetInterface(REFIID riid)
 	return nullptr;
 }
 
+void MidiTransportControl::ConfigureMappings(const ControllerMapping mappings[], size_t count)
+{
+	m_mappings.clear();
+
+	for (size_t index = 0; index < count; index++)
+	{
+		const ControllerMapping& mapping = mappings[index];
+		m_mappings.push_back(std::pair<unsigned char, ControllerCode>(static_cast<unsigned char>(mapping.CommandId), mapping.Code));
+	}
+}
+
 bool MidiTransportControl::get_IsActive() const
 {
 	return m_isActive;
@@ -78,31 +89,13 @@ void MidiTransportControl::OnData(void* pContext, const MidiMessage& msg, unsign
 
 	if (msg.Code == MidiMessage::CONTROL_CHANGE && msg.Data2 > 0)
 	{
-		ControllerCode code = ControllerCode::None;
+		unsigned char data1 = msg.Data1;
+		auto mapping = std::find_if(self->m_mappings.begin(), self->m_mappings.end(), 
+			[data1](std::pair<unsigned char, ControllerCode> pair) { return pair.first == data1; });
 
-		// TODO: Make MIDI control codes configurable
-		switch (msg.Data1)
+		if (mapping != self->m_mappings.end())
 		{
-		case 70:
-			code = ControllerCode::Locate;
-			break;
-		case 71:
-			code = ControllerCode::Stop;
-			break;
-		case 72:
-			code = ControllerCode::Run;
-			break;
-		case 73:
-			code = ControllerCode::Cancel;
-			break;
-		case 74:
-			code = ControllerCode::Record;
-			break;
-		}
-
-		if (code != ControllerCode::None)
-		{
-			self->m_code = code;
+			self->m_code = mapping->second;
 			SetEvent(self->m_eventHandle);
 		}
 	}

@@ -63,6 +63,10 @@ void DebugController::put_IsActive(bool value)
 	}
 }
 
+void DebugController::ConfigureMappings(const ControllerMapping mappings[], size_t count)
+{
+}
+
 bool DebugController::GetNext(unsigned int timeout, ControllerCode& code)
 {
 	code = ControllerCode::None;

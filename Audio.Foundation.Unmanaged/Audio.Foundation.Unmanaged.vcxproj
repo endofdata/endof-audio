@@ -102,6 +102,7 @@
   <ItemGroup>
     <ClInclude Include="Audio.Foundation.Unmanaged.h" />
     <ClInclude Include="AudioFoundationException.h" />
+    <ClInclude Include="ControllerMapping.h" />
     <ClInclude Include="INetClient.h" />
     <ClInclude Include="INetEndpoint.h" />
     <ClInclude Include="INetPeerServer.h" />
@@ -184,6 +185,7 @@
   <ItemGroup>
     <ClCompile Include="AudioFoundationException.cpp" />
     <ClCompile Include="AudioTime.cpp" />
+    <ClCompile Include="ControllerMapping.cpp" />
     <ClCompile Include="ServerEvents.cpp" />
     <ClCompile Include="ContainerReader.cpp" />
     <ClCompile Include="ContainerWriter.cpp" />

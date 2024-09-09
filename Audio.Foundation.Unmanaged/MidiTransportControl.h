@@ -20,10 +20,12 @@ namespace Audio
 				MidiTransportControl(IMidiInputPtr& midiInput, ITransportPtr& transport);
 				virtual ~MidiTransportControl();
 
+
 				bool get_IsActive() const;
 				void put_IsActive(bool value);
 				_declspec(property(get = get_IsActive, put = put_IsActive)) bool IsActive;
 
+				void ConfigureMappings(const ControllerMapping mappings[], size_t count);
 				bool GetNext(unsigned int timeout, ControllerCode& code);
 
 				DECLARE_IUNKNOWN
@@ -36,6 +38,7 @@ namespace Audio
 				ITransportPtr m_transport;
 				HANDLE m_eventHandle;
 				ControllerCode m_code;
+				std::vector<std::pair<unsigned char, ControllerCode>> m_mappings;
 				bool m_isActive;
 			};
 		}

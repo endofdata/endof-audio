@@ -45,6 +45,7 @@ ControllerEventHandler ControllerEvents::get_OnCommand()
 {
 	return m_onTransport;
 }
+
 void ControllerEvents::put_OnCommand(ControllerEventHandler value)
 {
 	m_onTransport = value;
