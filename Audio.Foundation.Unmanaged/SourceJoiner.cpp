@@ -36,6 +36,17 @@ void* SourceJoiner::GetInterface(REFIID iid)
 	return nullptr;
 }
 
+ISampleSourcePtr SourceJoiner::GetSourceByIndex(int index)
+{
+	const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);
+
+	if (index >= 0 && static_cast<int>(m_vecSources.size()) > index)
+	{
+		return m_vecSources[index].first;
+	}
+	return nullptr;
+}
+
 void SourceJoiner::AddSource(ISampleSourcePtr& source, const MixParameter& mix)
 {
 	const std::lock_guard<std::recursive_mutex> lock(m_processing_mutex);

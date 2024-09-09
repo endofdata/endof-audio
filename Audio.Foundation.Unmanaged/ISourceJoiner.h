@@ -29,6 +29,13 @@ namespace Audio
 					_declspec(property(get = get_Parameter)) MixParameter Parameter[];
 
 					/// <summary>
+					/// Gets source by its index
+					/// </summary>
+					/// <param name="index">Index in the range of 0 to SourceCount - 1
+					/// <returns>Source</returns>
+					ISampleSourcePtr GetSourceByIndex(int index) = 0;
+
+					/// <summary>
 					/// Adds a new item to the <see cref="Sources"/> collection
 					/// </summary>
 					/// <param name="source">Source to joint into output samples</param>

@@ -28,6 +28,8 @@ namespace Audio
 
 				MixParameter& get_Parameter(const GUID& id);
 
+				ISampleSourcePtr GetSourceByIndex(int index);
+
 				void AddSource(ISampleSourcePtr& source, const MixParameter& mix);
 
 				bool RemoveSource(ISampleSourcePtr& source);
