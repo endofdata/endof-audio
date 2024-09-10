@@ -29,10 +29,11 @@ namespace Audio
 
 				DECLARE_IUNKNOWN
 
-			private:
-
+			private:				
 				std::chrono::steady_clock::time_point m_offset;
 				double m_sampleRate;
+				AudioTime m_stopTime;
+				bool m_isRunning;
 			};
 		}
 	}

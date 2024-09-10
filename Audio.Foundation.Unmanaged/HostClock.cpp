@@ -7,8 +7,10 @@ using namespace Audio::Foundation::Unmanaged;
 HostClock::HostClock(double sampleRate) :
 	m_offset(std::chrono::steady_clock::now()),
 	m_sampleRate(sampleRate),
+	m_isRunning(false),
 	m_refCount(0)
 {
+	m_stopTime = CurrentTime;
 }
 
 HostClock::~HostClock()
@@ -33,7 +35,9 @@ void* HostClock::GetInterface(REFIID iid)
 
 AudioTime HostClock::get_CurrentTime() const
 {
-	return AudioTime(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - m_offset));
+	return m_isRunning ?
+		AudioTime(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - m_offset)) :
+		m_stopTime;
 }
 
 void HostClock::put_CurrentTime(const AudioTime& position)
@@ -46,10 +50,13 @@ void HostClock::put_CurrentTime(const AudioTime& position)
 void HostClock::Start()
 {
 	m_offset = std::chrono::steady_clock::now();
+	m_isRunning = true;
 }
 
 void HostClock::Stop()
 {
+	m_stopTime = CurrentTime;
+	m_isRunning = false;
 }
 
 double HostClock::get_SampleRate() const
