@@ -2,6 +2,7 @@
 #include <initguid.h>
 #include <AsioDebugDriverGuid.h>
 #include "SteinbergUrRt2.h"
+#include "CommandLine.h"
 #include <AsioCore.h>
 #include <FoundationObjectFactory.h>
 #include <AsioObjectFactory.h>
@@ -9,6 +10,7 @@
 
 #include "LooperEvents.h"
 
+using namespace RepeatMyself;
 using namespace Audio::Asio;
 using namespace Audio::Vst::Unmanaged;
 using namespace Audio::Asio::Unmanaged;
@@ -16,16 +18,17 @@ using namespace Audio::Foundation::Unmanaged;
 
 bool onDeviceCaps(unsigned int id, const MIDIINCAPS& devcaps, void* callbackParam)
 {
+	const CommandLine& commandLine = *reinterpret_cast<CommandLine*>(callbackParam);
 	std::string name = StrConv::ToUtf8(devcaps.szPname);
 
 	std::cout << "Input ID " << id << " '" << name.c_str() << "'" << std::endl;
 
-	bool isSelected = name == "2- Steinberg UR-RT2-1";
+	bool isSelected = name == commandLine.MidiDevice;
 	//bool isSelected = name == "LoopBe Internal MIDI";
 
 	if (isSelected)
 	{
-		std::cout << "Selected MIDI input device ID '" << id << "'" << std::endl;
+		std::cout << "Selected MIDI input device: '" << commandLine.MidiDevice << "', ID '" << id << "'" << std::endl;
 	}
 
 	return isSelected;
@@ -42,66 +45,66 @@ static void addVstFx(ILooper* looper)
 	looper->InsertFx(pluginIdRaw);
 }
 
-static void runLooper(const ILooperConfigPtr& config)
+static void runLooper(const ILooperConfigPtr& config, const CommandLine& commandLine)
 {
 	ILooperPtr looper = AsioObjectFactory::CreateLooper(config);
 	ILooperEventsPtr looperEvents = new RepeatMyself::LooperEvents();
 
-	try
+	looper->LooperEvents = looperEvents;
+	//addVstFx(looper);
+
+	for (int i = 0; i < static_cast<int>(config->InputChannelCount); i++)
 	{
-		looper->LooperEvents = looperEvents;
-		addVstFx(looper);
-
-		for (int i = 0; i < static_cast<int>(config->InputChannelCount); i++)
-		{
-			looper->SelectInput(config->InputChannel[i], true);
-		}
-		for (int i = 0; i < static_cast<int>(config->OutputChannelCount); i += 2)
-		{
-			int pair[2] = { config->OutputChannel[i], config->OutputChannel[i + 1] };
-			looper->SelectOutputPair(pair, true);
-		}
-
-		// create master recording
-		looper->IsSessionRecording = true;
-
-		std::wcout << L"Running the looper" << std::endl;
-
-		looper->Run();
-
-		if (looper->IsSessionRecording)
-		{
-			std::wostringstream builder;
-			SYSTEMTIME st;
-			GetSystemTime(&st);
-			builder << L"sessions\\"
-				<< std::setw(4) << st.wYear
-				<< std::setw(2) << std::setfill(L'0') << st.wMonth 
-				<< std::setw(2) << std::setfill(L'0') << st.wDay << L"_"
-				<< std::setw(2) << std::setfill(L'0') << st.wHour 
-				<< std::setw(2) << std::setfill(L'0') << st.wMinute 
-				<< std::setw(2) << std::setfill(L'0') << st.wSecond << L"_";
-			std::wstring filenameBase = builder.str();
-
-			std::wcout << L"Writing session to file set '" << filenameBase << L"*'." << std::endl;
-
-			looper->SaveSession(filenameBase.c_str());
-		}
+		looper->SelectInput(i, true);
 	}
-	catch (const std::exception&)
+	for (int i = 0; i < static_cast<int>(config->OutputChannelCount); i += 2)
 	{
-		looper->Release();
-		throw;
+		int pair[2] = { i, i + 1 };
+		looper->SelectOutputPair(pair, true);
 	}
-	looper->Release();
+
+	// create master recording, if requested
+	looper->IsSessionRecording = commandLine.IsSessionRecording;
+
+	ControllerMapping mappings[] =
+	{
+		ControllerMapping(ControllerCode::Locate, 70),
+		ControllerMapping(ControllerCode::Pause, 71),
+		ControllerMapping(ControllerCode::Cancel, 73),
+		ControllerMapping(ControllerCode::Record, 74),
+		ControllerMapping(ControllerCode::Run, 80),
+		ControllerMapping(ControllerCode::Stop, 81)
+	};
+
+	looper->Controller->ConfigureMappings(mappings, _countof(mappings));
+
+	std::wcout << L"Running the looper" << std::endl;
+
+	looper->Run();
+
+	if (looper->IsSessionRecording)
+	{
+		std::wostringstream builder;
+		SYSTEMTIME st;
+		GetSystemTime(&st);
+		builder << L"sessions\\"
+			<< std::setw(4) << st.wYear
+			<< std::setw(2) << std::setfill(L'0') << st.wMonth
+			<< std::setw(2) << std::setfill(L'0') << st.wDay << L"_"
+			<< std::setw(2) << std::setfill(L'0') << st.wHour
+			<< std::setw(2) << std::setfill(L'0') << st.wMinute
+			<< std::setw(2) << std::setfill(L'0') << st.wSecond << L"_";
+		std::wstring filenameBase = builder.str();
+
+		std::wcout << L"Writing session to file set '" << filenameBase << L"*'." << std::endl;
+
+		looper->SaveSession(filenameBase.c_str());
+	}
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-	int selectedInputs[] = { 0, 1 };
-	int selectedOutputs[] = { 0, 1 };
-	int sampleCount = 512;
-	float outputSaturation = 0.5f;
+	CommandLine commandLine = CommandLine::FromArgs(argc, argv);
 
 	bool isPrioritySet = SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 
@@ -120,7 +123,7 @@ int main()
 
 	try
 	{
-		int midiInId = FoundationObjectFactory::SelectMidiInputDevice(onDeviceCaps);
+		int midiInId = FoundationObjectFactory::SelectMidiInputDevice(onDeviceCaps, reinterpret_cast<void*>(&commandLine));
 
 		if (midiInId < 0)
 		{
@@ -134,14 +137,14 @@ int main()
 			looperConfig->MidiInput = midiInId;
 			looperConfig->AsioDevice = IID_STEINBERG_UR_RT2;
 			//looperConfig.AsioDevice = CLSID_AsioDebugDriver;
-			looperConfig->AddInputChannelList(selectedInputs, _countof(selectedInputs));
-			looperConfig->AddOutputChannelList(selectedOutputs, _countof(selectedOutputs));
+			looperConfig->AddInputChannelList(commandLine.InputList, commandLine.InputCount);
+			looperConfig->AddOutputChannelList(commandLine.OutputList, commandLine.OutputCount);
 
 			// optional
 			looperConfig->SampleCount = AsioCore::UsePreferredSize;
-			looperConfig->OutputSaturation = 1.0f;
+			looperConfig->OutputSaturation = commandLine.OutputSaturation;
 
-			runLooper(looperConfig);
+			runLooper(looperConfig, commandLine);
 
 			std::wcout << L"Shutting down everything. Bye!" << std::endl;
 		}
