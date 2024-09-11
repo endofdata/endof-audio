@@ -105,7 +105,7 @@ int VectorWriter::Process(ISampleContainerPtr& container, const ProcessingContex
 	return 0;
 }
 
-ISampleContainerPtr VectorWriter::CreateSampleContainer(bool continueRecording, int fadeIn, int fadeOut)
+ISampleContainerPtr VectorWriter::CreateSampleContainer(bool continueRecording, int maxSamples, int fadeIn, int fadeOut)
 {
 	if (m_inUse > 0)
 	{
@@ -113,9 +113,14 @@ ISampleContainerPtr VectorWriter::CreateSampleContainer(bool continueRecording, 
 
 		const std::lock_guard<std::recursive_mutex> lock(m_buffers_mutex);
 
-		FadeBuffers(fadeIn, fadeOut);
+		FadeBuffers(maxSamples, fadeIn, fadeOut);
 
-		auto container = new SampleContainer(m_buffers, m_inUse);
+		if (maxSamples == 0 || maxSamples > m_inUse)
+		{
+			maxSamples = m_inUse;
+		}
+
+		auto container = new SampleContainer(m_buffers, maxSamples);
 		m_buffers.clear();
 
 		if (continueRecording)
@@ -172,10 +177,12 @@ void VectorWriter::FreeBuffers()
 	m_buffers.clear();
 }
 
-void VectorWriter::FadeBuffers(int fadeIn, int fadeOut)
+void VectorWriter::FadeBuffers(int maxSamples, int fadeIn, int fadeOut)
 {
-	fadeIn = std::max(0, std::min(m_inUse / 2, fadeIn));
-	fadeOut = std::max(0, std::min(m_inUse / 2, fadeOut));
+	int inUse = m_inUse > maxSamples ? maxSamples : m_inUse;
+
+	fadeIn = std::max(0, std::min(inUse / 2, fadeIn));
+	fadeOut = std::max(0, std::min(inUse / 2, fadeOut));
 
 	double fadeInFac = fadeIn;
 	double fadeOutFac = fadeOut;
@@ -192,7 +199,7 @@ void VectorWriter::FadeBuffers(int fadeIn, int fadeOut)
 			*target++ = fadeInFunc(*target, s);
 		}
 
-		target += m_inUse - fadeIn - fadeOut;
+		target += inUse - fadeIn - fadeOut;
 
 		for (int s = 0; s < fadeOut; s++)
 		{
