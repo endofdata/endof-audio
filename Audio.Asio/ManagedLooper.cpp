@@ -136,12 +136,20 @@ bool ManagedLooper::IsLooping::get()
 
 float ManagedLooper::LoopPosition::get()
 {
-	return _loopPosition;
+	long long length = LoopLength->Value;
+
+	if (length != 0)
+	{
+		long long position = TransportPosition->Value;
+
+		return (float)((double)position / (double)length);
+}
+	return 0;
 }
 
-int ManagedLooper::LoopLength::get()
+Audio::Foundation::Interop::ManagedAudioTime^ ManagedLooper::LoopLength::get()
 {
-	return _loopLength;
+	return gcnew ManagedAudioTime(_unmanaged->LoopLength);
 }
 
 int ManagedLooper::LoopCount::get()
@@ -151,12 +159,12 @@ int ManagedLooper::LoopCount::get()
 
 ManagedAudioTime^ ManagedLooper::TransportPosition::get()
 {
-	return _transportPosition;
+	return gcnew ManagedAudioTime(_unmanaged->TransportPosition);
 }
 
 void ManagedLooper::TransportPosition::set(ManagedAudioTime^ value)
 {
-	_transportPosition = value;
+	_unmanaged->TransportPosition = AudioTime(value->Value);
 	OnPropertyChanged(TransportPositionProperty);
 }
 

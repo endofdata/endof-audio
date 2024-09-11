@@ -150,9 +150,9 @@ namespace Audio
 					float get();
 				}
 
-				property int LoopLength
+				property Audio::Foundation::Interop::ManagedAudioTime^ LoopLength
 				{
-					int get();
+					Audio::Foundation::Interop::ManagedAudioTime^ get();
 				}
 
 				property int LoopCount
@@ -199,8 +199,6 @@ namespace Audio
 				LoopEventHandler^ m_removeLoopEventHandler;
 				Audio::Asio::Unmanaged::Abstractions::ILooper* _unmanaged;
 				LooperEvents* _events;
-				int _loopLength;
-				float _loopPosition;
 				Audio::Foundation::Interop::ManagedAudioTime^ _transportPosition;
 			};
 		}
