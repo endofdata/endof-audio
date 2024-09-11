@@ -24,6 +24,10 @@ namespace Audio
 					/// </summary>
 					Run,
 					/// <summary>
+					/// Toggle looper transport pause/continue
+					/// </summary>
+					Pause,
+					/// <summary>
 					/// Delayed handling of 'Record' commands, triggered by master loop wrap
 					/// </summary>
 					Locate,

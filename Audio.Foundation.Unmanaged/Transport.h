@@ -35,6 +35,9 @@ namespace Audio
 				AudioTime get_LoopEndTime();
 				void put_LoopEndTime(AudioTime value);
 
+				bool get_IsPaused() const;
+				void put_IsPaused(bool value);
+
 				IHostClockPtr& get_HostClock();
 
 				IControllerEventsPtr& get_Events();
@@ -46,6 +49,7 @@ namespace Audio
 
 			private:
 				IHostClockPtr m_hostClock;
+				unsigned int m_isPaused;
 				IControllerEventsPtr m_events;
 				ProcessingContext m_context;
 			};

@@ -8,6 +8,7 @@ Transport::Transport(IHostClockPtr& hostClock, IControllerEventsPtr& events, int
 	m_hostClock(hostClock),
 	m_context(sampleCount),
 	m_events(events),
+	m_isPaused(0),
 	m_refCount(0)
 {
 }
@@ -34,27 +35,54 @@ void* Transport::GetInterface(REFIID iid)
 
 void Transport::Run()
 {
+	m_isPaused = false;
 	m_hostClock->Start();
 	m_context.SamplePosition = AudioTimeToSamplePosition(m_hostClock->CurrentTime);
 	m_events->ControllerCommand(ControllerCode::Run);
 }
 
+bool Transport::get_IsPaused() const
+{
+	return static_cast<bool>(m_isPaused);
+}
+
+void Transport::put_IsPaused(bool value)
+{
+	unsigned int oldValue = static_cast<bool>(::InterlockedExchange(&m_isPaused, value ? 1 : 0));
+
+	if (oldValue != m_isPaused)
+	{
+		if (m_isPaused)
+		{
+			m_hostClock->Stop();
+		}
+		else
+		{
+			m_hostClock->Start();
+		}
+	}
+}
+
 void Transport::Stop()
 {
+	m_isPaused = false;
 	m_hostClock->Stop();
 	m_events->ControllerCommand(ControllerCode::Stop);
 }
 
 ProcessingContext& Transport::Pulse()
 {
-	m_context.SamplePosition += m_context.SampleCount;
-
-	if (m_context.IsLooping)
+	if (!m_isPaused)
 	{
-		if (m_context.IsLoopStart)
+		m_context.SamplePosition += m_context.SampleCount;
+
+		if (m_context.IsLooping)
 		{
-			m_hostClock->CurrentTime = LoopStartTime;
-			m_events->ControllerCommand(ControllerCode::Locate);
+			if (m_context.IsLoopStart)
+			{
+				m_hostClock->CurrentTime = LoopStartTime;
+				m_events->ControllerCommand(ControllerCode::Locate);
+			}
 		}
 	}
 	return m_context;
@@ -107,10 +135,10 @@ IControllerEventsPtr& Transport::get_Events()
 
 int Transport::AudioTimeToSamplePosition(const AudioTime& value) const
 {
-	return static_cast<int>(static_cast<double>(value.Value) * m_hostClock->SampleRate / 1000000.0);
+	return static_cast<int>(static_cast<double>(value.Value) * m_hostClock->SampleRate / 10000000.0);
 }
 
 AudioTime Transport::SamplePositionToAudioTime(int value) const
 {
-	return AudioTime(static_cast<int>(static_cast<double>(value) / m_hostClock->SampleRate * 1000000.0));
+	return AudioTime(static_cast<int>(static_cast<double>(value) / m_hostClock->SampleRate * 10000000.0));
 }

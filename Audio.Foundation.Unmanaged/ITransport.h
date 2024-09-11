@@ -43,6 +43,10 @@ namespace Audio
 					void put_LoopEndTime(AudioTime value) = 0;
 					_declspec(property(get = get_LoopEndTime, put = put_LoopEndTime)) AudioTime LoopEndTime;
 
+					bool get_IsPaused() const = 0;
+					void put_IsPaused(bool value) = 0;
+					_declspec(property(get = get_IsPaused, put = put_IsPaused)) bool IsPaused;
+
 					IHostClockPtr& get_HostClock() = 0;
 					_declspec(property(get = get_HostClock)) IHostClockPtr HostClock;
 
