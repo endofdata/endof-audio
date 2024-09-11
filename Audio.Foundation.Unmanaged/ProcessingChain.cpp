@@ -62,8 +62,8 @@ void ProcessingChain::OnNextBuffer(bool writeSecondHalf)
 		});
 
 		// Fade at loop end / start with 10ms or at least one buffer
-		int fadeWidth = std::min(m_container->SampleCount, (int)(clock->SampleRate / 100));
-		FadeBuffers(context.IsLoopStart? fadeWidth: 0, context.IsLoopEnd? fadeWidth : 0);
+		//int fadeWidth = std::min(m_container->SampleCount, (int)(clock->SampleRate / 100));
+		//FadeBuffers(context.IsLoopStart? fadeWidth: 0, context.IsLoopEnd? fadeWidth : 0);
 
 		int firstOut = 0;
 
