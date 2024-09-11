@@ -42,8 +42,9 @@ namespace Audio
 			{
 			public:
 				static initonly System::String^ IsLoopingProperty = gcnew System::String("IsLooping");
-				static initonly System::String^ RecordingStatusProperty = gcnew System::String("RecordingStatus");
 				static initonly System::String^ IsSessionRecordingProperty = gcnew System::String("IsSessionRecording");
+				static initonly System::String^ IsPausedProperty = gcnew System::String("IsPaused");
+				static initonly System::String^ RecordingStatusProperty = gcnew System::String("RecordingStatus");
 				static initonly System::String^ LoopCountProperty = gcnew System::String("LoopCount");
 				static initonly System::String^ LoopLengthProperty = gcnew System::String("LoopLength");
 				static initonly System::String^ LoopPositionProperty = gcnew System::String("LoopPosition");
@@ -166,6 +167,12 @@ namespace Audio
 				}
 
 				property bool IsSessionRecording
+				{
+					bool get();
+					void set(bool value);
+				}
+
+				property bool IsPaused
 				{
 					bool get();
 					void set(bool value);

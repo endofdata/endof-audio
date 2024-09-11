@@ -143,7 +143,7 @@ float ManagedLooper::LoopPosition::get()
 		long long position = TransportPosition->Value;
 
 		return (float)((double)position / (double)length);
-}
+	}
 	return 0;
 }
 
@@ -196,6 +196,20 @@ void ManagedLooper::IsSessionRecording::set(bool value)
 	{
 		_unmanaged->IsSessionRecording = value;
 		OnPropertyChanged(IsSessionRecordingProperty);
+	}
+}
+
+bool ManagedLooper::IsPaused::get()
+{
+	return _unmanaged->IsPaused;
+}
+
+void ManagedLooper::IsPaused::set(bool value)
+{
+	if (value != _unmanaged->IsPaused)
+	{
+		_unmanaged->IsPaused = value;
+		OnPropertyChanged(IsPausedProperty);
 	}
 }
 

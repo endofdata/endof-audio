@@ -58,6 +58,11 @@ void LooperEvents::IsSessionRecordingChanged(ILooper& looper, bool isSessionReco
 	m_looper->OnPropertyChanged(ManagedLooper::IsSessionRecordingProperty);
 }
 
+void LooperEvents::IsPausedChanged(ILooper& looper, bool isPaused)
+{
+	m_looper->OnPropertyChanged(ManagedLooper::IsPausedProperty);
+}
+
 void LooperEvents::AddLoop(ILooper& looper, const GUID& id, int channelCount, int samplePosition, int sampleCount)
 {
 	auto managed = GuidConversion::FromNative(id);
