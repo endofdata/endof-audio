@@ -5,22 +5,22 @@ using namespace Audio::Foundation::Interop;
 
 ManagedAudioTime::ManagedAudioTime()
 {
-	_ticks = 0;
+	Value = 0;
 }
 
 ManagedAudioTime::ManagedAudioTime(long long micros)
 {
-	_ticks = micros;
+	Value = micros;
 }
 
 ManagedAudioTime::ManagedAudioTime(ManagedAudioTime^ other)
 {
-	_ticks = other->Value;
+	Value = other->Value;
 }
 
 ManagedAudioTime::ManagedAudioTime(const AudioTime& audioTime)
 {
-	_ticks = audioTime;
+	Value = audioTime;
 }
 
 ManagedAudioTime::~ManagedAudioTime()
