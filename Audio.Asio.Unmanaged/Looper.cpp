@@ -116,25 +116,37 @@ void* Looper::GetInterface(const IID& iid)
 	return nullptr;
 }
 
-bool Looper::SelectInput(int input, bool isSelected)
+bool Looper::SelectInput(int inputIdx, bool isSelected)
 {
 	IProcessingChainPtr processingChain = m_device->ProcessingChain;
 
-	if (input < 0 || input >= processingChain->InputChannelCount)
+	if (inputIdx < 0 || inputIdx >= processingChain->InputChannelCount)
 	{
 		throw std::invalid_argument("Input index is out of range.");
 	}
-	processingChain->InputChannel[input]->IsActive = isSelected;
+	IInputChannelPtr channel = processingChain->InputChannel[inputIdx];
+
+	channel->IsActive = isSelected;
+
+	m_eventLog.ActivateInputChannel(channel->Id, channel->IsActive);
 
 	return true;
 }
 
-bool Looper::SelectOutputPair(int outputPair[2], bool isSelected)
+bool Looper::SelectOutputPair(int outputPairIdx, bool isSelected)
 {
 	IProcessingChainPtr processingChain = m_device->ProcessingChain;
 
-	// TODO: Output channel pairing is still inconsistent
-	processingChain->OutputChannelPair[0]->IsActive = isSelected;
+	IOutputChannelPairPtr channelPair = processingChain->OutputChannelPair[outputPairIdx];
+		
+	channelPair->IsActive = isSelected;
+
+	// TODO: Expose channel IDs for left and right channel
+	int encodedIds = channelPair->Id;
+	int leftChannel = encodedIds >> 16;
+	int rightChannel = encodedIds & 0x00FF;
+
+	m_eventLog.ActivateOutputChannelPair(leftChannel, rightChannel, channelPair->IsActive);
 
 	return true;
 }
@@ -184,6 +196,8 @@ void Looper::Run()
 	{
 		throw std::runtime_error("Property 'Controller' must be set before running the looper.");
 	}
+
+	OnStarting();
 
 	m_eventLog.Status("running");
 
@@ -243,7 +257,7 @@ void Looper::Run()
 				}
 				break;
 			case ControllerCode::Locate:
-				OnLoopRestart();
+				Wrap();
 
 				// Triggered by master loop wrap: delayed handling of 'Record' commands
 				switch(m_recordingStatus)
@@ -274,7 +288,10 @@ void Looper::Run()
 					break;
 				}
 				break;
-
+			case ControllerCode::Pause:
+				// Stop playback temporarily
+				PausePlayback(transport);
+				break;
 			case ControllerCode::Stop:
 				// Drop current recording, stop recording, exit looping
 				transport->Stop();
@@ -292,6 +309,8 @@ void Looper::Run()
 	m_context = nullptr;
 	m_controller->IsActive = false;
 	m_device->Stop();
+
+	OnStopping();
 
 	m_eventLog.Status("stopped");
 }
@@ -359,9 +378,14 @@ bool Looper::Stop(DWORD waitTimeout)
 		m_eventLog.Status("stopping");
 
 		m_stopCalled = true;
-		return WAIT_OBJECT_0 == WaitForSingleObject(m_controlThread, waitTimeout);
+		return Wait(waitTimeout);
 	}
 	return true;
+}
+
+bool Looper::Wait(DWORD waitTimeout)
+{
+	return m_controlThread == nullptr || (WAIT_OBJECT_0 == WaitForSingleObject(m_controlThread, waitTimeout));
 }
 
 void Looper::ArmRecording()
@@ -401,19 +425,16 @@ void Looper::StopRecording()
 {
 	int switchSamplePos = m_context->SamplePosition;
 
+	if (m_context->IsLooping && switchSamplePos > m_context->LoopEndSample)
+	{
+		switchSamplePos = m_context->LoopEndSample;
+	}
+
 	m_recordingStatus = RecordingStatusType::Off;
 
-	if (AddLoop())
+	if (AddLoop(switchSamplePos))
 	{
-		if (m_context->IsLooping)
-		{
-			// TODO: Add threshold to prevent unintentional resize? Does resize work at all?
-			if (switchSamplePos > m_context->LoopEndSample)
-			{
-				m_context->LoopEndSample = switchSamplePos;
-			}
-		}
-		else
+		if (!m_context->IsLooping)
 		{
 			m_context->LoopEndSample = switchSamplePos;
 			m_context->IsLooping = true;
@@ -438,9 +459,18 @@ bool Looper::DropRecording()
 	return false;
 }
 
-bool Looper::AddLoop()
+bool Looper::PausePlayback(ITransportPtr& transport)
 {
-	ISampleContainerPtr take = m_recorder->CreateSampleContainer(false, 0, 0);
+	bool newValue = !transport->IsPaused;
+	transport->IsPaused = newValue;
+	OnIsPaused(newValue);
+
+	return newValue;
+}
+
+bool Looper::AddLoop(int maxSamples)
+{
+	ISampleContainerPtr take = m_recorder->CreateSampleContainer(false, maxSamples, 0, 0);
 
 	if (take != nullptr)
 	{
@@ -456,15 +486,29 @@ bool Looper::AddLoop()
 	return false;
 }
 
-MixParameter& Looper::get_LoopParameter(const GUID& id)
+void Looper::Wrap()
 {
-	return m_joiner->Parameter[id];
+	for (int i = 0; i < m_joiner->SourceCount; i++)
+	{
+		ISampleSourcePtr source = m_joiner->GetSourceByIndex(i);
+		if (source != nullptr)
+		{
+			source->SamplePosition = 0;
+		}
+	}
+	OnLoopRestart();
 }
 
 bool Looper::RemoveLoop(const GUID& id)
 {
 	if (m_joiner->RemoveSource(id))
 	{
+		if (m_joiner->SourceCount == 0)
+		{
+			m_context->IsLooping = false;
+			m_context->LoopEndSample = 0;
+			m_context->LoopStartSample = 0;
+		}
 		OnRemoveLoop(id);
 		return true;
 	}
@@ -473,7 +517,7 @@ bool Looper::RemoveLoop(const GUID& id)
 
 void Looper::SaveSession(const wchar_t* pwcszFilenameBase)
 {
-	ISampleContainerPtr container = m_sessionRecorder->CreateSampleContainer(false, 0, 0);
+	ISampleContainerPtr container = m_sessionRecorder->CreateSampleContainer(false, 0, 0, 0);
 
 	// TODO: Write WAV format
 	if (container != nullptr)
@@ -493,6 +537,23 @@ void Looper::SaveSession(const wchar_t* pwcszFilenameBase)
 		}
 	}
 }
+
+void Looper::OnStarting()
+{
+	if (m_events != nullptr)
+	{
+		m_events->Starting(*this);
+	}
+}
+
+void Looper::OnStopping()
+{
+	if (m_events != nullptr)
+	{
+		m_events->Stopping(*this);
+	}
+}
+
 
 void Looper::OnHeartbeat(ITransportPtr& transport)
 {
@@ -560,6 +621,16 @@ void Looper::OnRecordingStatusChanged()
 	}
 }
 
+void Looper::OnIsPaused(bool isPaused)
+{
+	m_eventLog.Pause(isPaused);
+
+	if (m_events != nullptr)
+	{
+		m_events->IsPausedChanged(*this, isPaused);
+	}
+}
+
 bool Looper::get_IsRunning() const
 {
 	return m_controlThread != nullptr;
@@ -575,6 +646,27 @@ int Looper::get_LoopCount() const
 	return m_joiner->SourceCount;
 }
 
+AudioTime Looper::get_LoopLength() const
+{
+	ITransportPtr& transport = m_device->ProcessingChain->Transport;
+	return transport->LoopEndTime - transport->LoopStartTime;
+}
+
+MixParameter& Looper::get_LoopParameter(const GUID& id)
+{
+	return m_joiner->Parameter[id];
+}
+
+AudioTime Looper::get_TransportPosition() const
+{
+	return m_device->ProcessingChain->Transport->TimePosition;
+}
+
+void Looper::put_TransportPosition(Audio::Foundation::Unmanaged::AudioTime value)
+{
+	m_device->ProcessingChain->Transport->TimePosition = value;
+}
+
 RecordingStatusType Looper::get_RecordingStatus() const
 {
 	return m_recordingStatus;
@@ -588,6 +680,16 @@ bool Looper::get_IsSessionRecording() const
 void Looper::put_IsSessionRecording(bool value)
 {
 	m_isSessionRecording = value;
+}
+
+bool Looper::get_IsPaused() const
+{
+	return m_device->ProcessingChain->Transport->IsPaused;
+}
+
+void Looper::put_IsPaused(bool value)
+{
+	m_device->ProcessingChain->Transport->IsPaused = value;
 }
 
 const wchar_t* Looper::get_Name() const

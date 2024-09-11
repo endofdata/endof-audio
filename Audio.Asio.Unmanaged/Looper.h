@@ -30,12 +30,12 @@ namespace Audio
 
 				virtual ~Looper();
 
-				bool SelectInput(int input, bool isSelected);
-				bool SelectOutputPair(int outputPair[2], bool isSelected);
+				bool SelectInput(int inputIdx, bool isSelected);
+				bool SelectOutputPair(int outputPairIdx, bool isSelected);
 
 				void Start();
 				bool Stop(DWORD waitTimeout);
-				void Run();
+				bool Wait(DWORD waitTimeout);
 
 				void SaveSession(const wchar_t* pwcszFilenameBase);
 
@@ -51,10 +51,18 @@ namespace Audio
 
 				int get_LoopCount() const;
 
+				Audio::Foundation::Unmanaged::AudioTime get_LoopLength() const;
+
+				Audio::Foundation::Unmanaged::AudioTime get_TransportPosition() const;
+				void put_TransportPosition(Audio::Foundation::Unmanaged::AudioTime value);
+
 				RecordingStatusType get_RecordingStatus() const;
 
 				bool get_IsSessionRecording() const;
 				void put_IsSessionRecording(bool value);
+
+				bool get_IsPaused() const;
+				void put_IsPaused(bool value);
 
 				const wchar_t* get_Name() const;
 				void put_Name(const wchar_t* value);
@@ -78,13 +86,18 @@ namespace Audio
 				void CreateVstHost();
 				void CreateProcessingChain();
 
+				void Run();
+				void Wrap();
 				void ArmRecording();
 				void UnarmRecording();
 				void StartRecording();
 				void StopRecording();
 				bool DropRecording();
-				bool AddLoop();
+				bool PausePlayback(ITransportPtr& transport);
+				bool AddLoop(int maxSamples);
 
+				void OnStarting();
+				void OnStopping();
 				void OnHeartbeat(ITransportPtr& transport);
 				void OnRecordingStatusChanged();
 				void OnIsLoopingChanged();
@@ -93,6 +106,7 @@ namespace Audio
 				void OnAddLoop(const GUID& id, int channelCount, int samplePosition, int sampleCount);
 				void OnRemoveLoop(const GUID& id);
 				void OnDropRecording();
+				void OnIsPaused(bool isPaused);
 
 				static DWORD ControlThreadEntry(LPVOID param);
 				void ControlThreadExit();

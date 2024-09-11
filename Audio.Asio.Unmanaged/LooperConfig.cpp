@@ -52,7 +52,7 @@ void LooperConfig::AddOutputChannel(int id)
 	m_outputChannelIds[m_numOutputIds++] = id;
 }
 
-void LooperConfig::AddInputChannelList(int idList[], size_t count)
+void LooperConfig::AddInputChannelList(const int idList[], size_t count)
 {
 	for (size_t i = 0; i < count; i++)
 	{
@@ -60,7 +60,7 @@ void LooperConfig::AddInputChannelList(int idList[], size_t count)
 	}
 }
 
-void LooperConfig::AddOutputChannelList(int idList[], size_t count)
+void LooperConfig::AddOutputChannelList(const int idList[], size_t count)
 {
 	for (size_t i = 0; i < count; i++)
 	{

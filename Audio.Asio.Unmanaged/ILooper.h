@@ -4,6 +4,7 @@
 #include <ISampleProcessor.h>
 #include <ILooperEvents.h>
 #include <IController.h>
+#include <AudioTime.h>
 #include <comdef.h>
 
 namespace Audio
@@ -16,12 +17,12 @@ namespace Audio
 			{
 				__interface _AUDIO_ASIO_UNMANAGED_API _declspec(uuid("d446c0dc-4868-4d20-893f-0e432cf4b7ce")) ILooper : public IUnknown
 				{
-					bool SelectInput(int input, bool isSelected) = 0;
-					bool SelectOutputPair(int outputPair[2], bool isSelected) = 0;
+					bool SelectInput(int inputIdx, bool isSelected) = 0;
+					bool SelectOutputPair(int outputPairIdx, bool isSelected) = 0;
 
 					void Start() = 0;
 					bool Stop(DWORD waitTimeout) = 0;
-					void Run() = 0;
+					bool Wait(DWORD waitTimeout) = 0;
 
 					void SaveSession(const wchar_t* pwcszFilenameBase) = 0;
 
@@ -40,12 +41,23 @@ namespace Audio
 					int get_LoopCount() const = 0;
 					_declspec(property(get = get_LoopCount)) int LoopCount;
 
+					Audio::Foundation::Unmanaged::AudioTime get_LoopLength() const = 0;
+					_declspec(property(get = get_LoopLength)) Audio::Foundation::Unmanaged::AudioTime LoopLength;
+
+					Audio::Foundation::Unmanaged::AudioTime get_TransportPosition() const = 0;
+					void put_TransportPosition(Audio::Foundation::Unmanaged::AudioTime value) = 0;
+					_declspec(property(get = get_TransportPosition, put = put_TransportPosition)) Audio::Foundation::Unmanaged::AudioTime TransportPosition;
+
 					RecordingStatusType get_RecordingStatus() const = 0;
 					_declspec(property(get = get_RecordingStatus)) RecordingStatusType RecordingStatus;
 
 					bool get_IsSessionRecording() const = 0;
 					void put_IsSessionRecording(bool value) = 0;
 					_declspec(property(get = get_IsSessionRecording, put = put_IsSessionRecording)) bool IsSessionRecording;
+
+					bool get_IsPaused() const = 0;
+					void put_IsPaused(bool value) = 0;
+					_declspec(property(get = get_IsPaused, put = put_IsPaused)) bool IsPaused;
 
 					const wchar_t* get_Name() const = 0;
 					void put_Name(const wchar_t* value) = 0;

@@ -24,7 +24,7 @@ void LooperEventLog::Status(const char* status)
 
 void LooperEventLog::Status(const wchar_t* status)
 {
-	WriteMessage(L"LooperStatus", status);	
+	WriteMessage(L"LooperStatus", status);
 }
 
 void LooperEventLog::RecordingStatus(RecordingStatusType status)
@@ -83,11 +83,37 @@ void LooperEventLog::ControlCode(ControllerCode code)
 	WriteMessage(L"LooperControl", codeText);
 }
 
+void LooperEventLog::Pause(bool isPaused)
+{
+	WriteMessage(L"LooperControl", isPaused ? L"Pause" : L"Continue");
+}
+
+void LooperEventLog::ActivateInputChannel(int channel, bool isActive)
+{
+	BuildMessage(L"LooperSetup", [channel, isActive](std::wostringstream& builder) {
+		builder << L"Input channel " << channel << (isActive ? L" active" : L" inactive");
+	});
+}
+
+void LooperEventLog::ActivateOutputChannelPair(int channelLeft, int channelRight, bool isActive)
+{
+	BuildMessage(L"LooperSetup", [channelLeft, channelRight, isActive](std::wostringstream& builder) {
+		builder << L"Output channels " << channelLeft << L"," << channelRight << (isActive ? L" active" : L" inactive");
+	});
+}
+
 void LooperEventLog::WriteMessage(const wchar_t* category, const wchar_t* message)
+{
+	BuildMessage(category, [message](std::wostringstream& builder) { builder << message; });
+}
+
+void LooperEventLog::BuildMessage(const wchar_t* category, std::function<void(std::wostringstream&)> createMessage)
 {
 	std::wostringstream builder;
 
-	builder << L"[" << category << L"] " << message << std::endl;
+	builder << L"[" << category << L"] ";
+	createMessage(builder);
+	builder << std::endl;
 
 	OutputDebugStringW(builder.str().c_str());
 }

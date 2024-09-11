@@ -26,6 +26,10 @@ namespace Audio
 
 				__interface _AUDIO_ASIO_UNMANAGED_API  _declspec(uuid("98bd51b8-8ab7-4a58-825b-70f77c447675")) ILooperEvents : public IUnknown
 				{
+					void Starting(ILooper& looper) = 0;
+
+					void Stopping(ILooper& looper) = 0;
+
 					void Heartbeat(ILooper& looper, ITransportPtr& transport) = 0;
 
 					void RecordingStatusChanged(ILooper& looper, RecordingStatusType recordingStatus) = 0;
@@ -35,6 +39,8 @@ namespace Audio
 					void IsLoopingChanged(ILooper& looper, bool isLooping) = 0;
 
 					void IsSessionRecordingChanged(ILooper& looper, bool isSessionRecording) = 0;
+
+					void IsPausedChanged(ILooper& looper, bool isPaused) = 0;
 
 					void AddLoop(ILooper& looper, const GUID& id, int channelCount, int samplePosition, int sampleCount) = 0;
 

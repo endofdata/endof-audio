@@ -87,8 +87,8 @@ namespace Audio
 					void AddInputChannel(int id) = 0;
 					void AddOutputChannel(int id) = 0;
 
-					void AddInputChannelList(int idList[], size_t count) = 0;
-					void AddOutputChannelList(int idList[], size_t count) = 0;
+					void AddInputChannelList(const int idList[], size_t count) = 0;
+					void AddOutputChannelList(const int idList[], size_t count) = 0;
 				};
 
 				_AUDIO_ASIO_UNMANAGED_API _COM_SMARTPTR_TYPEDEF(ILooperConfig, __uuidof(ILooperConfig));

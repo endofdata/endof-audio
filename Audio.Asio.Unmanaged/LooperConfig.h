@@ -57,8 +57,8 @@ namespace Audio
 				void AddInputChannel(int id);
 				void AddOutputChannel(int id);
 
-				void AddInputChannelList(int idList[], size_t count);
-				void AddOutputChannelList(int idList[], size_t count);
+				void AddInputChannelList(const int idList[], size_t count);
+				void AddOutputChannelList(const int idList[], size_t count);
 
 				DECLARE_IUNKNOWN
 
