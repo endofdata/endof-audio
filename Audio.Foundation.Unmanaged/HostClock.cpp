@@ -10,7 +10,7 @@ HostClock::HostClock(double sampleRate) :
 	m_isRunning(false),
 	m_refCount(0)
 {
-	m_stopTime = CurrentTime;
+	m_stopTime = get_CurrentTime();
 }
 
 HostClock::~HostClock()
