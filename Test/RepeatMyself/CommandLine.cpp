@@ -11,9 +11,10 @@ CommandLine::CommandLine() :
 	memset(m_input, 0, sizeof(int) * MAX_CHANNELS);
 	memset(m_output, 0, sizeof(int) * MAX_CHANNELS);
 
-	m_input[0] = 1;
+	m_input[0] = 0;
 	m_inputCount = 1;
 
+	m_output[0] = 0;
 	m_output[1] = 1;
 	m_outputCount = 2;
 }
@@ -152,7 +153,7 @@ int CommandLine::SplitIntList(const char* text, int values[], int maxValues)
 			if (pos != NULL)
 			{
 				value *= 10;
-				value += pos - digits;
+				value += static_cast<int>(pos - digits);
 				hasValue = true;
 			}
 			else if (t == ',')
