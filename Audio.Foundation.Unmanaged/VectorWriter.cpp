@@ -155,7 +155,7 @@ ISampleContainerPtr VectorWriter::CreateSampleContainer(bool continueRecording, 
 
 		if (takeIndex > 0)
 		{
-			container = SampleContainerSpan::Create(m_buffers, m_inUse, takeIndex * count, count, 0, m_buffers.size());
+			container = SampleContainerSpan::Create(m_buffers, m_inUse, takeIndex * count, count, 0, static_cast<int>(m_buffers.size()));
 		}
 		else
 		{

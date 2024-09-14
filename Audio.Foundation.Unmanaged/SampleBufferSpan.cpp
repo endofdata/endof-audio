@@ -96,14 +96,14 @@ int SampleBufferSpan::WriteTo(ISampleBufferPtr& other, int sampleOffset, int sam
 		{
 			for (int s = 0; s < count; s++)
 			{
-				*pTarget++ += *pSource++ * level;
+				*pTarget++ += static_cast<Sample>(*pSource++ * level);
 			}
 		}
 		else
 		{
 			for (int s = 0; s < count; s++)
 			{
-				*pTarget++ = *pSource++ * level;
+				*pTarget++ = static_cast<Sample>(*pSource++ * level);
 			}
 		}
 	}
