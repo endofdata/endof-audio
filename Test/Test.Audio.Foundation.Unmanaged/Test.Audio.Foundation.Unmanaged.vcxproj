@@ -98,6 +98,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ComPtrTests.cpp" />
+    <ClCompile Include="Constants.cpp" />
     <ClCompile Include="ContainerReaderTests.cpp" />
     <ClCompile Include="HelperMethods.cpp" />
     <ClCompile Include="IteratorTests.cpp" />
@@ -109,6 +110,7 @@
     </ClCompile>
     <ClCompile Include="SampleBufferTests.cpp" />
     <ClCompile Include="SampleContainerTests.cpp" />
+    <ClCompile Include="SourceJoinerTests.cpp" />
     <ClCompile Include="SampleTransferTests.cpp" />
     <ClCompile Include="NetPeerServerTests.cpp" />
   </ItemGroup>

@@ -54,6 +54,12 @@ namespace Test
 						HelperMethods::TestSampleContainer(pContainer, Constants::SampleCount, Constants::ChannelCount);
 					}
 
+					TEST_METHOD(CreateSpan)
+					{
+						ISampleContainerPtr pContainer = FoundationObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
+
+					}
+
 					TEST_METHOD_INITIALIZE(Init)
 					{
 						m_memCheck.BeginCheck();

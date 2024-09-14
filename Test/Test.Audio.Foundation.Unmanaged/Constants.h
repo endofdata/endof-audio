@@ -1,4 +1,5 @@
 #pragma once
+#include "HelperMethods.h"
 
 namespace Test
 {
@@ -11,9 +12,10 @@ namespace Test
 				class Constants
 				{
 				public:
-					static const int SampleCount = 256;
-					static const int ChannelCount = 2;
-					static const int SampleRate = 48000;
+					static const int SampleCount;
+					static const int ChannelCount;
+					static const int SampleRate;
+					static const Key Keys[];
 				};
 			}
 		}

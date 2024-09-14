@@ -117,6 +117,7 @@ namespace Test
 						AudioTime position = 0;
 						AudioTime length = AudioTime::FromSeconds(seconds);
 						ITakePtr pTake = FoundationObjectFactory::CreateTake(pContainer, position, length);
+						pTake->Mix = MixParameter::Neutral;
 
 						Assert::IsNotNull(pTake.GetInterfacePtr(), L"Can create audio take");
 
@@ -166,7 +167,7 @@ namespace Test
 						pVectorWriter->QueryInterface<IRecorder>(&pRecorder);
 						Assert::IsNotNull(pRecorder.GetInterfacePtr(), L"Can access IRecorder from ISampleProcessor (vector writer)");
 
-						ISampleContainerPtr pOutputContainer = pRecorder->CreateSampleContainer(false, 10, 10);						
+						ISampleContainerPtr pOutputContainer = pRecorder->CreateSampleContainer(false, 0, 10, 10);						
 						Assert::IsNotNull(pOutputContainer.GetInterfacePtr(), L"Can create ISampleContainer from IRecorder (vector writer)");
 						Assert::AreEqual(2, pOutputContainer->ChannelCount, L"Has two channels of output data");
 						Assert::AreEqual(loopsRequiredForTenSeconds * Constants::SampleCount, pOutputContainer->SampleCount, L"Has expected size of output data");

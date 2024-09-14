@@ -8,6 +8,13 @@ using namespace Audio::Foundation::Unmanaged;
 
 using namespace Test::Audio::Foundation::Unmanaged;
 
+const double HelperMethods::SAMPLE_RATE = 48000.0;
+
+double HelperMethods::Frequencies[] =
+{
+	261.6, 277.2, 293.7, 311.1, 329.6, 349.2, 370, 392, 415.3, 440, 466.2, 493.9
+};
+
 void HelperMethods::TestSampleBuffer(ISampleBufferPtr pBuffer, int sampleCount)
 {
 	Assert::AreEqual(sampleCount, pBuffer->SampleCount, L"Buffer sample count is OK");
@@ -33,17 +40,26 @@ void HelperMethods::TestSampleContainer(ISampleContainerPtr pContainer, int samp
 	}
 }
 
-ISampleContainerPtr HelperMethods::CreateTestContainer(int sampleCount, int channelCount)
+ISampleContainerPtr HelperMethods::CreateTestContainer(int sampleCount, int channelCount, const Key key[], double sampleRate)
 {
 	ISampleContainerPtr container = FoundationObjectFactory::CreateSampleContainer(sampleCount, channelCount);
 
 	for (int c = 0; c < channelCount; c++)
 	{
 		Sample* pSamples = container->Channels[c]->SamplePtr;
+		int freqIndex = static_cast<int>(key[c]);
+		if (freqIndex < 0 || freqIndex >= _countof(Frequencies))
+		{
+			throw std::invalid_argument("all 'key' values must be in the range of 0 to 11.");
+		}
+
+		double step = sampleRate / Frequencies[freqIndex];
+		double value = 0;
 
 		for (int s = 0; s < sampleCount; s++)
 		{
-			*pSamples++ = (Sample)sin((double)s / 100.0);
+			*pSamples++ = (Sample)sin(value);
+			value += step;
 		}
 	}
 	return container;

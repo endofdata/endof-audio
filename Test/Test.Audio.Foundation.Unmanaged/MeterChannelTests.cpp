@@ -41,7 +41,7 @@ namespace Test
 						}
 
 						ISampleContainerPtr pResultBuffers = FoundationObjectFactory::CreateSampleContainer(Constants::SampleCount, Constants::ChannelCount);
-						ISampleProcessorPtr pTarget = FoundationObjectFactory::CreateToContainerProcessor(pResultBuffers);
+						ISampleProcessorPtr pTarget = FoundationObjectFactory::CreateToContainerProcessor(pResultBuffers, MixParameter::Neutral);
 						
 
 						ISampleProcessorPtr pMeterProcessor = nullptr;
