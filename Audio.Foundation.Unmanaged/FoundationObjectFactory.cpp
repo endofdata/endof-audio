@@ -78,9 +78,9 @@ ISampleProcessorPtr FoundationObjectFactory::CreateToStreamProcessor(std::ostrea
 	return new StreamWriter(output);
 }
 
-ISampleProcessorPtr FoundationObjectFactory::CreateToContainerProcessor(ISampleContainerPtr& target)
+ISampleProcessorPtr FoundationObjectFactory::CreateToContainerProcessor(ISampleContainerPtr& target, const MixParameter& mix)
 {
-	return new ContainerWriter(target);
+	return new ContainerWriter(target, mix);
 }
 
 ISpatialPtr FoundationObjectFactory::CreateSpatial(double level, double pan)
@@ -107,9 +107,9 @@ ISampleSourcePtr FoundationObjectFactory::CreateContainerSource(ISampleContainer
 	return new ContainerReader(id, source);
 }
 
-ISampleProcessorPtr FoundationObjectFactory::CreateFromSourceProcessor(ISampleSourcePtr& source)
+ISampleProcessorPtr FoundationObjectFactory::CreateFromSourceProcessor(ISampleSourcePtr& source, const MixParameter& mix)
 {
-	return new SourceProcessor(source);
+	return new SourceProcessor(source, mix);
 }
 
 ITakePtr FoundationObjectFactory::CreateTake(ISampleContainerPtr& container, AudioTime position, IHostClockPtr& hostClock)

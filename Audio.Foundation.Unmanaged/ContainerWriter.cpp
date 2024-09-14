@@ -4,9 +4,10 @@
 using namespace Audio::Foundation::Unmanaged;
 
 
-ContainerWriter::ContainerWriter(ISampleContainerPtr& target) :
+ContainerWriter::ContainerWriter(ISampleContainerPtr& target, const MixParameter& mix) :
 	m_pTarget(target),
 	m_isBypassed(false),
+	m_mix(mix),
 	m_refCount(0)
 {
 }
@@ -34,7 +35,7 @@ int ContainerWriter::Process(ISampleContainerPtr& container, const ProcessingCon
 {
 	if (!m_isBypassed)
 	{
-		return container->WriteTo(m_pTarget, 0, container->SampleCount, 0, container->ChannelCount, 0, 0, MixParameter(), false);
+		return container->WriteTo(m_pTarget, 0, container->SampleCount, 0, container->ChannelCount, 0, 0, m_mix, false);
 	}
 	return 0;
 }

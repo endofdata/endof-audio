@@ -17,7 +17,7 @@ namespace Audio
 			class SourceProcessor : public ISampleProcessor
 			{
 			public:
-				SourceProcessor(ISampleSourcePtr& source);
+				SourceProcessor(ISampleSourcePtr& source, const MixParameter& mix);
 				virtual ~SourceProcessor();
 
 				bool get_IsBypassed() const;
@@ -29,6 +29,7 @@ namespace Audio
 
 			private:
 				ISampleSourcePtr m_pSource;
+				MixParameter m_mix;
 				bool m_isBypassed;
 			};
 		}

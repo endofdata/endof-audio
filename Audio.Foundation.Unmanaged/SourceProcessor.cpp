@@ -7,9 +7,10 @@
 using namespace Audio::Foundation::Unmanaged;
 using namespace Audio::Foundation::Unmanaged::Abstractions;
 
-SourceProcessor::SourceProcessor(ISampleSourcePtr& source) :
+SourceProcessor::SourceProcessor(ISampleSourcePtr& source, const MixParameter& mix) :
 	m_pSource(source),
 	m_isBypassed(false),
+	m_mix(mix),
 	m_refCount(0)
 {
 }
@@ -41,7 +42,7 @@ int SourceProcessor::Process(ISampleContainerPtr& container, const ProcessingCon
 		{
 			m_pSource->SamplePosition = context.SamplePosition;
 		}
-		return m_pSource->ReadSamples(container, MixParameter(), false);
+		return m_pSource->ReadSamples(container, m_mix, false);
 	}
 	return 0;
 }

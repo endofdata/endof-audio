@@ -51,7 +51,7 @@ namespace Audio
 
 				static ISampleProcessorPtr CreateToStreamProcessor(std::ostream& output);
 
-				static ISampleProcessorPtr CreateToContainerProcessor(ISampleContainerPtr& target);
+				static ISampleProcessorPtr CreateToContainerProcessor(ISampleContainerPtr& target, const MixParameter& mix);
 
 				static ISpatialPtr CreateSpatial(double level = 1.0f, double pan = 0.5f);
 
@@ -61,7 +61,7 @@ namespace Audio
 
 				static ISampleSourcePtr CreateContainerSource(ISampleContainerPtr& source);
 
-				static ISampleProcessorPtr CreateFromSourceProcessor(ISampleSourcePtr& source);
+				static ISampleProcessorPtr CreateFromSourceProcessor(ISampleSourcePtr& source, const MixParameter& mix);
 
 				static ITakePtr CreateTake(ISampleContainerPtr& container, AudioTime position, IHostClockPtr& hostClock);
 

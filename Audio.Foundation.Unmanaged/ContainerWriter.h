@@ -17,7 +17,7 @@ namespace Audio
 			class ContainerWriter : public ISampleProcessor
 			{
 			public:
-				ContainerWriter(ISampleContainerPtr& target);
+				ContainerWriter(ISampleContainerPtr& target, const MixParameter& mix);
 				virtual ~ContainerWriter();
 
 				int Process(ISampleContainerPtr& container, const ProcessingContext& context);
@@ -29,6 +29,7 @@ namespace Audio
 
 			private:
 				ISampleContainerPtr m_pTarget;
+				MixParameter m_mix;
 				bool m_isBypassed;
 			};
 		}
