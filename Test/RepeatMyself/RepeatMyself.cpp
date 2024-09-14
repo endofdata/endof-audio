@@ -24,7 +24,6 @@ bool onDeviceCaps(unsigned int id, const MIDIINCAPS& devcaps, void* callbackPara
 	std::cout << "Input ID " << id << " '" << name.c_str() << "'" << std::endl;
 
 	bool isSelected = name == commandLine.MidiDevice;
-	//bool isSelected = name == "LoopBe Internal MIDI";
 
 	if (isSelected)
 	{
@@ -45,9 +44,12 @@ static void addVstFx(ILooper* looper)
 	looper->InsertFx(pluginIdRaw);
 }
 
+static ILooper* _current_looper = NULL;
+
 static void runLooper(const ILooperConfigPtr& config, const CommandLine& commandLine)
 {
 	ILooperPtr looper = AsioObjectFactory::CreateLooper(config);
+
 	ILooperEventsPtr looperEvents = new RepeatMyself::LooperEvents();
 
 	looper->LooperEvents = looperEvents;
@@ -80,7 +82,13 @@ static void runLooper(const ILooperConfigPtr& config, const CommandLine& command
 
 	std::wcout << L"Running the looper" << std::endl;
 
-	looper->Run();
+	looper.AddRef();
+	_current_looper = looper.GetInterfacePtr();
+	looper->Start();
+
+	looper->Wait(INFINITE);
+	_current_looper = nullptr;
+	looper->Release();
 
 	if (looper->IsSessionRecording)
 	{
@@ -102,15 +110,37 @@ static void runLooper(const ILooperConfigPtr& config, const CommandLine& command
 	}
 }
 
+BOOL WINAPI consoleHandler(DWORD signal)
+{
+	if (signal == CTRL_C_EVENT)
+	{
+		ILooper* looper = _current_looper;
+
+		if (looper != NULL)
+		{
+			looper->Stop(INFINITE);
+			std::wcout << L"Looper stopped with CTRL-C" << std::endl;
+		}
+	}
+	return TRUE;
+}
+
 int main(int argc, char* argv[])
 {
 	CommandLine commandLine = CommandLine::FromArgs(argc, argv);
 
-	bool isPrioritySet = SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+	if (!SetConsoleCtrlHandler(consoleHandler, TRUE))
+	{
+		std::wcerr << L"Cannot not set console control handler";
+		return -1;
+	}
+
+	bool isPrioritySet = SetPriorityClass(GetCurrentProcess(), commandLine.Priority);
 
 	if (isPrioritySet == FALSE)
 	{
-		std::wcerr << L"Cannot set process priority class to 'high'.";
+		std::wcerr << L"Cannot set process priority class.";
+		return -1;
 	}
 
 	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_SPEED_OVER_MEMORY);
