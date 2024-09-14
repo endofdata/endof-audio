@@ -59,10 +59,9 @@ static void runLooper(const ILooperConfigPtr& config, const CommandLine& command
 	{
 		looper->SelectInput(i, true);
 	}
-	for (int i = 0; i < static_cast<int>(config->OutputChannelCount); i += 2)
+	for (int o = 0; o < static_cast<int>(config->OutputChannelCount) / 2; o++)
 	{
-		int pair[2] = { i, i + 1 };
-		looper->SelectOutputPair(pair, true);
+		looper->SelectOutputPair(o, true);
 	}
 
 	// create master recording, if requested
