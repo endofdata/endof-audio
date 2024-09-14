@@ -10,7 +10,7 @@ SampleBuffer::SampleBuffer(int sampleCount)
 	if(nullptr == m_pSamples)
 		throw new std::invalid_argument("SampleBuffer: Not enough memory for sample data buffer.");
 
-	m_iSamples = sampleCount;
+	m_samples = sampleCount;
 	Clear();
 }
 
@@ -20,7 +20,7 @@ SampleBuffer::SampleBuffer(Sample* pSamples, int sampleCount)
 	if (nullptr == m_pSamples)
 		throw new std::invalid_argument("SampleBuffer: Data buffer cannot be null.");
 
-	m_iSamples = sampleCount;
+	m_samples = sampleCount;
 }
 
 SampleBuffer::~SampleBuffer()

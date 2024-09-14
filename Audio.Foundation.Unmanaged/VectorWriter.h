@@ -25,7 +25,7 @@ namespace Audio
 				bool get_IsBypassed() const;
 				void put_IsBypassed(bool value);
 
-				ISampleContainerPtr CreateSampleContainer(bool continueRecording, int maxSamples, int fadeIn, int fadeOut);
+				ISampleContainerPtr CreateSampleContainer(bool continueRecording, int count, int fadeIn, int fadeOut, bool allTakes);
 				void DropRecording(bool continueRecording);
 
 				bool get_IsActive();
@@ -36,7 +36,7 @@ namespace Audio
 			protected:
 				void AllocBuffers();
 				void FreeBuffers();
-				void FadeBuffers(int maxSamples, int fadeIn, int fadeOut);
+				void FadeBuffers(int count, int fadeIn, int fadeOut);
 
 			private:
 				int m_channelCount;

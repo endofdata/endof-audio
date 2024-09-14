@@ -36,6 +36,9 @@ namespace Audio
 
 				virtual ISampleContainerPtr Span(int sampleOffset, int sampleCount, int channelOffset, int channelCount);
 
+				static ISampleContainerPtr Create(const std::vector<Sample*>& vecSamples, int samplesMax, 
+					int sampleOffset, int sampleCount, int channelOffset, int channelCount);
+
 				DECLARE_IUNKNOWN
 
 			protected:

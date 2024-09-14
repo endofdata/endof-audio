@@ -423,20 +423,17 @@ void Looper::StartRecording()
 
 void Looper::StopRecording()
 {
-	int switchSamplePos = m_context->SamplePosition;
-
-	if (m_context->IsLooping && switchSamplePos > m_context->LoopEndSample)
-	{
-		switchSamplePos = m_context->LoopEndSample;
-	}
+	int loopLength = m_context->IsLooping ?
+		m_context->LoopEndSample :
+		m_context->SamplePosition;
 
 	m_recordingStatus = RecordingStatusType::Off;
 
-	if (AddLoop(switchSamplePos))
+	if (AddLoop(loopLength))
 	{
 		if (!m_context->IsLooping)
 		{
-			m_context->LoopEndSample = switchSamplePos;
+			m_context->LoopEndSample = loopLength;
 			m_context->IsLooping = true;
 			OnIsLoopingChanged();
 		}

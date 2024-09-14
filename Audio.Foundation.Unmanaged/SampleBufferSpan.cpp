@@ -7,20 +7,38 @@ using namespace Audio::Foundation::Unmanaged;
 
 SampleBufferSpan::SampleBufferSpan() :
 	m_pSamples(nullptr),
-	m_iSamples(0),
+	m_samples(0),
+	m_pOwnedBuffer(nullptr),
+	m_samplesMax(0),
 	m_refCount(0)
 {
 }
 
-SampleBufferSpan::SampleBufferSpan(Sample* pSamples, int sampleCount) : 
+SampleBufferSpan::SampleBufferSpan(Sample* pSamples, int sampleCount) :
 	m_pSamples(pSamples),
-	m_iSamples(sampleCount),
+	m_samples(sampleCount),
+	m_pOwnedBuffer(nullptr),
+	m_samplesMax(0),
+	m_refCount(0)
+{
+}
+
+SampleBufferSpan::SampleBufferSpan(Sample* pOwnedBuffer, int samplesMax, int offset, int sampleCount) :
+	m_pSamples(&pOwnedBuffer[offset]),
+	m_samples(sampleCount),
+	m_pOwnedBuffer(pOwnedBuffer),
+	m_samplesMax(samplesMax),
 	m_refCount(0)
 {
 }
 
 SampleBufferSpan::~SampleBufferSpan()
 {
+	if (m_pOwnedBuffer != nullptr)
+	{
+		delete[] m_pOwnedBuffer;
+		m_pOwnedBuffer = nullptr;
+	}
 }
 
 IMPLEMENT_IUNKNOWN(SampleBufferSpan)
@@ -40,7 +58,7 @@ void* SampleBufferSpan::GetInterface(REFIID iid)
 
 void SampleBufferSpan::Clear()
 {
-	ZeroMemory(m_pSamples, sizeof(Sample) * m_iSamples);
+	ZeroMemory(m_pSamples, sizeof(Sample) * m_samples);
 }
 
 Sample SampleBufferSpan::get_Sample(int iIdx) const
@@ -55,7 +73,7 @@ void SampleBufferSpan::put_Sample(int iIdx, Sample value)
 
 int SampleBufferSpan::get_SampleCount() const
 {
-	return m_iSamples;
+	return m_samples;
 }
 
 Sample* SampleBufferSpan::get_SamplePtr()

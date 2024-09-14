@@ -135,6 +135,21 @@ ISampleContainerPtr SampleContainerSpan::Span(int sampleOffset, int sampleCount,
 	return new SampleContainerSpan(buffers);
 }
 
+ISampleContainerPtr SampleContainerSpan::Create(const std::vector<Sample*>& vecSamples, int samplesMax, 
+	int sampleOffset, int sampleCount, int channelOffset, int channelCount)
+{
+	auto buffers = std::vector<ISampleBufferPtr>(channelCount);
+	buffers.reserve(channelCount);
+
+	for (int c = 0; c < channelCount; c++)
+	{
+		auto pSamples = vecSamples[channelOffset + c];
+		buffers[c] = new SampleBufferSpan(pSamples, samplesMax, sampleOffset, sampleCount);
+	}
+
+	return new SampleContainerSpan(buffers, sampleCount);
+}
+
 void SampleContainerSpan::CreateChannels(int sampleCount, int channelCount)
 {
 	throw std::runtime_error("Change of sample count or channel count is not supported.");

@@ -64,7 +64,7 @@ int VectorWriter::Process(ISampleContainerPtr& container, const ProcessingContex
 		int maxSourceChannels = container->ChannelCount;
 		int channel = 0;
 		int newSize = 0;
-		
+
 		if (m_avail < m_inUse + samples)
 		{
 			newSize = (div(m_inUse + samples, m_growth).quot + 1) * m_growth;
@@ -89,6 +89,7 @@ int VectorWriter::Process(ISampleContainerPtr& container, const ProcessingContex
 				else
 				{
 					buffer = newBuffer;
+					// do not update m_avail here already as we still are in a per-channel loop
 				}
 			}
 			std::memcpy(&buffer[m_inUse], pSrc, samples * sizeof(Sample));
@@ -105,29 +106,68 @@ int VectorWriter::Process(ISampleContainerPtr& container, const ProcessingContex
 	return 0;
 }
 
-ISampleContainerPtr VectorWriter::CreateSampleContainer(bool continueRecording, int maxSamples, int fadeIn, int fadeOut)
+ISampleContainerPtr VectorWriter::CreateSampleContainer(bool continueRecording, int count, int fadeIn, int fadeOut, bool allTakes)
 {
-	if (m_inUse > 0)
+	if (count == 0)
 	{
+		count = m_inUse;
+	}
+
+	if (count > 0)
+	{
+		const std::lock_guard<std::recursive_mutex> lock(m_buffers_mutex);
 		IsBypassed = true;
 
-		const std::lock_guard<std::recursive_mutex> lock(m_buffers_mutex);
+		div_t takes = div(m_inUse, count);
+		int takeIndex = takes.quot - 1;
 
-		FadeBuffers(maxSamples, fadeIn, fadeOut);
-
-		if (maxSamples == 0 || maxSamples > m_inUse)
+		if (allTakes)
 		{
-			maxSamples = m_inUse;
+			if (takeIndex < 0)
+			{
+				// we have a partial take only
+				count = takes.rem;
+			}
+			else
+			{
+				// take all complete takes
+				count *= takes.quot;
+				takeIndex = -1;
+			}
+		}
+		else
+		{
+			// if we do not have a complete take or the final take is very close to the full take length, we take the final chunk
+			if (takeIndex < 0 || (float)takes.rem / count > 0.98f)
+			{
+				takeIndex++;
+				count = takes.rem;
+			}
 		}
 
-		auto container = new SampleContainer(m_buffers, maxSamples);
+		if (fadeIn > 0 || fadeOut > 0)
+		{
+			// TODO: fade only around selected take
+			FadeBuffers(count, fadeIn, fadeOut);
+		}
+
+		ISampleContainerPtr container;
+
+		if (takeIndex > 0)
+		{
+			container = SampleContainerSpan::Create(m_buffers, m_inUse, takeIndex * count, count, 0, m_buffers.size());
+		}
+		else
+		{
+			container = new SampleContainer(m_buffers, count);
+		}
+		
 		m_buffers.clear();
 
 		if (continueRecording)
 		{
 			IsBypassed = false;
 		}
-
 		return container;
 	}
 	return nullptr;
@@ -177,33 +217,36 @@ void VectorWriter::FreeBuffers()
 	m_buffers.clear();
 }
 
-void VectorWriter::FadeBuffers(int maxSamples, int fadeIn, int fadeOut)
+void VectorWriter::FadeBuffers(int count, int fadeIn, int fadeOut)
 {
-	int inUse = m_inUse > maxSamples ? maxSamples : m_inUse;
+	int avail = m_inUse > count ? count : m_inUse;
 
-	fadeIn = std::max(0, std::min(inUse / 2, fadeIn));
-	fadeOut = std::max(0, std::min(inUse / 2, fadeOut));
-
-	double fadeInFac = fadeIn;
-	double fadeOutFac = fadeOut;
-
-	std::function<Sample(Sample, int)> fadeInFunc = [fadeInFac](Sample sample, int index) { return static_cast<Sample>(sample * (double)index / fadeInFac); };
-	std::function<Sample(Sample, int)> fadeOutFunc = [fadeOutFac](Sample sample, int index) { return static_cast<Sample>(sample * (fadeOutFac - (double)index - 1) / fadeOutFac); };
-
-	for (Sample* buffer : m_buffers)
+	if (avail > 0)
 	{
-		Sample* target = buffer;
+		fadeIn = std::max(0, std::min(avail / 2, fadeIn));
+		fadeOut = std::max(0, std::min(avail / 2, fadeOut));
 
-		for (int s = 0; s < fadeIn; s++)
+		double fadeInFac = fadeIn;
+		double fadeOutFac = fadeOut;
+
+		std::function<Sample(Sample, int)> fadeInFunc = [fadeInFac](Sample sample, int index) { return static_cast<Sample>(sample * (double)index / fadeInFac); };
+		std::function<Sample(Sample, int)> fadeOutFunc = [fadeOutFac](Sample sample, int index) { return static_cast<Sample>(sample * (fadeOutFac - (double)index - 1) / fadeOutFac); };
+
+		for (Sample* buffer : m_buffers)
 		{
-			*target++ = fadeInFunc(*target, s);
-		}
+			Sample* target = buffer;
 
-		target += inUse - fadeIn - fadeOut;
+			for (int s = 0; s < fadeIn; s++)
+			{
+				*target++ = fadeInFunc(*target, s);
+			}
 
-		for (int s = 0; s < fadeOut; s++)
-		{
-			*target++ = fadeOutFunc(*target, s);
+			target += avail - fadeIn - fadeOut;
+
+			for (int s = 0; s < fadeOut; s++)
+			{
+				*target++ = fadeOutFunc(*target, s);
+			}
 		}
 	}
 }

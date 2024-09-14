@@ -16,7 +16,9 @@ namespace Audio
 			{
 			public:
 				SampleBufferSpan(Sample* pSamples, int sampleCount);
-
+				
+				SampleBufferSpan(Sample* pOwnedBuffer, int samplesMax, int offset, int sampleCount);
+				
 				virtual ~SampleBufferSpan();
 
 				void Clear();
@@ -37,7 +39,10 @@ namespace Audio
 				SampleBufferSpan();
 
 				Sample* m_pSamples;
-				int m_iSamples;
+				int m_samples;
+
+				Sample* m_pOwnedBuffer;
+				int m_samplesMax;
 
 			private:
 				int GetEffectiveCount(int requestedOffset, int requestedCount, int maxCount) const;
