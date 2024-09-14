@@ -62,7 +62,8 @@ namespace Audio
 					_declspec(property(get = get_Container)) ISampleContainerPtr Container;
 
 					MixParameter& get_Mix() = 0;
-					_declspec(property(get = get_Mix)) MixParameter& Mix;
+					void put_Mix(const MixParameter& value);
+					_declspec(property(get = get_Mix, put = put_Mix)) MixParameter& Mix;
 
 					bool HasDataAt(AudioTime position) const = 0;
 

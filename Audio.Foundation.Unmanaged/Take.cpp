@@ -8,6 +8,7 @@ Take::Take(int id, ISampleContainerPtr& container, AudioTime position, AudioTime
 	m_container(container),
 	m_position(position),
 	m_length(length),
+	m_mix(),
 	m_refCount(0)
 {
 }
@@ -70,6 +71,11 @@ ISampleContainerPtr Take::get_Container()
 MixParameter& Take::get_Mix()
 {
 	return m_mix;
+}
+
+void Take::put_Mix(const MixParameter& mix)
+{
+	m_mix = mix;
 }
 
 bool Take::HasDataAt(AudioTime position) const

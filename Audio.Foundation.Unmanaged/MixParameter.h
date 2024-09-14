@@ -11,49 +11,25 @@ namespace Audio
 		{
 			struct _AUDIO_FOUNDATION_UNMANAGED_API MixParameter
 			{
-				MixParameter() : MixParameter(LevelMax, PanCenter)
-				{
-				}
+			public:
+				static const MixParameter Neutral;
 
-				MixParameter(double level, double pan)
-				{
-					_level = LevelMax;
-					_pan = PanCenter;
-					SampleConversion::LevelAndPanFactor(_level, _pan, _factorLeft, _factorRight);
-				}
+				MixParameter();
+				MixParameter(double level, double pan);
+				MixParameter(double level, double pan, double factorLeft, double factorRight);
 
-				double get_Level() const
-				{
-					return _level;
-				}
-				void put_Level(double value)
-				{
-					_level = value;
-					SampleConversion::LevelAndPanFactor(_level, _pan, _factorLeft, _factorRight);
-				}
+				double get_Level() const;
+				void put_Level(double value);
 				_declspec(property(get = get_Level, put = put_Level)) double Level;
 
-				double get_Pan() const
-				{
-					return _pan;
-				}
-				void put_Pan(double value)
-				{
-					_pan = value;
-					SampleConversion::LevelAndPanFactor(_level, _pan, _factorLeft, _factorRight);
-				}
+				double get_Pan() const;
+				void put_Pan(double value);
 				_declspec(property(get = get_Pan, put = put_Pan)) double Pan;
 
-				double get_FactorLeft() const
-				{
-					return _factorLeft;
-				}
+				double get_FactorLeft() const;
 				_declspec(property(get = get_FactorLeft)) double FactorLeft;
 
-				double get_FactorRight() const
-				{
-					return _factorRight;
-				}
+				double get_FactorRight() const;
 				_declspec(property(get = get_FactorRight)) double FactorRight;
 
 			private:

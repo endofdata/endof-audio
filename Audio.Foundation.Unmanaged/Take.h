@@ -34,6 +34,7 @@ namespace Audio
 				virtual ISampleContainerPtr get_Container();
 
 				virtual MixParameter& get_Mix();
+				virtual void put_Mix(const MixParameter& value);
 
 				virtual bool HasDataAt(AudioTime position) const;
 

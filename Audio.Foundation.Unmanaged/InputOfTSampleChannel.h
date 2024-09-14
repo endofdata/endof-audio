@@ -28,6 +28,7 @@ namespace Audio
 						m_pBufferB(pBufferB),
 						m_pDirectMonitor(nullptr),
 						m_isActive(false),
+						m_mix(),
 						m_refCount(0)
 					{
 						if (nullptr == m_pBufferA || nullptr == m_pBufferB)

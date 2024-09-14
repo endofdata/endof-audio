@@ -380,5 +380,8 @@
     <ClCompile Include="ControllerMapping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MixParameter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

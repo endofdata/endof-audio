@@ -9,6 +9,7 @@ using namespace Audio::Foundation::Unmanaged::Abstractions;
 
 GainProcessor::GainProcessor(double level, double pan) :
 	m_isBypassed(false),
+	m_mix(MixParameter(level, pan)),
 	m_refCount(0)
 {
 }

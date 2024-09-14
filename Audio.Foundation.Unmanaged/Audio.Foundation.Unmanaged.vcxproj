@@ -186,6 +186,7 @@
     <ClCompile Include="AudioFoundationException.cpp" />
     <ClCompile Include="AudioTime.cpp" />
     <ClCompile Include="ControllerMapping.cpp" />
+    <ClCompile Include="MixParameter.cpp" />
     <ClCompile Include="ServerEvents.cpp" />
     <ClCompile Include="ContainerReader.cpp" />
     <ClCompile Include="ContainerWriter.cpp" />
