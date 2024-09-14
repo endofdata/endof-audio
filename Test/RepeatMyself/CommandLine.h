@@ -41,6 +41,9 @@ namespace RepeatMyself
 		float get_OutputSaturation() const;
 		_declspec(property(get = get_OutputSaturation)) float OutputSaturation;
 
+		int get_Priority() const;
+		_declspec(property(get = get_Priority)) int Priority;
+
 		static CommandLine FromArgs(int argc, char* argv[]);
 
 	private:
@@ -51,6 +54,7 @@ namespace RepeatMyself
 		int m_inputCount;
 		int m_output[MAX_CHANNELS];
 		int m_outputCount;
+		int m_priority;
 
 		std::string m_midiDevice;
 		float m_outputSaturation;

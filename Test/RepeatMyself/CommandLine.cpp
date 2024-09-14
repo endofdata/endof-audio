@@ -6,7 +6,8 @@ using namespace RepeatMyself;
 CommandLine::CommandLine() :
 	m_isSessionRecording(false),
 	m_midiDevice("2- Steinberg UR-RT2-1"),
-	m_outputSaturation(1.0)
+	m_outputSaturation(1.0),
+	m_priority(NORMAL_PRIORITY_CLASS)
 {
 	memset(m_input, 0, sizeof(int) * MAX_CHANNELS);
 	memset(m_output, 0, sizeof(int) * MAX_CHANNELS);
@@ -72,6 +73,11 @@ const char* CommandLine::get_MidiDevice() const
 	return m_midiDevice.c_str();
 }
 
+int CommandLine::get_Priority() const
+{
+	return m_priority;
+}
+
 float CommandLine::get_OutputSaturation() const
 {
 	return m_outputSaturation;
@@ -127,6 +133,36 @@ CommandLine CommandLine::FromArgs(int argc, char* argv[])
 			}
 
 			commandLine.m_outputSaturation = static_cast<float>(atof(argv[i++]));
+		}
+		else if (!_stricmp(arg, "/priority"))
+		{
+			if (i >= argc)
+			{
+				throw std::invalid_argument("missing device name after option '/priority'.");
+			}
+
+			const char* prioName = argv[i++];
+
+			if (!_stricmp(prioName, "low"))
+			{
+				commandLine.m_priority = BELOW_NORMAL_PRIORITY_CLASS;
+			}
+			else if (!_stricmp(prioName, "normal"))
+			{
+				commandLine.m_priority = NORMAL_PRIORITY_CLASS;
+			}
+			else if (!_stricmp(prioName, "medium"))
+			{
+				commandLine.m_priority = ABOVE_NORMAL_PRIORITY_CLASS;
+			}
+			else if (!_stricmp(prioName, "high"))
+			{
+				commandLine.m_priority = HIGH_PRIORITY_CLASS;
+			}
+			else
+			{
+				throw std::invalid_argument("priority must be one of 'low', 'normal', 'medium' or 'high'.");
+			}
 		}
 	}
 	return commandLine;
