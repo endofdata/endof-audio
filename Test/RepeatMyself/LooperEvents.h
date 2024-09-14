@@ -12,6 +12,10 @@ namespace RepeatMyself
 		LooperEvents();
 		virtual ~LooperEvents();
 
+		void Starting(ILooper& looper);
+
+		void Stopping(ILooper& looper);
+
 		void Heartbeat(ILooper& looper, ITransportPtr& transport);
 
 		void RecordingStatusChanged(ILooper& looper, RecordingStatusType recordingStatus);
@@ -21,6 +25,8 @@ namespace RepeatMyself
 		void IsLoopingChanged(ILooper& looper, bool isLooping);
 
 		void IsSessionRecordingChanged(ILooper& looper, bool isSessionRecording);
+
+		void IsPausedChanged(ILooper& looper, bool isPaused);
 
 		void AddLoop(ILooper& looper, const GUID& id, int channelCount, int samplePosition, int sampleCount);
 

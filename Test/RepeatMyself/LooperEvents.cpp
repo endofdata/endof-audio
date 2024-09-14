@@ -30,6 +30,16 @@ void* LooperEvents::GetInterface(REFIID iid)
 	return nullptr;
 }
 
+void LooperEvents::Starting(ILooper& looper)
+{
+	std::wcout << L"Looper starting" << std::endl;
+}
+
+void LooperEvents::Stopping(ILooper& looper)
+{
+	std::wcout << std::endl << L"Looper stopping" << std::endl;
+}
+
 void LooperEvents::Heartbeat(ILooper& looper, ITransportPtr& transport)
 {
 	std::wcout << transport->TimePosition.ToString() << L"\r";
@@ -55,6 +65,11 @@ void LooperEvents::IsSessionRecordingChanged(ILooper& looper, bool isSessionReco
 	//std::wcout << ClearLine << L"Session recording: " << std::boolalpha << isSessionRecording << std::endl;
 }
 
+void LooperEvents::IsPausedChanged(ILooper& looper, bool isPaused)
+{
+	std::wcout << ClearLine << L"Paused changed: " << std::boolalpha << isPaused << std::endl;
+}
+
 void LooperEvents::AddLoop(ILooper& looper, const GUID& id,  int channelCount, int samplePosition, int sampleCount)
 {
 	std::wcout << ClearLine << L"Added loop (channels: " << channelCount << L", pos: " << samplePosition << L", len: " << sampleCount << L")" << std::endl;
@@ -76,6 +91,8 @@ const wchar_t* LooperEvents::GetTransportCodeString(ControllerCode value)
 	{
 	case ControllerCode::Run:
 		return L"Run";
+	case ControllerCode::Pause:
+		return L"Pause";
 	case ControllerCode::Stop:
 		return L"Stop";
 	case ControllerCode::Record:
