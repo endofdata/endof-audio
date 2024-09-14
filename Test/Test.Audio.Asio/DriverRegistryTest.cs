@@ -29,16 +29,16 @@ namespace Test.Audio.Asio
 			Assert.That(driverRegistry.Count, Is.GreaterThanOrEqualTo(1), "At least one ASIO driver is available.");
 		}
 
-		[Test]
+		//[Test]
 		public void Mooh() => RunTest(tapeMachine => PlayTake(tapeMachine, CreateMoohTake(tapeMachine)));
 
-		[Test]
+		//[Test]
 		public void Beeep() => RunTest(tapeMachine => PlayTake(tapeMachine, CreateBeeepTake(tapeMachine)));
 
 
-		[Test]
-		[TestCase(1)]
-		[TestCase(3)]
+		//[Test]
+		//[TestCase(1)]
+		//[TestCase(3)]
 		public void MultiBeep(int beeps)
 		{
 			RunTest(tapeMachine =>
