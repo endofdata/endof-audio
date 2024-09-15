@@ -15,7 +15,7 @@ namespace Audio
 		{
 			namespace Abstractions
 			{
-				typedef IController* (*ControllerFactoryFunc)(ITransportPtr& transport);
+				typedef IController* (*ControllerFactoryFunc)(ITransportPtr& transport, void* param);
 
 				__interface _AUDIO_ASIO_UNMANAGED_API _declspec(uuid("7bc8271a-2bcb-4adb-a8e8-3b8bd71ea07a")) ILooperConfig : public IUnknown
 				{
@@ -47,6 +47,10 @@ namespace Audio
 					/// </para>
 					/// </remarks>
 					_declspec(property(get = get_ControllerFactory, put = put_ControllerFactory)) ControllerFactoryFunc ControllerFactory;
+
+					void* get_ControllerFactoryParam() const = 0;
+					void put_ControllerFactoryParam(void* value) = 0;
+					_declspec(property(get = get_ControllerFactoryParam, put = put_ControllerFactoryParam)) void* ControllerFactoryParam;
 
 					const IID& get_AsioDevice() const = 0;
 					void put_AsioDevice(const IID& value) = 0;

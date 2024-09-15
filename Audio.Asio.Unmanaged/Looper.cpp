@@ -21,18 +21,18 @@ Looper* Looper::Create(const ILooperConfig& config)
 
 		if (config.OutputChannelCount == 0)
 		{
-			throw new AsioCoreException("Number of selected output channels cannot be zero.");
+			throw AsioCoreException("Number of selected output channels cannot be zero.");
 		}
 		if (config.InputChannelCount == 0)
 		{
-			throw new AsioCoreException("Number of selected input channels cannot be zero.");
+			throw AsioCoreException("Number of selected input channels cannot be zero.");
 		}
 
 		AsioCorePtr device = AsioCore::CreateInstancePtr(config.AsioDevice);
 
 		if (device == nullptr)
 		{
-			throw std::runtime_error("Initialization of ASIO device failed.");
+			throw AsioCoreException("Initialization of ASIO device failed.");
 		}
 
 		int sampleCount = config.SampleCount == 0 ? AsioCore::UsePreferredSize : config.SampleCount;
@@ -51,8 +51,12 @@ Looper* Looper::Create(const ILooperConfig& config)
 
 		if (config.ControllerFactory != nullptr)
 		{
-			// TODO: Use InterfacePtr only where required!!
-			IControllerPtr customController(config.ControllerFactory(device->ProcessingChain->Transport));
+			IControllerPtr customController(config.ControllerFactory(device->ProcessingChain->Transport, config.ControllerFactoryParam));
+
+			if (customController == nullptr)
+			{
+				throw AsioCoreException("Initialization of Controller failed.");
+			}
 			pLooper->Controller = customController;
 		}
 		else if (config.MidiInput != static_cast<unsigned int>(-1))

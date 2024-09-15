@@ -11,7 +11,8 @@ LooperConfig::LooperConfig() :
 	m_sampleCount(Audio::Asio::Unmanaged::AsioCore::UsePreferredSize),
 	m_controlResolution(1000),
 	m_midiInput(0),
-	m_controllerFactory(NULL),
+	m_controllerFactory(nullptr),
+	m_controllerFactoryParam(nullptr),
 	m_refCount(0)
 {
 	std::memset(&m_asioDevice, 0, sizeof(m_asioDevice));
@@ -97,6 +98,18 @@ void LooperConfig::put_ControllerFactory(ControllerFactoryFunc value)
 {
 	m_controllerFactory = value;
 }
+
+
+void* LooperConfig::get_ControllerFactoryParam() const
+{
+	return m_controllerFactoryParam;
+}
+
+void LooperConfig::put_ControllerFactoryParam(void* value)
+{
+	m_controllerFactoryParam = value;
+}
+
 
 const IID& LooperConfig::get_AsioDevice() const
 {
