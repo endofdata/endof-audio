@@ -36,7 +36,7 @@ namespace Audio
 			protected:
 				void AllocBuffers();
 				void FreeBuffers();
-				void FadeBuffers(int count, int fadeIn, int fadeOut);
+				void FadeBuffers(ISampleContainerPtr& container, int fadeIn, int fadeOut);
 
 			private:
 				int m_channelCount;

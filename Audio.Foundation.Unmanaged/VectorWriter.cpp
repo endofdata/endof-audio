@@ -145,12 +145,6 @@ ISampleContainerPtr VectorWriter::CreateSampleContainer(bool continueRecording, 
 			}
 		}
 
-		if (fadeIn > 0 || fadeOut > 0)
-		{
-			// TODO: fade only around selected take
-			FadeBuffers(count, fadeIn, fadeOut);
-		}
-
 		ISampleContainerPtr container;
 
 		if (takeIndex > 0)
@@ -161,8 +155,10 @@ ISampleContainerPtr VectorWriter::CreateSampleContainer(bool continueRecording, 
 		{
 			container = new SampleContainer(m_buffers, count);
 		}
-		
+
 		m_buffers.clear();
+
+		FadeBuffers(container, fadeIn, fadeOut);
 
 		if (continueRecording)
 		{
@@ -217,11 +213,11 @@ void VectorWriter::FreeBuffers()
 	m_buffers.clear();
 }
 
-void VectorWriter::FadeBuffers(int count, int fadeIn, int fadeOut)
+void VectorWriter::FadeBuffers(ISampleContainerPtr& container, int fadeIn, int fadeOut)
 {
-	int avail = m_inUse > count ? count : m_inUse;
+	int avail = container->SampleCount;
 
-	if (avail > 0)
+	if (avail > 0 && (fadeIn > 0 || fadeOut > 0))
 	{
 		fadeIn = std::max(0, std::min(avail / 2, fadeIn));
 		fadeOut = std::max(0, std::min(avail / 2, fadeOut));
@@ -232,9 +228,11 @@ void VectorWriter::FadeBuffers(int count, int fadeIn, int fadeOut)
 		std::function<Sample(Sample, int)> fadeInFunc = [fadeInFac](Sample sample, int index) { return static_cast<Sample>(sample * (double)index / fadeInFac); };
 		std::function<Sample(Sample, int)> fadeOutFunc = [fadeOutFac](Sample sample, int index) { return static_cast<Sample>(sample * (fadeOutFac - (double)index - 1) / fadeOutFac); };
 
-		for (Sample* buffer : m_buffers)
+		int channelCount = container->ChannelCount;
+
+		for (int c = 0; c < channelCount; c++)
 		{
-			Sample* target = buffer;
+			Sample* target = container->Channels[c]->SamplePtr;
 
 			for (int s = 0; s < fadeIn; s++)
 			{
