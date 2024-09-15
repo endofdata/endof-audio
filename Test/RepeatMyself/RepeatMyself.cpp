@@ -33,6 +33,19 @@ bool onDeviceCaps(unsigned int id, const MIDIINCAPS& devcaps, void* callbackPara
 	return isSelected;
 }
 
+IController* createController(ITransportPtr& transport, void* param)
+{
+	int midiInput = reinterpret_cast<int>(param);
+
+	IController* controller = FoundationObjectFactory::CreateMidiTransportControl(transport, midiInput).Detach();
+
+	if (controller == nullptr)
+	{
+		throw std::runtime_error("Initialization of Controller failed.");
+	}
+	return controller;
+}
+
 static void addVstFx(ILooper* looper)
 {
 	const wchar_t* pwcszLibName = L"C:\\Program Files\\Common Files\\VST3\\Unfiltered Audio Indent.vst3";
@@ -161,9 +174,12 @@ int main(int argc, char* argv[])
 		else
 		{
 			ILooperConfigPtr looperConfig = AsioObjectFactory::CreateLooperConfiguration();
+			
 
 			looperConfig->Name = L"RepeatMyself";
-			looperConfig->MidiInput = midiInId;
+			//looperConfig->MidiInput = midiInId;
+			looperConfig->ControllerFactory = createController;
+			looperConfig->ControllerFactoryParam = reinterpret_cast<void*>(midiInId);
 			looperConfig->AsioDevice = IID_STEINBERG_UR_RT2;
 			//looperConfig.AsioDevice = CLSID_AsioDebugDriver;
 			looperConfig->AddInputChannelList(commandLine.InputList, commandLine.InputCount);
