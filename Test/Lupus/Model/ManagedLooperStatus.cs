@@ -11,7 +11,7 @@ namespace Lupus.Model
 		private ManagedLooperTrackStatus? _selectedTrack;
 		private readonly Collection<ManagedLooperTrackStatus> _soloTracks = [];
 
-		public TimeSpan Position => TimeSpan.FromMilliseconds(_looper.LoopPosition * _looper.LoopLength);
+		public TimeSpan Position => TimeSpan.FromTicks(_looper.TransportPosition.Value);
 
 		public ManagedLooperTrackStatus? SelectedTrack
 		{
