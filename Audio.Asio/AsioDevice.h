@@ -21,6 +21,11 @@ namespace Audio
 				static initonly System::String^ IsPoweredOnProperty = gcnew System::String("IsPoweredOn");
 
 				/// <summary>
+				/// Gets the name of the <see cref="InputSaturation"/> property
+				/// </summary>
+				static initonly System::String^ InputSaturationProperty = gcnew System::String("InputSaturation");
+
+				/// <summary>
 				/// Gets the name of the <see cref="OutputSaturation"/> property
 				/// </summary>
 				static initonly System::String^ OutputSaturationProperty = gcnew System::String("OutputSaturation");
@@ -152,6 +157,12 @@ namespace Audio
 					void set(System::Boolean value);
 				}
 
+				property System::Single InputSaturation
+				{
+					System::Single get();
+					void set(System::Single value);
+				}
+
 				property System::Single OutputSaturation
 				{
 					System::Single get();
@@ -179,6 +190,7 @@ namespace Audio
 
 				Audio::Asio::Unmanaged::AsioCore* m_pCore;
 				bool m_isPoweredOn;
+				System::Single m_inputSaturation;
 				System::Single m_outputSaturation;
 				System::Runtime::InteropServices::GCHandle m_delegateHandle;
 				System::ComponentModel::PropertyChangedEventHandler^ m_propertyChangedEventHandler;
