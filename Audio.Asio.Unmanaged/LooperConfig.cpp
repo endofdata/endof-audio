@@ -6,6 +6,7 @@ using namespace Audio::Asio::Unmanaged;
 
 LooperConfig::LooperConfig() :
 	m_numInputIds(0),
+	m_inputSaturation(0.0),
 	m_numOutputIds(0),
 	m_outputSaturation(0.0),
 	m_sampleCount(Audio::Asio::Unmanaged::AsioCore::UsePreferredSize),
@@ -188,6 +189,15 @@ void LooperConfig::put_SampleCount(int value)
 	m_sampleCount = value;
 }
 
+float LooperConfig::get_InputSaturation() const
+{
+	return m_inputSaturation;
+}
+
+void LooperConfig::put_InputSaturation(float value)
+{
+	m_inputSaturation = value;
+}
 
 float LooperConfig::get_OutputSaturation() const
 {

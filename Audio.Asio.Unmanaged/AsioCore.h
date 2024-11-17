@@ -98,7 +98,8 @@ namespace Audio
 				BufferSwitchEventHandler get_BufferSwitchEventHandler();
 				void put_BufferSwitchEventHandler(BufferSwitchEventHandler value);
 
-				void CreateBuffers(const int inputChannelIds[], int numInputIds, const int outputChannelIds[], int numOutputIds, int sampleCount, float outputSaturation = 0.0f);
+				void CreateBuffers(const int inputChannelIds[], int numInputIds, const int outputChannelIds[], int numOutputIds, 
+					int sampleCount, float inputSaturation, float outputSaturation);
 
 			private:
 				struct BufferSize
@@ -130,9 +131,9 @@ namespace Audio
 
 				void SelectSampleRate();
 
-				void CreateInputChannels(int offset, int count);
+				void CreateInputChannels(int offset, int count, float inputSaturation);
 
-				void CreateOutputChannels(int offset, int count, float saturation = 0.0f);
+				void CreateOutputChannels(int offset, int count, float saturation);
 
 				int MapSampleType(ASIOSampleType asioSampleType);
 

@@ -54,6 +54,9 @@ namespace Audio
 				float get_OutputSaturation() const;
 				void put_OutputSaturation(float value);
 
+				float get_InputSaturation() const;
+				void put_InputSaturation(float value);
+
 				int get_ControlResolution() const;
 				void put_ControlResolution(int value);
 
@@ -77,6 +80,7 @@ namespace Audio
 				size_t m_numOutputIds;
 				int m_sampleCount;
 				float m_outputSaturation;
+				float m_inputSaturation;
 				int m_controlResolution;
 			};
 

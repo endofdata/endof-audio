@@ -241,7 +241,8 @@ void AsioCore::SelectSampleRate()
 	}
 }
 
-void AsioCore::CreateBuffers(const int inputChannelIds[], int numInputIds, const int outputChannelIds[], int numOutputIds, int sampleCount, float outputSaturation)
+void AsioCore::CreateBuffers(const int inputChannelIds[], int numInputIds, const int outputChannelIds[], int numOutputIds, 
+	int sampleCount, float inputSaturation, float outputSaturation)
 {
 	int requestedBufferSize = 0;
 
@@ -299,7 +300,7 @@ void AsioCore::CreateBuffers(const int inputChannelIds[], int numInputIds, const
 			auto container = FoundationObjectFactory::CreateSampleContainer(SampleCount, std::max<int>(numInputIds, numOutputIds));
 			m_processingChain = FoundationObjectFactory::CreateProcessingChain(transport, container);
 
-			CreateInputChannels(0, numInputIds);
+			CreateInputChannels(0, numInputIds, inputSaturation);
 			CreateOutputChannels(numInputIds, numOutputIds, outputSaturation);
 		}
 		catch (...)
@@ -310,7 +311,7 @@ void AsioCore::CreateBuffers(const int inputChannelIds[], int numInputIds, const
 	}
 }
 
-void AsioCore::CreateInputChannels(int offset, int count)
+void AsioCore::CreateInputChannels(int offset, int count, float saturation)
 {
 	if (count > 0)
 	{
@@ -320,7 +321,8 @@ void AsioCore::CreateInputChannels(int offset, int count)
 				m_pHwBufferInfo[iIdx].channelNum,
 				m_pHwBufferInfo[iIdx].buffers[0],
 				m_pHwBufferInfo[iIdx].buffers[1],
-				SampleCount);
+				SampleCount,
+				saturation);
 
 			if (input == nullptr)
 				throw AsioCoreException("AsioCore: Failed to create InputChannel instance.", E_OUTOFMEMORY);

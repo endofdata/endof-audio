@@ -80,6 +80,10 @@ namespace Audio
 					void put_SampleCount(int value) = 0;
 					_declspec(property(get = get_SampleCount, put = put_SampleCount)) int& SampleCount;
 
+					float get_InputSaturation() const = 0;
+					void put_InputSaturation(float value) = 0;
+					_declspec(property(get = get_InputSaturation, put = put_InputSaturation)) float& InputSaturation;
+
 					float get_OutputSaturation() const = 0;
 					void put_OutputSaturation(float value) = 0;
 					_declspec(property(get = get_OutputSaturation, put = put_OutputSaturation)) float& OutputSaturation;

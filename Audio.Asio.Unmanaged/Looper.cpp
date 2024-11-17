@@ -38,7 +38,7 @@ Looper* Looper::Create(const ILooperConfig& config)
 		int sampleCount = config.SampleCount == 0 ? AsioCore::UsePreferredSize : config.SampleCount;
 
 		device->CreateBuffers(config.InputChannelList, static_cast<int>(config.InputChannelCount), 
-			config.OutputChannelList, static_cast<int>(config.OutputChannelCount), sampleCount, config.OutputSaturation);
+			config.OutputChannelList, static_cast<int>(config.OutputChannelCount), sampleCount, config.InputSaturation, config.OutputSaturation);
 
 		Looper* pLooper = new Looper(device);
 
