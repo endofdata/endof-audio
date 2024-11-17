@@ -6,7 +6,8 @@ using namespace RepeatMyself;
 CommandLine::CommandLine() :
 	m_isSessionRecording(false),
 	m_midiDevice("2- Steinberg UR-RT2-1"),
-	m_outputSaturation(1.0),
+	m_inputSaturation(0.0),
+	m_outputSaturation(0.0),
 	m_priority(NORMAL_PRIORITY_CLASS)
 {
 	memset(m_input, 0, sizeof(int) * MAX_CHANNELS);
@@ -78,6 +79,11 @@ int CommandLine::get_Priority() const
 	return m_priority;
 }
 
+float CommandLine::get_InputSaturation() const
+{
+	return m_inputSaturation;
+}
+
 float CommandLine::get_OutputSaturation() const
 {
 	return m_outputSaturation;
@@ -124,6 +130,15 @@ CommandLine CommandLine::FromArgs(int argc, char* argv[])
 			}
 
 			commandLine.m_midiDevice = argv[i++];
+		}
+		else if (!_stricmp(arg, "/insat"))
+		{
+			if (i >= argc)
+			{
+				throw std::invalid_argument("missing value after option '/insat'.");
+			}
+
+			commandLine.m_inputSaturation = static_cast<float>(atof(argv[i++]));
 		}
 		else if (!_stricmp(arg, "/outsat"))
 		{

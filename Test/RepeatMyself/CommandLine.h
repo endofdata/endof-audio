@@ -38,6 +38,9 @@ namespace RepeatMyself
 		const char* get_MidiDevice() const;
 		_declspec(property(get = get_MidiDevice)) const char* MidiDevice;
 
+		float get_InputSaturation() const;
+		_declspec(property(get = get_InputSaturation)) float InputSaturation;
+
 		float get_OutputSaturation() const;
 		_declspec(property(get = get_OutputSaturation)) float OutputSaturation;
 
@@ -57,6 +60,7 @@ namespace RepeatMyself
 		int m_priority;
 
 		std::string m_midiDevice;
+		float m_inputSaturation;
 		float m_outputSaturation;
 	};
 }

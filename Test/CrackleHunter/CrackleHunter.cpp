@@ -67,9 +67,11 @@ int main()
 		int selectedInputs[] = { 0, 1 };
 		int selectedOutputs[] = { 0, 1 };
 		int sampleCount = AsioCore::UsePreferredSize;
-		float outputSaturation = 1.0f;
+		float inputSaturation = 0.0f;
+		float outputSaturation = 0.0f;
 
-		asioCore->CreateBuffers(selectedInputs, _countof(selectedInputs), selectedOutputs, _countof(selectedOutputs), sampleCount, outputSaturation);
+		asioCore->CreateBuffers(selectedInputs, _countof(selectedInputs), selectedOutputs, _countof(selectedOutputs), 
+			sampleCount, inputSaturation, outputSaturation);
 
 
 		IProcessingChainPtr processingChain = asioCore->ProcessingChain;

@@ -39,9 +39,11 @@ namespace Test
 						int selectedInputs[] = { 0, 1 };
 						int selectedOutputs[] = { 0, 1 };
 						int sampleCount = 512;
-						float outputSaturation = 1.0f;
+						float inputSaturation = 0.0f;
+						float outputSaturation = 0.0f;
 
-						asioCore->CreateBuffers(selectedInputs, _countof(selectedInputs), selectedOutputs, _countof(selectedOutputs), AsioCore::UsePreferredSize, outputSaturation);
+						asioCore->CreateBuffers(selectedInputs, _countof(selectedInputs), selectedOutputs, _countof(selectedOutputs), 
+							AsioCore::UsePreferredSize, inputSaturation, outputSaturation);
 
 						IProcessingChainPtr processingChain = asioCore->ProcessingChain;
 
@@ -55,7 +57,7 @@ namespace Test
 						asioCore->Stop();
 					}
 
-					static IController* CreateDebugController(ITransportPtr& transport)
+					static IController* CreateDebugController(ITransportPtr& transport, void* param)
 					{
 						return new DebugController(transport);
 					}

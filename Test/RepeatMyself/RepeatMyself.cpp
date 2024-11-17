@@ -187,6 +187,7 @@ int main(int argc, char* argv[])
 
 			// optional
 			looperConfig->SampleCount = AsioCore::UsePreferredSize;
+			looperConfig->InputSaturation = commandLine.InputSaturation;
 			looperConfig->OutputSaturation = commandLine.OutputSaturation;
 
 			runLooper(looperConfig, commandLine);
