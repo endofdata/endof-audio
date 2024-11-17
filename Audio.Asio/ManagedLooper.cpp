@@ -70,16 +70,14 @@ ManagedLooper::~ManagedLooper()
 	_unmanaged->Release();
 }
 
-bool ManagedLooper::SelectInput(int input, bool isSelected)
+bool ManagedLooper::SelectInput(int inputIndex, bool isSelected)
 {
-	return _unmanaged->SelectInput(input, isSelected);
+	return _unmanaged->SelectInput(inputIndex, isSelected);
 }
 
-bool ManagedLooper::SelectOutputPair(int left, int right, bool isSelected)
+bool ManagedLooper::SelectOutputPair(int outputPairIndex, bool isSelected)
 {
-	int pair[] = { left, right };
-
-	return _unmanaged->SelectOutputPair(pair, isSelected);
+	return _unmanaged->SelectOutputPair(outputPairIndex, isSelected);
 }
 
 void ManagedLooper::Start()

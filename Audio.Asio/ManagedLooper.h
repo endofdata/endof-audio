@@ -124,8 +124,8 @@ namespace Audio
 
 				~ManagedLooper();
 
-				bool SelectInput(int input, bool isSelected);
-				bool SelectOutputPair(int left, int right, bool isSelected);
+				bool SelectInput(int inputIndex, bool isSelected);
+				bool SelectOutputPair(int outputPairIndex, bool isSelected);
 
 				void Start();
 				void Stop(System::Nullable<System::TimeSpan> timeout);
