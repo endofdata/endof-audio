@@ -9,6 +9,7 @@ using namespace Steinberg;
 
 AudioProcessor::AudioProcessor(IAudioProcessorPtr& processor, IParameterChangesPtr& parameterChanges, int sampleCount, int sampleRate) :
 	m_processor(processor),
+	m_parameterChanges(parameterChanges),
 	m_isActive(false),
 	m_isBypassed(true),
 	m_canProcess64Bit(false)
@@ -27,6 +28,7 @@ AudioProcessor::~AudioProcessor()
 AudioProcessor& AudioProcessor::operator =(const AudioProcessor& other)
 {
 	m_processor = other.m_processor;
+	m_parameterChanges = other.m_parameterChanges;
 	m_component = other.m_component;
 	m_isActive = other.m_isActive;
 	m_isBypassed = other.m_isBypassed;
