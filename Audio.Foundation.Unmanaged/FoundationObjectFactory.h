@@ -75,10 +75,14 @@ namespace Audio
 
 				static ITakeSequencePtr CreateTakeSequence(ITransportPtr& transport);
 
-				static IInputChannelPtr CreateInputChannel(int sampleType, int hwChannelId, void* pHwBufferA, void* pHwBufferB, int sampleCount);
+				static IInputChannelPtr CreateInputChannel(int sampleType, int hwChannelId, 
+					void* pHwBufferA, void* pHwBufferB, 
+					int sampleCount, float saturation = 0.0);
 
 				static IOutputChannelPairPtr CreateOutputChannelPair(int sampleTpe,
-					int hwChannelId1, void* pBufferA1, void* pBufferB1, int hwChannelId2, void* pBufferA2, void* pBufferB2, int sampleCount, float saturation = 0.0f);
+					int hwChannelId1, void* pBufferA1, void* pBufferB1, 
+					int hwChannelId2, void* pBufferA2, void* pBufferB2, 
+					int sampleCount, float saturation = 0.0f);
 
 				static IProcessingChainPtr CreateProcessingChain(ITransportPtr& transport, ISampleContainerPtr& container);
 

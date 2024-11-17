@@ -129,6 +129,17 @@ namespace Audio
 					return static_cast<float>(value);
 				}
 
+				/// <summary>
+				/// Adds saturation during sample conversion from 32-bit int to internal sample
+				/// </summary>
+				/// <param name="value">32-bit int little endian sample</param>
+				/// <param name="maxValue">Maximum sample value (usually 1.0f)</param>
+				/// <return>internal sample</returns>
+				static inline Sample Int32ToSaturatedSample(int value, Sample maxValue)
+				{
+					return Saturated(static_cast<Sample>(value * Int32ToSampleFactor), maxValue);
+				}
+
 				/*! \brief A helper, which adds saturation during sample conversion from internal sample to 32-bit int
 
 					\param[in] value		internal sample to convert
@@ -138,6 +149,17 @@ namespace Audio
 				static inline int SampleToSaturatedInt32(Sample value, Sample maxValue)
 				{
 					return static_cast<int>(Saturated(value, maxValue) * SampleToInt32Factor);
+				}
+
+				/// <summary>
+				/// Adds saturation during sample conversion from 24-bit int to internal sample
+				/// </summary>
+				/// <param name="value">24-bit int little endian sample</param>
+				/// <param name="maxValue">Maximum sample value (usually 1.0f)</param>
+				/// <return>internal sample</returns>
+				static inline Sample Int24ToSaturatedSample(int value, Sample maxValue)
+				{
+					return Saturated(static_cast<Sample>(value * Int24ToSampleFactor), maxValue);
 				}
 
 				/*! \brief A helper, which adds saturation during sample conversion from internal sample to 24-bit int
@@ -151,6 +173,17 @@ namespace Audio
 					return static_cast<int>(Saturated(value, maxValue) * SampleToInt24Factor);
 				}
 
+				/// <summary>
+				/// Adds saturation during sample conversion from 16-bit int to internal sample
+				/// </summary>
+				/// <param name="value">16-bit int little endian sample</param>
+				/// <param name="maxValue">Maximum sample value (usually 1.0f)</param>
+				/// <return>internal sample</returns>
+				static inline Sample Int16ToSaturatedSample(int value, Sample maxValue)
+				{
+					return Saturated(static_cast<Sample>(value * Int16ToSampleFactor), maxValue);
+				}
+
 				/*! \brief A helper, which adds saturation during sample conversion from internal sample to 16-bit int
 
 					\param[in] value		internal sample to convert
@@ -160,6 +193,17 @@ namespace Audio
 				static inline int SampleToSaturatedInt16(Sample value, Sample maxValue)
 				{
 					return static_cast<int>(Saturated(value, maxValue) * SampleToInt16Factor);
+				}
+
+				/// <summary>
+				/// Adds saturation during sample conversion from 32-bit float to internal sample
+				/// </summary>
+				/// <param name="value">32-bit float little endian sample</param>
+				/// <param name="maxValue">Maximum sample value (usually 1.0f)</param>
+				/// <return>internal sample</returns>
+				static inline Sample Float32ToSaturatedSample(int value, Sample maxValue)
+				{
+					return Saturated(static_cast<Sample>(value), maxValue);
 				}
 
 				/*! \brief A helper, which adds saturation during sample conversion from internal sample to 32-bit floaat

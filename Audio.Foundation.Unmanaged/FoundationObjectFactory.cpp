@@ -13,8 +13,11 @@
 #include "Take.h"
 #include "TakeSequence.h"
 #include "InputInt32Channel.h"
+#include "SatInputInt32Channel.h"
 #include "InputInt24Channel.h"
+#include "SatInputInt24Channel.h"
 #include "InputFloat32Channel.h"
+#include "SatInputFloat32Channel.h"
 #include "OutputInt32ChannelPair.h"
 #include "SatOutputInt32ChannelPair.h"
 #include "OutputInt24ChannelPair.h"
@@ -159,16 +162,26 @@ ITakeSequencePtr FoundationObjectFactory::CreateTakeSequence(ITransportPtr& tran
 	return new TakeSequence(transport);
 }
 
-IInputChannelPtr FoundationObjectFactory::CreateInputChannel(int sampleType, int hwChannelId, void* pHwBufferA, void* pHwBufferB, int sampleCount)
+IInputChannelPtr FoundationObjectFactory::CreateInputChannel(int sampleType, int hwChannelId, 
+	void* pHwBufferA, void* pHwBufferB, int sampleCount, float saturation)
 {
 	switch (sampleType)
 	{
 	case Int32LSB:
-		return new InputInt32Channel(hwChannelId, reinterpret_cast<int*>(pHwBufferA), reinterpret_cast<int*>(pHwBufferB), sampleCount);
+		return saturation > 0.0f ?
+			reinterpret_cast<IInputChannel*>(
+				new SatInputInt32Channel(hwChannelId, reinterpret_cast<int*>(pHwBufferA), reinterpret_cast<int*>(pHwBufferB), sampleCount, saturation)) :
+			new InputInt32Channel(hwChannelId, reinterpret_cast<int*>(pHwBufferA), reinterpret_cast<int*>(pHwBufferB), sampleCount);
 	case Int24LSB:
-		return new InputInt24Channel(hwChannelId, reinterpret_cast<byte*>(pHwBufferA), reinterpret_cast<byte*>(pHwBufferB), sampleCount);
+		return saturation > 0.0f ?
+			reinterpret_cast<IInputChannel*>(
+				new SatInputInt24Channel(hwChannelId, reinterpret_cast<byte*>(pHwBufferA), reinterpret_cast<byte*>(pHwBufferB), sampleCount, saturation)) :
+				new InputInt24Channel(hwChannelId, reinterpret_cast<byte*>(pHwBufferA), reinterpret_cast<byte*>(pHwBufferB), sampleCount);
 	case Float32LSB:
-		return new InputFloat32Channel(hwChannelId, reinterpret_cast<float*>(pHwBufferA), reinterpret_cast<float*>(pHwBufferB), sampleCount);
+		return saturation > 0.0f ?
+			reinterpret_cast<IInputChannel*>(
+				new SatInputFloat32Channel(hwChannelId, reinterpret_cast<float*>(pHwBufferA), reinterpret_cast<float*>(pHwBufferB), sampleCount, saturation)) :
+				new InputFloat32Channel(hwChannelId, reinterpret_cast<float*>(pHwBufferA), reinterpret_cast<float*>(pHwBufferB), sampleCount);
 	default:
 		throw AudioFoundationException("Unsupported sample type.", E_UNEXPECTED);
 	}

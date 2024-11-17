@@ -258,6 +258,15 @@
     <ClInclude Include="ControllerMapping.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SatInputFloat32Channel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SatInputInt24Channel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SatInputInt32Channel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
