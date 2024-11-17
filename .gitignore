@@ -32,3 +32,4 @@ Audio.Asio/TestResults/
 /Release
 /Test/Test.Audio.Osc.Unmanaged/Debug
 /Test/Test.Audio.Osc.Unmanaged/Release
+/.vscode
