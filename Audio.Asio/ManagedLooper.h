@@ -41,6 +41,7 @@ namespace Audio
 			public ref class ManagedLooper sealed : public System::ComponentModel::INotifyPropertyChanged
 			{
 			public:
+				static initonly System::String^ IsRunningProperty = gcnew System::String("IsRunning");
 				static initonly System::String^ IsLoopingProperty = gcnew System::String("IsLooping");
 				static initonly System::String^ IsSessionRecordingProperty = gcnew System::String("IsSessionRecording");
 				static initonly System::String^ IsPausedProperty = gcnew System::String("IsPaused");
@@ -159,6 +160,12 @@ namespace Audio
 				property int LoopCount
 				{
 					int get();
+				}
+
+				property bool IsRunning
+				{
+					bool get();
+					void set(bool value);
 				}
 
 				property bool IsLooping

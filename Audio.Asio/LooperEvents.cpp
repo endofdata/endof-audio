@@ -32,6 +32,18 @@ void* LooperEvents::GetInterface(REFIID iid)
 	return nullptr;
 }
 
+void LooperEvents::Starting(ILooper& looper)
+{
+	m_looper->IsRunning = true;
+	m_looper->OnPropertyChanged(ManagedLooper::IsRunningProperty);
+}
+
+void LooperEvents::Stopping(ILooper& looper)
+{
+	m_looper->IsRunning = true;
+	m_looper->OnPropertyChanged(ManagedLooper::IsRunningProperty);
+}
+
 void LooperEvents::Heartbeat(ILooper& looper, ITransportPtr& transport)
 {
 	m_looper->TransportPosition->Value = transport->TimePosition.Value;

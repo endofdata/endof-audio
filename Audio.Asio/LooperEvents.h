@@ -20,6 +20,10 @@ namespace Audio
 			LooperEvents(Interop::ManagedLooper^ looper);
 			virtual ~LooperEvents();
 
+			void Starting(ILooper& looper);
+
+			void Stopping(ILooper& looper);
+
 			void Heartbeat(ILooper& looper, ITransportPtr& transport);
 
 			void RecordingStatusChanged(ILooper& looper, RecordingStatusType recordingStatus);
