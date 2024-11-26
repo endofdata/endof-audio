@@ -76,7 +76,7 @@ void AudioTrack::Source::set(IAudioSource^ value)
 
 		if (nullptr == value)
 		{
-			TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 101, "Trk {0}: RecordIn = null", m_trackId);
+			//TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 101, "Trk {0}: RecordIn = null", m_trackId);
 		}
 		else
 		{
@@ -84,7 +84,7 @@ void AudioTrack::Source::set(IAudioSource^ value)
 
 			IAudioInput^ hwInput = (IAudioInput^)value;
 			String^ channelId = hwInput == nullptr ? "-" : hwInput->ChannelId.ToString();
-			TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 101, "Trk {0}: RecordIn = channel {1}", m_trackId, channelId);
+			//TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 101, "Trk {0}: RecordIn = channel {1}", m_trackId, channelId);
 		}
 	}
 }
@@ -108,7 +108,7 @@ void AudioTrack::Target::set(IAudioTarget^ value)
 
 		if (nullptr == value)
 		{
-			TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 102, "Trk {0}: MonitorOut = null", m_trackId);
+			//TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 102, "Trk {0}: MonitorOut = null", m_trackId);
 		}
 		else
 		{
@@ -116,7 +116,7 @@ void AudioTrack::Target::set(IAudioTarget^ value)
 
 			IAudioOutput^ hwOutput = (IAudioOutput^)value;
 			String^ channelId = hwOutput == nullptr ? "-" : hwOutput->ChannelId.ToString();
-			TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 102, "Trk {0}: MonitorOut = channel pair {1}", m_trackId, channelId);
+			//TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 102, "Trk {0}: MonitorOut = channel pair {1}", m_trackId, channelId);
 		}
 	}
 }
@@ -208,7 +208,7 @@ void AudioTrack::IsHot::set(bool value)
 		}
 		OnPropertyChanged(IsHotProperty);
 
-		TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 103, "Trk {0}: IsHot = {1}", m_trackId, value);
+		//TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 103, "Trk {0}: IsHot = {1}", m_trackId, value);
 	}
 }
 
@@ -224,7 +224,7 @@ void AudioTrack::BeginRecording()
 		m_isRecording = true;
 		m_source->AddTarget(m_recordingTake);
 
-		TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 104, "Trk {0}: IsRecording = {1}", m_trackId, m_isRecording);
+		//TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 104, "Trk {0}: IsRecording = {1}", m_trackId, m_isRecording);
 
 		OnPropertyChanged(IsRecordingProperty);
 	}
@@ -237,7 +237,7 @@ void AudioTrack::EndRecording()
 		CompleteTake();
 		m_isRecording = false;
 
-		TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 104, "Trk {0}: IsRecording = {1}", m_trackId, m_isRecording);
+		//TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 104, "Trk {0}: IsRecording = {1}", m_trackId, m_isRecording);
 
 		NewTake();
 
@@ -257,7 +257,7 @@ void AudioTrack::IsMuted::set(bool value)
 		m_isMuted = value;
 		OnPropertyChanged(IsMutedProperty);
 
-		TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 105, "Trk {0}: IsMuted = {1}", m_trackId, value);
+		//TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 105, "Trk {0}: IsMuted = {1}", m_trackId, value);
 	}
 }
 
@@ -273,7 +273,7 @@ void AudioTrack::IsSolo::set(bool value)
 		m_isSolo = value;
 		OnPropertyChanged(IsSoloProperty);
 
-		TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 106, "Trk {0}: IsSolo = {1}", m_trackId, value);
+		//TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 106, "Trk {0}: IsSolo = {1}", m_trackId, value);
 	}
 }
 
@@ -323,16 +323,16 @@ bool AudioTrack::AdvancePlaybackTake()
 
 	if (m_isAtEndOfStream)
 	{
-		TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 107, "Trk {0}: End of stream", m_trackId);
+		//TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 107, "Trk {0}: End of stream", m_trackId);
 	}
 	else if(m_playbackTake != nullptr)
 	{
 		((IAudioSource^)m_playbackTake)->AddTarget(m_target);
-		TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 108, "Trk {0}: Take from {1} to {2}", m_trackId, m_playbackTake->Offset, m_playbackTake->End);
+		//TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 108, "Trk {0}: Take from {1} to {2}", m_trackId, m_playbackTake->Offset, m_playbackTake->End);
 	}
 	else
 	{
-		TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 109, "Trk {0}: Waiting for first take", m_trackId);
+		//TapeMachine::TraceSource->TraceEvent(TraceEventType::Information, 109, "Trk {0}: Waiting for first take", m_trackId);
 	}
 	return !m_isAtEndOfStream;
 }
